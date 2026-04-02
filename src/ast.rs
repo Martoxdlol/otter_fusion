@@ -56,6 +56,7 @@ pub struct InterfaceDecl {
     pub generics: Vec<GenericParam>,
     pub fields: Vec<FieldDecl>,
     pub methods: Vec<FunctionDecl>,
+    pub implements: Vec<TypeExpr>,
 }
 
 #[derive(Debug, Clone, PartialEq)]

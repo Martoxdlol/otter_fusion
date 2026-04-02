@@ -121,6 +121,14 @@ struct Person: Named {
 }
 ```
 
+Interfaces can extend other interfaces using the same colon syntax:
+
+```typescript
+interface Printable: Named {
+  function to_string(self): str
+}
+```
+
 ### Struct Instantiation
 
 Structs are instantiated by name with field values.

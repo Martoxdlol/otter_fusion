@@ -1,7 +1,7 @@
 use crate::{
     ast::{
-        Block, Expr, FieldDecl, FunctionDecl, GenericParam, Item, ParamDecl, PrimitiveType,
-        Program, Statement, StructDecl, TypeExpr,
+        Block, Expr, ExtendDecl, FieldDecl, FunctionDecl, GenericParam, InterfaceDecl, Item,
+        ParamDecl, PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl, TypeExpr,
     },
     tokens::{Token, TokenType},
 };
@@ -56,8 +56,13 @@ impl Parser {
 
     // Items
     pub fn parse_type_decl(&mut self) -> Result<Item, ParserError> {
-        // Implement type declaration parsing logic here
-        todo!()
+        self.expect(TokenType::Type)?;
+        let name = self.expect_identifier()?;
+        let generics = self.parse_generic_params()?;
+        self.expect(TokenType::Eq)?;
+        let ty = self.parse_type_expr()?;
+        self.expect(TokenType::Semicolon)?;
+        Ok(Item::TypeAlias(TypeAliasDecl { name, generics, ty }))
     }
 
     pub fn parse_struct_decl(&mut self) -> Result<StructDecl, ParserError> {
@@ -76,8 +81,18 @@ impl Parser {
     }
 
     pub fn parse_interface_decl(&mut self) -> Result<Item, ParserError> {
-        // Implement interface declaration parsing logic here
-        todo!()
+        self.expect(TokenType::Interface)?;
+        let name = self.expect_identifier()?;
+        let generics = self.parse_generic_params()?;
+        let implements = self.parse_implements()?;
+        let (fields, methods) = self.parse_struct_body()?;
+        Ok(Item::Interface(InterfaceDecl {
+            name,
+            generics,
+            implements,
+            fields,
+            methods,
+        }))
     }
 
     pub fn parse_function_decl(&mut self) -> Result<FunctionDecl, ParserError> {
@@ -113,9 +128,21 @@ impl Parser {
         })
     }
 
-    pub fn parse_extend_decl(&self) -> Result<Item, ParserError> {
-        // Implement extend declaration parsing logic here
-        todo!()
+    pub fn parse_extend_decl(&mut self) -> Result<Item, ParserError> {
+        self.expect(TokenType::Extend)?;
+        let generics = self.parse_generic_params()?;
+        let name = self.expect_identifier()?;
+        let type_args = self.parse_type_args()?;
+        let implements = self.parse_implements()?;
+
+        let methods = self.parse_extend_body()?;
+
+        Ok(Item::Extend(ExtendDecl {
+            target: TypeExpr::Named(name, type_args),
+            generic_params: generics,
+            implements,
+            methods,
+        }))
     }
 
     // Types
@@ -285,6 +312,27 @@ impl Parser {
         Ok((fields, methods))
     }
 
+    pub fn parse_extend_body(&mut self) -> Result<Vec<FunctionDecl>, ParserError> {
+        self.expect(TokenType::LeftBrace)?;
+
+        // Implement struct body parsing logic here
+        let mut methods: Vec<FunctionDecl> = Vec::new();
+
+        loop {
+            let tok = self.peek();
+            match &tok.token_type {
+                TokenType::Function => methods.push(self.parse_function_decl()?),
+                TokenType::RightBrace => {
+                    self.advance();
+                    break;
+                }
+                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+            }
+        }
+
+        Ok(methods)
+    }
+
     // Functions
 
     pub fn parse_function_args(&mut self) -> Result<Vec<ParamDecl>, ParserError> {
@@ -309,6 +357,14 @@ impl Parser {
     }
 
     pub fn parse_block(&mut self) -> Result<Block, ParserError> {
+        if self.peek().token_type == TokenType::Semicolon {
+            self.advance();
+            return Ok(Block {
+                statements: vec![],
+                returns: None,
+            });
+        }
+
         self.expect(TokenType::LeftBrace)?;
         // Implement block parsing logic here
         let mut statements = Vec::new();
@@ -741,6 +797,7 @@ mod tests {
                 ty: TypeExpr::Named("str".to_string(), vec![]),
             }],
             methods: vec![],
+            implements: vec![],
         });
 
         assert_eq!(result, expected);
