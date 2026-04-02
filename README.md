@@ -9,6 +9,7 @@ This document defines the core syntax and behavior of the language, including ty
 - Floating Point: `f32`, `f64`
 - Boolean: `bool`
 - String: `str`
+- Character: `char`
 - Empty: `null`
 
 Slightly inspired in rust and typescript.
@@ -61,6 +62,18 @@ var status = if (age >= 18) {
 };
 ```
 
+### Block Expressions
+
+A block `{ ... }` evaluates to its last expression. This works anywhere an expression is expected.
+
+```typescript
+var value = {
+  var x = 10;
+  var y = 20;
+  x + y
+};
+```
+
 ## Functions
 
 Functions use the `function` keyword. The last expression in a function body is automatically returned. Use the `return` keyword for early exits.
@@ -80,9 +93,18 @@ function get_ratio(current: f64, total: f64): f64 {
 }
 ```
 
+### Lambdas
+
+Anonymous functions can be used as values. They follow the same implicit return rules.
+
+```typescript
+var double = function(x: i32): i32 { x * 2 };
+var apply = function<T>(value: T, f: (T) -> T): T { f(value) };
+```
+
 ## 4. Structs and Interfaces
 
-Interfaces define requirements, and structs provide data and implementation.
+Interfaces define requirements, and structs provide data and implementation. Methods receive `self` as the first parameter to access the struct's fields.
 
 ```typescript
 interface Named {
@@ -99,9 +121,20 @@ struct Person: Named {
 }
 ```
 
+### Struct Instantiation
+
+Structs are instantiated by name with field values.
+
+```typescript
+var person = Person {
+  name: "Alice",
+  age: 30,
+};
+```
+
 ## Extensions
 
-The `extend` keyword adds methods or interface implementations to existing structs.
+The `extend` keyword adds methods or interface implementations to existing structs. It works like Rust's `impl`.
 
 ```typescript
 struct Vehicle {
@@ -121,6 +154,37 @@ interface Movable {
 extend Vehicle: Movable {
   function move(self): str {
     "The vehicle moves"
+  }
+}
+```
+
+### Generic Extensions
+
+Extensions can introduce or specialize generic parameters, similar to Rust's `impl<T>`.
+
+```typescript
+struct Wrapper<T> {
+  value: T,
+}
+
+// Generic extension — applies to all Wrapper<T>
+extend<T> Wrapper<T> {
+  function get(self): T {
+    self.value
+  }
+}
+
+// Specialized extension — only applies to Wrapper<i32>
+extend Wrapper<i32> {
+  function double(self): i32 {
+    self.value * 2
+  }
+}
+
+// Generic extension with interface implementation
+extend<T> Wrapper<T>: Named {
+  function name(self): str {
+    "Wrapper"
   }
 }
 ```
@@ -244,10 +308,40 @@ var user_ages: Map<str, i32> = {
 };
 ```
 
-## For loops iterate over lists or maps.
+## Control Flow
+
+### For Loops
+
+For loops iterate over lists or maps.
 
 ```typescript
 for (num in numbers) {
+  print(num);
+}
+```
+
+### While Loops
+
+```typescript
+var i = 0;
+while (i < 10) {
+  print(i);
+  i = i + 1;
+}
+```
+
+### Break and Continue
+
+Use `break` to exit a loop early and `continue` to skip to the next iteration.
+
+```typescript
+for (num in numbers) {
+  if (num == 0) {
+    continue;
+  }
+  if (num > 100) {
+    break;
+  }
   print(num);
 }
 ```
