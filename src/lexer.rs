@@ -70,9 +70,8 @@ impl Lexer {
                     '"' => return Some(self.scan_string()),
                     '/' => {
                         if self.peek() == Some('/') {
-                            while !self.is_at_end() && self.peek() != Some('\n') {
-                                self.advance();
-                            }
+                            self.advance();
+                            return Some(Ok(self.scan_comment()));
                         } else {
                             return Some(Ok(self.token(TokenType::Slash)));
                         }
@@ -180,7 +179,7 @@ impl Lexer {
 
     fn scan_number(&mut self) -> Result<Token, LexerError> {
         let mut number = String::new();
-        let mut has_digits = false;
+        let mut has_point = false;
 
         while let Some(c) = self.peek() {
             match c {
@@ -189,21 +188,23 @@ impl Lexer {
                     number.push(c);
                 }
                 '.' => {
-                    if has_digits {
+                    if !has_point {
+                        has_point = true;
                         self.advance();
                         number.push(c);
                     } else {
-                        break;
+                        return Err(LexerError::InvalidNumber(number, self.line, self.column));
                     }
 
                     self.advance();
                     number.push(c);
                 }
-                _ => break,
+
+                _ => return Err(LexerError::InvalidNumber(number, self.line, self.column)),
             }
         }
 
-        Err(LexerError::InvalidNumber(number, self.line, self.column))
+        return Ok(self.token(TokenType::Int(number)));
     }
 
     fn scan_string(&mut self) -> Result<Token, LexerError> {
@@ -227,6 +228,21 @@ impl Lexer {
         // end of file
 
         Err(LexerError::UnterminatedString(self.line, self.column))
+    }
+
+    fn scan_comment(&mut self) -> Token {
+        let mut comment = String::new();
+
+        while let Some(c) = self.peek() {
+            if c == '\n' {
+                break;
+            } else {
+                comment.push(c);
+                self.advance();
+            }
+        }
+
+        self.token(TokenType::Comment(comment))
     }
 
     fn scan_char(&mut self) -> Result<Token, LexerError> {
@@ -271,10 +287,6 @@ impl Lexer {
 
     fn peek(&self) -> Option<char> {
         self.input.get(self.position).copied()
-    }
-
-    fn is_at_end(&self) -> bool {
-        self.position == self.input.len()
     }
 
     fn err_unexpected(&self, c: char) -> Option<Result<Token, LexerError>> {
@@ -328,10 +340,6 @@ mod tests {
     }
 
     #[test]
-    fn scan_number_invalid_int() {
-        let mut lexer = Lexer::new("123");
-    }
-    #[test]
     fn scan_number_valid_float() {
         let mut lexer = Lexer::new("123.02");
         let token = next_ok(&mut lexer);
@@ -339,7 +347,12 @@ mod tests {
     }
     #[test]
     fn scan_number_invalid_float() {
-        let mut lexer = Lexer::new("123");
+        let mut lexer = Lexer::new("123.02.5");
+        let err = next_err(&mut lexer);
+        match err {
+            LexerError::InvalidNumber(value, _, _) => assert_eq!(value, "123.02.5"),
+            _ => panic!("expected invalid number error"),
+        }
     }
     #[test]
     fn scan_number_invalid_float_multiple_point() {
@@ -522,6 +535,8 @@ mod tests {
     fn slash_starts_comment_when_followed_by_slash() {
         let mut lexer = Lexer::new("// comment\nvar");
 
+        let _ = next_ok(&mut lexer);
+
         let token = next_ok(&mut lexer);
         assert!(matches!(token.token_type, TokenType::Var));
     }
@@ -529,6 +544,7 @@ mod tests {
     #[test]
     fn comment_at_end_of_input_results_in_eof() {
         let mut lexer = Lexer::new("// comment");
+        let _ = next_ok(&mut lexer);
         let token = next_ok(&mut lexer);
 
         assert_eof(token);
@@ -604,9 +620,12 @@ mod tests {
     fn comment_then_identifier_on_later_line_has_correct_line() {
         let mut lexer = Lexer::new("// first line\nbar");
 
-        let tokens: Vec<Token> = lexer.scan_all().unwrap();
+        let comment = next_ok(&mut lexer);
 
-        println!("{tokens:#?}");
+        match comment.token_type {
+            TokenType::Comment(value) => assert_eq!(value, " first line"),
+            _ => panic!("expected comment"),
+        }
 
         let token = next_ok(&mut lexer);
 
