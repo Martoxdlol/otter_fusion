@@ -1,6 +1,7 @@
 use crate::{
     ast::{
-        Expr, FieldDecl, FunctionDecl, GenericParam, Item, Program, Statement, StructDecl, TypeExpr,
+        Expr, FieldDecl, FunctionDecl, GenericParam, Item, PrimitiveType, Program, Statement,
+        StructDecl, TypeExpr,
     },
     tokens::{Token, TokenType},
 };
@@ -47,7 +48,7 @@ impl Parser {
             TokenType::Type => self.parse_type_decl(),
             TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl()?)),
             TokenType::Interface => self.parse_interface_decl(),
-            TokenType::Function => self.parse_function_decl(),
+            TokenType::Function => Ok(Item::Function((self.parse_function_decl()?))),
             TokenType::Extend => self.parse_extend_decl(),
             _ => Err(ParserError::UnexpectedToken(token.clone())),
         }
@@ -79,7 +80,7 @@ impl Parser {
         todo!()
     }
 
-    pub fn parse_function_decl(&self) -> Result<Item, ParserError> {
+    pub fn parse_function_decl(&self) -> Result<FunctionDecl, ParserError> {
         // Implement function declaration parsing logic here
         todo!()
     }
@@ -152,8 +153,81 @@ impl Parser {
     }
 
     pub fn parse_type_expr(&mut self) -> Result<TypeExpr, ParserError> {
-        // Implement type expression parsing logic here
-        todo!()
+        let ty = self.parse_type_atom()?;
+
+        // Union type: type1 | type2 | ...
+        if self.peek().token_type == TokenType::Pipe {
+            let mut variants = vec![ty];
+            while self.expect_optional(TokenType::Pipe) {
+                variants.push(self.parse_type_atom()?);
+            }
+            Ok(TypeExpr::Union(variants))
+        } else {
+            Ok(ty)
+        }
+    }
+
+    fn parse_type_atom(&mut self) -> Result<TypeExpr, ParserError> {
+        let token = self.peek().clone();
+        match &token.token_type {
+            TokenType::Identifier(name) => {
+                if let Some(primitive) = self.parse_optional_primitive(name) {
+                    self.advance();
+                    Ok(TypeExpr::Primitive(primitive))
+                } else {
+                    let name = name.clone();
+                    self.advance();
+                    let args = self.parse_type_args()?;
+                    Ok(TypeExpr::Named(name, args))
+                }
+            }
+            TokenType::Null => {
+                self.advance();
+                Ok(TypeExpr::Primitive(PrimitiveType::Null))
+            }
+            // Function type: (param_types) -> return_type
+            TokenType::LeftParen => {
+                self.advance();
+                let mut param_types = Vec::new();
+                if self.peek().token_type != TokenType::RightParen {
+                    param_types.push(self.parse_type_expr()?);
+                    while self.expect_optional(TokenType::Comma) {
+                        param_types.push(self.parse_type_expr()?);
+                    }
+                }
+                self.expect(TokenType::RightParen)?;
+                self.expect(TokenType::Minus)?;
+                self.expect(TokenType::GT)?;
+                let return_type = self.parse_type_expr()?;
+                Ok(TypeExpr::Function(param_types, Box::new(return_type)))
+            }
+            _ => Err(ParserError::UnexpectedToken(token)),
+        }
+    }
+
+    pub fn parse_type_args(&mut self) -> Result<Vec<TypeExpr>, ParserError> {
+        if !self.expect_optional(TokenType::LT) {
+            return Ok(vec![]);
+        }
+
+        let mut args = Vec::new();
+
+        if self.peek().token_type != TokenType::GT {
+            args.push(self.parse_type_expr()?);
+            while self.expect_optional(TokenType::Comma) {
+                args.push(self.parse_type_expr()?);
+            }
+        }
+
+        self.expect(TokenType::GT)?;
+        Ok(args)
+    }
+
+    pub fn parse_field(&mut self) -> Result<FieldDecl, ParserError> {
+        let name = self.expect_identifier()?;
+        self.expect(TokenType::Colon)?;
+        let ty = self.parse_type_expr()?;
+        Ok(FieldDecl { name, ty })
     }
 
     // Struct
@@ -161,18 +235,23 @@ impl Parser {
         &mut self,
     ) -> Result<(Vec<FieldDecl>, Vec<FunctionDecl>), ParserError> {
         // Implement struct body parsing logic here
-        self.expect(TokenType::And)?;
+        let mut fields: Vec<FieldDecl> = Vec::new();
+        let mut methods: Vec<FunctionDecl> = Vec::new();
 
-        let name = self.expect_identifier()?;
+        loop {
+            let tok = self.peek();
+            match &tok.token_type {
+                TokenType::Identifier(name) => fields.push(self.parse_field()?),
+                TokenType::Function => methods.push(self.parse_function_decl()?),
+                TokenType::RightBrace => {
+                    self.advance();
+                    break;
+                }
+                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+            }
+        }
 
-        let generics = self.parse_generic_params()?;
-
-        let implements = self.parse_implements()?;
-
-        let
-
-        let 
-        Ok((vec![], vec![]))
+        Ok((fields, methods))
     }
 
     //
@@ -236,6 +315,26 @@ impl Parser {
         }
 
         Err(ParserError::UnexpectedToken(token.clone()))
+    }
+
+    pub fn parse_optional_primitive(&self, name: &str) -> Option<PrimitiveType> {
+        return match name {
+            "i8" => Some(PrimitiveType::Int8),
+            "i16" => Some(PrimitiveType::Int16),
+            "i32" => Some(PrimitiveType::Int32),
+            "i64" => Some(PrimitiveType::Int64),
+            "u8" => Some(PrimitiveType::Uint8),
+            "u16" => Some(PrimitiveType::Uint16),
+            "u32" => Some(PrimitiveType::Uint32),
+            "u64" => Some(PrimitiveType::Uint64),
+            "f32" => Some(PrimitiveType::Float32),
+            "f64" => Some(PrimitiveType::Float64),
+            "str" => Some(PrimitiveType::String),
+            "char" => Some(PrimitiveType::Char),
+            "bool" => Some(PrimitiveType::Bool),
+            "null" => Some(PrimitiveType::Null),
+            _ => return None,
+        };
     }
 }
 
