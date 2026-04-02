@@ -340,15 +340,72 @@ impl Parser {
 
     //
 
-    pub fn parse_statement(&self) -> Result<Statement, ParserError> {
+    pub fn parse_statement(&mut self) -> Result<Statement, ParserError> {
         // Implement statement parsing logic here
         // var x = 1
-        todo!()
+        match &self.peek().token_type {
+            TokenType::Var => {
+                self.expect(TokenType::Var)?;
+                let name = self.expect_identifier()?;
+                let ty: Option<TypeExpr> = if self.expect_optional(TokenType::Colon) {
+                    Some(self.parse_type_expr()?)
+                } else {
+                    None
+                };
+
+                let value: Option<Expr> = if self.expect_optional(TokenType::Eq) {
+                    Some(self.parse_expr()?)
+                } else {
+                    None
+                };
+
+                Ok(Statement::VarDecl(name, ty, value))
+            }
+            TokenType::Return => {
+                self.expect(TokenType::Return)?;
+
+                if self.peek().token_type == TokenType::Semicolon
+                    || self.peek().token_type == TokenType::RightBrace
+                {
+                    return Ok(Statement::Return(None));
+                }
+
+                let expr = self.parse_expr()?;
+                Ok(Statement::Return(Some(expr)))
+            }
+            TokenType::While => {
+                self.expect(TokenType::While)?;
+                let condition = self.parse_expr()?;
+                let body = self.parse_block()?;
+                Ok(Statement::While(condition, body))
+            }
+
+            TokenType::For => {
+                self.expect(TokenType::For)?;
+                let name = self.expect_identifier()?;
+                self.expect(TokenType::In)?;
+                let iterable = self.parse_expr()?;
+                let body = self.parse_block()?;
+                Ok(Statement::For(name, iterable, body))
+            }
+            TokenType::Break => Ok(Statement::Break),
+            TokenType::Continue => Ok(Statement::Continue),
+            _ => Ok(Statement::Expr(self.parse_expr()?)),
+        }
     }
 
     pub fn parse_expr(&self) -> Result<Expr, ParserError> {
         // Implement expression parsing logic here
-        todo!()
+        match self.peek().token_type {
+            TokenType::LeftBrace => todo!(),     // Block expression or map
+            TokenType::LeftBracket => todo!(),   // Array literal
+            TokenType::Identifier(_) => todo!(), // Variable or function call
+            TokenType::Int(_) => todo!(),        // Int literal
+            TokenType::Float(_) => todo!(),      // Float literal
+            TokenType::StringLit(_) => todo!(),  // String literal
+
+            _ => return Err(ParserError::UnexpectedToken(self.peek().clone())),
+        }
     }
 
     // Util

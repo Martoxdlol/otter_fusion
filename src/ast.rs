@@ -87,18 +87,12 @@ pub struct ParamDecl {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum ForPattern {
-    Identifier(String),
-    KeyValue(String, String),
-}
-
-#[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
     VarDecl(String, Option<TypeExpr>, Option<Expr>), // var x: int = 5; / var x = 5;
     Return(Option<Expr>),                            // return 5;
     Expr(Expr),                                      // x + 5;
     While(Expr, Block),                              // while x < 10 { ... }
-    For(ForPattern, Expr, Block),                    // for (item in items) { ... }
+    For(String, Expr, Block),                        // for (item in items) { ... }
     Break,                                           // break
     Continue,                                        // continue
 }

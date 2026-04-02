@@ -59,6 +59,7 @@ pub enum TokenType {
     Return,    // return
     Interface, // interface
     Is,        // is
+    In,        // in
     Type,      // type
     As,        // as
     SelfRef,   // self
@@ -240,7 +241,7 @@ impl TokenType {
             // Literals
             TokenType::Identifier(name) => name.len(),
             TokenType::StringLit(value) => value.len() + 2, // quotes
-            TokenType::CharLit(_) => 3,                      // 'x'
+            TokenType::CharLit(_) => 3,                     // 'x'
             TokenType::Float(value) => value.len(),
             TokenType::Int(value) => value.len(),
 
@@ -260,6 +261,7 @@ impl TokenType {
             TokenType::Return => 6,
             TokenType::Interface => 9,
             TokenType::Is => 2,
+            TokenType::In => 2,
             TokenType::Type => 4,
             TokenType::As => 2,
             TokenType::SelfRef => 4,
@@ -323,65 +325,165 @@ impl TokenListBuilder {
     }
 
     // Delimiters
-    pub fn left_paren(self) -> Self { self.push(TokenType::LeftParen) }
-    pub fn right_paren(self) -> Self { self.push(TokenType::RightParen) }
-    pub fn left_brace(self) -> Self { self.push(TokenType::LeftBrace) }
-    pub fn right_brace(self) -> Self { self.push(TokenType::RightBrace) }
-    pub fn left_bracket(self) -> Self { self.push(TokenType::LeftBracket) }
-    pub fn right_bracket(self) -> Self { self.push(TokenType::RightBracket) }
+    pub fn left_paren(self) -> Self {
+        self.push(TokenType::LeftParen)
+    }
+    pub fn right_paren(self) -> Self {
+        self.push(TokenType::RightParen)
+    }
+    pub fn left_brace(self) -> Self {
+        self.push(TokenType::LeftBrace)
+    }
+    pub fn right_brace(self) -> Self {
+        self.push(TokenType::RightBrace)
+    }
+    pub fn left_bracket(self) -> Self {
+        self.push(TokenType::LeftBracket)
+    }
+    pub fn right_bracket(self) -> Self {
+        self.push(TokenType::RightBracket)
+    }
 
     // Operators
-    pub fn lt(self) -> Self { self.push(TokenType::LT) }
-    pub fn gt(self) -> Self { self.push(TokenType::GT) }
-    pub fn eq(self) -> Self { self.push(TokenType::Eq) }
-    pub fn eq_eq(self) -> Self { self.push(TokenType::EqEq) }
-    pub fn bang(self) -> Self { self.push(TokenType::Bang) }
-    pub fn bang_eq(self) -> Self { self.push(TokenType::BangEq) }
-    pub fn plus(self) -> Self { self.push(TokenType::Plus) }
-    pub fn minus(self) -> Self { self.push(TokenType::Minus) }
-    pub fn star(self) -> Self { self.push(TokenType::Star) }
-    pub fn slash(self) -> Self { self.push(TokenType::Slash) }
-    pub fn percent(self) -> Self { self.push(TokenType::Percent) }
-    pub fn and(self) -> Self { self.push(TokenType::And) }
-    pub fn or(self) -> Self { self.push(TokenType::Or) }
-    pub fn pipe(self) -> Self { self.push(TokenType::Pipe) }
-    pub fn colon(self) -> Self { self.push(TokenType::Colon) }
-    pub fn semicolon(self) -> Self { self.push(TokenType::Semicolon) }
-    pub fn dot(self) -> Self { self.push(TokenType::Dot) }
-    pub fn comma(self) -> Self { self.push(TokenType::Comma) }
+    pub fn lt(self) -> Self {
+        self.push(TokenType::LT)
+    }
+    pub fn gt(self) -> Self {
+        self.push(TokenType::GT)
+    }
+    pub fn eq(self) -> Self {
+        self.push(TokenType::Eq)
+    }
+    pub fn eq_eq(self) -> Self {
+        self.push(TokenType::EqEq)
+    }
+    pub fn bang(self) -> Self {
+        self.push(TokenType::Bang)
+    }
+    pub fn bang_eq(self) -> Self {
+        self.push(TokenType::BangEq)
+    }
+    pub fn plus(self) -> Self {
+        self.push(TokenType::Plus)
+    }
+    pub fn minus(self) -> Self {
+        self.push(TokenType::Minus)
+    }
+    pub fn star(self) -> Self {
+        self.push(TokenType::Star)
+    }
+    pub fn slash(self) -> Self {
+        self.push(TokenType::Slash)
+    }
+    pub fn percent(self) -> Self {
+        self.push(TokenType::Percent)
+    }
+    pub fn and(self) -> Self {
+        self.push(TokenType::And)
+    }
+    pub fn or(self) -> Self {
+        self.push(TokenType::Or)
+    }
+    pub fn pipe(self) -> Self {
+        self.push(TokenType::Pipe)
+    }
+    pub fn colon(self) -> Self {
+        self.push(TokenType::Colon)
+    }
+    pub fn semicolon(self) -> Self {
+        self.push(TokenType::Semicolon)
+    }
+    pub fn dot(self) -> Self {
+        self.push(TokenType::Dot)
+    }
+    pub fn comma(self) -> Self {
+        self.push(TokenType::Comma)
+    }
 
     // Literals
-    pub fn identifier(self, name: &str) -> Self { self.push(TokenType::Identifier(name.to_string())) }
-    pub fn string_lit(self, value: &str) -> Self { self.push(TokenType::StringLit(value.to_string())) }
-    pub fn char_lit(self, value: char) -> Self { self.push(TokenType::CharLit(value)) }
-    pub fn float(self, value: &str) -> Self { self.push(TokenType::Float(value.to_string())) }
-    pub fn int(self, value: &str) -> Self { self.push(TokenType::Int(value.to_string())) }
+    pub fn identifier(self, name: &str) -> Self {
+        self.push(TokenType::Identifier(name.to_string()))
+    }
+    pub fn string_lit(self, value: &str) -> Self {
+        self.push(TokenType::StringLit(value.to_string()))
+    }
+    pub fn char_lit(self, value: char) -> Self {
+        self.push(TokenType::CharLit(value))
+    }
+    pub fn float(self, value: &str) -> Self {
+        self.push(TokenType::Float(value.to_string()))
+    }
+    pub fn int(self, value: &str) -> Self {
+        self.push(TokenType::Int(value.to_string()))
+    }
 
     // Other
-    pub fn comment(self, value: &str) -> Self { self.push(TokenType::Comment(value.to_string())) }
+    pub fn comment(self, value: &str) -> Self {
+        self.push(TokenType::Comment(value.to_string()))
+    }
 
     // Keywords
-    pub fn kw_struct(self) -> Self { self.push(TokenType::Struct) }
-    pub fn kw_function(self) -> Self { self.push(TokenType::Function) }
-    pub fn kw_for(self) -> Self { self.push(TokenType::For) }
-    pub fn kw_while(self) -> Self { self.push(TokenType::While) }
-    pub fn kw_null(self) -> Self { self.push(TokenType::Null) }
-    pub fn kw_true(self) -> Self { self.push(TokenType::True) }
-    pub fn kw_false(self) -> Self { self.push(TokenType::False) }
-    pub fn kw_var(self) -> Self { self.push(TokenType::Var) }
-    pub fn kw_extend(self) -> Self { self.push(TokenType::Extend) }
-    pub fn kw_return(self) -> Self { self.push(TokenType::Return) }
-    pub fn kw_interface(self) -> Self { self.push(TokenType::Interface) }
-    pub fn kw_is(self) -> Self { self.push(TokenType::Is) }
-    pub fn kw_type(self) -> Self { self.push(TokenType::Type) }
-    pub fn kw_as(self) -> Self { self.push(TokenType::As) }
-    pub fn kw_self(self) -> Self { self.push(TokenType::SelfRef) }
-    pub fn kw_match(self) -> Self { self.push(TokenType::Match) }
-    pub fn kw_class(self) -> Self { self.push(TokenType::Class) }
-    pub fn kw_continue(self) -> Self { self.push(TokenType::Continue) }
-    pub fn kw_break(self) -> Self { self.push(TokenType::Break) }
+    pub fn kw_struct(self) -> Self {
+        self.push(TokenType::Struct)
+    }
+    pub fn kw_function(self) -> Self {
+        self.push(TokenType::Function)
+    }
+    pub fn kw_for(self) -> Self {
+        self.push(TokenType::For)
+    }
+    pub fn kw_while(self) -> Self {
+        self.push(TokenType::While)
+    }
+    pub fn kw_null(self) -> Self {
+        self.push(TokenType::Null)
+    }
+    pub fn kw_true(self) -> Self {
+        self.push(TokenType::True)
+    }
+    pub fn kw_false(self) -> Self {
+        self.push(TokenType::False)
+    }
+    pub fn kw_var(self) -> Self {
+        self.push(TokenType::Var)
+    }
+    pub fn kw_extend(self) -> Self {
+        self.push(TokenType::Extend)
+    }
+    pub fn kw_return(self) -> Self {
+        self.push(TokenType::Return)
+    }
+    pub fn kw_interface(self) -> Self {
+        self.push(TokenType::Interface)
+    }
+    pub fn kw_is(self) -> Self {
+        self.push(TokenType::Is)
+    }
+    pub fn kw_type(self) -> Self {
+        self.push(TokenType::Type)
+    }
+    pub fn kw_as(self) -> Self {
+        self.push(TokenType::As)
+    }
+    pub fn kw_self(self) -> Self {
+        self.push(TokenType::SelfRef)
+    }
+    pub fn kw_match(self) -> Self {
+        self.push(TokenType::Match)
+    }
+    pub fn kw_class(self) -> Self {
+        self.push(TokenType::Class)
+    }
+    pub fn kw_continue(self) -> Self {
+        self.push(TokenType::Continue)
+    }
+    pub fn kw_break(self) -> Self {
+        self.push(TokenType::Break)
+    }
 
-    pub fn eof(self) -> Self { self.push(TokenType::EOF) }
+    pub fn eof(self) -> Self {
+        self.push(TokenType::EOF)
+    }
 
     pub fn build(self) -> Vec<Token> {
         self.tokens
