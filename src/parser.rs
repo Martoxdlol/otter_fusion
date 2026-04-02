@@ -314,23 +314,35 @@ impl Parser {
         let mut statements = Vec::new();
         let mut final_expresion: Option<Expr> = None;
         loop {
-            match self.peek().token_type {
-                TokenType::RightBrace => {
-                    self.advance();
-                    return Ok(Block {
-                        statements,
-                        returns: None,
-                    });
-                }
-                _ => {}
+            let tok = self.peek();
+
+            if tok.token_type == TokenType::RightBrace {
+                self.advance();
+                break;
+            }
+
+            statements.push(self.parse_statement()?);
+
+            if self.peek().token_type != TokenType::RightBrace {
+                final_expresion = Some(self.parse_expr()?);
+                self.expect(TokenType::RightBrace)?;
+                break;
+            } else {
+                self.expect(TokenType::Semicolon)?;
             }
         }
+
+        Ok(Block {
+            statements,
+            returns: final_expresion,
+        })
     }
 
     //
 
     pub fn parse_statement(&self) -> Result<Statement, ParserError> {
         // Implement statement parsing logic here
+        // var x = 1
         todo!()
     }
 
