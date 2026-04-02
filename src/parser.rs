@@ -1,7 +1,7 @@
 use crate::{
     ast::{
-        Expr, FieldDecl, FunctionDecl, GenericParam, Item, PrimitiveType, Program, Statement,
-        StructDecl, TypeExpr,
+        Block, Expr, FieldDecl, FunctionDecl, GenericParam, Item, ParamDecl, PrimitiveType,
+        Program, Statement, StructDecl, TypeExpr,
     },
     tokens::{Token, TokenType},
 };
@@ -48,7 +48,7 @@ impl Parser {
             TokenType::Type => self.parse_type_decl(),
             TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl()?)),
             TokenType::Interface => self.parse_interface_decl(),
-            TokenType::Function => Ok(Item::Function((self.parse_function_decl()?))),
+            TokenType::Function => Ok(Item::Function(self.parse_function_decl()?)),
             TokenType::Extend => self.parse_extend_decl(),
             _ => Err(ParserError::UnexpectedToken(token.clone())),
         }
@@ -62,8 +62,8 @@ impl Parser {
 
     pub fn parse_struct_decl(&mut self) -> Result<StructDecl, ParserError> {
         self.expect(TokenType::Struct)?;
-        let generics = self.parse_generic_params()?;
         let name = self.expect_identifier()?;
+        let generics = self.parse_generic_params()?;
         let implements = self.parse_implements()?;
         let (fields, methods) = self.parse_struct_body()?;
         Ok(StructDecl {
@@ -80,9 +80,37 @@ impl Parser {
         todo!()
     }
 
-    pub fn parse_function_decl(&self) -> Result<FunctionDecl, ParserError> {
-        // Implement function declaration parsing logic here
-        todo!()
+    pub fn parse_function_decl(&mut self) -> Result<FunctionDecl, ParserError> {
+        self.expect(TokenType::Function)?;
+        let name = self.expect_identifier()?;
+        let generics = self.parse_generic_params()?;
+        let mut params = self.parse_function_args()?;
+        let mut return_type = None;
+        if self.expect_optional(TokenType::Colon) {
+            return_type = Some(self.parse_type_expr()?);
+        }
+
+        let has_self_param = params.first().map_or(false, |p| p.name == "self");
+
+        if has_self_param {
+            params.remove(0);
+        }
+
+        let body = if self.peek().token_type == TokenType::Semicolon {
+            self.advance();
+            None
+        } else {
+            Some(self.parse_block()?)
+        };
+
+        Ok(FunctionDecl {
+            name,
+            has_self_param,
+            generics,
+            return_type,
+            params,
+            body,
+        })
     }
 
     pub fn parse_extend_decl(&self) -> Result<Item, ParserError> {
@@ -144,6 +172,7 @@ impl Parser {
         loop {
             let type_expr = self.parse_type_expr()?;
             implements.push(type_expr);
+            self.advance();
 
             if !self.expect_optional(TokenType::Plus) {
                 break;
@@ -234,6 +263,8 @@ impl Parser {
     pub fn parse_struct_body(
         &mut self,
     ) -> Result<(Vec<FieldDecl>, Vec<FunctionDecl>), ParserError> {
+        self.expect(TokenType::LeftBrace)?;
+
         // Implement struct body parsing logic here
         let mut fields: Vec<FieldDecl> = Vec::new();
         let mut methods: Vec<FunctionDecl> = Vec::new();
@@ -241,7 +272,7 @@ impl Parser {
         loop {
             let tok = self.peek();
             match &tok.token_type {
-                TokenType::Identifier(name) => fields.push(self.parse_field()?),
+                TokenType::Identifier(_) => fields.push(self.parse_field()?),
                 TokenType::Function => methods.push(self.parse_function_decl()?),
                 TokenType::RightBrace => {
                     self.advance();
@@ -252,6 +283,48 @@ impl Parser {
         }
 
         Ok((fields, methods))
+    }
+
+    // Functions
+
+    pub fn parse_function_args(&mut self) -> Result<Vec<ParamDecl>, ParserError> {
+        self.expect(TokenType::LeftParen)?;
+        let mut params = Vec::new();
+
+        if self.peek().token_type != TokenType::RightParen {
+            params.push(self.parse_param_decl()?);
+            while self.expect_optional(TokenType::Comma) {
+                params.push(self.parse_param_decl()?);
+            }
+        }
+
+        Ok(params)
+    }
+
+    pub fn parse_param_decl(&mut self) -> Result<ParamDecl, ParserError> {
+        let name = self.expect_identifier()?;
+        self.expect(TokenType::Colon)?;
+        let ty = self.parse_type_expr()?;
+        Ok(ParamDecl { name, ty })
+    }
+
+    pub fn parse_block(&mut self) -> Result<Block, ParserError> {
+        self.expect(TokenType::LeftBrace)?;
+        // Implement block parsing logic here
+        let mut statements = Vec::new();
+        let mut final_expresion: Option<Expr> = None;
+        loop {
+            match self.peek().token_type {
+                TokenType::RightBrace => {
+                    self.advance();
+                    return Ok(Block {
+                        statements,
+                        returns: None,
+                    });
+                }
+                _ => {}
+            }
+        }
     }
 
     //
@@ -468,7 +541,7 @@ mod tests {
             name: String::from("add"),
             has_self_param: false,
             generics: vec![],
-            return_type: TypeExpr::Named(String::from("i64"), vec![]),
+            return_type: Some(TypeExpr::Named(String::from("i64"), vec![])),
             params: vec![
                 ParamDecl {
                     name: String::from("a"),
@@ -516,12 +589,12 @@ mod tests {
 
     #[test]
     fn test_parse_implements_clause() {
-        // Simulamos: : Movable, Drawable
+        // Simulamos: : Movable + Drawable
         let tokens = TokenListBuilder::new()
             .colon()
             .space()
             .identifier("Movable")
-            .comma()
+            .plus()
             .space()
             .identifier("Drawable")
             .eof()

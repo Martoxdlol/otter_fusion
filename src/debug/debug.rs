@@ -12,3 +12,7 @@ pub struct LexerDebugData {
     pub column: usize,
     pub line: usize,
 }
+
+pub struct ParserDebugData {
+    pub consumed_tokens: Vec<Token>,
+}

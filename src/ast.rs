@@ -75,7 +75,7 @@ pub struct FunctionDecl {
     pub name: String,
     pub has_self_param: bool,
     pub generics: Vec<GenericParam>,
-    pub return_type: TypeExpr,
+    pub return_type: Option<TypeExpr>,
     pub params: Vec<ParamDecl>,
     pub body: Option<Block>,
 }
