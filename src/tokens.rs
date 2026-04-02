@@ -43,6 +43,9 @@ pub enum TokenType {
     Float(String),      // 123.0, 3.14
     Int(String),        // 123
 
+    // Other
+    Comment(String), // // comment
+
     // Keywords
     Struct,    // struct
     Function,  // function
@@ -55,6 +58,12 @@ pub enum TokenType {
     Extend,    // extend
     Return,    // return
     Interface, // interface
+    Is,        // is
+    Type,      // type
+    As,        // as
+    SelfRef,   // self
+    Match,     // match
+    Class,     // class
 
     EOF,
 }

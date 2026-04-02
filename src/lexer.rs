@@ -21,7 +21,6 @@ pub enum LexerError {
     UnexpectedCharacter(char, usize, usize),
     UnterminatedString(usize, usize),
     InvalidNumber(String, usize, usize),
-    InvalidOperator(String, usize, usize),
 }
 
 impl Iterator for Lexer {
@@ -173,6 +172,13 @@ impl Lexer {
             "extend" => self.token(TokenType::Extend),
             "return" => self.token(TokenType::Return),
             "interface" => self.token(TokenType::Interface),
+            "is" => self.token(TokenType::Is),
+            "type" => self.token(TokenType::Type),
+            "as" => self.token(TokenType::As),
+            "self" => self.token(TokenType::SelfRef),
+            "match" => self.token(TokenType::Match),
+            "class" => self.token(TokenType::Class),
+
             _ => self.token(TokenType::Identifier(literal)),
         }
     }
