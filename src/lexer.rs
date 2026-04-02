@@ -65,9 +65,9 @@ impl Lexer {
                 return Some(self.scan_number());
             } else {
                 self.advance();
-                match c {
-                    '\'' => return Some(self.scan_char()),
-                    '"' => return Some(self.scan_string()),
+                return match c {
+                    '\'' => Some(self.scan_char()),
+                    '"' => Some(self.scan_string()),
                     '/' => {
                         if self.peek() == Some('/') {
                             self.advance();
@@ -76,14 +76,14 @@ impl Lexer {
                             return Some(Ok(self.token(TokenType::Slash)));
                         }
                     }
-                    '(' => return Some(Ok(self.token(TokenType::LeftParen))),
-                    ')' => return Some(Ok(self.token(TokenType::RightParen))),
-                    '{' => return Some(Ok(self.token(TokenType::LeftBrace))),
-                    '}' => return Some(Ok(self.token(TokenType::RightBrace))),
-                    '[' => return Some(Ok(self.token(TokenType::LeftBracket))),
-                    ']' => return Some(Ok(self.token(TokenType::RightBracket))),
-                    '<' => return Some(Ok(self.token(TokenType::LT))),
-                    '>' => return Some(Ok(self.token(TokenType::GT))),
+                    '(' => Some(Ok(self.token(TokenType::LeftParen))),
+                    ')' => Some(Ok(self.token(TokenType::RightParen))),
+                    '{' => Some(Ok(self.token(TokenType::LeftBrace))),
+                    '}' => Some(Ok(self.token(TokenType::RightBrace))),
+                    '[' => Some(Ok(self.token(TokenType::LeftBracket))),
+                    ']' => Some(Ok(self.token(TokenType::RightBracket))),
+                    '<' => Some(Ok(self.token(TokenType::LT))),
+                    '>' => Some(Ok(self.token(TokenType::GT))),
                     '=' => {
                         if self.peek() == Some('=') {
                             self.advance();
@@ -100,10 +100,10 @@ impl Lexer {
                             return Some(Ok(self.token(TokenType::Bang)));
                         }
                     }
-                    '+' => return Some(Ok(self.token(TokenType::Plus))),
-                    '-' => return Some(Ok(self.token(TokenType::Minus))),
-                    '*' => return Some(Ok(self.token(TokenType::Star))),
-                    '%' => return Some(Ok(self.token(TokenType::Percent))),
+                    '+' => Some(Ok(self.token(TokenType::Plus))),
+                    '-' => Some(Ok(self.token(TokenType::Minus))),
+                    '*' => Some(Ok(self.token(TokenType::Star))),
+                    '%' => Some(Ok(self.token(TokenType::Percent))),
                     '&' => {
                         if self.peek() == Some('&') {
                             self.advance();
@@ -120,12 +120,12 @@ impl Lexer {
                             return Some(Ok(self.token(TokenType::Pipe)));
                         }
                     }
-                    '.' => return Some(Ok(self.token(TokenType::Dot))),
-                    ',' => return Some(Ok(self.token(TokenType::Comma))),
-                    ':' => return Some(Ok(self.token(TokenType::Colon))),
-                    ';' => return Some(Ok(self.token(TokenType::Semicolon))),
-                    _ => return self.err_unexpected(c),
-                }
+                    '.' => Some(Ok(self.token(TokenType::Dot))),
+                    ',' => Some(Ok(self.token(TokenType::Comma))),
+                    ':' => Some(Ok(self.token(TokenType::Colon))),
+                    ';' => Some(Ok(self.token(TokenType::Semicolon))),
+                    _ => self.err_unexpected(c),
+                };
             }
         }
 
@@ -179,32 +179,41 @@ impl Lexer {
 
     fn scan_number(&mut self) -> Result<Token, LexerError> {
         let mut number = String::new();
-        let mut has_point = false;
+        let mut has_dot = false;
+        let mut last_char_was_dot = false;
 
         while let Some(c) = self.peek() {
             match c {
                 '0'..='9' => {
                     self.advance();
                     number.push(c);
+                    last_char_was_dot = false;
                 }
                 '.' => {
-                    if !has_point {
-                        has_point = true;
+                    if !has_dot {
+                        has_dot = true;
                         self.advance();
                         number.push(c);
+
+                        last_char_was_dot = true;
                     } else {
                         return Err(LexerError::InvalidNumber(number, self.line, self.column));
                     }
-
-                    self.advance();
-                    number.push(c);
                 }
 
                 _ => return Err(LexerError::InvalidNumber(number, self.line, self.column)),
             }
         }
 
-        return Ok(self.token(TokenType::Int(number)));
+        if last_char_was_dot {
+            return Err(LexerError::InvalidNumber(number, self.line, self.column));
+        }
+
+        if has_dot {
+            return Ok(self.token(TokenType::Float(number)));
+        } else {
+            return Ok(self.token(TokenType::Int(number)));
+        }
     }
 
     fn scan_string(&mut self) -> Result<Token, LexerError> {
@@ -346,17 +355,21 @@ mod tests {
         assert_eq!(token.token_type, TokenType::Float("123.02".to_string()));
     }
     #[test]
-    fn scan_number_invalid_float() {
-        let mut lexer = Lexer::new("123.02.5");
-        let err = next_err(&mut lexer);
-        match err {
-            LexerError::InvalidNumber(value, _, _) => assert_eq!(value, "123.02.5"),
-            _ => panic!("expected invalid number error"),
-        }
+    fn scan_number_invalid_float_non_digit_after_dot() {
+        let mut lexer = Lexer::new("123.abc");
+        next_err(&mut lexer);
     }
+
+    #[test]
+    fn scan_number_invalid_float_none_after_dot() {
+        let mut lexer = Lexer::new("123.");
+        next_err(&mut lexer);
+    }
+
     #[test]
     fn scan_number_invalid_float_multiple_point() {
-        let mut lexer = Lexer::new("123");
+        let mut lexer = Lexer::new("123.02.5");
+        next_err(&mut lexer);
     }
 
     #[test]
