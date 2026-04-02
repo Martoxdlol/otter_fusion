@@ -24,10 +24,11 @@ pub struct GenericParam {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum TypeAliasExpr {
+pub enum TypeExpr {
     Primitive(PrimitiveType),
-    Union(Vec<TypeAliasExpr>),
-    Named(String, Vec<TypeAliasExpr>),
+    Union(Vec<TypeExpr>),
+    Named(String, Vec<TypeExpr>),
+    Function(Vec<TypeExpr>, Box<TypeExpr>), // (param_types) -> return_type
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -60,7 +61,7 @@ pub struct InterfaceDecl {
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldDecl {
     pub name: String,
-    pub ty: TypeAliasExpr,
+    pub ty: TypeExpr,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -68,7 +69,7 @@ pub struct FunctionDecl {
     pub name: String,
     pub has_self_param: bool,
     pub generics: Vec<GenericParam>,
-    pub return_type: TypeAliasExpr,
+    pub return_type: TypeExpr,
     pub params: Vec<ParamDecl>,
     pub body: Option<Vec<Statement>>,
 }
@@ -76,16 +77,16 @@ pub struct FunctionDecl {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ParamDecl {
     pub name: String,
-    pub ty: TypeAliasExpr,
+    pub ty: TypeExpr,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
-    VarDecl(String, TypeAliasExpr, Option<Expr>), // var x: int = 5;
-    Return(Option<Expr>),                         // return 5;
-    Expr(Expr),                                   // x + 5;
-    For(String, Expr, Vec<Statement>),            // for i in 0..10 { ... }
-    While(Expr, Vec<Statement>),                  // while x < 10 { ... }
+    VarDecl(String, TypeExpr, Option<Expr>), // var x: int = 5;
+    Return(Option<Expr>),                    // return 5;
+    Expr(Expr),                              // x + 5;
+    For(String, Expr, Vec<Statement>),       // for i in 0..10 { ... }
+    While(Expr, Vec<Statement>),             // while x < 10 { ... }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -93,15 +94,23 @@ pub enum Expr {
     Literal(Literal),                               // 5, "hello", true
     Variable(String),                               // x
     If(Box<Expr>, Box<Expr>, Option<Box<Expr>>),    // if cond { then } else { else }
-    Call(Box<Expr>, Vec<TypeAliasExpr>, Vec<Expr>), // func(args)
+    Call(Box<Expr>, Vec<TypeExpr>, Vec<Expr>),      // func(args)
     LiteralMap(Vec<(String, Expr)>),                // { x: 1, y: 2 }
     LiteralList(Vec<Expr>),                         // [1, 2, 3]
     StructInit(String, Vec<(String, Expr)>),        // Point { x: 1, y: 2 }
-    As(Box<Expr>, TypeAliasExpr),                   // x as int32
-    Is(Box<Expr>, TypeAliasExpr),                   // x is int32
+    As(Box<Expr>, TypeExpr),                        // x as int32
+    Is(Box<Expr>, TypeExpr),                        // x is int32
     Member(Box<Expr>, String),                      // point.x
     BinaryOp(Box<Expr>, BinaryOperator, Box<Expr>), // x + y
     UnaryOp(UnaryOperator, Box<Expr>),              // -x
+    FunctionLiteral(Vec<GenericParam>, Vec<ParamDecl>, TypeExpr, Vec<Statement>), // (x: int): int { ... }
+    FunctionDecl(
+        String,
+        Vec<GenericParam>,
+        Vec<ParamDecl>,
+        TypeExpr,
+        Vec<Statement>,
+    ), // function foo(x: int): int { ... }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -148,6 +157,6 @@ pub struct StructDecl {
 pub struct ExtendDecl {
     pub struct_name: String,
     pub generic_params: Vec<GenericParam>,
-    pub generics: Vec<TypeAliasExpr>,
+    pub generics: Vec<TypeExpr>,
     pub methods: Vec<FunctionDecl>,
 }
