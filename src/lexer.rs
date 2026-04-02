@@ -28,7 +28,7 @@ impl Iterator for Lexer {
     type Item = Result<Token, LexerError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match Lexer::next(self) {
+        match Lexer::next_token(self) {
             Some(Ok(token)) => Some(Ok(token)),
             Some(Err(err)) => Some(Err(err)),
             None => None,
@@ -46,7 +46,7 @@ impl Lexer {
         }
     }
 
-    pub fn next(&mut self) -> Option<Result<Token, LexerError>> {
+    pub fn next_token(&mut self) -> Option<Result<Token, LexerError>> {
         let mut c = self.peek();
 
         while let Some(chr) = c {
@@ -135,7 +135,7 @@ impl Lexer {
     pub fn scan_all(&mut self) -> Result<Vec<Token>, LexerError> {
         let mut tokens = Vec::new();
 
-        while let Some(result) = self.next() {
+        while let Some(result) = self.next_token() {
             match result {
                 Ok(token) => {
                     if matches!(token.token_type, TokenType::EOF) {
@@ -210,9 +210,9 @@ impl Lexer {
         }
 
         if has_dot {
-            return Ok(self.token(TokenType::Float(number)));
+            Ok(self.token(TokenType::Float(number)))
         } else {
-            return Ok(self.token(TokenType::Int(number)));
+            Ok(self.token(TokenType::Int(number)))
         }
     }
 
@@ -321,7 +321,7 @@ mod tests {
     use super::*;
 
     fn next_ok(lexer: &mut Lexer) -> Token {
-        match lexer.next() {
+        match lexer.next_token() {
             Some(Ok(token)) => token,
             Some(Err(_)) => panic!("expected token, got error"),
             None => panic!("expected token, got none"),
@@ -329,7 +329,7 @@ mod tests {
     }
 
     fn next_err(lexer: &mut Lexer) -> LexerError {
-        match lexer.next() {
+        match lexer.next_token() {
             Some(Err(err)) => err,
             Some(Ok(_)) => panic!("expected error, got token"),
             None => panic!("expected error, got none"),
