@@ -61,7 +61,7 @@ impl Parser {
 
     pub fn parse_struct_decl(&mut self) -> Result<StructDecl, ParserError> {
         self.expect(TokenType::Struct)?;
-        let generics = self.parse_optional_generic_params()?;
+        let generics = self.parse_generic_params()?;
         let name = self.expect_identifier()?;
         let implements = self.parse_implements()?;
         let (fields, methods) = self.parse_struct_body()?;
@@ -74,7 +74,7 @@ impl Parser {
         })
     }
 
-    pub fn parse_interface_decl(&self) -> Result<Item, ParserError> {
+    pub fn parse_interface_decl(&mut self) -> Result<Item, ParserError> {
         // Implement interface declaration parsing logic here
         todo!()
     }
@@ -91,14 +91,69 @@ impl Parser {
 
     // Types
 
-    pub fn parse_optional_generic_params(&mut self) -> Result<Vec<GenericParam>, ParserError> {
-        // Implement optional generic parameters parsing logic here
-        Ok(vec![])
+    pub fn parse_generic_params(&mut self) -> Result<Vec<GenericParam>, ParserError> {
+        if !self.expect_optional(TokenType::LT) {
+            return Ok(vec![]);
+        }
+
+        let mut has_comma = false;
+        let mut is_first = true;
+
+        let mut params = Vec::new();
+
+        loop {
+            let tok = self.peek();
+            match &tok.token_type {
+                TokenType::Identifier(name) => {
+                    if has_comma || is_first {
+                        params.push(GenericParam {
+                            name: name.to_string(),
+                        });
+                    } else {
+                        return Err(ParserError::UnexpectedToken(tok.clone()));
+                    }
+                }
+                TokenType::Comma => {
+                    if has_comma || is_first {
+                        return Err(ParserError::UnexpectedToken(tok.clone()));
+                    }
+                    has_comma = true;
+                }
+                TokenType::GT => {
+                    self.advance();
+                    break;
+                }
+                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+            }
+
+            self.advance();
+            is_first = false;
+        }
+
+        Ok(params)
     }
 
     pub fn parse_implements(&mut self) -> Result<Vec<TypeExpr>, ParserError> {
-        // Implement implements parsing logic here
-        Ok(vec![])
+        if !self.expect_optional(TokenType::Colon) {
+            return Ok(vec![]);
+        }
+
+        let mut implements = Vec::new();
+
+        loop {
+            let type_expr = self.parse_type_expr()?;
+            implements.push(type_expr);
+
+            if !self.expect_optional(TokenType::Plus) {
+                break;
+            }
+        }
+        Ok(implements)
+    }
+
+    pub fn parse_type_expr(&mut self) -> Result<TypeExpr, ParserError> {
+        // Implement type expression parsing logic here
+        todo!()
     }
 
     // Struct
@@ -106,6 +161,17 @@ impl Parser {
         &mut self,
     ) -> Result<(Vec<FieldDecl>, Vec<FunctionDecl>), ParserError> {
         // Implement struct body parsing logic here
+        self.expect(TokenType::And)?;
+
+        let name = self.expect_identifier()?;
+
+        let generics = self.parse_generic_params()?;
+
+        let implements = self.parse_implements()?;
+
+        let
+
+        let 
         Ok((vec![], vec![]))
     }
 
@@ -152,6 +218,15 @@ impl Parser {
         Err(ParserError::UnexpectedToken(token.clone()))
     }
 
+    pub fn expect_optional(&mut self, token_type: TokenType) -> bool {
+        let token = self.peek();
+        if token.token_type == token_type {
+            self.advance();
+            return true;
+        }
+        false
+    }
+
     pub fn expect_identifier(&mut self) -> Result<String, ParserError> {
         let token = self.peek();
         if let TokenType::Identifier(name) = &token.token_type {
@@ -175,16 +250,11 @@ def parse(self) -> list[Stmt]:
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{ast::*, tokens::TokenType};
+    use crate::{ast::*, tokens::TokenListBuilder};
 
     #[test]
     fn test_parse_empty_program() {
-        let tokens = vec![Token {
-            token_type: TokenType::EOF,
-            position: 0,
-            line: 1,
-            column: 1,
-        }];
+        let tokens = TokenListBuilder::new().eof().build();
         let mut parser = Parser::new(tokens);
         let result = parser.parse().unwrap();
         assert_eq!(result.items.len(), 0);
@@ -193,56 +263,22 @@ mod tests {
     #[test]
     fn test_parse_simple_struct() {
         // struct Point { x: i32 }
-        let tokens = vec![
-            Token {
-                token_type: TokenType::Struct,
-                position: 0,
-                line: 1,
-                column: 1,
-            },
-            Token {
-                token_type: TokenType::Identifier("Point".to_string()),
-                position: 7,
-                line: 1,
-                column: 8,
-            },
-            Token {
-                token_type: TokenType::LeftBrace,
-                position: 13,
-                line: 1,
-                column: 14,
-            },
-            Token {
-                token_type: TokenType::Identifier("x".to_string()),
-                position: 17,
-                line: 2,
-                column: 5,
-            },
-            Token {
-                token_type: TokenType::Colon,
-                position: 18,
-                line: 2,
-                column: 6,
-            },
-            Token {
-                token_type: TokenType::Identifier("i32".to_string()),
-                position: 20,
-                line: 2,
-                column: 8,
-            },
-            Token {
-                token_type: TokenType::RightBrace,
-                position: 24,
-                line: 3,
-                column: 1,
-            },
-            Token {
-                token_type: TokenType::EOF,
-                position: 25,
-                line: 3,
-                column: 2,
-            },
-        ];
+        let tokens = TokenListBuilder::new()
+            .kw_struct()
+            .space()
+            .identifier("Point")
+            .space()
+            .left_brace()
+            .newline()
+            .spaces(4)
+            .identifier("x")
+            .colon()
+            .space()
+            .identifier("i32")
+            .newline()
+            .right_brace()
+            .eof()
+            .build();
 
         let mut parser = Parser::new(tokens);
         let program = parser.parse().expect("Fallo al parsear struct básico");
@@ -259,56 +295,21 @@ mod tests {
     #[test]
     fn test_parse_type_alias_union() {
         // type Result = i64 | str;
-        let tokens = vec![
-            Token {
-                token_type: TokenType::Type,
-                position: 0,
-                line: 1,
-                column: 1,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("Result")),
-                position: 5,
-                line: 1,
-                column: 6,
-            },
-            Token {
-                token_type: TokenType::Eq,
-                position: 12,
-                line: 1,
-                column: 13,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("i64")),
-                position: 14,
-                line: 1,
-                column: 15,
-            },
-            Token {
-                token_type: TokenType::Pipe,
-                position: 18,
-                line: 1,
-                column: 19,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("str")),
-                position: 20,
-                line: 1,
-                column: 21,
-            },
-            Token {
-                token_type: TokenType::Semicolon,
-                position: 23,
-                line: 1,
-                column: 24,
-            },
-            Token {
-                token_type: TokenType::EOF,
-                position: 24,
-                line: 1,
-                column: 25,
-            },
-        ];
+        let tokens = TokenListBuilder::new()
+            .kw_type()
+            .space()
+            .identifier("Result")
+            .space()
+            .eq()
+            .space()
+            .identifier("i64")
+            .space()
+            .pipe()
+            .space()
+            .identifier("str")
+            .semicolon()
+            .eof()
+            .build();
 
         let mut parser = Parser::new(tokens);
         let program = parser.parse().unwrap();
@@ -329,122 +330,37 @@ mod tests {
     #[test]
     fn test_parse_function_implicit_return() {
         // function add(a: i64, b: i64): i64 { a + b }
-        let tokens = vec![
-            Token {
-                token_type: TokenType::Function,
-                position: 0,
-                line: 1,
-                column: 1,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("add")),
-                position: 9,
-                line: 1,
-                column: 10,
-            },
-            Token {
-                token_type: TokenType::LeftParen,
-                position: 12,
-                line: 1,
-                column: 13,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("a")),
-                position: 13,
-                line: 1,
-                column: 14,
-            },
-            Token {
-                token_type: TokenType::Colon,
-                position: 14,
-                line: 1,
-                column: 15,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("i64")),
-                position: 16,
-                line: 1,
-                column: 17,
-            },
-            Token {
-                token_type: TokenType::Comma,
-                position: 19,
-                line: 1,
-                column: 20,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("b")),
-                position: 21,
-                line: 1,
-                column: 22,
-            },
-            Token {
-                token_type: TokenType::Colon,
-                position: 22,
-                line: 1,
-                column: 23,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("i64")),
-                position: 24,
-                line: 1,
-                column: 25,
-            },
-            Token {
-                token_type: TokenType::RightParen,
-                position: 27,
-                line: 1,
-                column: 28,
-            },
-            Token {
-                token_type: TokenType::Colon,
-                position: 28,
-                line: 1,
-                column: 29,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("i64")),
-                position: 30,
-                line: 1,
-                column: 31,
-            },
-            Token {
-                token_type: TokenType::LeftBrace,
-                position: 34,
-                line: 1,
-                column: 35,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("a")),
-                position: 36,
-                line: 1,
-                column: 37,
-            },
-            Token {
-                token_type: TokenType::Plus,
-                position: 38,
-                line: 1,
-                column: 39,
-            },
-            Token {
-                token_type: TokenType::Identifier(String::from("b")),
-                position: 40,
-                line: 1,
-                column: 41,
-            },
-            Token {
-                token_type: TokenType::RightBrace,
-                position: 42,
-                line: 1,
-                column: 43,
-            },
-            Token {
-                token_type: TokenType::EOF,
-                position: 43,
-                line: 1,
-                column: 44,
-            },
-        ];
+        let tokens = TokenListBuilder::new()
+            .kw_function()
+            .space()
+            .identifier("add")
+            .left_paren()
+            .identifier("a")
+            .colon()
+            .space()
+            .identifier("i64")
+            .comma()
+            .space()
+            .identifier("b")
+            .colon()
+            .space()
+            .identifier("i64")
+            .right_paren()
+            .colon()
+            .space()
+            .identifier("i64")
+            .space()
+            .left_brace()
+            .space()
+            .identifier("a")
+            .space()
+            .plus()
+            .space()
+            .identifier("b")
+            .space()
+            .right_brace()
+            .eof()
+            .build();
 
         let mut parser = Parser::new(tokens);
         let program = parser.parse().unwrap();
@@ -476,5 +392,145 @@ mod tests {
 
         assert_eq!(program.items.len(), 1);
         assert_eq!(program.items[0], Item::Function(expected_func));
+    }
+
+    #[test]
+    fn test_parse_optional_generic_params() {
+        // Simulamos: <T, U>
+        let tokens = TokenListBuilder::new()
+            .lt()
+            .identifier("T")
+            .comma()
+            .identifier("U")
+            .gt()
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        // Llamamos directamente al método unitario
+        let generics = parser.parse_generic_params().unwrap();
+
+        assert_eq!(generics.len(), 2);
+        assert_eq!(generics[0].name, "T");
+        assert_eq!(generics[1].name, "U");
+    }
+
+    #[test]
+    fn test_parse_implements_clause() {
+        // Simulamos: : Movable, Drawable
+        let tokens = TokenListBuilder::new()
+            .colon()
+            .space()
+            .identifier("Movable")
+            .comma()
+            .space()
+            .identifier("Drawable")
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        let implements = parser.parse_implements().unwrap();
+
+        assert_eq!(implements.len(), 2);
+        assert_eq!(
+            implements[0],
+            TypeExpr::Named("Movable".to_string(), vec![])
+        );
+        assert_eq!(
+            implements[1],
+            TypeExpr::Named("Drawable".to_string(), vec![])
+        );
+    }
+
+    #[test]
+    fn test_parse_type_decl_unit() {
+        // Simulamos: type Age = i32;
+        let tokens = TokenListBuilder::new()
+            .kw_type()
+            .space()
+            .identifier("Age")
+            .space()
+            .eq()
+            .space()
+            .identifier("i32")
+            .semicolon()
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        // Consumimos directamente la declaración de tipo
+        let result = parser.parse_type_decl().unwrap();
+
+        let expected = Item::TypeAlias(TypeAliasDecl {
+            name: "Age".to_string(),
+            generics: vec![],
+            ty: TypeExpr::Named("i32".to_string(), vec![]),
+        });
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_parse_interface_decl_unit() {
+        // Simulamos: interface Named { name: str }
+        let tokens = TokenListBuilder::new()
+            .kw_interface()
+            .space()
+            .identifier("Named")
+            .space()
+            .left_brace()
+            .space()
+            .identifier("name")
+            .colon()
+            .space()
+            .identifier("str")
+            .space()
+            .right_brace()
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        let result = parser.parse_interface_decl().unwrap();
+
+        let expected = Item::Interface(InterfaceDecl {
+            name: "Named".to_string(),
+            generics: vec![],
+            fields: vec![FieldDecl {
+                name: "name".to_string(),
+                ty: TypeExpr::Named("str".to_string(), vec![]),
+            }],
+            methods: vec![],
+        });
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_parse_extend_decl_unit() {
+        // Simulamos: extend Vehicle: Movable {}
+        let tokens = TokenListBuilder::new()
+            .kw_extend()
+            .space()
+            .identifier("Vehicle")
+            .colon()
+            .space()
+            .identifier("Movable")
+            .space()
+            .left_brace()
+            .right_brace()
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        let result = parser.parse_extend_decl().unwrap();
+
+        let expected = Item::Extend(ExtendDecl {
+            target: TypeExpr::Named("Vehicle".to_string(), vec![]),
+            generic_params: vec![],
+            implements: vec![TypeExpr::Named("Movable".to_string(), vec![])],
+            methods: vec![],
+        });
+
+        assert_eq!(result, expected);
     }
 }
