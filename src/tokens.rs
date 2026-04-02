@@ -64,6 +64,8 @@ pub enum TokenType {
     SelfRef,   // self
     Match,     // match
     Class,     // class
+    Continue,  // continue
+    Break,     // break
 
     EOF,
 }
