@@ -1,4 +1,13 @@
-pub enum Token {
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Token {
+    pub token_type: TokenType,
+    pub position: usize,
+    pub line: usize,
+    pub column: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TokenType {
     // Single-character delimiters
     LeftParen,    // (
     RightParen,   // )
@@ -30,8 +39,9 @@ pub enum Token {
     // Literals
     Identifier(String), // variable/function name
     StringLit(String),  // "texto entre comillas"
-    Float(f64),         // 123.0, 3.14
-    Int(i64),           // 123
+    CharLit(char),      // 'a'
+    Float(String),      // 123.0, 3.14
+    Int(String),        // 123
 
     // Keywords
     Struct,    // struct
