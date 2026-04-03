@@ -1,4 +1,10 @@
 #[derive(Debug, Clone, PartialEq)]
+pub struct Module {
+    pub name: String,
+    pub program: Program,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Program {
     pub items: Vec<Item>,
 }
@@ -10,6 +16,25 @@ pub enum Item {
     Struct(StructDecl),
     Function(FunctionDecl),
     Extend(ExtendDecl),
+    Import(ImportDecl),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ImportDecl {
+    pub module: String,
+    pub symbols: ImportSymbols,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ImportSymbols {
+    Glob,                        // import "utils"
+    Named(Vec<ImportSymbol>),    // import { Foo, bar } from "utils"
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ImportSymbol {
+    pub name: String,
+    pub alias: Option<String>,   // import { Foo as Bar } from "utils"
 }
 
 #[derive(Debug, Clone, PartialEq)]

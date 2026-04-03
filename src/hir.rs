@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct ModuleId(pub u32);
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TypeId(pub u32);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -17,7 +20,30 @@ pub struct TypeParamInfo {
 }
 
 #[derive(Debug, Clone)]
+pub struct HirModule {
+    pub id: ModuleId,
+    pub name: String,
+    pub structs: Vec<TypeId>,
+    pub interfaces: Vec<TypeId>,
+    pub functions: Vec<FnId>,
+    pub imports: Vec<HirImport>,
+}
+
+#[derive(Debug, Clone)]
+pub enum HirImport {
+    Glob(ModuleId),
+    Named(ModuleId, Vec<HirImportSymbol>),
+}
+
+#[derive(Debug, Clone)]
+pub enum HirImportSymbol {
+    Type(TypeId, String),      // (resolved id, local name/alias)
+    Function(FnId, String),    // (resolved id, local name/alias)
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct Hir {
+    pub modules: HashMap<ModuleId, HirModule>,
     pub structs: HashMap<TypeId, HirStruct>,
     pub interfaces: HashMap<TypeId, HirInterface>,
     pub functions: HashMap<FnId, HirFunction>,
@@ -56,6 +82,7 @@ pub enum PrimitiveType {
 #[derive(Debug, Clone)]
 pub struct HirStruct {
     pub id: TypeId,
+    pub module: ModuleId,
     pub name: String,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
@@ -66,6 +93,7 @@ pub struct HirStruct {
 #[derive(Debug, Clone)]
 pub struct HirInterface {
     pub id: TypeId,
+    pub module: ModuleId,
     pub name: String,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
@@ -82,6 +110,7 @@ pub struct HirField {
 #[derive(Debug, Clone)]
 pub struct HirFunction {
     pub id: FnId,
+    pub module: ModuleId,
     pub name: String,
     pub owner: Option<TypeId>, // None for free functions
     pub has_self: bool,
@@ -121,6 +150,12 @@ pub struct TypedExpr {
 }
 
 #[derive(Debug, Clone)]
+pub struct HirCapture {
+    pub name: String,
+    pub ty: ResolvedType,
+}
+
+#[derive(Debug, Clone)]
 pub enum ExprKind {
     Literal(HirLiteral),
     Variable(String),
@@ -134,7 +169,12 @@ pub enum ExprKind {
     Member(Box<TypedExpr>, String),
     BinaryOp(Box<TypedExpr>, BinaryOperator, Box<TypedExpr>),
     UnaryOp(UnaryOperator, Box<TypedExpr>),
-    FunctionLiteral(Vec<TypeParamId>, Vec<HirParam>, Box<HirBlock>),
+    FunctionLiteral(
+        Vec<TypeParamId>,
+        Vec<HirParam>,
+        Vec<HirCapture>,
+        Box<HirBlock>,
+    ),
     Block(Box<HirBlock>),
 }
 
