@@ -10,10 +10,18 @@ pub struct FnId(pub u32);
 pub struct TypeParamId(pub u32);
 
 #[derive(Debug, Clone)]
+pub struct TypeParamInfo {
+    pub id: TypeParamId,
+    pub name: String,
+    pub bounds: Vec<TypeId>, // interfaces this param must implement
+}
+
+#[derive(Debug, Clone)]
 pub struct Hir {
     pub structs: HashMap<TypeId, HirStruct>,
     pub interfaces: HashMap<TypeId, HirInterface>,
     pub functions: HashMap<FnId, HirFunction>,
+    pub type_params: HashMap<TypeParamId, TypeParamInfo>,
 }
 
 #[derive(Debug, Clone, PartialEq)]

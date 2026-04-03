@@ -22,6 +22,7 @@ pub struct TypeAliasDecl {
 #[derive(Debug, Clone, PartialEq)]
 pub struct GenericParam {
     pub name: String,
+    pub bounds: Vec<TypeExpr>,
 }
 
 #[derive(Debug, Clone, PartialEq)]

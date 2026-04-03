@@ -152,41 +152,31 @@ impl Parser {
             return Ok(vec![]);
         }
 
-        let mut has_comma = false;
-        let mut is_first = true;
-
         let mut params = Vec::new();
 
-        loop {
-            let tok = self.peek();
-            match &tok.token_type {
-                TokenType::Identifier(name) => {
-                    if has_comma || is_first {
-                        params.push(GenericParam {
-                            name: name.to_string(),
-                        });
-                    } else {
-                        return Err(ParserError::UnexpectedToken(tok.clone()));
-                    }
-                }
-                TokenType::Comma => {
-                    if has_comma || is_first {
-                        return Err(ParserError::UnexpectedToken(tok.clone()));
-                    }
-                    has_comma = true;
-                }
-                TokenType::GT => {
-                    self.advance();
-                    break;
-                }
-                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+        if self.peek().token_type != TokenType::GT {
+            params.push(self.parse_generic_param()?);
+            while self.expect_optional(TokenType::Comma) {
+                params.push(self.parse_generic_param()?);
             }
-
-            self.advance();
-            is_first = false;
         }
 
+        self.expect(TokenType::GT)?;
         Ok(params)
+    }
+
+    fn parse_generic_param(&mut self) -> Result<GenericParam, ParserError> {
+        let name = self.expect_identifier()?;
+        let bounds = if self.expect_optional(TokenType::Colon) {
+            let mut bounds = vec![self.parse_type_atom()?];
+            while self.expect_optional(TokenType::Plus) {
+                bounds.push(self.parse_type_atom()?);
+            }
+            bounds
+        } else {
+            vec![]
+        };
+        Ok(GenericParam { name, bounds })
     }
 
     pub fn parse_implements(&mut self) -> Result<Vec<TypeExpr>, ParserError> {
@@ -923,7 +913,8 @@ mod tests {
             Item::TypeAlias(TypeAliasDecl {
                 name: "Option".to_string(),
                 generics: vec![GenericParam {
-                    name: "T".to_string()
+                    name: "T".to_string(),
+                    bounds: vec![],
                 }],
                 ty: TypeExpr::Union(vec![
                     TypeExpr::Named("T".to_string(), vec![]),
