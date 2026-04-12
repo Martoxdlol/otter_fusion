@@ -55,6 +55,8 @@ pub enum TokenType {
     True,      // true
     False,     // false
     Var,       // var
+    If,        // if
+    Else,      // else
     Extend,    // extend
     Return,    // return
     Interface, // interface
@@ -257,6 +259,8 @@ impl TokenType {
             TokenType::True => 4,
             TokenType::False => 5,
             TokenType::Var => 3,
+            TokenType::If => 2,
+            TokenType::Else => 4,
             TokenType::Extend => 6,
             TokenType::Return => 6,
             TokenType::Interface => 9,

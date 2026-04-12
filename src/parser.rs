@@ -657,17 +657,14 @@ impl Parser {
             // Block or map literal
             TokenType::LeftBrace => self.parse_block_or_map(),
 
-            // Identifier: variable, if, struct init, or generic call
+            // Identifier: variable
             TokenType::Identifier(name) => {
                 let name = name.clone();
                 self.advance();
-                if name == "if" {
-                    return self.parse_if_expr();
-                }
-                // Check for struct init: `Name { ... }` or generic call: `name<T>(...)`
-                // For now, just return variable
                 Ok(Expr::Variable(name))
             }
+
+            TokenType::If => self.parse_if_expr(),
 
             _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
         }
@@ -710,6 +707,114 @@ impl Parser {
         Ok(expr)
     }
 
+    fn parse_list_literal(&mut self) -> Result<Expr, ParserError> {
+        self.expect(TokenType::LeftBracket)?;
+        let mut elements = Vec::new();
+
+        if self.peek().token_type != TokenType::RightBracket {
+            elements.push(self.parse_expr()?);
+            while self.expect_optional(TokenType::Comma) {
+                if self.peek().token_type == TokenType::RightBracket {
+                    break;
+                }
+                elements.push(self.parse_expr()?);
+            }
+        }
+
+        self.expect(TokenType::RightBracket)?;
+        Ok(Expr::LiteralList(elements))
+    }
+
+    fn parse_if_expr(&mut self) -> Result<Expr, ParserError> {
+        self.expect(TokenType::If)?;
+        let cond = self.parse_expr()?;
+        let then_branch = self.parse_block()?;
+        let else_branch = if self.expect_optional(TokenType::Else) {
+            Some(Box::new(self.parse_block()?))
+        } else {
+            None
+        };
+        Ok(Expr::If(Box::new(cond), Box::new(then_branch), else_branch))
+    }
+
+    fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
+        self.expect(TokenType::LeftBrace)?;
+        if self.peek().token_type == TokenType::RightBrace {
+            self.advance();
+            return Ok(Expr::LiteralMap(vec![]));
+        }
+
+        // if token is string literal followed by colon, it's a map literal
+        // match StringLit, Colon
+        // Can be other lit types
+        let is_map = self.check_is_map();
+
+        if is_map {
+            self.parse_map_literal()
+        } else {
+            let block = self.parse_block()?;
+            Ok(Expr::Block(Box::new(block)))
+        }
+    }
+
+    fn check_is_map(&mut self) -> bool {
+        let tok1 = self.peek();
+        match tok1.token_type {
+            TokenType::StringLit(_)
+            | TokenType::Int(_)
+            | TokenType::Float(_)
+            | TokenType::CharLit(_) => {}
+            _ => return false,
+        };
+
+        self.advance();
+        let tok2 = self.peek().clone();
+        self.back();
+
+        return tok2.token_type == TokenType::Colon;
+    }
+
+    fn parse_map_literal(&mut self) -> Result<Expr, ParserError> {
+        let mut entries = Vec::new();
+
+        loop {
+            let key = match &self.peek().token_type {
+                TokenType::StringLit(s) => {
+                    let s = Expr::Literal(Literal::String(s.clone()));
+                    self.advance();
+                    s
+                }
+                TokenType::Int(i) => {
+                    let s = Expr::Literal(Literal::Int(i.clone()));
+                    self.advance();
+                    s
+                }
+                TokenType::Float(f) => {
+                    let s = Expr::Literal(Literal::Float(f.clone()));
+                    self.advance();
+                    s
+                }
+                TokenType::CharLit(c) => {
+                    let s = Expr::Literal(Literal::Char(*c));
+                    self.advance();
+                    s
+                }
+                _ => return Err(ParserError::UnexpectedToken(self.peek().clone())),
+            };
+
+            self.expect(TokenType::Colon)?;
+            let value = self.parse_expr()?;
+            entries.push((key, value));
+
+            if !self.expect_optional(TokenType::Comma) {
+                break;
+            }
+        }
+
+        self.expect(TokenType::RightBrace)?;
+        Ok(Expr::LiteralMap(entries))
+    }
+
     // Util
 
     fn is_at_end(&self) -> bool {
@@ -728,6 +833,12 @@ impl Parser {
     pub fn advance(&mut self) {
         if self.current < self.tokens.len() {
             self.current += 1;
+        }
+    }
+
+    pub fn back(&mut self) {
+        if self.current > 0 {
+            self.current -= 1;
         }
     }
 
@@ -1412,5 +1523,98 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let implements = parser.parse_implements().unwrap();
         assert_eq!(implements.len(), 0);
+    }
+
+    #[test]
+    fn test_parse_expr_binary_left_associative() {
+        // x + y + z
+        let tokens = TokenListBuilder::new()
+            .identifier("x")
+            .space()
+            .plus()
+            .space()
+            .identifier("y")
+            .space()
+            .plus()
+            .space()
+            .identifier("z")
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let expr = parser.parse_expr().unwrap();
+
+        let expected = Expr::BinaryOp(
+            Box::new(Expr::BinaryOp(
+                Box::new(Expr::Variable("x".to_string())),
+                BinaryOperator::Add,
+                Box::new(Expr::Variable("y".to_string())),
+            )),
+            BinaryOperator::Add,
+            Box::new(Expr::Variable("z".to_string())),
+        );
+
+        assert_eq!(expr, expected);
+    }
+
+    #[test]
+    fn test_parse_expr_binary_precedence() {
+        // x + y * z
+        let tokens = TokenListBuilder::new()
+            .identifier("x")
+            .space()
+            .plus()
+            .space()
+            .identifier("y")
+            .space()
+            .star()
+            .space()
+            .identifier("z")
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let expr = parser.parse_expr().unwrap();
+
+        let expected = Expr::BinaryOp(
+            Box::new(Expr::Variable("x".to_string())),
+            BinaryOperator::Add,
+            Box::new(Expr::BinaryOp(
+                Box::new(Expr::Variable("y".to_string())),
+                BinaryOperator::Mul,
+                Box::new(Expr::Variable("z".to_string())),
+            )),
+        );
+
+        assert_eq!(expr, expected);
+    }
+
+    #[test]
+    fn test_parse_expr_binary_mixed() {
+        // x + y / z
+        let tokens = TokenListBuilder::new()
+            .identifier("x")
+            .space()
+            .plus()
+            .space()
+            .identifier("y")
+            .space()
+            .slash()
+            .space()
+            .identifier("z")
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let expr = parser.parse_expr().unwrap();
+
+        let expected = Expr::BinaryOp(
+            Box::new(Expr::Variable("x".to_string())),
+            BinaryOperator::Add,
+            Box::new(Expr::BinaryOp(
+                Box::new(Expr::Variable("y".to_string())),
+                BinaryOperator::Div,
+                Box::new(Expr::Variable("z".to_string())),
+            )),
+        );
+
+        assert_eq!(expr, expected);
     }
 }

@@ -179,6 +179,8 @@ impl Lexer {
             "self" => self.token(TokenType::SelfRef),
             "match" => self.token(TokenType::Match),
             "class" => self.token(TokenType::Class),
+            "if" => self.token(TokenType::If),
+            "else" => self.token(TokenType::Else),
 
             _ => self.token(TokenType::Identifier(literal)),
         }
