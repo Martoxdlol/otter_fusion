@@ -1,15 +1,39 @@
-use std::sync::Arc;
+use clap::{Parser, Subcommand};
+
+#[derive(Subcommand)]
+enum Commands {
+    Scan { file: String },
+    Parse { file: String },
+    Validate { file: String },
+    Run { file: String },
+    Compile { file: String },
+}
+#[derive(Parser)]
+#[command(version, about)]
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
 
 fn main() {
-    fn demo() -> (Arc<i32>, impl Fn() -> Arc<i32>) {
-        let a = Arc::new(5);
+    let cli = Cli::parse();
 
-        let a_c = Arc::clone(&a);
-
-        let f = move || (&a_c).clone();
-
-        (a, f)
+    match &cli.command {
+        Commands::Scan { file } => {
+            println!("Scanning: {file}");
+        }
+        Commands::Parse { file } => {
+            println!("Parsing: {file}");
+        }
+        Commands::Validate { file } => {
+            println!("Validating: {file}");
+        }
+        Commands::Run { file } => {
+            println!("Running: {file}");
+        }
+        Commands::Compile { file } => {
+            println!("Compiling: {file}");
+        }
     }
-
-    let (x, f) = demo();
 }
