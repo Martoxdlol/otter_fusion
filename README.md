@@ -316,6 +316,11 @@ var user_ages: Map<str, i32> = {
 };
 ```
 
+Differentiate from block:
+
+- Key value always with quotes: `"key": value,`
+- Try to parse as map, if it fails, parse as block.
+
 ## Control Flow
 
 ### For Loops

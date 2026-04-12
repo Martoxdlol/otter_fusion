@@ -1,7 +1,8 @@
 use crate::{
     ast::{
-        Block, Expr, ExtendDecl, FieldDecl, FunctionDecl, GenericParam, InterfaceDecl, Item,
-        ParamDecl, PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl, TypeExpr,
+        BinaryOperator, Block, Expr, ExtendDecl, FieldDecl, FunctionDecl, GenericParam,
+        InterfaceDecl, Item, Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl,
+        TypeAliasDecl, TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -440,17 +441,252 @@ impl Parser {
         }
     }
 
-    pub fn parse_expr(&self) -> Result<Expr, ParserError> {
-        // Implement expression parsing logic here
-        match self.peek().token_type {
-            TokenType::LeftBrace => todo!(),     // Block expression or map
-            TokenType::LeftBracket => todo!(),   // Array literal
-            TokenType::Identifier(_) => todo!(), // Variable or function call
-            TokenType::Int(_) => todo!(),        // Int literal
-            TokenType::Float(_) => todo!(),      // Float literal
-            TokenType::StringLit(_) => todo!(),  // String literal
+    // - base:
+    // literal (int, float, string, char, bool, null)
+    // variable
+    //
+    // - recursive:
+    // (expr)                              — grouping
+    // { stmt; stmt; expr }                — block expression
+    // [expr, ...]                         — list literal
+    // { "key": value, ... }               — map literal
+    // Type { field: value, ... }          — struct init
+    // (params): Type { body }             — function literal
+    // if cond { ... } else { ... }        — if expression
+    // expr.member                         — member access
+    // expr<T>(args)                       — function call
+    // op expr                             — unary operation
+    // expr op expr                        — binary operation
+    // expr as Type                        — type cast
+    // expr is Type                        — type check
+    pub fn parse_expr(&mut self) -> Result<Expr, ParserError> {
+        self.parse_expr_bp(0)
+    }
 
-            _ => return Err(ParserError::UnexpectedToken(self.peek().clone())),
+    // Pratt parser: parses expressions respecting operator precedence.
+    // `min_bp` is the minimum precedence an operator must have to be consumed
+    // in this call. The initial call uses 0 (accept everything). Each infix
+    // operator passes `prec + 1` as min_bp for its right-hand side, which
+    // ensures higher-precedence operators bind tighter and equal-precedence
+    // operators associate left-to-right.
+    fn parse_expr_bp(&mut self, min_bp: u8) -> Result<Expr, ParserError> {
+        // 1. Parse prefix (left-hand side)
+        let mut lhs = self.parse_prefix()?;
+
+        // 2. Loop: postfix and infix operators
+        // Infix -> between two expressions, e.g. a + b
+        // Postfix -> after an expression, e.g. a.b, func<T>(args), a as Type
+        loop {
+            let op: BinaryOperator = match &self.peek().token_type {
+                // Postfix: member access
+                TokenType::Dot => {
+                    self.advance();
+                    let member = self.expect_identifier()?;
+                    lhs = Expr::Member(Box::new(lhs), member);
+                    continue;
+                }
+                // Postfix: function call
+                TokenType::LeftParen => {
+                    lhs = self.parse_call_args(lhs, vec![])?;
+                    continue;
+                }
+                // Postfix: as / is
+                TokenType::As => {
+                    if 15 < min_bp {
+                        break;
+                    }
+                    self.advance();
+                    let ty = self.parse_type_expr()?;
+                    lhs = Expr::As(Box::new(lhs), ty);
+                    continue;
+                }
+                TokenType::Is => {
+                    if 15 < min_bp {
+                        break;
+                    }
+                    self.advance();
+                    let ty = self.parse_type_expr()?;
+                    lhs = Expr::Is(Box::new(lhs), ty);
+                    continue;
+                }
+                // Infix binary operators
+                TokenType::Or => BinaryOperator::Or,
+                TokenType::And => BinaryOperator::And,
+                TokenType::EqEq => BinaryOperator::Eq,
+                TokenType::BangEq => BinaryOperator::Neq,
+                TokenType::LT => BinaryOperator::Lt,
+                TokenType::GT => BinaryOperator::Gt,
+                TokenType::Plus => BinaryOperator::Add,
+                TokenType::Minus => BinaryOperator::Sub,
+                TokenType::Star => BinaryOperator::Mul,
+                TokenType::Slash => BinaryOperator::Div,
+                TokenType::Percent => BinaryOperator::Mod,
+                _ => break, // not an operator, stop
+            };
+
+            let prec = self.infix_precedence(&op);
+            if prec < min_bp {
+                break;
+            }
+
+            // case: x + y + z
+
+            // min_bp: 0
+            // lhs: x
+            // op: +
+            // prec: 5
+            // min_bp: 0 (initial call) -> 5 + 1 = 6 (right side of +)
+            // recursive call: parse_expr_bp(6)
+
+            // min_bp: 6
+            // lhs: y
+            // op: +
+            // prec: 5
+            // prec < min_bp (5 < 6) -> stop, return y as rhs of first +
+
+            // return to first call:
+            // lhs: x
+            // op: +
+            // rhs: y (result of second call)
+            // lhs = x + y
+            // return to main loop -> (x + y) + z
+
+            //
+            // case: x + y * z
+
+            // min_bp: 0
+            // lhs: x
+            // op: +
+            // prec: 5
+            // min_bp: 0 (initial call) -> 5 + 1 = 6 (right side of +)
+            // recursive call: parse_expr_bp(6)
+
+            // min_bp: 6
+            // lhs: y
+            // op: *
+            // prec: 6
+            // min_bp: 6 -> 6 + 1 = 7 (right side of *)
+            // recursive call: parse_expr_bp(7)
+
+            // min_bp: 7
+            // lhs: z
+            // no more operators -> return z
+            // return to second call:
+            // lhs: y
+            // op: *
+            // rhs: z
+
+            // return to first call:
+            // lhs: x
+            // op: +
+            // rhs: (y * z)
+            // lhs = x + (y * z)
+            // return to main loop -> (x + (y * z))
+
+            self.advance(); // consume operator
+            let rhs = self.parse_expr_bp(prec + 1)?; // +1 = left-associative
+            lhs = Expr::BinaryOp(Box::new(lhs), op, Box::new(rhs));
+        }
+
+        Ok(lhs)
+    }
+
+    fn parse_prefix(&mut self) -> Result<Expr, ParserError> {
+        match &self.peek().token_type {
+            // Unary operators
+            TokenType::Minus => {
+                self.advance();
+                let expr = self.parse_expr_bp(13)?; // high bp for prefix
+                Ok(Expr::UnaryOp(UnaryOperator::Neg, Box::new(expr)))
+            }
+            TokenType::Bang => {
+                self.advance();
+                let expr = self.parse_expr_bp(13)?;
+                Ok(Expr::UnaryOp(UnaryOperator::Not, Box::new(expr)))
+            }
+            // Literals
+            TokenType::Int(_) => {
+                if let TokenType::Int(v) = &self.peek().token_type {
+                    let v = v.clone();
+                    self.advance();
+                    Ok(Expr::Literal(Literal::Int(v)))
+                } else {
+                    unreachable!()
+                }
+            }
+            TokenType::Float(_) => {
+                if let TokenType::Float(v) = &self.peek().token_type {
+                    let v = v.clone();
+                    self.advance();
+                    Ok(Expr::Literal(Literal::Float(v)))
+                } else {
+                    unreachable!()
+                }
+            }
+            TokenType::StringLit(_) => {
+                if let TokenType::StringLit(v) = &self.peek().token_type {
+                    let v = v.clone();
+                    self.advance();
+                    Ok(Expr::Literal(Literal::String(v)))
+                } else {
+                    unreachable!()
+                }
+            }
+            TokenType::CharLit(_) => {
+                if let TokenType::CharLit(v) = &self.peek().token_type {
+                    let v = *v;
+                    self.advance();
+                    Ok(Expr::Literal(Literal::Char(v)))
+                } else {
+                    unreachable!()
+                }
+            }
+            TokenType::True => {
+                self.advance();
+                Ok(Expr::Literal(Literal::Bool(true)))
+            }
+            TokenType::False => {
+                self.advance();
+                Ok(Expr::Literal(Literal::Bool(false)))
+            }
+            TokenType::Null => {
+                self.advance();
+                Ok(Expr::Literal(Literal::Null))
+            }
+
+            // Parenthesized expr or function literal
+            TokenType::LeftParen => self.parse_paren_or_fn_literal(),
+
+            // Array literal
+            TokenType::LeftBracket => self.parse_list_literal(),
+
+            // Block or map literal
+            TokenType::LeftBrace => self.parse_block_or_map(),
+
+            // Identifier: variable, if, struct init, or generic call
+            TokenType::Identifier(name) => {
+                let name = name.clone();
+                self.advance();
+                if name == "if" {
+                    return self.parse_if_expr();
+                }
+                // Check for struct init: `Name { ... }` or generic call: `name<T>(...)`
+                // For now, just return variable
+                Ok(Expr::Variable(name))
+            }
+
+            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+        }
+    }
+
+    fn infix_precedence(&self, op: &BinaryOperator) -> u8 {
+        match op {
+            BinaryOperator::Or => 1,
+            BinaryOperator::And => 2,
+            BinaryOperator::Eq | BinaryOperator::Neq => 3,
+            BinaryOperator::Lt | BinaryOperator::Le | BinaryOperator::Gt | BinaryOperator::Ge => 4,
+            BinaryOperator::Add | BinaryOperator::Sub => 5,
+            BinaryOperator::Mul | BinaryOperator::Div | BinaryOperator::Mod => 6,
         }
     }
 
@@ -826,10 +1062,7 @@ mod tests {
     #[test]
     fn test_parse_type_expr_primitive() {
         // i32 should parse as Primitive(Int32)
-        let tokens = TokenListBuilder::new()
-            .identifier("i32")
-            .eof()
-            .build();
+        let tokens = TokenListBuilder::new().identifier("i32").eof().build();
         let mut parser = Parser::new(tokens);
         let ty = parser.parse_type_expr().unwrap();
         assert_eq!(ty, TypeExpr::Primitive(PrimitiveType::Int32));
@@ -1052,10 +1285,7 @@ mod tests {
 
     #[test]
     fn test_parse_error_unexpected_token_at_item() {
-        let tokens = TokenListBuilder::new()
-            .int("42")
-            .eof()
-            .build();
+        let tokens = TokenListBuilder::new().int("42").eof().build();
         let mut parser = Parser::new(tokens);
         assert!(parser.parse_item().is_err());
     }
@@ -1087,9 +1317,15 @@ mod tests {
         let result = parser.parse_struct_decl().unwrap();
         assert_eq!(result.fields.len(), 2);
         assert_eq!(result.fields[0].name, "x");
-        assert_eq!(result.fields[0].ty, TypeExpr::Primitive(PrimitiveType::Float64));
+        assert_eq!(
+            result.fields[0].ty,
+            TypeExpr::Primitive(PrimitiveType::Float64)
+        );
         assert_eq!(result.fields[1].name, "y");
-        assert_eq!(result.fields[1].ty, TypeExpr::Primitive(PrimitiveType::Float64));
+        assert_eq!(
+            result.fields[1].ty,
+            TypeExpr::Primitive(PrimitiveType::Float64)
+        );
     }
 
     #[test]
@@ -1143,10 +1379,7 @@ mod tests {
     #[test]
     fn test_parse_generic_params_empty() {
         // no < at all
-        let tokens = TokenListBuilder::new()
-            .identifier("Foo")
-            .eof()
-            .build();
+        let tokens = TokenListBuilder::new().identifier("Foo").eof().build();
         let mut parser = Parser::new(tokens);
         let generics = parser.parse_generic_params().unwrap();
         assert_eq!(generics.len(), 0);
@@ -1155,10 +1388,7 @@ mod tests {
     #[test]
     fn test_parse_implements_empty() {
         // no : at all
-        let tokens = TokenListBuilder::new()
-            .left_brace()
-            .eof()
-            .build();
+        let tokens = TokenListBuilder::new().left_brace().eof().build();
         let mut parser = Parser::new(tokens);
         let implements = parser.parse_implements().unwrap();
         assert_eq!(implements.len(), 0);
