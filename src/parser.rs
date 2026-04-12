@@ -463,12 +463,6 @@ impl Parser {
         self.parse_expr_bp(0)
     }
 
-    // Pratt parser: parses expressions respecting operator precedence.
-    // `min_bp` is the minimum precedence an operator must have to be consumed
-    // in this call. The initial call uses 0 (accept everything). Each infix
-    // operator passes `prec + 1` as min_bp for its right-hand side, which
-    // ensures higher-precedence operators bind tighter and equal-precedence
-    // operators associate left-to-right.
     fn parse_expr_bp(&mut self, min_bp: u8) -> Result<Expr, ParserError> {
         // 1. Parse prefix (left-hand side)
         let mut lhs = self.parse_prefix()?;
@@ -688,6 +682,32 @@ impl Parser {
             BinaryOperator::Add | BinaryOperator::Sub => 5,
             BinaryOperator::Mul | BinaryOperator::Div | BinaryOperator::Mod => 6,
         }
+    }
+
+    fn parse_call_args(
+        &mut self,
+        callee: Expr,
+        type_args: Vec<TypeExpr>,
+    ) -> Result<Expr, ParserError> {
+        self.expect(TokenType::LeftParen)?;
+        let mut args = Vec::new();
+
+        if self.peek().token_type != TokenType::RightParen {
+            args.push(self.parse_expr()?);
+            while self.expect_optional(TokenType::Comma) {
+                args.push(self.parse_expr()?);
+            }
+        }
+
+        self.expect(TokenType::RightParen)?;
+        Ok(Expr::Call(Box::new(callee), type_args, args))
+    }
+
+    fn parse_paren_or_fn_literal(&mut self) -> Result<Expr, ParserError> {
+        self.expect(TokenType::LeftParen)?;
+        let expr = self.parse_expr()?;
+        self.expect(TokenType::RightParen)?;
+        Ok(expr)
     }
 
     // Util
