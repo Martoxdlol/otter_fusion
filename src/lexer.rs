@@ -181,6 +181,8 @@ impl Lexer {
             "class" => self.token(TokenType::Class),
             "if" => self.token(TokenType::If),
             "else" => self.token(TokenType::Else),
+            "continue" => self.token(TokenType::Continue),
+            "break" => self.token(TokenType::Break),
 
             _ => self.token(TokenType::Identifier(literal)),
         }

@@ -435,8 +435,14 @@ impl Parser {
                 let body = self.parse_block()?;
                 Ok(Statement::For(name, iterable, body))
             }
-            TokenType::Break => Ok(Statement::Break),
-            TokenType::Continue => Ok(Statement::Continue),
+            TokenType::Break => {
+                self.expect(TokenType::Break)?;
+                Ok(Statement::Break)
+            }
+            TokenType::Continue => {
+                self.expect(TokenType::Continue)?;
+                Ok(Statement::Continue)
+            }
             _ => Ok(Statement::Expr(self.parse_expr()?)),
         }
     }
@@ -1614,6 +1620,44 @@ mod tests {
                 Box::new(Expr::Variable("z".to_string())),
             )),
         );
+
+        assert_eq!(expr, expected);
+    }
+
+    #[test]
+    fn test_parse_map_literal() {
+        // { "a": 1, "b": 2 }
+        let tokens = TokenListBuilder::new()
+            .left_brace()
+            .space()
+            .string_lit("a")
+            .colon()
+            .space()
+            .int("1")
+            .comma()
+            .space()
+            .string_lit("b")
+            .colon()
+            .space()
+            .int("2")
+            .space()
+            .right_brace()
+            .eof()
+            .build();
+
+        let mut parser = Parser::new(tokens);
+        let expr = parser.parse_expr().unwrap();
+
+        let expected = Expr::LiteralMap(vec![
+            (
+                Expr::Literal(Literal::String("a".to_string())),
+                Expr::Literal(Literal::Int("1".to_string())),
+            ),
+            (
+                Expr::Literal(Literal::String("b".to_string())),
+                Expr::Literal(Literal::Int("2".to_string())),
+            ),
+        ]);
 
         assert_eq!(expr, expected);
     }
