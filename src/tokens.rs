@@ -460,6 +460,9 @@ impl TokenListBuilder {
     pub fn kw_interface(self) -> Self {
         self.push(TokenType::Interface)
     }
+    pub fn kw_in(self) -> Self {
+        self.push(TokenType::In)
+    }
     pub fn kw_is(self) -> Self {
         self.push(TokenType::Is)
     }

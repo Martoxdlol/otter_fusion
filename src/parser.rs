@@ -742,8 +742,7 @@ impl Parser {
         };
         Ok(Expr::If(Box::new(cond), Box::new(then_branch), else_branch))
     }
-
-    fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
+fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
         self.expect(TokenType::LeftBrace)?;
         if self.peek().token_type == TokenType::RightBrace {
             self.advance();
