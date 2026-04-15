@@ -183,6 +183,8 @@ impl Lexer {
             "else" => self.token(TokenType::Else),
             "continue" => self.token(TokenType::Continue),
             "break" => self.token(TokenType::Break),
+            "import" => self.token(TokenType::Import),
+            "from" => self.token(TokenType::From),
 
             _ => self.token(TokenType::Identifier(literal)),
         }

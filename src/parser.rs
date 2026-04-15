@@ -1,8 +1,8 @@
 use crate::{
     ast::{
         BinaryOperator, Block, Expr, ExtendDecl, FieldDecl, FunctionDecl, GenericParam,
-        InterfaceDecl, Item, Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl,
-        TypeAliasDecl, TypeExpr, UnaryOperator,
+        ImportDecl, ImportSymbol, ImportSymbols, InterfaceDecl, Item, Literal, ParamDecl,
+        PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -51,6 +51,7 @@ impl Parser {
             TokenType::Interface => self.parse_interface_decl(),
             TokenType::Function => Ok(Item::Function(self.parse_function_decl()?)),
             TokenType::Extend => self.parse_extend_decl(),
+            TokenType::Import => self.parse_import_decl(),
             _ => Err(ParserError::UnexpectedToken(token.clone())),
         }
     }
@@ -144,6 +145,69 @@ impl Parser {
             implements,
             methods,
         }))
+    }
+
+    /// Parse: `import { name1, name2 as alias } from "module"`
+    /// Or:    `import "module"` (glob import)
+    pub fn parse_import_decl(&mut self) -> Result<Item, ParserError> {
+        self.expect(TokenType::Import)?;
+
+        // Check if it's `import { ... } from "module"` or `import "module"`
+        if self.peek().token_type == TokenType::LeftBrace {
+            // Named imports: import { A, B as C } from "module"
+            self.expect(TokenType::LeftBrace)?;
+
+            let mut symbols = Vec::new();
+            if self.peek().token_type != TokenType::RightBrace {
+                symbols.push(self.parse_import_symbol()?);
+                while self.expect_optional(TokenType::Comma) {
+                    if self.peek().token_type == TokenType::RightBrace {
+                        break; // trailing comma
+                    }
+                    symbols.push(self.parse_import_symbol()?);
+                }
+            }
+
+            self.expect(TokenType::RightBrace)?;
+            self.expect(TokenType::From)?;
+
+            let module = self.expect_string_literal()?;
+
+            Ok(Item::Import(ImportDecl {
+                module,
+                symbols: ImportSymbols::Named(symbols),
+            }))
+        } else {
+            // Glob import: import "module"
+            let module = self.expect_string_literal()?;
+
+            Ok(Item::Import(ImportDecl {
+                module,
+                symbols: ImportSymbols::Glob,
+            }))
+        }
+    }
+
+    fn parse_import_symbol(&mut self) -> Result<ImportSymbol, ParserError> {
+        let name = self.expect_identifier()?;
+        let alias = if self.expect_optional(TokenType::As) {
+            Some(self.expect_identifier()?)
+        } else {
+            None
+        };
+        Ok(ImportSymbol { name, alias })
+    }
+
+    fn expect_string_literal(&mut self) -> Result<String, ParserError> {
+        let token = self.peek().clone();
+        match &token.token_type {
+            TokenType::StringLit(s) => {
+                let s = s.clone();
+                self.advance();
+                Ok(s)
+            }
+            _ => Err(ParserError::UnexpectedToken(token)),
+        }
     }
 
     // Types

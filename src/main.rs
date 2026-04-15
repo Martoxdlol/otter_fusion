@@ -40,7 +40,25 @@ fn main() -> Result<(), std::io::Error> {
             println!("{ast:#?}");
         }
         Commands::Validate { file } => {
-            println!("Validating: {file}");
+            let source = read_source_file(file)?;
+            let mut scanner = Lexer::new(&source);
+            let tokens = scanner.scan_all().expect("Failed to scan tokens");
+            let mut parser = otter_fusion::parser::Parser::new(tokens);
+            let ast = parser.parse().expect("Failed to parse source code");
+            let module = otter_fusion::ast::Module {
+                name: file.clone(),
+                program: ast,
+            };
+            let validator = otter_fusion::validator::Validator::new(vec![module]);
+            match validator.validate() {
+                Ok(hir) => println!("{hir:#?}"),
+                Err(errors) => {
+                    for e in &errors {
+                        eprintln!("{e}");
+                    }
+                    std::process::exit(1);
+                }
+            }
         }
         Commands::Run { file } => {
             println!("Running: {file}");

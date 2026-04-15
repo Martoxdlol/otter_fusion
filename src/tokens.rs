@@ -69,6 +69,8 @@ pub enum TokenType {
     Class,     // class
     Continue,  // continue
     Break,     // break
+    Import,    // import
+    From,      // from
 
     EOF,
 }
@@ -273,6 +275,8 @@ impl TokenType {
             TokenType::Class => 5,
             TokenType::Continue => 8,
             TokenType::Break => 5,
+            TokenType::Import => 6,
+            TokenType::From => 4,
 
             TokenType::EOF => 0,
         }
@@ -471,6 +475,12 @@ impl TokenListBuilder {
     }
     pub fn kw_as(self) -> Self {
         self.push(TokenType::As)
+    }
+    pub fn kw_import(self) -> Self {
+        self.push(TokenType::Import)
+    }
+    pub fn kw_from(self) -> Self {
+        self.push(TokenType::From)
     }
     pub fn kw_self(self) -> Self {
         self.push(TokenType::SelfRef)
