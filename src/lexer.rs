@@ -212,7 +212,7 @@ impl Lexer {
                     }
                 }
 
-                _ => return Err(LexerError::InvalidNumber(number, self.line, self.column)),
+                _ => break,
             }
         }
 

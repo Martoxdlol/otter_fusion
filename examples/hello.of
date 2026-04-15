@@ -1,0 +1,13 @@
+function main(): i64 {
+  print("Hello, Otter Fusion!");
+
+  var x: i64 = 10;
+  var y: i64 = 20;
+  var sum = x + y;
+  print("Sum: " + (sum as str));
+
+  var name: str = "World";
+  print("Hello, " + name + "!");
+
+  0
+}

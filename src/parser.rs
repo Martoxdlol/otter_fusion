@@ -361,21 +361,27 @@ impl Parser {
         let mut statements = Vec::new();
         let mut final_expression: Option<Expr> = None;
         loop {
-            let tok = self.peek();
-
-            if tok.token_type == TokenType::RightBrace {
+            if self.peek().token_type == TokenType::RightBrace {
                 self.advance();
                 break;
             }
 
-            statements.push(self.parse_statement()?);
+            let stmt = self.parse_statement()?;
 
-            if self.peek().token_type != TokenType::RightBrace {
-                final_expression = Some(self.parse_expr()?);
-                self.expect(TokenType::RightBrace)?;
+            if self.expect_optional(TokenType::Semicolon) {
+                // Semicolon present — it's a regular statement, continue looping
+                statements.push(stmt);
+            } else if self.peek().token_type == TokenType::RightBrace {
+                // No semicolon, followed by } — final return expression
+                if let Statement::Expr(expr) = stmt {
+                    final_expression = Some(expr);
+                } else {
+                    statements.push(stmt);
+                }
+                self.advance();
                 break;
             } else {
-                self.expect(TokenType::Semicolon)?;
+                return Err(ParserError::UnexpectedToken(self.peek().clone()));
             }
         }
 
