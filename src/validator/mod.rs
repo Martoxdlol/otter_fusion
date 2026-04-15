@@ -172,6 +172,8 @@ impl Validator {
                 fields: vec![],
                 methods: vec![],
                 implements: vec![],
+                specialized_methods: vec![],
+                specialized_implements: vec![],
             },
         );
         std_scope.types.insert("List".to_string(), list_id);
@@ -210,6 +212,8 @@ impl Validator {
                 fields: vec![],
                 methods: vec![],
                 implements: vec![],
+                specialized_methods: vec![],
+                specialized_implements: vec![],
             },
         );
         std_scope.types.insert("Map".to_string(), map_id);

@@ -18,109 +18,142 @@ impl Validator {
 
             let module_name = self.module_name(hir_struct.module);
 
+            // Validate generic implements
             for &iface_id in &hir_struct.implements {
-                let (required_fields, required_method_ids) =
-                    self.collect_interface_requirements(iface_id);
+                self.validate_interface_impl(
+                    iface_id,
+                    &hir_struct.fields,
+                    &hir_struct.methods,
+                    &hir_struct.name,
+                    &module_name,
+                );
+            }
 
-                // Check fields
-                for req_field in &required_fields {
-                    let found = hir_struct
-                        .fields
-                        .iter()
-                        .find(|f| f.name == req_field.name);
-                    match found {
-                        None => {
-                            let iface_name = self
-                                .hir
-                                .interfaces
-                                .get(&iface_id)
-                                .map(|i| i.name.as_str())
-                                .unwrap_or("?");
-                            self.errors.push(ValidationError {
-                                kind: ErrorKind::MissingInterfaceField {
-                                    iface: iface_name.to_string(),
-                                    field: req_field.name.clone(),
-                                },
-                                module: module_name.clone(),
-                                context: Some(format!("in struct '{}'", hir_struct.name)),
-                            });
-                        }
-                        Some(actual_field) => {
-                            if !self.types_compatible(&req_field.ty, &actual_field.ty) {
-                                let iface_name = self
-                                    .hir
-                                    .interfaces
-                                    .get(&iface_id)
-                                    .map(|i| i.name.as_str())
-                                    .unwrap_or("?");
-                                self.errors.push(ValidationError {
-                                    kind: ErrorKind::MethodSignatureMismatch {
-                                        iface: iface_name.to_string(),
-                                        method: req_field.name.clone(),
-                                        detail: format!(
-                                            "field type mismatch: expected '{}', found '{}'",
-                                            self.format_type(&req_field.ty),
-                                            self.format_type(&actual_field.ty)
-                                        ),
-                                    },
-                                    module: module_name.clone(),
-                                    context: Some(format!("in struct '{}'", hir_struct.name)),
-                                });
-                            }
-                        }
+            // Validate specialized implements
+            for (spec_args, iface_id) in &hir_struct.specialized_implements {
+                // Collect methods from the matching specialization
+                let mut spec_method_ids: Vec<hir::FnId> = Vec::new();
+                for spec in &hir_struct.specialized_methods {
+                    if spec.type_args == *spec_args {
+                        spec_method_ids.extend(&spec.methods);
                     }
                 }
+                // Also include generic methods (they apply to all specializations)
+                spec_method_ids.extend(&hir_struct.methods);
 
-                // Check methods
-                for &req_fn_id in &required_method_ids {
-                    let req_fn = match self.hir.functions.get(&req_fn_id) {
-                        Some(f) => f.clone(),
-                        None => continue,
-                    };
+                self.validate_interface_impl(
+                    *iface_id,
+                    &hir_struct.fields,
+                    &spec_method_ids,
+                    &hir_struct.name,
+                    &module_name,
+                );
+            }
+        }
+    }
 
-                    // Find a matching method on the struct
-                    let found = hir_struct.methods.iter().find(|&&m_id| {
-                        self.hir
-                            .functions
-                            .get(&m_id)
-                            .map(|f| f.name == req_fn.name)
-                            .unwrap_or(false)
+    /// Validate that a set of fields + methods satisfies an interface's requirements.
+    fn validate_interface_impl(
+        &mut self,
+        iface_id: TypeId,
+        struct_fields: &[HirField],
+        method_ids: &[FnId],
+        struct_name: &str,
+        module_name: &str,
+    ) {
+        let (required_fields, required_method_ids) =
+            self.collect_interface_requirements(iface_id);
+
+        // Check fields
+        for req_field in &required_fields {
+            let found = struct_fields.iter().find(|f| f.name == req_field.name);
+            match found {
+                None => {
+                    let iface_name = self
+                        .hir
+                        .interfaces
+                        .get(&iface_id)
+                        .map(|i| i.name.as_str())
+                        .unwrap_or("?");
+                    self.errors.push(ValidationError {
+                        kind: ErrorKind::MissingInterfaceField {
+                            iface: iface_name.to_string(),
+                            field: req_field.name.clone(),
+                        },
+                        module: module_name.to_string(),
+                        context: Some(format!("in struct '{struct_name}'")),
                     });
+                }
+                Some(actual_field) => {
+                    if !self.types_compatible(&req_field.ty, &actual_field.ty) {
+                        let iface_name = self
+                            .hir
+                            .interfaces
+                            .get(&iface_id)
+                            .map(|i| i.name.as_str())
+                            .unwrap_or("?");
+                        self.errors.push(ValidationError {
+                            kind: ErrorKind::MethodSignatureMismatch {
+                                iface: iface_name.to_string(),
+                                method: req_field.name.clone(),
+                                detail: format!(
+                                    "field type mismatch: expected '{}', found '{}'",
+                                    self.format_type(&req_field.ty),
+                                    self.format_type(&actual_field.ty)
+                                ),
+                            },
+                            module: module_name.to_string(),
+                            context: Some(format!("in struct '{struct_name}'")),
+                        });
+                    }
+                }
+            }
+        }
 
-                    match found {
-                        None => {
-                            // Only require if the interface method has no body (abstract)
-                            if !self.ast_fn_bodies.contains_key(&req_fn_id) && req_fn.body.is_none()
-                            {
-                                let iface_name = self
-                                    .hir
-                                    .interfaces
-                                    .get(&iface_id)
-                                    .map(|i| i.name.as_str())
-                                    .unwrap_or("?");
-                                self.errors.push(ValidationError {
-                                    kind: ErrorKind::MissingInterfaceMethod {
-                                        iface: iface_name.to_string(),
-                                        method: req_fn.name.clone(),
-                                    },
-                                    module: module_name.clone(),
-                                    context: Some(format!("in struct '{}'", hir_struct.name)),
-                                });
-                            }
-                        }
-                        Some(&actual_fn_id) => {
-                            // Verify signature matches
-                            if let Some(actual_fn) = self.hir.functions.get(&actual_fn_id) {
-                                let actual_fn = actual_fn.clone();
-                                self.check_method_signature_match(
-                                    iface_id,
-                                    &req_fn,
-                                    &actual_fn,
-                                    &hir_struct.name,
-                                    &module_name,
-                                );
-                            }
-                        }
+        // Check methods
+        for &req_fn_id in &required_method_ids {
+            let req_fn = match self.hir.functions.get(&req_fn_id) {
+                Some(f) => f.clone(),
+                None => continue,
+            };
+
+            let found = method_ids.iter().find(|&&m_id| {
+                self.hir
+                    .functions
+                    .get(&m_id)
+                    .map(|f| f.name == req_fn.name)
+                    .unwrap_or(false)
+            });
+
+            match found {
+                None => {
+                    if !self.ast_fn_bodies.contains_key(&req_fn_id) && req_fn.body.is_none() {
+                        let iface_name = self
+                            .hir
+                            .interfaces
+                            .get(&iface_id)
+                            .map(|i| i.name.as_str())
+                            .unwrap_or("?");
+                        self.errors.push(ValidationError {
+                            kind: ErrorKind::MissingInterfaceMethod {
+                                iface: iface_name.to_string(),
+                                method: req_fn.name.clone(),
+                            },
+                            module: module_name.to_string(),
+                            context: Some(format!("in struct '{struct_name}'")),
+                        });
+                    }
+                }
+                Some(&actual_fn_id) => {
+                    if let Some(actual_fn) = self.hir.functions.get(&actual_fn_id) {
+                        let actual_fn = actual_fn.clone();
+                        self.check_method_signature_match(
+                            iface_id,
+                            &req_fn,
+                            &actual_fn,
+                            struct_name,
+                            module_name,
+                        );
                     }
                 }
             }

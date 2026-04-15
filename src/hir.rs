@@ -79,6 +79,13 @@ pub enum PrimitiveType {
     Char,
 }
 
+/// Methods available only for a specific type argument combination
+#[derive(Debug, Clone)]
+pub struct SpecializedExtend {
+    pub type_args: Vec<ResolvedType>,
+    pub methods: Vec<FnId>,
+}
+
 /// Struct with all extend methods merged in
 #[derive(Debug, Clone)]
 pub struct HirStruct {
@@ -87,8 +94,10 @@ pub struct HirStruct {
     pub name: String,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
-    pub methods: Vec<FnId>,      // includes methods from extend blocks
-    pub implements: Vec<TypeId>, // resolved interface IDs
+    pub methods: Vec<FnId>,      // generic methods (includes generic extend blocks)
+    pub implements: Vec<TypeId>, // generic interface IDs
+    pub specialized_methods: Vec<SpecializedExtend>,
+    pub specialized_implements: Vec<(Vec<ResolvedType>, TypeId)>, // (type_args, iface_id)
 }
 
 #[derive(Debug, Clone)]

@@ -54,6 +54,8 @@ pub enum ErrorKind {
 
     // Extend
     ExtendTargetNotStruct(String),
+    SpecializationArityMismatch { type_name: String, expected: usize, found: usize },
+    DuplicateSpecializedMethod { name: String, type_args: String },
 
     // Import
     ImportSymbolNotFound { module: String, symbol: String },
@@ -142,6 +144,12 @@ impl fmt::Display for ErrorKind {
             }
             ErrorKind::ExtendTargetNotStruct(name) => {
                 write!(f, "extend target '{name}' is not a struct")
+            }
+            ErrorKind::SpecializationArityMismatch { type_name, expected, found } => {
+                write!(f, "extend target '{type_name}' expects {expected} type arguments, found {found}")
+            }
+            ErrorKind::DuplicateSpecializedMethod { name, type_args } => {
+                write!(f, "duplicate method '{name}' in specialized extend for <{type_args}>")
             }
             ErrorKind::ImportSymbolNotFound { module, symbol } => {
                 write!(f, "symbol '{symbol}' not found in module '{module}'")

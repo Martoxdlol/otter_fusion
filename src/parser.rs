@@ -405,6 +405,14 @@ impl Parser {
     }
 
     pub fn parse_param_decl(&mut self) -> Result<ParamDecl, ParserError> {
+        // Handle `self` as a special parameter (no type annotation)
+        if self.peek().token_type == TokenType::SelfRef {
+            self.advance();
+            return Ok(ParamDecl {
+                name: "self".to_string(),
+                ty: TypeExpr::Primitive(PrimitiveType::Null), // placeholder, resolved later
+            });
+        }
         let name = self.expect_identifier()?;
         self.expect(TokenType::Colon)?;
         let ty = self.parse_type_expr()?;

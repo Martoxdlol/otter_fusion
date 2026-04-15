@@ -52,6 +52,8 @@ impl Validator {
                                 fields: vec![],
                                 methods: vec![],
                                 implements: vec![],
+                                specialized_methods: vec![],
+                                specialized_implements: vec![],
                             },
                         );
                         self.hir.modules.get_mut(&module_id).unwrap().structs.push(type_id);

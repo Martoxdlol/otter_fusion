@@ -904,6 +904,19 @@ impl Validator {
         }
     }
 
+    /// Check if the concrete type_args of a struct instance match a specialization's type_args.
+    fn specialized_args_match(
+        &self,
+        instance_args: &[ResolvedType],
+        spec_args: &[ResolvedType],
+    ) -> bool {
+        instance_args.len() == spec_args.len()
+            && instance_args
+                .iter()
+                .zip(spec_args)
+                .all(|(a, b)| self.types_compatible(a, b) && self.types_compatible(b, a))
+    }
+
     /// Unfold an Alias type one level if it is one, otherwise return as-is.
     /// Used to expose the structural type for pattern matching (member access, for-loop, call).
     fn shallow_unfold_alias(&mut self, module_id: ModuleId, ty: &ResolvedType) -> ResolvedType {
@@ -952,7 +965,34 @@ impl Validator {
                     });
                 }
 
-                // Check methods
+                // Check specialized methods first (higher priority)
+                for spec in &hir_struct.specialized_methods {
+                    if self.specialized_args_match(type_args, &spec.type_args) {
+                        for &method_id in &spec.methods {
+                            if let Some(method) = self.hir.functions.get(&method_id) {
+                                if method.name == member_name {
+                                    // Specialized methods already have concrete types,
+                                    // no substitution needed
+                                    let param_types: Vec<_> =
+                                        method.params.iter().map(|p| p.ty.clone()).collect();
+                                    let ret_type = method.return_type.clone();
+                                    return Ok(TypedExpr {
+                                        kind: ExprKind::Member(
+                                            Box::new(typed_obj),
+                                            member_name.to_string(),
+                                        ),
+                                        ty: ResolvedType::Function(
+                                            param_types,
+                                            Box::new(ret_type),
+                                        ),
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Check generic methods
                 for &method_id in &hir_struct.methods {
                     if let Some(method) = self.hir.functions.get(&method_id) {
                         if method.name == member_name {
