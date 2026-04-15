@@ -58,6 +58,7 @@ pub enum ResolvedType {
     Union(Vec<ResolvedType>),
     Function(Vec<ResolvedType>, Box<ResolvedType>),
     TypeParam(TypeParamId), // unresolved generic, resolved later
+    Alias(TypeId, Vec<ResolvedType>), // recursive type alias reference
     Null,
 }
 

@@ -260,7 +260,9 @@ impl Validator {
                 let typed_iter = self.typecheck_expr(iterable, scope, module_id, context, module_name)?;
 
                 // Determine element type: iterable must be List<T>
-                let elem_type = match &typed_iter.ty {
+                // Unfold aliases to find the underlying type
+                let iter_ty = self.shallow_unfold_alias(module_id, &typed_iter.ty);
+                let elem_type = match &iter_ty {
                     ResolvedType::Struct(id, args) if Some(*id) == self.list_type_id => {
                         if args.is_empty() {
                             ResolvedType::Null
@@ -386,8 +388,8 @@ impl Validator {
                     typed_args.push(self.typecheck_expr(arg, scope, module_id, context, module_name)?);
                 }
 
-                // Determine return type
-                let callee_ty = typed_callee.ty.clone();
+                // Determine return type — unfold aliases to find Function type
+                let callee_ty = self.shallow_unfold_alias(module_id, &typed_callee.ty);
                 match &callee_ty {
                     ResolvedType::Function(param_types, ret_type) => {
                         if param_types.len() != typed_args.len() {
@@ -431,7 +433,7 @@ impl Validator {
 
             ast::Expr::Member(obj, member_name) => {
                 let typed_obj = self.typecheck_expr(obj, scope, module_id, context, module_name)?;
-                self.typecheck_member_access(typed_obj, member_name, module_name, context)
+                self.typecheck_member_access(typed_obj, member_name, module_id, module_name, context)
             }
 
             ast::Expr::If(cond, then_block, else_block) => {
@@ -902,14 +904,28 @@ impl Validator {
         }
     }
 
+    /// Unfold an Alias type one level if it is one, otherwise return as-is.
+    /// Used to expose the structural type for pattern matching (member access, for-loop, call).
+    fn shallow_unfold_alias(&mut self, module_id: ModuleId, ty: &ResolvedType) -> ResolvedType {
+        match ty {
+            ResolvedType::Alias(id, args) => {
+                self.unfold_alias(module_id, *id, args).unwrap_or_else(|_| ty.clone())
+            }
+            _ => ty.clone(),
+        }
+    }
+
     fn typecheck_member_access(
-        &self,
+        &mut self,
         typed_obj: TypedExpr,
         member_name: &str,
+        module_id: ModuleId,
         module_name: &str,
         context: &str,
     ) -> Result<TypedExpr, Vec<ValidationError>> {
-        match &typed_obj.ty {
+        // Unfold aliases to find the structural type for member access
+        let effective_ty = self.shallow_unfold_alias(module_id, &typed_obj.ty);
+        match &effective_ty {
             ResolvedType::Struct(id, type_args) => {
                 let hir_struct = match self.hir.structs.get(id) {
                     Some(s) => s.clone(),

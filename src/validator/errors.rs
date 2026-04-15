@@ -45,6 +45,7 @@ pub enum ErrorKind {
 
     // Type alias
     CyclicTypeAlias(String),
+    RecursiveAliasNoBaseCase(String),
 
     // Interface
     MissingInterfaceField { iface: String, field: String },
@@ -119,6 +120,9 @@ impl fmt::Display for ErrorKind {
             ErrorKind::ContinueOutsideLoop => write!(f, "'continue' outside of loop"),
             ErrorKind::CyclicTypeAlias(name) => {
                 write!(f, "cyclic type alias '{name}'")
+            }
+            ErrorKind::RecursiveAliasNoBaseCase(name) => {
+                write!(f, "recursive type alias '{name}' has no non-recursive base case")
             }
             ErrorKind::MissingInterfaceField { iface, field } => {
                 write!(f, "missing field '{field}' required by interface '{iface}'")

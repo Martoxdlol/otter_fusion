@@ -33,6 +33,7 @@ pub struct Validator {
     // Type aliases
     pub(crate) type_aliases: HashMap<TypeId, TypeAliasInfo>,
     pub(crate) alias_expanding: HashSet<TypeId>,
+    pub(crate) resolved_alias_bodies: HashMap<TypeId, hir::ResolvedType>,
 
     // Active type param scope (set contextually during resolution)
     pub(crate) type_param_scope: HashMap<String, TypeParamId>,
@@ -75,6 +76,7 @@ impl Validator {
 
             type_aliases: HashMap::new(),
             alias_expanding: HashSet::new(),
+            resolved_alias_bodies: HashMap::new(),
 
             type_param_scope: HashMap::new(),
 
