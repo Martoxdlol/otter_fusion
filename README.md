@@ -376,6 +376,177 @@ function print_all<T>(iter: Iterator<T>) {
 }
 ```
 
+## Foreign Function Interface (`extern`)
+
+The `extern` keyword declares items that follow the C ABI, so they can interact
+with foreign code. It can be applied to functions, structs, and function types.
+
+### Extern Functions
+
+The `extern` keyword on a function is the boundary with the C ABI. It has two
+forms:
+
+**Import** — no body. The implementation is provided by foreign code.
+
+```typescript
+extern function print(value: str);
+extern function malloc(size: u64): *Buffer;
+```
+
+**Export** — has a body. The compiler emits the function with the C calling
+convention so that foreign code can call it. Typically used for callbacks
+registered with C libraries.
+
+```typescript
+extern function on_tick(d: *MyStruct) {
+  d.counter = d.counter + 1
+}
+```
+
+Exported extern functions are always top-level items. They **cannot capture
+variables** from any enclosing scope (there is no enclosing scope), because a
+C function pointer is a single machine pointer with nowhere to hold a closure
+environment. C callback APIs conventionally pass user state through a
+`void*` parameter — in this language that role is filled by a `*T` argument
+on the callback itself.
+
+### Extern Structs
+
+Structs marked as `extern` are laid out in memory as C structs, so they can
+be passed to or returned from extern functions.
+
+```typescript
+extern struct MyCFunctionArgs {
+  flags: i32,
+  name: *str,
+}
+```
+
+### Extern Function Types
+
+Function types that follow the C ABI use the `extern (...)  => T` syntax.
+Parameters have names (like a declaration) and can be pointers.
+
+```typescript
+type Fun = extern (x: MyStruct) => bool;
+type Callback = extern (data: *MyStruct, size: u64) => *Buffer | null;
+```
+
+### Pointer Syntax
+
+Inside extern functions and extern structs, parameters, fields and return
+types can be prefixed with `*` to mark them as pointers.
+
+```typescript
+extern function hashmap_set(key: *str, value: *MyStruct);
+extern function hashmap_set<T>(key: *str, value: *T);
+extern function malloc(size: u64): *Buffer;
+extern function malloc(size: u64): *Buffer | null;
+```
+
+### Rules
+
+- `*` as a type prefix is only allowed inside extern functions, extern structs
+  and extern function types.
+- In extern functions and extern structs, a parameter or field marked with `*`
+  behaves as a pointer; otherwise, values are passed by value (not by pointer).
+- Extern structs are laid out as C structs. Non-extern structs have no
+  guaranteed layout.
+- Generic type parameters (`T`, `U`, ...) can only be passed as pointers
+  (`*T`), since their size is not known at the call site.
+- Union types are only supported as pointers over the entire union
+  (`*(A | B)`), or as the special case of a nullable pointer (`*T | null`).
+- If a return type is declared without the `| null` option, calling the
+  function will fail (panic) when the underlying pointer is actually null.
+
+### Memory Model
+
+The runtime has two disjoint memory regions:
+
+- **Managed heap** — allocated, traced and reclaimed by the garbage collector.
+  Holds regular (non-extern) structs, lists, maps, strings, closures.
+- **Foreign heap** — anything allocated by extern code (`malloc`, `mmap`,
+  library allocators, arenas). Opaque to the GC. Ownership is manual.
+
+`extern struct` values live in the foreign heap. Non-extern struct values live
+in the managed heap. The `*T` syntax expresses a raw pointer into either
+region — the GC decides how to treat it at runtime, based on whether the
+pointer refers to memory allocated by the managed allocator.
+
+- Pointer refers to managed memory → the GC knows about the object and applies
+  its normal rules (tracing, moving, collection).
+- Pointer refers to foreign memory → the GC ignores it entirely. The
+  programmer is responsible for its lifetime.
+
+### Pinning
+
+The GC is free to move or reclaim managed objects at any time. Whenever a
+`*T` pointing into the managed heap is handed to foreign code, the object
+must be **pinned** so the GC neither moves nor collects it. Pinning is
+**always manual** — the compiler does not insert `pin` / `unpin` anywhere.
+
+```typescript
+function pin<T>(value: T): *T;
+function unpin<T>(ptr: *T);
+```
+
+- `pin(value)` registers `value` as a pinned GC root and returns its raw
+  address as `*T`. While pinned, the object is guaranteed not to move and not
+  to be collected.
+- `unpin(ptr)` releases the pin. After this call the pointer is no longer
+  valid for foreign use — the GC may move or collect the underlying object on
+  its next cycle.
+
+Pinning is refcounted per object: nested `pin` / `unpin` pairs on the same
+value compose correctly. `pin` on a value that already lives in the foreign
+heap returns its address unchanged (no-op).
+
+Passing a managed value to an extern function without first pinning it is a
+programmer error. Nothing happens implicitly.
+
+### Example
+
+```typescript
+extern struct Buffer {
+  data: *u8,
+  size: u64,
+}
+
+extern function malloc(size: u64): *Buffer | null;
+extern function free(buf: *Buffer);
+
+function allocate(size: u64): *Buffer {
+  var maybe = malloc(size);
+  if (maybe is null) {
+    return null; // will fail if caller requires non-null
+  }
+  maybe as Buffer
+}
+```
+
+Pinning a managed value across a foreign callback:
+
+```typescript
+extern function register_callback(data: *MyStruct, cb: extern (d: *MyStruct) => void);
+extern function unregister_callback(data: *MyStruct);
+
+struct MyStruct {
+  counter: i64,
+}
+
+function install(): *MyStruct {
+  var state = MyStruct { counter: 0 };
+  var ptr = pin(state);
+  register_callback(ptr, on_tick);
+  ptr
+}
+
+function remove(ptr: *MyStruct) {
+  unregister_callback(ptr);
+  unpin(ptr);
+}
+```
+
 ## Conclusion
 
-This document outlines the core features of the FIU-LYC-LANG, including its type system, variable declarations, functions, structs, interfaces, extensions, and error management. The language is designed to be flexible and powerful while maintaining a clear and concise syntax.
+This document outlines the core features of the Otter Fusion, including its type system, variable declarations, functions, structs, interfaces, extensions, and error management. The language is designed to be flexible and powerful while maintaining a clear and concise syntax.

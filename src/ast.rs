@@ -56,6 +56,15 @@ pub enum TypeExpr {
     Union(Vec<TypeExpr>),
     Named(String, Vec<TypeExpr>),
     Function(Vec<TypeExpr>, Box<TypeExpr>), // (param_types) -> return_type
+    ExternFunction(Vec<ExternParam>, Box<TypeExpr>), // extern (name: *T, ...) => return_type
+    Pointer(Box<TypeExpr>),                 // *T (only valid in extern contexts)
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExternParam {
+    pub name: String,
+    pub ty: TypeExpr,
+    pub is_pointer: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -89,6 +98,7 @@ pub struct InterfaceDecl {
 pub struct FieldDecl {
     pub name: String,
     pub ty: TypeExpr,
+    pub is_pointer: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -101,6 +111,7 @@ pub struct Block {
 pub struct FunctionDecl {
     pub name: String,
     pub has_self_param: bool,
+    pub is_extern: bool,
     pub generics: Vec<GenericParam>,
     pub return_type: Option<TypeExpr>,
     pub params: Vec<ParamDecl>,
@@ -111,6 +122,7 @@ pub struct FunctionDecl {
 pub struct ParamDecl {
     pub name: String,
     pub ty: TypeExpr,
+    pub is_pointer: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -178,6 +190,7 @@ pub enum UnaryOperator {
 #[derive(Debug, Clone, PartialEq)]
 pub struct StructDecl {
     pub name: String,
+    pub is_extern: bool,
     pub generics: Vec<GenericParam>,
     pub fields: Vec<FieldDecl>,
     pub methods: Vec<FunctionDecl>,

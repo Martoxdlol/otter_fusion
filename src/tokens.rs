@@ -21,6 +21,7 @@ pub enum TokenType {
     GT,        // >
     Eq,        // =
     EqEq,      // ==
+    FatArrow,  // =>
     Bang,      // !
     BangEq,    // !=
     Plus,      // +
@@ -69,6 +70,7 @@ pub enum TokenType {
     Class,     // class
     Continue,  // continue
     Break,     // break
+    Extern,    // extern
 
     EOF,
 }
@@ -238,7 +240,11 @@ impl TokenType {
             | TokenType::Comma => 1,
 
             // Two-character
-            TokenType::EqEq | TokenType::BangEq | TokenType::And | TokenType::Or => 2,
+            TokenType::EqEq
+            | TokenType::BangEq
+            | TokenType::And
+            | TokenType::Or
+            | TokenType::FatArrow => 2,
 
             // Literals
             TokenType::Identifier(name) => name.len(),
@@ -273,6 +279,7 @@ impl TokenType {
             TokenType::Class => 5,
             TokenType::Continue => 8,
             TokenType::Break => 5,
+            TokenType::Extern => 6,
 
             TokenType::EOF => 0,
         }
@@ -486,6 +493,12 @@ impl TokenListBuilder {
     }
     pub fn kw_break(self) -> Self {
         self.push(TokenType::Break)
+    }
+    pub fn kw_extern(self) -> Self {
+        self.push(TokenType::Extern)
+    }
+    pub fn fat_arrow(self) -> Self {
+        self.push(TokenType::FatArrow)
     }
 
     pub fn eof(self) -> Self {

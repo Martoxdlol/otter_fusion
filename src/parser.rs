@@ -1,8 +1,8 @@
 use crate::{
     ast::{
-        BinaryOperator, Block, Expr, ExtendDecl, FieldDecl, FunctionDecl, GenericParam,
-        InterfaceDecl, Item, Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl,
-        TypeAliasDecl, TypeExpr, UnaryOperator,
+        BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
+        GenericParam, InterfaceDecl, Item, Literal, ParamDecl, PrimitiveType, Program, Statement,
+        StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -47,10 +47,21 @@ impl Parser {
         let token = self.peek();
         match &token.token_type {
             TokenType::Type => self.parse_type_decl(),
-            TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl()?)),
+            TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl(false)?)),
             TokenType::Interface => self.parse_interface_decl(),
-            TokenType::Function => Ok(Item::Function(self.parse_function_decl()?)),
+            TokenType::Function => Ok(Item::Function(self.parse_function_decl(false)?)),
             TokenType::Extend => self.parse_extend_decl(),
+            TokenType::Extern => {
+                self.advance();
+                let next = self.peek();
+                match &next.token_type {
+                    TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl(true)?)),
+                    TokenType::Function => {
+                        Ok(Item::Function(self.parse_function_decl(true)?))
+                    }
+                    _ => Err(ParserError::UnexpectedToken(next.clone())),
+                }
+            }
             _ => Err(ParserError::UnexpectedToken(token.clone())),
         }
     }
@@ -66,14 +77,15 @@ impl Parser {
         Ok(Item::TypeAlias(TypeAliasDecl { name, generics, ty }))
     }
 
-    pub fn parse_struct_decl(&mut self) -> Result<StructDecl, ParserError> {
+    pub fn parse_struct_decl(&mut self, is_extern: bool) -> Result<StructDecl, ParserError> {
         self.expect(TokenType::Struct)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
         let implements = self.parse_implements()?;
-        let (fields, methods) = self.parse_struct_body()?;
+        let (fields, methods) = self.parse_struct_body(is_extern)?;
         Ok(StructDecl {
             name,
+            is_extern,
             fields,
             generics,
             implements,
@@ -86,7 +98,7 @@ impl Parser {
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
         let implements = self.parse_implements()?;
-        let (fields, methods) = self.parse_struct_body()?;
+        let (fields, methods) = self.parse_struct_body(false)?;
         Ok(Item::Interface(InterfaceDecl {
             name,
             generics,
@@ -96,14 +108,14 @@ impl Parser {
         }))
     }
 
-    pub fn parse_function_decl(&mut self) -> Result<FunctionDecl, ParserError> {
+    pub fn parse_function_decl(&mut self, is_extern: bool) -> Result<FunctionDecl, ParserError> {
         self.expect(TokenType::Function)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
-        let mut params = self.parse_function_args()?;
+        let mut params = self.parse_function_args(is_extern)?;
         let mut return_type = None;
         if self.expect_optional(TokenType::Colon) {
-            return_type = Some(self.parse_type_expr()?);
+            return_type = Some(self.parse_return_type(is_extern)?);
         }
 
         let has_self_param = params.first().map_or(false, |p| p.name == "self");
@@ -122,10 +134,57 @@ impl Parser {
         Ok(FunctionDecl {
             name,
             has_self_param,
+            is_extern,
             generics,
             return_type,
             params,
             body,
+        })
+    }
+
+    fn parse_return_type(&mut self, in_extern: bool) -> Result<TypeExpr, ParserError> {
+        if in_extern {
+            self.parse_extern_type_expr()
+        } else {
+            self.parse_type_expr()
+        }
+    }
+
+    // In extern contexts, a type expression can include *T (pointer) atoms and
+    // *T | null unions. We parse a regular type_expr but allow pointer atoms.
+    fn parse_extern_type_expr(&mut self) -> Result<TypeExpr, ParserError> {
+        let ty = self.parse_extern_type_atom()?;
+
+        if self.peek().token_type == TokenType::Pipe {
+            let mut variants = vec![ty];
+            while self.expect_optional(TokenType::Pipe) {
+                variants.push(self.parse_extern_type_atom()?);
+            }
+            Ok(TypeExpr::Union(variants))
+        } else {
+            Ok(ty)
+        }
+    }
+
+    fn parse_extern_type_atom(&mut self) -> Result<TypeExpr, ParserError> {
+        if self.peek().token_type == TokenType::Star {
+            self.advance();
+            let inner = self.parse_type_atom()?;
+            Ok(TypeExpr::Pointer(Box::new(inner)))
+        } else {
+            self.parse_type_atom()
+        }
+    }
+
+    fn parse_extern_fn_type_param(&mut self) -> Result<ExternParam, ParserError> {
+        let name = self.expect_identifier()?;
+        self.expect(TokenType::Colon)?;
+        let is_pointer = self.expect_optional(TokenType::Star);
+        let ty = self.parse_type_expr()?;
+        Ok(ExternParam {
+            name,
+            ty,
+            is_pointer,
         })
     }
 
@@ -231,6 +290,22 @@ impl Parser {
                 self.advance();
                 Ok(TypeExpr::Primitive(PrimitiveType::Null))
             }
+            // Extern function type: extern (name: T, name: *T) => return_type
+            TokenType::Extern => {
+                self.advance();
+                self.expect(TokenType::LeftParen)?;
+                let mut params = Vec::new();
+                if self.peek().token_type != TokenType::RightParen {
+                    params.push(self.parse_extern_fn_type_param()?);
+                    while self.expect_optional(TokenType::Comma) {
+                        params.push(self.parse_extern_fn_type_param()?);
+                    }
+                }
+                self.expect(TokenType::RightParen)?;
+                self.expect(TokenType::FatArrow)?;
+                let return_type = self.parse_extern_type_expr()?;
+                Ok(TypeExpr::ExternFunction(params, Box::new(return_type)))
+            }
             // Function type: (param_types) -> return_type
             TokenType::LeftParen => {
                 self.advance();
@@ -269,16 +344,21 @@ impl Parser {
         Ok(args)
     }
 
-    pub fn parse_field(&mut self) -> Result<FieldDecl, ParserError> {
+    pub fn parse_field(&mut self, in_extern: bool) -> Result<FieldDecl, ParserError> {
         let name = self.expect_identifier()?;
         self.expect(TokenType::Colon)?;
-        let ty = self.parse_type_expr()?;
-        Ok(FieldDecl { name, ty })
+        let (ty, is_pointer) = self.parse_maybe_pointer_type(in_extern)?;
+        Ok(FieldDecl {
+            name,
+            ty,
+            is_pointer,
+        })
     }
 
     // Struct
     pub fn parse_struct_body(
         &mut self,
+        in_extern: bool,
     ) -> Result<(Vec<FieldDecl>, Vec<FunctionDecl>), ParserError> {
         self.expect(TokenType::LeftBrace)?;
 
@@ -289,8 +369,8 @@ impl Parser {
         loop {
             let tok = self.peek();
             match &tok.token_type {
-                TokenType::Identifier(_) => fields.push(self.parse_field()?),
-                TokenType::Function => methods.push(self.parse_function_decl()?),
+                TokenType::Identifier(_) => fields.push(self.parse_field(in_extern)?),
+                TokenType::Function => methods.push(self.parse_function_decl(false)?),
                 TokenType::RightBrace => {
                     self.advance();
                     break;
@@ -311,7 +391,7 @@ impl Parser {
         loop {
             let tok = self.peek();
             match &tok.token_type {
-                TokenType::Function => methods.push(self.parse_function_decl()?),
+                TokenType::Function => methods.push(self.parse_function_decl(false)?),
                 TokenType::RightBrace => {
                     self.advance();
                     break;
@@ -325,14 +405,14 @@ impl Parser {
 
     // Functions
 
-    pub fn parse_function_args(&mut self) -> Result<Vec<ParamDecl>, ParserError> {
+    pub fn parse_function_args(&mut self, in_extern: bool) -> Result<Vec<ParamDecl>, ParserError> {
         self.expect(TokenType::LeftParen)?;
         let mut params = Vec::new();
 
         if self.peek().token_type != TokenType::RightParen {
-            params.push(self.parse_param_decl()?);
+            params.push(self.parse_param_decl(in_extern)?);
             while self.expect_optional(TokenType::Comma) {
-                params.push(self.parse_param_decl()?);
+                params.push(self.parse_param_decl(in_extern)?);
             }
         }
 
@@ -340,11 +420,34 @@ impl Parser {
         Ok(params)
     }
 
-    pub fn parse_param_decl(&mut self) -> Result<ParamDecl, ParserError> {
+    pub fn parse_param_decl(&mut self, in_extern: bool) -> Result<ParamDecl, ParserError> {
         let name = self.expect_identifier()?;
         self.expect(TokenType::Colon)?;
-        let ty = self.parse_type_expr()?;
-        Ok(ParamDecl { name, ty })
+        let (ty, is_pointer) = self.parse_maybe_pointer_type(in_extern)?;
+        Ok(ParamDecl {
+            name,
+            ty,
+            is_pointer,
+        })
+    }
+
+    // In extern contexts, a field/param type may be prefixed with `*` to mark
+    // it as a pointer. Outside extern contexts, `*` is not allowed here.
+    fn parse_maybe_pointer_type(
+        &mut self,
+        in_extern: bool,
+    ) -> Result<(TypeExpr, bool), ParserError> {
+        if in_extern && self.peek().token_type == TokenType::Star {
+            self.advance();
+            let ty = self.parse_type_expr()?;
+            Ok((ty, true))
+        } else if in_extern {
+            let ty = self.parse_extern_type_expr()?;
+            Ok((ty, false))
+        } else {
+            let ty = self.parse_type_expr()?;
+            Ok((ty, false))
+        }
     }
 
     pub fn parse_block(&mut self) -> Result<Block, ParserError> {
@@ -1034,16 +1137,19 @@ mod tests {
         let expected_func = FunctionDecl {
             name: String::from("add"),
             has_self_param: false,
+            is_extern: false,
             generics: vec![],
             return_type: Some(TypeExpr::Primitive(PrimitiveType::Int64)),
             params: vec![
                 ParamDecl {
                     name: String::from("a"),
                     ty: TypeExpr::Primitive(PrimitiveType::Int64),
+                    is_pointer: false,
                 },
                 ParamDecl {
                     name: String::from("b"),
                     ty: TypeExpr::Primitive(PrimitiveType::Int64),
+                    is_pointer: false,
                 },
             ],
             body: Some(Block {
@@ -1164,6 +1270,7 @@ mod tests {
             fields: vec![FieldDecl {
                 name: "name".to_string(),
                 ty: TypeExpr::Primitive(PrimitiveType::String),
+                is_pointer: false,
             }],
             methods: vec![],
             implements: vec![],
@@ -1321,7 +1428,7 @@ mod tests {
             .eof()
             .build();
         let mut parser = Parser::new(tokens);
-        let result = parser.parse_struct_decl().unwrap();
+        let result = parser.parse_struct_decl(false).unwrap();
         assert_eq!(result.name, "Box");
         assert_eq!(result.generics.len(), 1);
         assert_eq!(result.generics[0].name, "T");
@@ -1353,17 +1460,19 @@ mod tests {
             .eof()
             .build();
         let mut parser = Parser::new(tokens);
-        let result = parser.parse_function_decl().unwrap();
+        let result = parser.parse_function_decl(false).unwrap();
         assert_eq!(
             result,
             FunctionDecl {
                 name: "foo".to_string(),
                 has_self_param: false,
+                is_extern: false,
                 generics: vec![],
                 return_type: Some(TypeExpr::Primitive(PrimitiveType::Bool)),
                 params: vec![ParamDecl {
                     name: "x".to_string(),
                     ty: TypeExpr::Primitive(PrimitiveType::Int32),
+                    is_pointer: false,
                 }],
                 body: None,
             }
@@ -1383,7 +1492,7 @@ mod tests {
             .eof()
             .build();
         let mut parser = Parser::new(tokens);
-        let result = parser.parse_function_decl().unwrap();
+        let result = parser.parse_function_decl(false).unwrap();
         assert_eq!(result.name, "noop");
         assert_eq!(result.params.len(), 0);
         assert!(result.body.is_none());
@@ -1414,7 +1523,7 @@ mod tests {
             .eof()
             .build();
         let mut parser = Parser::new(tokens);
-        let result = parser.parse_struct_decl().unwrap();
+        let result = parser.parse_struct_decl(false).unwrap();
         assert_eq!(result.name, "Foo");
         assert_eq!(result.fields.len(), 0);
         assert_eq!(result.methods.len(), 1);
@@ -1456,7 +1565,7 @@ mod tests {
             .eof()
             .build();
         let mut parser = Parser::new(tokens);
-        let result = parser.parse_struct_decl().unwrap();
+        let result = parser.parse_struct_decl(false).unwrap();
         assert_eq!(result.fields.len(), 2);
         assert_eq!(result.fields[0].name, "x");
         assert_eq!(
@@ -1665,5 +1774,349 @@ mod tests {
         ]);
 
         assert_eq!(expr, expected);
+    }
+
+    #[test]
+    fn test_parse_extern_function_simple() {
+        // extern function print(value: str);
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("print")
+            .left_paren()
+            .identifier("value")
+            .colon()
+            .space()
+            .identifier("str")
+            .right_paren()
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+
+        let expected = Item::Function(FunctionDecl {
+            name: "print".to_string(),
+            has_self_param: false,
+            is_extern: true,
+            generics: vec![],
+            return_type: None,
+            params: vec![ParamDecl {
+                name: "value".to_string(),
+                ty: TypeExpr::Primitive(PrimitiveType::String),
+                is_pointer: false,
+            }],
+            body: None,
+        });
+        assert_eq!(item, expected);
+    }
+
+    #[test]
+    fn test_parse_extern_function_pointer_param_and_return() {
+        // extern function malloc(size: u64): *Buffer;
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("malloc")
+            .left_paren()
+            .identifier("size")
+            .colon()
+            .space()
+            .identifier("u64")
+            .right_paren()
+            .colon()
+            .space()
+            .star()
+            .identifier("Buffer")
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+
+        if let Item::Function(f) = item {
+            assert_eq!(f.name, "malloc");
+            assert!(f.is_extern);
+            assert_eq!(f.params.len(), 1);
+            assert!(!f.params[0].is_pointer);
+            assert_eq!(
+                f.return_type,
+                Some(TypeExpr::Pointer(Box::new(TypeExpr::Named(
+                    "Buffer".to_string(),
+                    vec![]
+                ))))
+            );
+        } else {
+            panic!("expected Item::Function");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_function_pointer_params() {
+        // extern function hashmap_set(key: *str, value: *MyStruct);
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("hashmap_set")
+            .left_paren()
+            .identifier("key")
+            .colon()
+            .space()
+            .star()
+            .identifier("str")
+            .comma()
+            .space()
+            .identifier("value")
+            .colon()
+            .space()
+            .star()
+            .identifier("MyStruct")
+            .right_paren()
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::Function(f) = item {
+            assert!(f.is_extern);
+            assert_eq!(f.params.len(), 2);
+            assert!(f.params[0].is_pointer);
+            assert_eq!(f.params[0].ty, TypeExpr::Primitive(PrimitiveType::String));
+            assert!(f.params[1].is_pointer);
+            assert_eq!(
+                f.params[1].ty,
+                TypeExpr::Named("MyStruct".to_string(), vec![])
+            );
+        } else {
+            panic!("expected Item::Function");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_function_generic_pointer() {
+        // extern function hashmap_set<T>(key: *str, value: *T);
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("hashmap_set")
+            .lt()
+            .identifier("T")
+            .gt()
+            .left_paren()
+            .identifier("key")
+            .colon()
+            .space()
+            .star()
+            .identifier("str")
+            .comma()
+            .space()
+            .identifier("value")
+            .colon()
+            .space()
+            .star()
+            .identifier("T")
+            .right_paren()
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::Function(f) = item {
+            assert!(f.is_extern);
+            assert_eq!(f.generics.len(), 1);
+            assert!(f.params[1].is_pointer);
+            assert_eq!(f.params[1].ty, TypeExpr::Named("T".to_string(), vec![]));
+        } else {
+            panic!("expected Item::Function");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_function_nullable_pointer_return() {
+        // extern function malloc(size: u64): *Buffer | null;
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("malloc")
+            .left_paren()
+            .identifier("size")
+            .colon()
+            .space()
+            .identifier("u64")
+            .right_paren()
+            .colon()
+            .space()
+            .star()
+            .identifier("Buffer")
+            .space()
+            .pipe()
+            .space()
+            .kw_null()
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::Function(f) = item {
+            assert_eq!(
+                f.return_type,
+                Some(TypeExpr::Union(vec![
+                    TypeExpr::Pointer(Box::new(TypeExpr::Named(
+                        "Buffer".to_string(),
+                        vec![]
+                    ))),
+                    TypeExpr::Primitive(PrimitiveType::Null),
+                ]))
+            );
+        } else {
+            panic!("expected Item::Function");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_struct() {
+        // extern struct MyCFunctionArgs { a: i32 b: *str }
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_struct()
+            .space()
+            .identifier("MyCFunctionArgs")
+            .space()
+            .left_brace()
+            .space()
+            .identifier("a")
+            .colon()
+            .space()
+            .identifier("i32")
+            .space()
+            .identifier("b")
+            .colon()
+            .space()
+            .star()
+            .identifier("str")
+            .space()
+            .right_brace()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::Struct(s) = item {
+            assert!(s.is_extern);
+            assert_eq!(s.fields.len(), 2);
+            assert!(!s.fields[0].is_pointer);
+            assert!(s.fields[1].is_pointer);
+            assert_eq!(s.fields[1].ty, TypeExpr::Primitive(PrimitiveType::String));
+        } else {
+            panic!("expected Item::Struct");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_function_type_alias() {
+        // type Fun = extern (x: MyStruct) => bool;
+        let tokens = TokenListBuilder::new()
+            .kw_type()
+            .space()
+            .identifier("Fun")
+            .space()
+            .eq()
+            .space()
+            .kw_extern()
+            .space()
+            .left_paren()
+            .identifier("x")
+            .colon()
+            .space()
+            .identifier("MyStruct")
+            .right_paren()
+            .space()
+            .fat_arrow()
+            .space()
+            .identifier("bool")
+            .semicolon()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::TypeAlias(alias) = item {
+            assert_eq!(alias.name, "Fun");
+            match alias.ty {
+                TypeExpr::ExternFunction(params, ret) => {
+                    assert_eq!(params.len(), 1);
+                    assert_eq!(params[0].name, "x");
+                    assert!(!params[0].is_pointer);
+                    assert_eq!(
+                        params[0].ty,
+                        TypeExpr::Named("MyStruct".to_string(), vec![])
+                    );
+                    assert_eq!(*ret, TypeExpr::Primitive(PrimitiveType::Bool));
+                }
+                _ => panic!("expected ExternFunction"),
+            }
+        } else {
+            panic!("expected TypeAlias");
+        }
+    }
+
+    #[test]
+    fn test_parse_extern_function_with_body() {
+        // extern function on_tick(d: *MyStruct) { return; }
+        let tokens = TokenListBuilder::new()
+            .kw_extern()
+            .space()
+            .kw_function()
+            .space()
+            .identifier("on_tick")
+            .left_paren()
+            .identifier("d")
+            .colon()
+            .space()
+            .star()
+            .identifier("MyStruct")
+            .right_paren()
+            .space()
+            .left_brace()
+            .space()
+            .kw_return()
+            .semicolon()
+            .space()
+            .right_brace()
+            .eof()
+            .build();
+        let mut parser = Parser::new(tokens);
+        let item = parser.parse_item().unwrap();
+        if let Item::Function(f) = item {
+            assert!(f.is_extern);
+            assert_eq!(f.name, "on_tick");
+            assert_eq!(f.params.len(), 1);
+            assert!(f.params[0].is_pointer);
+            assert!(f.body.is_some());
+            let body = f.body.unwrap();
+            assert_eq!(body.statements.len(), 1);
+            assert!(matches!(body.statements[0], Statement::Return(None)));
+        } else {
+            panic!("expected Item::Function");
+        }
+    }
+
+    #[test]
+    fn test_lex_fat_arrow_and_extern_keyword() {
+        use crate::lexer::Lexer;
+        let mut lexer = Lexer::new("extern =>");
+        let t1 = lexer.next_token().unwrap().unwrap();
+        let t2 = lexer.next_token().unwrap().unwrap();
+        assert_eq!(t1.token_type, TokenType::Extern);
+        assert_eq!(t2.token_type, TokenType::FatArrow);
     }
 }

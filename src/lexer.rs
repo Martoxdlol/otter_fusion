@@ -87,6 +87,9 @@ impl Lexer {
                         if self.peek() == Some('=') {
                             self.advance();
                             return Some(Ok(self.token(TokenType::EqEq)));
+                        } else if self.peek() == Some('>') {
+                            self.advance();
+                            return Some(Ok(self.token(TokenType::FatArrow)));
                         } else {
                             return Some(Ok(self.token(TokenType::Eq)));
                         }
@@ -183,6 +186,7 @@ impl Lexer {
             "else" => self.token(TokenType::Else),
             "continue" => self.token(TokenType::Continue),
             "break" => self.token(TokenType::Break),
+            "extern" => self.token(TokenType::Extern),
 
             _ => self.token(TokenType::Identifier(literal)),
         }
