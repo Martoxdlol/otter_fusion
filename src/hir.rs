@@ -110,6 +110,7 @@ pub struct HirInterface {
 pub struct HirField {
     pub name: String,
     pub ty: ResolvedType,
+    pub is_pointer: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -129,6 +130,7 @@ pub struct HirFunction {
 pub struct HirParam {
     pub name: String,
     pub ty: ResolvedType,
+    pub is_pointer: bool,
 }
 
 #[derive(Debug, Clone)]
