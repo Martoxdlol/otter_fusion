@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Token {
     pub token_type: TokenType,
@@ -211,6 +213,68 @@ impl Token {
 
     pub fn eof(position: usize, line: usize, column: usize) -> Self {
         Self::new(TokenType::EOF, position, line, column)
+    }
+}
+
+impl fmt::Display for TokenType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TokenType::LeftParen => f.write_str("'('"),
+            TokenType::RightParen => f.write_str("')'"),
+            TokenType::LeftBrace => f.write_str("'{'"),
+            TokenType::RightBrace => f.write_str("'}'"),
+            TokenType::LeftBracket => f.write_str("'['"),
+            TokenType::RightBracket => f.write_str("']'"),
+            TokenType::LT => f.write_str("'<'"),
+            TokenType::GT => f.write_str("'>'"),
+            TokenType::Eq => f.write_str("'='"),
+            TokenType::EqEq => f.write_str("'=='"),
+            TokenType::FatArrow => f.write_str("'=>'"),
+            TokenType::Bang => f.write_str("'!'"),
+            TokenType::BangEq => f.write_str("'!='"),
+            TokenType::Plus => f.write_str("'+'"),
+            TokenType::Minus => f.write_str("'-'"),
+            TokenType::Star => f.write_str("'*'"),
+            TokenType::Slash => f.write_str("'/'"),
+            TokenType::Percent => f.write_str("'%'"),
+            TokenType::And => f.write_str("'&&'"),
+            TokenType::Or => f.write_str("'||'"),
+            TokenType::Pipe => f.write_str("'|'"),
+            TokenType::Colon => f.write_str("':'"),
+            TokenType::Semicolon => f.write_str("';'"),
+            TokenType::Dot => f.write_str("'.'"),
+            TokenType::Comma => f.write_str("','"),
+            TokenType::Identifier(name) => write!(f, "identifier '{name}'"),
+            TokenType::StringLit(_) => f.write_str("string literal"),
+            TokenType::CharLit(_) => f.write_str("char literal"),
+            TokenType::Float(v) => write!(f, "float '{v}'"),
+            TokenType::Int(v) => write!(f, "integer '{v}'"),
+            TokenType::Comment(_) => f.write_str("comment"),
+            TokenType::Struct => f.write_str("'struct'"),
+            TokenType::Function => f.write_str("'function'"),
+            TokenType::For => f.write_str("'for'"),
+            TokenType::While => f.write_str("'while'"),
+            TokenType::Null => f.write_str("'null'"),
+            TokenType::True => f.write_str("'true'"),
+            TokenType::False => f.write_str("'false'"),
+            TokenType::Var => f.write_str("'var'"),
+            TokenType::If => f.write_str("'if'"),
+            TokenType::Else => f.write_str("'else'"),
+            TokenType::Extend => f.write_str("'extend'"),
+            TokenType::Return => f.write_str("'return'"),
+            TokenType::Interface => f.write_str("'interface'"),
+            TokenType::Is => f.write_str("'is'"),
+            TokenType::In => f.write_str("'in'"),
+            TokenType::Type => f.write_str("'type'"),
+            TokenType::As => f.write_str("'as'"),
+            TokenType::SelfRef => f.write_str("'self'"),
+            TokenType::Match => f.write_str("'match'"),
+            TokenType::Class => f.write_str("'class'"),
+            TokenType::Continue => f.write_str("'continue'"),
+            TokenType::Break => f.write_str("'break'"),
+            TokenType::Extern => f.write_str("'extern'"),
+            TokenType::EOF => f.write_str("end of file"),
+        }
     }
 }
 

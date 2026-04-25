@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::tokens::{Token, TokenType};
 
 pub struct Lexer {
@@ -22,6 +24,28 @@ pub enum LexerError {
     UnterminatedString(usize, usize),
     InvalidNumber(String, usize, usize),
 }
+
+impl LexerError {
+    pub fn span(&self) -> (usize, usize) {
+        match self {
+            LexerError::UnexpectedCharacter(_, line, col)
+            | LexerError::UnterminatedString(line, col)
+            | LexerError::InvalidNumber(_, line, col) => (*line, *col),
+        }
+    }
+}
+
+impl fmt::Display for LexerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LexerError::UnexpectedCharacter(c, _, _) => write!(f, "unexpected character '{c}'"),
+            LexerError::UnterminatedString(_, _) => write!(f, "unterminated string literal"),
+            LexerError::InvalidNumber(n, _, _) => write!(f, "invalid number literal '{n}'"),
+        }
+    }
+}
+
+impl std::error::Error for LexerError {}
 
 impl Iterator for Lexer {
     type Item = Result<Token, LexerError>;

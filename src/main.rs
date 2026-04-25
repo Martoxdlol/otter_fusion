@@ -1,5 +1,9 @@
 use clap::{Parser, Subcommand};
-use otter_fusion::lexer::Lexer;
+use otter_fusion::{
+    ast::Module,
+    lexer::Lexer,
+    validator::Validator,
+};
 
 #[derive(Subcommand)]
 enum Commands {
@@ -40,7 +44,7 @@ fn main() -> Result<(), std::io::Error> {
             println!("{ast:#?}");
         }
         Commands::Validate { file } => {
-            println!("Validating: {file}");
+            std::process::exit(run_validate(file));
         }
         Commands::Run { file } => {
             println!("Running: {file}");
@@ -51,4 +55,53 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     Ok(())
+}
+
+fn run_validate(file: &str) -> i32 {
+    let source = match read_source_file(file) {
+        Ok(s) => s,
+        Err(e) => {
+            println!("{file}:1:1: error: cannot read file: {e}");
+            return 1;
+        }
+    };
+
+    let tokens = match Lexer::new(&source).scan_all() {
+        Ok(t) => t,
+        Err(e) => {
+            let (line, col) = e.span();
+            println!("{file}:{line}:{col}: error: {e}");
+            return 1;
+        }
+    };
+
+    let program = match otter_fusion::parser::Parser::new(tokens).parse() {
+        Ok(p) => p,
+        Err(e) => {
+            let (line, col) = e.span();
+            println!("{file}:{line}:{col}: error: {e}");
+            return 1;
+        }
+    };
+
+    let module_name = std::path::Path::new(file)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("main")
+        .to_string();
+
+    let module = Module {
+        name: module_name,
+        program,
+    };
+
+    match Validator::new(vec![module]).validate() {
+        Ok(_) => 0,
+        Err(errors) => {
+            for err in &errors {
+                println!("{file}:1:1: error: {err}");
+            }
+            1
+        }
+    }
 }

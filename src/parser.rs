@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::{
     ast::{
         BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
@@ -20,6 +22,26 @@ pub enum ParserError {
     UnexpectedToken(Token),
     // Other error variants can be added here
 }
+
+impl ParserError {
+    pub fn span(&self) -> (usize, usize) {
+        match self {
+            ParserError::UnexpectedToken(tok) => (tok.line, tok.column),
+        }
+    }
+}
+
+impl fmt::Display for ParserError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParserError::UnexpectedToken(tok) => {
+                write!(f, "unexpected token {}", tok.token_type)
+            }
+        }
+    }
+}
+
+impl std::error::Error for ParserError {}
 
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {

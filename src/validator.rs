@@ -1,4 +1,5 @@
 use std::collections::{HashMap, HashSet};
+use std::fmt;
 
 use crate::{
     ast::{
@@ -158,6 +159,180 @@ pub enum ValidationError {
         literal: String,
     },
 }
+
+impl fmt::Display for ValidationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use ValidationError::*;
+        match self {
+            DuplicateModule { name } => write!(f, "duplicate module '{name}'"),
+            UnknownImportModule { in_module, target } => write!(
+                f,
+                "module '{in_module}' imports unknown module '{target}'"
+            ),
+            SelfImport { module } => write!(f, "module '{module}' cannot import itself"),
+            DuplicateName { module, name } => write!(
+                f,
+                "duplicate top-level name '{name}' in module '{module}'"
+            ),
+            UnknownImportSymbol {
+                in_module,
+                from_module,
+                symbol,
+            } => write!(
+                f,
+                "module '{in_module}' imports unknown symbol '{symbol}' from '{from_module}'"
+            ),
+            DuplicateImport {
+                in_module,
+                local_name,
+            } => write!(f, "duplicate import '{local_name}' in module '{in_module}'"),
+            UnknownType { module, name } => {
+                write!(f, "unknown type '{name}' in module '{module}'")
+            }
+            GenericArgsOnTypeParam { module, name } => write!(
+                f,
+                "generic arguments not allowed on type parameter '{name}' in module '{module}'"
+            ),
+            GenericArityMismatch {
+                module,
+                name,
+                expected,
+                actual,
+            } => write!(
+                f,
+                "type '{name}' in module '{module}' expects {expected} generic argument(s), got {actual}"
+            ),
+            DuplicateGenericParam { scope, name } => {
+                write!(f, "duplicate generic parameter '{name}' in {scope}")
+            }
+            BoundNotInterface { scope, type_param } => write!(
+                f,
+                "bound on type parameter '{type_param}' in {scope} must be an interface"
+            ),
+            ExpectedTypeFoundFunction { module, name } => write!(
+                f,
+                "expected type, found function '{name}' in module '{module}'"
+            ),
+            PointerOutsideExtern { location } => write!(
+                f,
+                "pointer type '*T' is only allowed in extern declarations ({location})"
+            ),
+            DuplicateMethod { type_name, method } => {
+                write!(f, "duplicate method '{method}' on type '{type_name}'")
+            }
+            DuplicateField { type_name, field } => {
+                write!(f, "duplicate field '{field}' on type '{type_name}'")
+            }
+            DuplicateParam { function, param } => {
+                write!(f, "duplicate parameter '{param}' in function '{function}'")
+            }
+            InvalidExtendTarget { module } => {
+                write!(f, "invalid extend target in module '{module}'")
+            }
+            ImplementsNotInterface { type_name } => write!(
+                f,
+                "type '{type_name}' implements clause references a non-interface"
+            ),
+            MissingInterfaceMember {
+                type_name,
+                interface,
+                member,
+            } => write!(
+                f,
+                "type '{type_name}' is missing member '{member}' required by interface '{interface}'"
+            ),
+            InterfaceMemberMismatch {
+                type_name,
+                interface,
+                member,
+            } => write!(
+                f,
+                "type '{type_name}' member '{member}' does not match interface '{interface}'"
+            ),
+            UnknownVariable { function, name } => {
+                write!(f, "unknown variable '{name}' in function '{function}'")
+            }
+            TypeUsedAsValue { function, name } => {
+                write!(f, "type '{name}' used as value in function '{function}'")
+            }
+            VariableNeedsType { function, name } => write!(
+                f,
+                "variable '{name}' in function '{function}' needs an explicit type annotation"
+            ),
+            TypeMismatch {
+                function,
+                context,
+                expected,
+                actual,
+            } => write!(
+                f,
+                "type mismatch in function '{function}' ({context}): expected '{expected}', found '{actual}'"
+            ),
+            NotCallable { function, context } => write!(
+                f,
+                "expression is not callable in function '{function}' ({context})"
+            ),
+            CallArityMismatch {
+                function,
+                callee,
+                expected,
+                actual,
+            } => write!(
+                f,
+                "call to '{callee}' in function '{function}' expects {expected} argument(s), got {actual}"
+            ),
+            UnknownMember {
+                function,
+                on,
+                member,
+            } => write!(
+                f,
+                "unknown member '{member}' on '{on}' in function '{function}'"
+            ),
+            InvalidStructInit { function, context } => write!(
+                f,
+                "invalid struct initializer in function '{function}' ({context})"
+            ),
+            MissingFieldInit {
+                function,
+                struct_name,
+                field,
+            } => write!(
+                f,
+                "missing field '{field}' when initializing '{struct_name}' in function '{function}'"
+            ),
+            ExtraFieldInit {
+                function,
+                struct_name,
+                field,
+            } => write!(
+                f,
+                "unknown field '{field}' when initializing '{struct_name}' in function '{function}'"
+            ),
+            InvalidOperator {
+                function,
+                op,
+                operand_ty,
+            } => write!(
+                f,
+                "invalid operator '{op}' for operand of type '{operand_ty}' in function '{function}'"
+            ),
+            BreakOutsideLoop { function } => {
+                write!(f, "'break' used outside of a loop in function '{function}'")
+            }
+            ContinueOutsideLoop { function } => write!(
+                f,
+                "'continue' used outside of a loop in function '{function}'"
+            ),
+            LiteralOutOfRange { function, literal } => write!(
+                f,
+                "literal '{literal}' is out of range in function '{function}'"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for ValidationError {}
 
 #[derive(Debug, Clone)]
 enum ScopeEntry {

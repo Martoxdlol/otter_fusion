@@ -1,0 +1,47 @@
+{
+  "name": "otter-fusion",
+  "displayName": "Otter Fusion",
+  "description": "Syntax highlighting and validation for Otter Fusion (.of) files",
+  "version": "0.0.1",
+  "publisher": "otter-fusion",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Linters"],
+  "main": "./out/extension.js",
+  "activationEvents": ["onLanguage:otter-fusion"],
+  "contributes": {
+    "languages": [
+      {
+        "id": "otter-fusion",
+        "aliases": ["Otter Fusion", "otter-fusion"],
+        "extensions": [".of"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "otter-fusion",
+        "scopeName": "source.of",
+        "path": "./syntaxes/otter-fusion.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "Otter Fusion",
+      "properties": {
+        "otterFusion.binaryPath": {
+          "type": "string",
+          "default": "otter_fusion",
+          "description": "Path to the otter_fusion binary. Use an absolute path or ensure it is on PATH."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -p . -w"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.4.0"
+  }
+}
