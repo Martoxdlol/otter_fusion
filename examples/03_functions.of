@@ -1,0 +1,17 @@
+function add(a: i64, b: i64): i64 {
+  a + b
+}
+
+function get_ratio(current: f64, total: f64): f64 {
+  if (total == 0.0) {
+    return 0.0;
+  }
+  current / total
+}
+
+function main(): i64 {
+  print((add(2, 3) as str));
+  print((get_ratio(1.0, 0.0) as str));
+  print((get_ratio(3.0, 4.0) as str));
+  0
+}

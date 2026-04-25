@@ -1,0 +1,54 @@
+extern struct Buffer {
+  data: *u8,
+  size: u64,
+}
+
+extern function malloc(size: u64): *Buffer | null;
+extern function free(buf: *Buffer);
+extern function print(value: str);
+
+type TickCb = extern (d: *MyStruct) => void;
+
+extern function register_callback(data: *MyStruct, cb: TickCb);
+extern function unregister_callback(data: *MyStruct);
+
+struct MyStruct {
+  counter: i64,
+}
+
+extern function on_tick(d: *MyStruct) {
+  d.counter = d.counter + 1
+}
+
+function allocate(size: u64): Buffer {
+  var maybe = malloc(size);
+  if (maybe is null) {
+    return Buffer { data: null, size: 0 };
+  }
+  maybe as Buffer
+}
+
+function install(): MyStruct {
+  var state = MyStruct { counter: 0 };
+  var ptr = pin<MyStruct>(state);
+  register_callback(ptr, on_tick);
+  state
+}
+
+function remove(state: MyStruct) {
+  var ptr = pin<MyStruct>(state);
+  unregister_callback(ptr);
+  unpin<MyStruct>(ptr);
+  unpin<MyStruct>(ptr);
+}
+
+function main(): i64 {
+  var buf = allocate(1024 as u64);
+  print("buffer size: " + (buf.size as str));
+
+  var state = install();
+  print("counter: " + (state.counter as str));
+  remove(state);
+
+  0
+}

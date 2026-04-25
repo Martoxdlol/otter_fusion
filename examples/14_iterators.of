@@ -1,0 +1,30 @@
+interface Iterator<T> {
+  function next(self): T | null
+}
+
+struct Range: Iterator<i64> {
+  current: i64,
+  end:     i64,
+
+  function next(self): i64 | null {
+    if (self.current >= self.end) {
+      null
+    } else {
+      var v = self.current;
+      self.current = self.current + 1;
+      v
+    }
+  }
+}
+
+function print_all<T>(iter: Iterator<T>) {
+  for (item in iter) {
+    print(item as str);
+  }
+}
+
+function main(): i64 {
+  var r = Range { current: 0, end: 5 };
+  print_all<i64>(r);
+  0
+}

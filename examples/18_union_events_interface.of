@@ -1,0 +1,58 @@
+// Union of structs that all implement a shared interface.
+// You can narrow to the interface for shared behavior, or to the
+// concrete struct for variant-specific fields.
+interface Event {
+  function kind(self): str
+}
+
+struct Click: Event {
+  x: i32,
+  y: i32,
+
+  function kind(self): str { "click" }
+}
+
+struct KeyPress: Event {
+  key: char,
+  ctrl: bool,
+
+  function kind(self): str { "key" }
+}
+
+struct Resize: Event {
+  width: i32,
+  height: i32,
+
+  function kind(self): str { "resize" }
+}
+
+type AnyEvent = Click | KeyPress | Resize;
+
+function describe(e: AnyEvent): str {
+  // shared behavior via the interface
+  var prefix = (e as Event).kind() + ": ";
+
+  // variant-specific fields via the concrete struct
+  if (e is Click) {
+    var c = e as Click;
+    prefix + (c.x as str) + "," + (c.y as str)
+  } else if (e is KeyPress) {
+    var k = e as KeyPress;
+    prefix + (k.key as str) + " ctrl=" + (k.ctrl as str)
+  } else {
+    var r = e as Resize;
+    prefix + (r.width as str) + "x" + (r.height as str)
+  }
+}
+
+function main(): i64 {
+  var events: List<AnyEvent> = [
+    Click    { x: 10, y: 20 },
+    KeyPress { key: 'A', ctrl: true },
+    Resize   { width: 1920, height: 1080 },
+  ];
+  for (e in events) {
+    print(describe(e));
+  }
+  0
+}

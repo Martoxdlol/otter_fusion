@@ -1,0 +1,26 @@
+function main(): i64 {
+  var numbers: List<i64> = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  for (n in numbers) {
+    if (n == 3) { continue; }
+    if (n > 6)  { break; }
+    print("n = " + (n as str));
+  }
+
+  var ages: Map<str, i32> = {
+    "Alice": 30,
+    "Bob":   25,
+  };
+
+  for (entry in ages) {
+    print(entry.key + " -> " + (entry.value as str));
+  }
+
+  var i = 0;
+  while (i < 3) {
+    print("tick " + (i as str));
+    i = i + 1;
+  }
+
+  0
+}

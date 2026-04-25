@@ -1,0 +1,26 @@
+interface Named {
+  name: str,
+}
+
+interface Printable: Named {
+  function to_string(self): str
+}
+
+struct Book: Printable {
+  name: str,
+  pages: i32,
+
+  function to_string(self): str {
+    self.name + " (" + (self.pages as str) + " pages)"
+  }
+}
+
+function show(p: Printable) {
+  print(p.to_string());
+}
+
+function main(): i64 {
+  var b = Book { name: "Otter Fusion Spec", pages: 12 };
+  show(b);
+  0
+}

@@ -1,0 +1,68 @@
+// Mixed union: primitives for the success branch, multiple distinct
+// error structs for the failure branch — all errors share an interface
+// so they can be handled uniformly without further narrowing.
+interface HasMessage {
+  function message(self): str
+}
+
+struct NotFound: HasMessage {
+  resource: str,
+
+  function message(self): str {
+    "not found: " + self.resource
+  }
+}
+
+struct PermissionDenied: HasMessage {
+  user: str,
+  resource: str,
+
+  function message(self): str {
+    self.user + " cannot access " + self.resource
+  }
+}
+
+struct Timeout: HasMessage {
+  millis: i64,
+
+  function message(self): str {
+    "timed out after " + (self.millis as str) + "ms"
+  }
+}
+
+type Failure = NotFound | PermissionDenied | Timeout;
+type Fetched = i64 | str | Failure;
+
+function fetch(id: i64): Fetched {
+  if (id == 1) {
+    "Alice"
+  } else if (id == 2) {
+    NotFound { resource: "user(2)" }
+  } else if (id == 3) {
+    PermissionDenied { user: "guest", resource: "user(3)" }
+  } else if (id == 4) {
+    Timeout { millis: 5000 }
+  } else {
+    id
+  }
+}
+
+function display(r: Fetched): str {
+  if (r is i64) {
+    "id-only: " + ((r as i64) as str)
+  } else if (r is str) {
+    "name: " + (r as str)
+  } else {
+    // r is one of the failure structs — all implement HasMessage,
+    // so a single cast handles every error variant.
+    "err: " + (r as HasMessage).message()
+  }
+}
+
+function main(): i64 {
+  var ids: List<i64> = [1, 2, 3, 4, 99];
+  for (id in ids) {
+    print(display(fetch(id)));
+  }
+  0
+}

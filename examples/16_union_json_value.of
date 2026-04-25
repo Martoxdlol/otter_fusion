@@ -1,0 +1,43 @@
+// Recursive union of every primitive plus collections.
+type Json = null | bool | i64 | f64 | str | List<Json> | Map<str, Json>;
+
+function describe(v: Json): str {
+  if (v is null) {
+    "null"
+  } else if (v is bool) {
+    if (v as bool) { "true" } else { "false" }
+  } else if (v is i64) {
+    "int(" + ((v as i64) as str) + ")"
+  } else if (v is f64) {
+    "float(" + ((v as f64) as str) + ")"
+  } else if (v is str) {
+    "str(\"" + (v as str) + "\")"
+  } else if (v is List<Json>) {
+    var list = v as List<Json>;
+    var out = "list[";
+    for (item in list) {
+      out = out + describe(item) + ",";
+    }
+    out + "]"
+  } else {
+    var map = v as Map<str, Json>;
+    var out = "map{";
+    for (entry in map) {
+      out = out + entry.key + ":" + describe(entry.value) + ",";
+    }
+    out + "}"
+  }
+}
+
+function main(): i64 {
+  var doc: Json = {
+    "name": "Alice",
+    "age": 30,
+    "active": true,
+    "score": 9.5,
+    "tags": ["admin", "user"],
+    "extra": null,
+  };
+  print(describe(doc));
+  0
+}

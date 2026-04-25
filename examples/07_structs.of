@@ -1,0 +1,21 @@
+struct Person {
+  name: str,
+  age: i32,
+
+  function greet(self): str {
+    "Hi, I'm " + self.name + " (" + (self.age as str) + ")"
+  }
+
+  function birthday(self): Person {
+    Person { name: self.name, age: self.age + 1 }
+  }
+}
+
+function main(): i64 {
+  var alice = Person { name: "Alice", age: 30 };
+  print(alice.greet());
+
+  var older = alice.birthday();
+  print(older.greet());
+  0
+}

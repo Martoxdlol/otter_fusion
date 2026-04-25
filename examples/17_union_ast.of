@@ -1,0 +1,66 @@
+// Union of multiple distinct struct variants — a tiny expression AST.
+struct NumLit { value: i64 }
+struct StrLit { value: str }
+struct BinOp  { op: str, left: Expr, right: Expr }
+struct Call   { name: str, args: List<Expr> }
+
+type Expr = NumLit | StrLit | BinOp | Call;
+
+function eval_int(e: Expr): i64 | null {
+  if (e is NumLit) {
+    (e as NumLit).value
+  } else if (e is BinOp) {
+    var b = e as BinOp;
+    var l = eval_int(b.left);
+    var r = eval_int(b.right);
+    if (l is null) { return null; }
+    if (r is null) { return null; }
+    var lv = l as i64;
+    var rv = r as i64;
+    if (b.op == "+") { lv + rv }
+    else if (b.op == "-") { lv - rv }
+    else if (b.op == "*") { lv * rv }
+    else { null }
+  } else {
+    null
+  }
+}
+
+function show(e: Expr): str {
+  if (e is NumLit) {
+    ((e as NumLit).value as str)
+  } else if (e is StrLit) {
+    "\"" + (e as StrLit).value + "\""
+  } else if (e is BinOp) {
+    var b = e as BinOp;
+    "(" + show(b.left) + " " + b.op + " " + show(b.right) + ")"
+  } else {
+    var c = e as Call;
+    var out = c.name + "(";
+    for (a in c.args) {
+      out = out + show(a) + ",";
+    }
+    out + ")"
+  }
+}
+
+function main(): i64 {
+  var expr: Expr = BinOp {
+    op: "+",
+    left: NumLit { value: 1 },
+    right: BinOp {
+      op: "*",
+      left: NumLit { value: 2 },
+      right: NumLit { value: 3 },
+    },
+  };
+  print(show(expr));
+
+  var v = eval_int(expr);
+  if (v is null) {
+    print("could not eval");
+  } else {
+    print("result: " + ((v as i64) as str));
+  }
+  0
+}

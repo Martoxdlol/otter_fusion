@@ -1,0 +1,18 @@
+type Value = i64 | str | bool;
+
+function describe(v: Value): str {
+  if (v is i64) {
+    "int: " + ((v as i64) as str)
+  } else if (v is bool) {
+    "bool: " + ((v as bool) as str)
+  } else {
+    "str: " + (v as str)
+  }
+}
+
+function main(): i64 {
+  print(describe(42));
+  print(describe("hello"));
+  print(describe(true));
+  0
+}

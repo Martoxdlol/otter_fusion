@@ -1,0 +1,24 @@
+function classify(age: i64): str {
+  var status = if (age >= 65) {
+    "Senior"
+  } else if (age >= 18) {
+    "Adult"
+  } else {
+    "Minor"
+  };
+
+  var msg = {
+    var prefix = "Status: ";
+    var suffix = " (age " + (age as str) + ")";
+    prefix + status + suffix
+  };
+
+  msg
+}
+
+function main(): i64 {
+  print(classify(8));
+  print(classify(30));
+  print(classify(72));
+  0
+}

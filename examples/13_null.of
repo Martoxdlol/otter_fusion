@@ -1,0 +1,25 @@
+function find_user(id: i64): str | null {
+  if (id == 1) {
+    "Admin"
+  } else if (id == 2) {
+    "Guest"
+  } else {
+    null
+  }
+}
+
+function greet(id: i64): str {
+  var user = find_user(id);
+  if (user is null) {
+    "no user with id " + (id as str)
+  } else {
+    "hello, " + (user as str)
+  }
+}
+
+function main(): i64 {
+  print(greet(1));
+  print(greet(2));
+  print(greet(99));
+  0
+}

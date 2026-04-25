@@ -1,0 +1,14 @@
+function apply<T>(value: T, f: (T) -> T): T {
+  f(value)
+}
+
+function main(): i64 {
+  var double = function(x: i32): i32 { x * 2 };
+  var inc    = function(x: i32): i32 { x + 1 };
+
+  var a = apply<i32>(10, double);  // 20
+  var b = apply<i32>(a, inc);      // 21
+
+  print("a=" + (a as str) + " b=" + (b as str));
+  0
+}

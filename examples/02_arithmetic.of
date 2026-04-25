@@ -1,0 +1,16 @@
+function describe(a: i64, b: i64): str {
+  var sum = a + b;
+  var diff = a - b;
+  var prod = a * b;
+  var quot = if (b == 0) { 0 } else { a / b };
+
+  "sum=" + (sum as str) +
+  " diff=" + (diff as str) +
+  " prod=" + (prod as str) +
+  " quot=" + (quot as str)
+}
+
+function main(): i64 {
+  print(describe(10, 3));
+  0
+}

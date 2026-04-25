@@ -1,0 +1,31 @@
+struct Vehicle {
+  speed: i32,
+}
+
+extend Vehicle {
+  function is_fast(self): bool {
+    self.speed > 100
+  }
+}
+
+interface Movable {
+  function move(self): str
+}
+
+extend Vehicle: Movable {
+  function move(self): str {
+    if (self.is_fast()) {
+      "The vehicle zooms"
+    } else {
+      "The vehicle moves"
+    }
+  }
+}
+
+function main(): i64 {
+  var slow = Vehicle { speed: 40 };
+  var fast = Vehicle { speed: 220 };
+  print(slow.move());
+  print(fast.move());
+  0
+}

@@ -1,0 +1,14 @@
+function main(): i64 {
+  var name: str = "Otter";
+  var age = 30;            // inferred i64
+  var height: f32 = 1.78;
+  var alive: bool = true;
+  var initial: char = 'O';
+
+  print(name);
+  print("age: " + (age as str));
+  print("height: " + (height as str));
+  print("alive: " + (alive as str));
+
+  0
+}

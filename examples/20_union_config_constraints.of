@@ -1,0 +1,71 @@
+// Two heterogeneous unions interacting: ConfigValue mixes primitives
+// and a list, while Constraint mixes structs with null. The validator
+// has to discriminate both unions at once.
+struct Range {
+  min: f64,
+  max: f64,
+}
+
+struct Choices {
+  values: List<str>,
+}
+
+type Constraint  = Range | Choices | null;
+type ConfigValue = bool | i64 | f64 | str | List<str> | null;
+
+struct Setting {
+  name: str,
+  value: ConfigValue,
+  constraint: Constraint,
+}
+
+function in_range(value: ConfigValue, r: Range): bool {
+  if (value is f64) {
+    var v = value as f64;
+    v >= r.min && v <= r.max
+  } else if (value is i64) {
+    var v = (value as i64) as f64;
+    v >= r.min && v <= r.max
+  } else {
+    false
+  }
+}
+
+function in_choices(value: ConfigValue, c: Choices): bool {
+  if (value is str) {
+    var sv = value as str;
+    var ok = false;
+    for (option in c.values) {
+      if (option == sv) { ok = true; }
+    }
+    ok
+  } else {
+    false
+  }
+}
+
+function check(s: Setting): str {
+  var valid = if (s.constraint is null) {
+    true
+  } else if (s.constraint is Range) {
+    in_range(s.value, s.constraint as Range)
+  } else {
+    in_choices(s.value, s.constraint as Choices)
+  };
+
+  s.name + " = " + (if (valid) { "ok" } else { "INVALID" })
+}
+
+function main(): i64 {
+  var settings: List<Setting> = [
+    Setting { name: "volume", value: 0.7,    constraint: Range   { min: 0.0, max: 1.0 } },
+    Setting { name: "mode",   value: "fast", constraint: Choices { values: ["slow", "fast", "auto"] } },
+    Setting { name: "debug",  value: true,   constraint: null },
+    Setting { name: "speed",  value: 200,    constraint: Range   { min: 0.0, max: 100.0 } },
+    Setting { name: "mode2",  value: "warp", constraint: Choices { values: ["slow", "fast", "auto"] } },
+  ];
+  for (s in settings) {
+    print(check(s));
+  }
+  0
+}

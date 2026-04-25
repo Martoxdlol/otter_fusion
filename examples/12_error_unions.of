@@ -1,0 +1,27 @@
+struct Error {
+  message: str,
+  code: i32,
+}
+
+function divide(a: f64, b: f64): f64 | Error {
+  if (b == 0.0) {
+    Error { message: "Division by zero", code: 1 }
+  } else {
+    a / b
+  }
+}
+
+function format(result: f64 | Error): str {
+  if (result is Error) {
+    var e = result as Error;
+    "Failed [" + (e.code as str) + "]: " + e.message
+  } else {
+    "OK: " + ((result as f64) as str)
+  }
+}
+
+function main(): i64 {
+  print(format(divide(10.0, 2.0)));
+  print(format(divide(10.0, 0.0)));
+  0
+}

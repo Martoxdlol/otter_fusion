@@ -1,0 +1,38 @@
+function identity<T>(value: T): T {
+  value
+}
+
+struct Wrapper<T> {
+  value: T,
+}
+
+extend<T> Wrapper<T> {
+  function get(self): T {
+    self.value
+  }
+}
+
+extend Wrapper<i32> {
+  function double(self): i32 {
+    self.value * 2
+  }
+}
+
+interface Named {
+  name: str,
+}
+
+extend<T> Wrapper<T>: Named {
+  function name(self): str {
+    "Wrapper"
+  }
+}
+
+function main(): i64 {
+  var w = Wrapper<i32> { value: 21 };
+  print("get: "    + (w.get() as str));
+  print("double: " + (w.double() as str));
+  print("name: "   + w.name());
+  print("id: "     + (identity<i64>(7) as str));
+  0
+}
