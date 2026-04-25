@@ -6,9 +6,10 @@ use crate::{
         TypeExpr,
     },
     hir::{
-        FnId, Hir, HirField, HirFunction, HirImport, HirImportSymbol, HirInterface, HirModule,
-        HirParam, HirStruct, ModuleId, PrimitiveType, ResolvedType, TypeId, TypeParamId,
-        TypeParamInfo,
+        BinaryOperator as HirBinOp, ExprKind, FnId, Hir, HirBlock, HirField, HirFunction,
+        HirImport, HirImportSymbol, HirInterface, HirLiteral, HirModule, HirParam, HirStatement,
+        HirStruct, ModuleId, PrimitiveType, ResolvedType, TypeId, TypeParamId, TypeParamInfo,
+        TypedExpr, UnaryOperator as HirUnOp,
     },
 };
 
@@ -93,6 +94,68 @@ pub enum ValidationError {
         type_name: String,
         interface: String,
         member: String,
+    },
+    UnknownVariable {
+        function: String,
+        name: String,
+    },
+    TypeUsedAsValue {
+        function: String,
+        name: String,
+    },
+    VariableNeedsType {
+        function: String,
+        name: String,
+    },
+    TypeMismatch {
+        function: String,
+        context: String,
+        expected: String,
+        actual: String,
+    },
+    NotCallable {
+        function: String,
+        context: String,
+    },
+    CallArityMismatch {
+        function: String,
+        callee: String,
+        expected: usize,
+        actual: usize,
+    },
+    UnknownMember {
+        function: String,
+        on: String,
+        member: String,
+    },
+    InvalidStructInit {
+        function: String,
+        context: String,
+    },
+    MissingFieldInit {
+        function: String,
+        struct_name: String,
+        field: String,
+    },
+    ExtraFieldInit {
+        function: String,
+        struct_name: String,
+        field: String,
+    },
+    InvalidOperator {
+        function: String,
+        op: String,
+        operand_ty: String,
+    },
+    BreakOutsideLoop {
+        function: String,
+    },
+    ContinueOutsideLoop {
+        function: String,
+    },
+    LiteralOutOfRange {
+        function: String,
+        literal: String,
     },
 }
 
@@ -211,12 +274,13 @@ impl Validator {
         // step 4: validate interface implementations
         self.validate_implementations(&modules);
         // step 5: validate function bodies
+        self.validate_function_bodies();
 
         if !self.errors.is_empty() {
             return Err(self.errors);
         }
 
-        todo!("phase 5 not yet implemented")
+        Ok(self.hir)
     }
 
     fn register_modules_and_imports(&mut self, modules: &[Module]) {
@@ -1093,6 +1157,1081 @@ impl Validator {
         None
     }
 
+    fn validate_function_bodies(&mut self) {
+        let pending = std::mem::take(&mut self.pending_function_bodies);
+        for (fn_id, decl) in &pending {
+            let Some(body_ast) = decl.body.as_ref() else {
+                continue;
+            };
+            let func = self.hir.functions[fn_id].clone();
+            let module_name = self.hir.modules[&func.module].name.clone();
+            let fn_label = if let Some(owner) = func.owner {
+                let owner_name = self
+                    .hir
+                    .structs
+                    .get(&owner)
+                    .map(|s| s.name.clone())
+                    .or_else(|| self.hir.interfaces.get(&owner).map(|i| i.name.clone()))
+                    .unwrap_or_default();
+                format!("{}::{}::{}", module_name, owner_name, func.name)
+            } else {
+                format!("{}::{}", module_name, func.name)
+            };
+
+            let mut locals: Vec<HashMap<String, ResolvedType>> = vec![HashMap::new()];
+            if func.has_self {
+                if let Some(owner) = func.owner {
+                    let self_ty = self.self_type_for(owner);
+                    locals[0].insert("self".to_string(), self_ty);
+                }
+            }
+            for p in &func.params {
+                locals[0].insert(p.name.clone(), p.ty.clone());
+            }
+
+            let owner_scope = func
+                .owner
+                .and_then(|t| self.type_generics.get(&t))
+                .cloned()
+                .unwrap_or_default();
+            let own_scope = self.fn_generics.get(fn_id).cloned().unwrap_or_default();
+            let mut generics: Vec<Vec<(String, TypeParamId)>> = Vec::new();
+            if !owner_scope.is_empty() {
+                generics.push(owner_scope);
+            }
+            generics.push(own_scope);
+
+            let block = self.check_block(
+                body_ast,
+                &fn_label,
+                func.module,
+                &generics,
+                &mut locals,
+                &func.return_type,
+                0,
+            );
+
+            self.hir.functions.get_mut(fn_id).unwrap().body = Some(block);
+        }
+        self.pending_function_bodies = pending;
+    }
+
+    fn self_type_for(&self, owner: TypeId) -> ResolvedType {
+        if let Some(s) = self.hir.structs.get(&owner) {
+            ResolvedType::Struct(
+                owner,
+                s.type_params
+                    .iter()
+                    .map(|t| ResolvedType::TypeParam(*t))
+                    .collect(),
+            )
+        } else if let Some(i) = self.hir.interfaces.get(&owner) {
+            ResolvedType::Interface(
+                owner,
+                i.type_params
+                    .iter()
+                    .map(|t| ResolvedType::TypeParam(*t))
+                    .collect(),
+            )
+        } else {
+            ResolvedType::Null
+        }
+    }
+
+    fn check_block(
+        &mut self,
+        block: &ast::Block,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> HirBlock {
+        locals.push(HashMap::new());
+        let mut statements = Vec::new();
+        for stmt in &block.statements {
+            if let Some(s) =
+                self.check_statement(stmt, fn_label, module, generics, locals, return_type, loop_depth)
+            {
+                statements.push(s);
+            }
+        }
+        let returns = block
+            .returns
+            .as_ref()
+            .map(|e| self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth));
+        locals.pop();
+        HirBlock { statements, returns }
+    }
+
+    fn check_statement(
+        &mut self,
+        stmt: &ast::Statement,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> Option<HirStatement> {
+        match stmt {
+            ast::Statement::VarDecl(name, ty, init) => {
+                let annotated = ty.as_ref().map(|t| {
+                    let ctx = TypeResolveCtx {
+                        module,
+                        generics: generics.to_vec(),
+                        local_subst: HashMap::new(),
+                        allow_pointer: false,
+                    };
+                    self.resolve_type_expr(t, &ctx)
+                });
+                let init_typed = init.as_ref().map(|e| {
+                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                });
+
+                let final_ty = match (&annotated, &init_typed) {
+                    (Some(a), Some(typed)) => {
+                        if !types_compatible(&typed.ty, a) {
+                            self.errors.push(ValidationError::TypeMismatch {
+                                function: fn_label.to_string(),
+                                context: format!("var {}", name),
+                                expected: format_type(a),
+                                actual: format_type(&typed.ty),
+                            });
+                        }
+                        a.clone()
+                    }
+                    (Some(a), None) => a.clone(),
+                    (None, Some(typed)) => typed.ty.clone(),
+                    (None, None) => {
+                        self.errors.push(ValidationError::VariableNeedsType {
+                            function: fn_label.to_string(),
+                            name: name.clone(),
+                        });
+                        ResolvedType::Null
+                    }
+                };
+
+                locals
+                    .last_mut()
+                    .unwrap()
+                    .insert(name.clone(), final_ty.clone());
+                Some(HirStatement::VarDecl(name.clone(), final_ty, init_typed))
+            }
+            ast::Statement::Return(expr) => {
+                let typed = expr.as_ref().map(|e| {
+                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                });
+                let actual = typed
+                    .as_ref()
+                    .map(|t| t.ty.clone())
+                    .unwrap_or(ResolvedType::Null);
+                if !types_compatible(&actual, return_type) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: "return".to_string(),
+                        expected: format_type(return_type),
+                        actual: format_type(&actual),
+                    });
+                }
+                Some(HirStatement::Return(typed))
+            }
+            ast::Statement::Expr(e) => {
+                let typed =
+                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+                Some(HirStatement::Expr(typed))
+            }
+            ast::Statement::While(cond, body) => {
+                let typed_cond =
+                    self.check_expr(cond, fn_label, module, generics, locals, return_type, loop_depth);
+                if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: "while condition".to_string(),
+                        expected: "bool".to_string(),
+                        actual: format_type(&typed_cond.ty),
+                    });
+                }
+                let body_block = self.check_block(
+                    body,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth + 1,
+                );
+                Some(HirStatement::While(typed_cond, body_block))
+            }
+            ast::Statement::For(name, iter_expr, body) => {
+                let typed_iter = self.check_expr(
+                    iter_expr, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                // v1 limitation: element type isn't extracted from `Iterator<T>`
+                // (the prelude that would define it isn't injected yet).
+                let elem_ty = ResolvedType::Null;
+                locals.push(HashMap::new());
+                locals
+                    .last_mut()
+                    .unwrap()
+                    .insert(name.clone(), elem_ty);
+                let body_block = self.check_block(
+                    body,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth + 1,
+                );
+                locals.pop();
+                Some(HirStatement::For(name.clone(), typed_iter, body_block))
+            }
+            ast::Statement::Break => {
+                if loop_depth == 0 {
+                    self.errors.push(ValidationError::BreakOutsideLoop {
+                        function: fn_label.to_string(),
+                    });
+                }
+                Some(HirStatement::Break)
+            }
+            ast::Statement::Continue => {
+                if loop_depth == 0 {
+                    self.errors.push(ValidationError::ContinueOutsideLoop {
+                        function: fn_label.to_string(),
+                    });
+                }
+                Some(HirStatement::Continue)
+            }
+        }
+    }
+
+    fn check_expr(
+        &mut self,
+        expr: &ast::Expr,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        match expr {
+            ast::Expr::Literal(lit) => self.check_literal(lit, fn_label),
+            ast::Expr::Variable(name) => self.check_variable(name, fn_label, module, locals),
+            ast::Expr::If(cond, then_b, else_b) => {
+                let typed_cond = self.check_expr(
+                    cond, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: "if condition".to_string(),
+                        expected: "bool".to_string(),
+                        actual: format_type(&typed_cond.ty),
+                    });
+                }
+                let then_block = self.check_block(
+                    then_b, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                let else_block = else_b.as_ref().map(|b| {
+                    self.check_block(b, fn_label, module, generics, locals, return_type, loop_depth)
+                });
+                let ty = then_block
+                    .returns
+                    .as_ref()
+                    .map(|t| t.ty.clone())
+                    .unwrap_or(ResolvedType::Null);
+                TypedExpr {
+                    kind: ExprKind::If(
+                        Box::new(typed_cond),
+                        Box::new(then_block),
+                        else_block.map(Box::new),
+                    ),
+                    ty,
+                }
+            }
+            ast::Expr::Call(callee, type_args, args) => self.check_call(
+                callee, type_args, args, fn_label, module, generics, locals, return_type, loop_depth,
+            ),
+            ast::Expr::LiteralList(elems) => {
+                let typed_elems: Vec<TypedExpr> = elems
+                    .iter()
+                    .map(|e| {
+                        self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                    })
+                    .collect();
+                // v1: no `List<T>` type yet (it lives in std). Element type is
+                // recorded as a union of element types; the container type
+                // itself is `Null` until prelude/std lookup is wired up.
+                let _elem_ty = if typed_elems.is_empty() {
+                    ResolvedType::Null
+                } else {
+                    let tys: Vec<_> = typed_elems.iter().map(|e| e.ty.clone()).collect();
+                    if tys.iter().all(|t| t == &tys[0]) {
+                        tys[0].clone()
+                    } else {
+                        ResolvedType::Union(tys)
+                    }
+                };
+                TypedExpr {
+                    kind: ExprKind::LiteralList(typed_elems),
+                    ty: ResolvedType::Null,
+                }
+            }
+            ast::Expr::LiteralMap(entries) => {
+                let typed_entries: Vec<(TypedExpr, TypedExpr)> = entries
+                    .iter()
+                    .map(|(k, v)| {
+                        let tk = self.check_expr(
+                            k, fn_label, module, generics, locals, return_type, loop_depth,
+                        );
+                        let tv = self.check_expr(
+                            v, fn_label, module, generics, locals, return_type, loop_depth,
+                        );
+                        (tk, tv)
+                    })
+                    .collect();
+                TypedExpr {
+                    kind: ExprKind::LiteralMap(typed_entries),
+                    ty: ResolvedType::Null,
+                }
+            }
+            ast::Expr::StructInit(ty_expr, fields) => self.check_struct_init(
+                ty_expr, fields, fn_label, module, generics, locals, return_type, loop_depth,
+            ),
+            ast::Expr::As(inner, ty) => {
+                let typed_inner = self.check_expr(
+                    inner, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                let ctx = TypeResolveCtx {
+                    module,
+                    generics: generics.to_vec(),
+                    local_subst: HashMap::new(),
+                    allow_pointer: false,
+                };
+                let target_ty = self.resolve_type_expr(ty, &ctx);
+                TypedExpr {
+                    kind: ExprKind::As(Box::new(typed_inner), target_ty.clone()),
+                    ty: target_ty,
+                }
+            }
+            ast::Expr::Is(inner, ty) => {
+                let typed_inner = self.check_expr(
+                    inner, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                let ctx = TypeResolveCtx {
+                    module,
+                    generics: generics.to_vec(),
+                    local_subst: HashMap::new(),
+                    allow_pointer: false,
+                };
+                let target_ty = self.resolve_type_expr(ty, &ctx);
+                TypedExpr {
+                    kind: ExprKind::Is(Box::new(typed_inner), target_ty),
+                    ty: ResolvedType::Primitive(PrimitiveType::Bool),
+                }
+            }
+            ast::Expr::Member(receiver, name) => self.check_member(
+                receiver, name, fn_label, module, generics, locals, return_type, loop_depth,
+            ),
+            ast::Expr::BinaryOp(l, op, r) => self.check_binary(
+                l, op, r, fn_label, module, generics, locals, return_type, loop_depth,
+            ),
+            ast::Expr::UnaryOp(op, e) => self.check_unary(
+                op, e, fn_label, module, generics, locals, return_type, loop_depth,
+            ),
+            ast::Expr::FunctionLiteral(_, _, _, _) => {
+                // v1: function literals are accepted but bodies aren't
+                // type-checked yet (captures + nested scope handling deferred).
+                TypedExpr {
+                    kind: ExprKind::Literal(HirLiteral::Null),
+                    ty: ResolvedType::Null,
+                }
+            }
+            ast::Expr::Block(b) => {
+                let block = self.check_block(
+                    b, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                let ty = block
+                    .returns
+                    .as_ref()
+                    .map(|t| t.ty.clone())
+                    .unwrap_or(ResolvedType::Null);
+                TypedExpr {
+                    kind: ExprKind::Block(Box::new(block)),
+                    ty,
+                }
+            }
+        }
+    }
+
+    fn check_literal(&mut self, lit: &ast::Literal, fn_label: &str) -> TypedExpr {
+        let (kind, ty) = match lit {
+            ast::Literal::Int(s) => match s.parse::<i64>() {
+                Ok(v) => (
+                    HirLiteral::Int(v),
+                    ResolvedType::Primitive(PrimitiveType::Int64),
+                ),
+                Err(_) => {
+                    self.errors.push(ValidationError::LiteralOutOfRange {
+                        function: fn_label.to_string(),
+                        literal: s.clone(),
+                    });
+                    (
+                        HirLiteral::Int(0),
+                        ResolvedType::Primitive(PrimitiveType::Int64),
+                    )
+                }
+            },
+            ast::Literal::Float(s) => match s.parse::<f64>() {
+                Ok(v) => (
+                    HirLiteral::Float(v),
+                    ResolvedType::Primitive(PrimitiveType::Float64),
+                ),
+                Err(_) => {
+                    self.errors.push(ValidationError::LiteralOutOfRange {
+                        function: fn_label.to_string(),
+                        literal: s.clone(),
+                    });
+                    (
+                        HirLiteral::Float(0.0),
+                        ResolvedType::Primitive(PrimitiveType::Float64),
+                    )
+                }
+            },
+            ast::Literal::String(s) => (
+                HirLiteral::String(s.clone()),
+                ResolvedType::Primitive(PrimitiveType::String),
+            ),
+            ast::Literal::Char(c) => (
+                HirLiteral::Char(*c),
+                ResolvedType::Primitive(PrimitiveType::Char),
+            ),
+            ast::Literal::Bool(b) => (
+                HirLiteral::Bool(*b),
+                ResolvedType::Primitive(PrimitiveType::Bool),
+            ),
+            ast::Literal::Null => (HirLiteral::Null, ResolvedType::Null),
+        };
+        TypedExpr {
+            kind: ExprKind::Literal(kind),
+            ty,
+        }
+    }
+
+    fn check_variable(
+        &mut self,
+        name: &str,
+        fn_label: &str,
+        module: ModuleId,
+        locals: &[HashMap<String, ResolvedType>],
+    ) -> TypedExpr {
+        for scope in locals.iter().rev() {
+            if let Some(ty) = scope.get(name) {
+                return TypedExpr {
+                    kind: ExprKind::Variable(name.to_string()),
+                    ty: ty.clone(),
+                };
+            }
+        }
+        if let Some(entry) = self.lookup_in_scope(module, name) {
+            match entry {
+                ScopeEntry::Function(fn_id) => {
+                    let f = &self.hir.functions[&fn_id];
+                    let params: Vec<ResolvedType> =
+                        f.params.iter().map(|p| p.ty.clone()).collect();
+                    let ret = f.return_type.clone();
+                    return TypedExpr {
+                        kind: ExprKind::Variable(name.to_string()),
+                        ty: ResolvedType::Function(params, Box::new(ret)),
+                    };
+                }
+                ScopeEntry::Type(_) | ScopeEntry::Alias { .. } => {
+                    self.errors.push(ValidationError::TypeUsedAsValue {
+                        function: fn_label.to_string(),
+                        name: name.to_string(),
+                    });
+                    return TypedExpr {
+                        kind: ExprKind::Variable(name.to_string()),
+                        ty: ResolvedType::Null,
+                    };
+                }
+            }
+        }
+        self.errors.push(ValidationError::UnknownVariable {
+            function: fn_label.to_string(),
+            name: name.to_string(),
+        });
+        TypedExpr {
+            kind: ExprKind::Variable(name.to_string()),
+            ty: ResolvedType::Null,
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn check_call(
+        &mut self,
+        callee: &ast::Expr,
+        type_args: &[ast::TypeExpr],
+        args: &[ast::Expr],
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        // Resolve any explicit type arguments up front.
+        let ctx = TypeResolveCtx {
+            module,
+            generics: generics.to_vec(),
+            local_subst: HashMap::new(),
+            allow_pointer: false,
+        };
+        let resolved_type_args: Vec<ResolvedType> = type_args
+            .iter()
+            .map(|t| self.resolve_type_expr(t, &ctx))
+            .collect();
+
+        let typed_args: Vec<TypedExpr> = args
+            .iter()
+            .map(|a| {
+                self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth)
+            })
+            .collect();
+
+        // Special-case Variable(name) and Member(expr, name) callees so we can
+        // see the underlying FnId and substitute method/owner generics. Other
+        // callees fall through to the generic Function-type path.
+        let (callee_typed, callee_label, fn_subst, params, ret) = match callee {
+            ast::Expr::Variable(name) => {
+                if locals.iter().any(|s| s.contains_key(name)) {
+                    let ty = self.lookup_local(name, locals);
+                    let typed = TypedExpr {
+                        kind: ExprKind::Variable(name.clone()),
+                        ty: ty.clone(),
+                    };
+                    let (params, ret) = match ty {
+                        ResolvedType::Function(p, r) => (p, *r),
+                        _ => {
+                            self.errors.push(ValidationError::NotCallable {
+                                function: fn_label.to_string(),
+                                context: name.clone(),
+                            });
+                            return TypedExpr {
+                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                                ty: ResolvedType::Null,
+                            };
+                        }
+                    };
+                    (typed, name.clone(), HashMap::new(), params, ret)
+                } else if let Some(ScopeEntry::Function(fn_id)) =
+                    self.lookup_in_scope(module, name)
+                {
+                    let func = self.hir.functions[&fn_id].clone();
+                    let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+                    if !resolved_type_args.is_empty() {
+                        if resolved_type_args.len() != func.type_params.len() {
+                            self.errors.push(ValidationError::CallArityMismatch {
+                                function: fn_label.to_string(),
+                                callee: format!("{} (type args)", name),
+                                expected: func.type_params.len(),
+                                actual: resolved_type_args.len(),
+                            });
+                        } else {
+                            for (tp, arg) in
+                                func.type_params.iter().zip(resolved_type_args.iter())
+                            {
+                                subst.insert(*tp, arg.clone());
+                            }
+                        }
+                    }
+                    let params: Vec<ResolvedType> = func
+                        .params
+                        .iter()
+                        .map(|p| substitute(&p.ty, &subst))
+                        .collect();
+                    let ret = substitute(&func.return_type, &subst);
+                    let typed = TypedExpr {
+                        kind: ExprKind::Variable(name.clone()),
+                        ty: ResolvedType::Function(params.clone(), Box::new(ret.clone())),
+                    };
+                    (typed, name.clone(), subst, params, ret)
+                } else {
+                    self.errors.push(ValidationError::UnknownVariable {
+                        function: fn_label.to_string(),
+                        name: name.clone(),
+                    });
+                    let typed = TypedExpr {
+                        kind: ExprKind::Variable(name.clone()),
+                        ty: ResolvedType::Null,
+                    };
+                    return TypedExpr {
+                        kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                        ty: ResolvedType::Null,
+                    };
+                }
+            }
+            ast::Expr::Member(receiver, member_name) => {
+                let typed_recv = self.check_expr(
+                    receiver, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                if let Some((fn_id, owner_subst)) =
+                    self.find_method_for_call(&typed_recv.ty, member_name)
+                {
+                    let func = self.hir.functions[&fn_id].clone();
+                    let mut subst = owner_subst;
+                    if !resolved_type_args.is_empty() {
+                        if resolved_type_args.len() != func.type_params.len() {
+                            self.errors.push(ValidationError::CallArityMismatch {
+                                function: fn_label.to_string(),
+                                callee: format!("{} (type args)", member_name),
+                                expected: func.type_params.len(),
+                                actual: resolved_type_args.len(),
+                            });
+                        } else {
+                            for (tp, arg) in
+                                func.type_params.iter().zip(resolved_type_args.iter())
+                            {
+                                subst.insert(*tp, arg.clone());
+                            }
+                        }
+                    }
+                    // Methods bind self implicitly — drop it from the visible
+                    // param list when type-checking call args.
+                    let params: Vec<ResolvedType> = func
+                        .params
+                        .iter()
+                        .map(|p| substitute(&p.ty, &subst))
+                        .collect();
+                    let ret = substitute(&func.return_type, &subst);
+                    let typed = TypedExpr {
+                        kind: ExprKind::Member(Box::new(typed_recv), member_name.clone()),
+                        ty: ResolvedType::Function(params.clone(), Box::new(ret.clone())),
+                    };
+                    (typed, member_name.clone(), subst, params, ret)
+                } else {
+                    self.errors.push(ValidationError::UnknownMember {
+                        function: fn_label.to_string(),
+                        on: format_type(&typed_recv.ty),
+                        member: member_name.clone(),
+                    });
+                    let typed = TypedExpr {
+                        kind: ExprKind::Member(Box::new(typed_recv), member_name.clone()),
+                        ty: ResolvedType::Null,
+                    };
+                    return TypedExpr {
+                        kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                        ty: ResolvedType::Null,
+                    };
+                }
+            }
+            other => {
+                let typed = self.check_expr(
+                    other, fn_label, module, generics, locals, return_type, loop_depth,
+                );
+                let (params, ret) = match &typed.ty {
+                    ResolvedType::Function(p, r) => (p.clone(), (**r).clone()),
+                    _ => {
+                        self.errors.push(ValidationError::NotCallable {
+                            function: fn_label.to_string(),
+                            context: format_type(&typed.ty),
+                        });
+                        return TypedExpr {
+                            kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                            ty: ResolvedType::Null,
+                        };
+                    }
+                };
+                (typed, "<expr>".to_string(), HashMap::new(), params, ret)
+            }
+        };
+
+        if typed_args.len() != params.len() {
+            self.errors.push(ValidationError::CallArityMismatch {
+                function: fn_label.to_string(),
+                callee: callee_label.clone(),
+                expected: params.len(),
+                actual: typed_args.len(),
+            });
+        } else {
+            for (i, (arg, expected)) in typed_args.iter().zip(params.iter()).enumerate() {
+                if !types_compatible(&arg.ty, expected) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: format!("call to {} arg {}", callee_label, i),
+                        expected: format_type(expected),
+                        actual: format_type(&arg.ty),
+                    });
+                }
+            }
+        }
+        let _ = fn_subst; // already applied to params/ret
+        TypedExpr {
+            kind: ExprKind::Call(Box::new(callee_typed), resolved_type_args, typed_args),
+            ty: ret,
+        }
+    }
+
+    fn lookup_local(&self, name: &str, locals: &[HashMap<String, ResolvedType>]) -> ResolvedType {
+        for scope in locals.iter().rev() {
+            if let Some(ty) = scope.get(name) {
+                return ty.clone();
+            }
+        }
+        ResolvedType::Null
+    }
+
+    /// Locate a method `name` on a value of type `ty` for call-site dispatch.
+    /// Returns the method's `FnId` and the substitution from the owner's
+    /// type params to the receiver's actual type args.
+    fn find_method_for_call(
+        &self,
+        ty: &ResolvedType,
+        name: &str,
+    ) -> Option<(FnId, HashMap<TypeParamId, ResolvedType>)> {
+        let (owner_id, owner_args) = match ty {
+            ResolvedType::Struct(id, args) => (*id, args.clone()),
+            ResolvedType::Interface(id, args) => (*id, args.clone()),
+            _ => return None,
+        };
+
+        if let Some(s) = self.hir.structs.get(&owner_id) {
+            let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+            for (tp, arg) in s.type_params.iter().zip(owner_args.iter()) {
+                subst.insert(*tp, arg.clone());
+            }
+            for fn_id in &s.methods {
+                if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) == Some(name) {
+                    return Some((*fn_id, subst));
+                }
+            }
+            for (target_args, fn_id) in &s.specialised_methods {
+                if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) != Some(name) {
+                    continue;
+                }
+                if let Some(extend_subst) =
+                    universal_extend_mapping(target_args, &s.type_params)
+                {
+                    let mut combined = subst.clone();
+                    for (k, v) in extend_subst {
+                        combined.insert(k, substitute(&v, &subst));
+                    }
+                    return Some((*fn_id, combined));
+                }
+            }
+        } else if let Some(i) = self.hir.interfaces.get(&owner_id) {
+            let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+            for (tp, arg) in i.type_params.iter().zip(owner_args.iter()) {
+                subst.insert(*tp, arg.clone());
+            }
+            for fn_id in &i.methods {
+                if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) == Some(name) {
+                    return Some((*fn_id, subst));
+                }
+            }
+        }
+        None
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn check_struct_init(
+        &mut self,
+        ty_expr: &ast::TypeExpr,
+        fields: &[(String, ast::Expr)],
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        let ctx = TypeResolveCtx {
+            module,
+            generics: generics.to_vec(),
+            local_subst: HashMap::new(),
+            allow_pointer: false,
+        };
+        let resolved = self.resolve_type_expr(ty_expr, &ctx);
+        let (struct_id, struct_args) = match &resolved {
+            ResolvedType::Struct(id, args) => (*id, args.clone()),
+            _ => {
+                self.errors.push(ValidationError::InvalidStructInit {
+                    function: fn_label.to_string(),
+                    context: format_type(&resolved),
+                });
+                let typed_fields: Vec<(String, TypedExpr)> = fields
+                    .iter()
+                    .map(|(n, e)| {
+                        (
+                            n.clone(),
+                            self.check_expr(
+                                e, fn_label, module, generics, locals, return_type, loop_depth,
+                            ),
+                        )
+                    })
+                    .collect();
+                return TypedExpr {
+                    kind: ExprKind::StructInit(TypeId(0), Vec::new(), typed_fields),
+                    ty: ResolvedType::Null,
+                };
+            }
+        };
+
+        let struct_def = self.hir.structs[&struct_id].clone();
+        let struct_name = struct_def.name.clone();
+        let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+        for (tp, arg) in struct_def.type_params.iter().zip(struct_args.iter()) {
+            subst.insert(*tp, arg.clone());
+        }
+
+        let mut typed_fields: Vec<(String, TypedExpr)> = Vec::new();
+        let mut provided: HashSet<String> = HashSet::new();
+        for (fname, fexpr) in fields {
+            let typed = self.check_expr(
+                fexpr, fn_label, module, generics, locals, return_type, loop_depth,
+            );
+            if !provided.insert(fname.clone()) {
+                self.errors.push(ValidationError::ExtraFieldInit {
+                    function: fn_label.to_string(),
+                    struct_name: struct_name.clone(),
+                    field: fname.clone(),
+                });
+                continue;
+            }
+            match struct_def.fields.iter().find(|f| &f.name == fname) {
+                Some(field) => {
+                    let expected = substitute(&field.ty, &subst);
+                    if !types_compatible(&typed.ty, &expected) {
+                        self.errors.push(ValidationError::TypeMismatch {
+                            function: fn_label.to_string(),
+                            context: format!("field {}", fname),
+                            expected: format_type(&expected),
+                            actual: format_type(&typed.ty),
+                        });
+                    }
+                }
+                None => {
+                    self.errors.push(ValidationError::ExtraFieldInit {
+                        function: fn_label.to_string(),
+                        struct_name: struct_name.clone(),
+                        field: fname.clone(),
+                    });
+                }
+            }
+            typed_fields.push((fname.clone(), typed));
+        }
+
+        for f in &struct_def.fields {
+            if !provided.contains(&f.name) {
+                self.errors.push(ValidationError::MissingFieldInit {
+                    function: fn_label.to_string(),
+                    struct_name: struct_name.clone(),
+                    field: f.name.clone(),
+                });
+            }
+        }
+
+        TypedExpr {
+            kind: ExprKind::StructInit(struct_id, struct_args.clone(), typed_fields),
+            ty: ResolvedType::Struct(struct_id, struct_args),
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn check_member(
+        &mut self,
+        receiver: &ast::Expr,
+        name: &str,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        let typed_recv = self.check_expr(
+            receiver, fn_label, module, generics, locals, return_type, loop_depth,
+        );
+        let recv_ty = typed_recv.ty.clone();
+
+        if let ResolvedType::Struct(id, args) = &recv_ty {
+            let s = self.hir.structs[id].clone();
+            let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+            for (tp, arg) in s.type_params.iter().zip(args.iter()) {
+                subst.insert(*tp, arg.clone());
+            }
+            if let Some(field) = s.fields.iter().find(|f| f.name == name) {
+                let ty = substitute(&field.ty, &subst);
+                return TypedExpr {
+                    kind: ExprKind::Member(Box::new(typed_recv), name.to_string()),
+                    ty,
+                };
+            }
+        } else if let ResolvedType::Interface(id, args) = &recv_ty {
+            let i = self.hir.interfaces[id].clone();
+            let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+            for (tp, arg) in i.type_params.iter().zip(args.iter()) {
+                subst.insert(*tp, arg.clone());
+            }
+            if let Some(field) = i.fields.iter().find(|f| f.name == name) {
+                let ty = substitute(&field.ty, &subst);
+                return TypedExpr {
+                    kind: ExprKind::Member(Box::new(typed_recv), name.to_string()),
+                    ty,
+                };
+            }
+        }
+
+        // Methods: produce a Function type (with implicit self bound).
+        if let Some((fn_id, subst)) = self.find_method_for_call(&recv_ty, name) {
+            let func = self.hir.functions[&fn_id].clone();
+            let params: Vec<ResolvedType> = func
+                .params
+                .iter()
+                .map(|p| substitute(&p.ty, &subst))
+                .collect();
+            let ret = substitute(&func.return_type, &subst);
+            return TypedExpr {
+                kind: ExprKind::Member(Box::new(typed_recv), name.to_string()),
+                ty: ResolvedType::Function(params, Box::new(ret)),
+            };
+        }
+
+        self.errors.push(ValidationError::UnknownMember {
+            function: fn_label.to_string(),
+            on: format_type(&recv_ty),
+            member: name.to_string(),
+        });
+        TypedExpr {
+            kind: ExprKind::Member(Box::new(typed_recv), name.to_string()),
+            ty: ResolvedType::Null,
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn check_binary(
+        &mut self,
+        l: &ast::Expr,
+        op: &ast::BinaryOperator,
+        r: &ast::Expr,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        let lt = self.check_expr(l, fn_label, module, generics, locals, return_type, loop_depth);
+        let rt = self.check_expr(r, fn_label, module, generics, locals, return_type, loop_depth);
+        let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
+
+        let (hir_op, result_ty) = match op {
+            ast::BinaryOperator::Add => (HirBinOp::Add, lt.ty.clone()),
+            ast::BinaryOperator::Sub => (HirBinOp::Sub, lt.ty.clone()),
+            ast::BinaryOperator::Mul => (HirBinOp::Mul, lt.ty.clone()),
+            ast::BinaryOperator::Div => (HirBinOp::Div, lt.ty.clone()),
+            ast::BinaryOperator::Mod => (HirBinOp::Mod, lt.ty.clone()),
+            ast::BinaryOperator::And => (HirBinOp::And, bool_ty.clone()),
+            ast::BinaryOperator::Or => (HirBinOp::Or, bool_ty.clone()),
+            ast::BinaryOperator::Eq => (HirBinOp::Eq, bool_ty.clone()),
+            ast::BinaryOperator::Neq => (HirBinOp::Neq, bool_ty.clone()),
+            ast::BinaryOperator::Lt => (HirBinOp::Lt, bool_ty.clone()),
+            ast::BinaryOperator::Le => (HirBinOp::Le, bool_ty.clone()),
+            ast::BinaryOperator::Gt => (HirBinOp::Gt, bool_ty.clone()),
+            ast::BinaryOperator::Ge => (HirBinOp::Ge, bool_ty.clone()),
+        };
+
+        let needs_numeric = matches!(
+            op,
+            ast::BinaryOperator::Add
+                | ast::BinaryOperator::Sub
+                | ast::BinaryOperator::Mul
+                | ast::BinaryOperator::Div
+                | ast::BinaryOperator::Mod
+                | ast::BinaryOperator::Lt
+                | ast::BinaryOperator::Le
+                | ast::BinaryOperator::Gt
+                | ast::BinaryOperator::Ge
+        );
+        let needs_bool = matches!(op, ast::BinaryOperator::And | ast::BinaryOperator::Or);
+
+        if needs_numeric && !is_numeric(&lt.ty) {
+            self.errors.push(ValidationError::InvalidOperator {
+                function: fn_label.to_string(),
+                op: format!("{:?}", op),
+                operand_ty: format_type(&lt.ty),
+            });
+        }
+        if needs_bool && lt.ty != bool_ty {
+            self.errors.push(ValidationError::InvalidOperator {
+                function: fn_label.to_string(),
+                op: format!("{:?}", op),
+                operand_ty: format_type(&lt.ty),
+            });
+        }
+        if lt.ty != rt.ty {
+            self.errors.push(ValidationError::TypeMismatch {
+                function: fn_label.to_string(),
+                context: format!("binary {:?}", op),
+                expected: format_type(&lt.ty),
+                actual: format_type(&rt.ty),
+            });
+        }
+
+        TypedExpr {
+            kind: ExprKind::BinaryOp(Box::new(lt), hir_op, Box::new(rt)),
+            ty: result_ty,
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn check_unary(
+        &mut self,
+        op: &ast::UnaryOperator,
+        e: &ast::Expr,
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        let typed = self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+        let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
+        match op {
+            ast::UnaryOperator::Neg => {
+                if !is_numeric(&typed.ty) {
+                    self.errors.push(ValidationError::InvalidOperator {
+                        function: fn_label.to_string(),
+                        op: "-".to_string(),
+                        operand_ty: format_type(&typed.ty),
+                    });
+                }
+                let ty = typed.ty.clone();
+                TypedExpr {
+                    kind: ExprKind::UnaryOp(HirUnOp::Neg, Box::new(typed)),
+                    ty,
+                }
+            }
+            ast::UnaryOperator::Not => {
+                if typed.ty != bool_ty {
+                    self.errors.push(ValidationError::InvalidOperator {
+                        function: fn_label.to_string(),
+                        op: "!".to_string(),
+                        operand_ty: format_type(&typed.ty),
+                    });
+                }
+                TypedExpr {
+                    kind: ExprKind::UnaryOp(HirUnOp::Not, Box::new(typed)),
+                    ty: bool_ty,
+                }
+            }
+        }
+    }
+
     fn resolve_function_signature(
         &mut self,
         fn_id: FnId,
@@ -1564,6 +2703,69 @@ impl Validator {
         let id = self.next_tp_id;
         self.next_tp_id += 1;
         id
+    }
+}
+
+fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
+    if actual == expected {
+        return true;
+    }
+    if let ResolvedType::Union(types) = expected {
+        if types.iter().any(|t| t == actual) {
+            return true;
+        }
+    }
+    false
+}
+
+fn is_numeric(ty: &ResolvedType) -> bool {
+    matches!(
+        ty,
+        ResolvedType::Primitive(
+            PrimitiveType::Int8
+                | PrimitiveType::Int16
+                | PrimitiveType::Int32
+                | PrimitiveType::Int64
+                | PrimitiveType::Uint8
+                | PrimitiveType::Uint16
+                | PrimitiveType::Uint32
+                | PrimitiveType::Uint64
+                | PrimitiveType::Float32
+                | PrimitiveType::Float64
+        )
+    )
+}
+
+fn format_type(ty: &ResolvedType) -> String {
+    match ty {
+        ResolvedType::Primitive(p) => format!("{:?}", p).to_lowercase(),
+        ResolvedType::Struct(id, args) => format_named("struct", id.0, args),
+        ResolvedType::Interface(id, args) => format_named("interface", id.0, args),
+        ResolvedType::Union(types) => types
+            .iter()
+            .map(format_type)
+            .collect::<Vec<_>>()
+            .join(" | "),
+        ResolvedType::Function(params, ret) => format!(
+            "({}) -> {}",
+            params.iter().map(format_type).collect::<Vec<_>>().join(", "),
+            format_type(ret)
+        ),
+        ResolvedType::TypeParam(id) => format!("'tp{}", id.0),
+        ResolvedType::Null => "null".to_string(),
+    }
+}
+
+fn format_named(kind: &str, id: u32, args: &[ResolvedType]) -> String {
+    if args.is_empty() {
+        format!("{}#{}", kind, id)
+    } else {
+        format!(
+            "{}#{}<{}>",
+            kind,
+            id,
+            args.iter().map(format_type).collect::<Vec<_>>().join(", ")
+        )
     }
 }
 
