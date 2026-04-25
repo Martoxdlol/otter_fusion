@@ -75,6 +75,9 @@ pub enum ValidationError {
         function: String,
         param: String,
     },
+    InvalidExtendTarget {
+        module: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -146,6 +149,11 @@ pub struct Validator {
     /// generics; the method's owner generics live in `type_generics`).
     fn_generics: HashMap<FnId, Vec<(String, TypeParamId)>>,
 
+    /// Implements clauses contributed by extend blocks (resolved interface
+    /// types). Drained by phase 4 and merged into the target struct's
+    /// `implements` list.
+    pending_extend_implements: Vec<(TypeId, Vec<ResolvedType>)>,
+
     next_module_id: u32,
     next_type_id: u32,
     next_fn_id: u32,
@@ -165,6 +173,7 @@ impl Validator {
             pending_function_bodies: HashMap::new(),
             type_generics: HashMap::new(),
             fn_generics: HashMap::new(),
+            pending_extend_implements: Vec::new(),
             next_module_id: 0,
             next_type_id: 0,
             next_fn_id: 0,
@@ -182,6 +191,7 @@ impl Validator {
         // step 2: register type params, resolve fields & signatures
         self.register_type_params_and_signatures(&modules);
         // step 3: merge extend blocks
+        self.merge_extend_blocks(&modules);
         // step 4: validate interface implementations
         // step 5: validate function bodies
 
@@ -189,7 +199,7 @@ impl Validator {
             return Err(self.errors);
         }
 
-        todo!("phases 3-5 not yet implemented")
+        todo!("phases 4-5 not yet implemented")
     }
 
     fn register_modules_and_imports(&mut self, modules: &[Module]) {
@@ -301,6 +311,7 @@ impl Validator {
                                 type_params: Vec::new(),
                                 fields: Vec::new(),
                                 methods: Vec::new(),
+                                specialised_methods: Vec::new(),
                                 implements: Vec::new(),
                             },
                         );
@@ -659,49 +670,173 @@ impl Validator {
 
             let module_name = self.hir.modules[&func.module].name.clone();
             let fn_label = format!("{}::{}", module_name, func.name);
-
-            let ctx = TypeResolveCtx {
-                module: func.module,
-                generics,
-                local_subst: HashMap::new(),
-                allow_pointer: decl.is_extern,
-            };
-
-            let mut params: Vec<HirParam> = Vec::new();
-            let mut seen_params: HashSet<String> = HashSet::new();
-            for p in &decl.params {
-                if !seen_params.insert(p.name.clone()) {
-                    self.errors.push(ValidationError::DuplicateParam {
-                        function: fn_label.clone(),
-                        param: p.name.clone(),
-                    });
-                    continue;
-                }
-                if p.is_pointer && !decl.is_extern {
-                    self.errors.push(ValidationError::PointerOutsideExtern {
-                        location: format!("{}({})", fn_label, p.name),
-                    });
-                }
-                let ty = self.resolve_type_expr(&p.ty, &ctx);
-                params.push(HirParam {
-                    name: p.name.clone(),
-                    ty,
-                    is_pointer: p.is_pointer,
-                });
-            }
-
-            let return_type = match &decl.return_type {
-                Some(ty) => self.resolve_type_expr(ty, &ctx),
-                None => ResolvedType::Null,
-            };
-
-            let f = self.hir.functions.get_mut(fn_id).unwrap();
-            f.params = params;
-            f.return_type = return_type;
+            self.resolve_function_signature(*fn_id, decl, func.module, generics, &fn_label);
         }
 
         // Restore pending bodies for phase 5.
         self.pending_function_bodies = pending;
+    }
+
+    fn merge_extend_blocks(&mut self, modules: &[Module]) {
+        for module in modules {
+            let module_id = match self.module_ids.get(&module.name) {
+                Some(id) => *id,
+                None => continue,
+            };
+
+            for item in &module.program.items {
+                let Item::Extend(decl) = item else { continue };
+
+                let extend_label = format!("{}::extend", module.name);
+                let extend_scope = self.mint_generics(&decl.generic_params, extend_label.clone());
+
+                self.resolve_generic_bounds_with_scope(
+                    module_id,
+                    &decl.generic_params,
+                    vec![extend_scope.clone()],
+                    &extend_scope,
+                    &extend_label,
+                );
+
+                let target_ctx = TypeResolveCtx {
+                    module: module_id,
+                    generics: vec![extend_scope.clone()],
+                    local_subst: HashMap::new(),
+                    allow_pointer: false,
+                };
+                let target_resolved = self.resolve_type_expr(&decl.target, &target_ctx);
+
+                let (target_id, target_args) = match target_resolved {
+                    ResolvedType::Struct(id, args) => (id, args),
+                    ResolvedType::Null => continue, // resolution already errored
+                    _ => {
+                        self.errors.push(ValidationError::InvalidExtendTarget {
+                            module: module.name.clone(),
+                        });
+                        continue;
+                    }
+                };
+
+                let target_name = self.hir.structs[&target_id].name.clone();
+                let target_label = format!("{}::{}", module.name, target_name);
+
+                let mut seen: HashSet<String> = HashSet::new();
+                for method in &decl.methods {
+                    if !seen.insert(method.name.clone()) {
+                        self.errors.push(ValidationError::DuplicateMethod {
+                            type_name: target_label.clone(),
+                            method: method.name.clone(),
+                        });
+                        continue;
+                    }
+
+                    let fn_id = FnId(self.next_fn_id());
+                    self.hir.functions.insert(
+                        fn_id,
+                        HirFunction {
+                            id: fn_id,
+                            module: module_id,
+                            name: method.name.clone(),
+                            owner: Some(target_id),
+                            has_self: method.has_self_param,
+                            type_params: Vec::new(),
+                            params: Vec::new(),
+                            return_type: ResolvedType::Null,
+                            body: None,
+                        },
+                    );
+
+                    let method_label = format!("{}::{}", target_label, method.name);
+                    let method_scope = self.mint_generics(&method.generics, method_label.clone());
+                    let ids: Vec<TypeParamId> = method_scope.iter().map(|(_, id)| *id).collect();
+                    self.hir.functions.get_mut(&fn_id).unwrap().type_params = ids;
+                    self.fn_generics.insert(fn_id, method_scope.clone());
+
+                    let combined = vec![extend_scope.clone(), method_scope.clone()];
+                    self.resolve_generic_bounds_with_scope(
+                        module_id,
+                        &method.generics,
+                        combined.clone(),
+                        &method_scope,
+                        &method_label,
+                    );
+
+                    self.resolve_function_signature(
+                        fn_id,
+                        method,
+                        module_id,
+                        combined,
+                        &method_label,
+                    );
+
+                    self.hir
+                        .structs
+                        .get_mut(&target_id)
+                        .unwrap()
+                        .specialised_methods
+                        .push((target_args.clone(), fn_id));
+
+                    self.pending_function_bodies.insert(fn_id, method.clone());
+                }
+
+                if !decl.implements.is_empty() {
+                    let mut resolved_impls: Vec<ResolvedType> = Vec::new();
+                    for impl_expr in &decl.implements {
+                        resolved_impls.push(self.resolve_type_expr(impl_expr, &target_ctx));
+                    }
+                    self.pending_extend_implements
+                        .push((target_id, resolved_impls));
+                }
+            }
+        }
+    }
+
+    fn resolve_function_signature(
+        &mut self,
+        fn_id: FnId,
+        decl: &FunctionDecl,
+        module: ModuleId,
+        generics: Vec<Vec<(String, TypeParamId)>>,
+        fn_label: &str,
+    ) {
+        let ctx = TypeResolveCtx {
+            module,
+            generics,
+            local_subst: HashMap::new(),
+            allow_pointer: decl.is_extern,
+        };
+
+        let mut params: Vec<HirParam> = Vec::new();
+        let mut seen_params: HashSet<String> = HashSet::new();
+        for p in &decl.params {
+            if !seen_params.insert(p.name.clone()) {
+                self.errors.push(ValidationError::DuplicateParam {
+                    function: fn_label.to_string(),
+                    param: p.name.clone(),
+                });
+                continue;
+            }
+            if p.is_pointer && !decl.is_extern {
+                self.errors.push(ValidationError::PointerOutsideExtern {
+                    location: format!("{}({})", fn_label, p.name),
+                });
+            }
+            let ty = self.resolve_type_expr(&p.ty, &ctx);
+            params.push(HirParam {
+                name: p.name.clone(),
+                ty,
+                is_pointer: p.is_pointer,
+            });
+        }
+
+        let return_type = match &decl.return_type {
+            Some(ty) => self.resolve_type_expr(ty, &ctx),
+            None => ResolvedType::Null,
+        };
+
+        let f = self.hir.functions.get_mut(&fn_id).unwrap();
+        f.params = params;
+        f.return_type = return_type;
     }
 
     fn mint_methods(

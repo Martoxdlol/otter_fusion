@@ -91,8 +91,16 @@ pub struct HirStruct {
     pub name: String,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
-    pub methods: Vec<FnId>,      // includes methods from extend blocks
-    pub implements: Vec<TypeId>, // resolved interface IDs
+    /// Methods declared inline on the struct.
+    pub methods: Vec<FnId>,
+    /// Methods contributed by extend blocks. Each entry's `Vec<ResolvedType>`
+    /// is the extend's target type-argument list — phase 5 unifies these
+    /// with the instance's type args to determine applicability. The
+    /// "universal" extend `extend<T> Foo<T>` shows up here too with args
+    /// like `[TypeParam(T_id)]`.
+    pub specialised_methods: Vec<(Vec<ResolvedType>, FnId)>,
+    /// Implemented interfaces with their type arguments.
+    pub implements: Vec<(TypeId, Vec<ResolvedType>)>,
 }
 
 #[derive(Debug, Clone)]
@@ -102,8 +110,9 @@ pub struct HirInterface {
     pub name: String,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
-    pub methods: Vec<FnId>,   // abstract + default methods
-    pub extends: Vec<TypeId>, // parent interfaces
+    pub methods: Vec<FnId>, // abstract + default methods
+    /// Parent interfaces with their type arguments.
+    pub extends: Vec<(TypeId, Vec<ResolvedType>)>,
 }
 
 #[derive(Debug, Clone)]
