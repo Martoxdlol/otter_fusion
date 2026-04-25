@@ -37,8 +37,13 @@ pub enum HirImport {
 
 #[derive(Debug, Clone)]
 pub enum HirImportSymbol {
-    Type(TypeId, String),      // (resolved id, local name/alias)
-    Function(FnId, String),    // (resolved id, local name/alias)
+    Type(TypeId, String),   // (resolved id, local name/alias)
+    Function(FnId, String), // (resolved id, local name/alias)
+    Alias {
+        source: ModuleId,
+        original: String, // alias name in the source module
+        local: String,    // local name in the importing module
+    },
 }
 
 #[derive(Debug, Clone, Default)]
