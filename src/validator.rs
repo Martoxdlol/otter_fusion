@@ -1,7 +1,10 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::{
-    ast::{self, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, Item, Module, TypeAliasDecl, TypeExpr},
+    ast::{
+        self, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, Item, Module, TypeAliasDecl,
+        TypeExpr,
+    },
     hir::{
         FnId, Hir, HirField, HirFunction, HirImport, HirImportSymbol, HirInterface, HirModule,
         HirParam, HirStruct, ModuleId, PrimitiveType, ResolvedType, TypeId, TypeParamId,
@@ -77,6 +80,19 @@ pub enum ValidationError {
     },
     InvalidExtendTarget {
         module: String,
+    },
+    ImplementsNotInterface {
+        type_name: String,
+    },
+    MissingInterfaceMember {
+        type_name: String,
+        interface: String,
+        member: String,
+    },
+    InterfaceMemberMismatch {
+        type_name: String,
+        interface: String,
+        member: String,
     },
 }
 
@@ -193,13 +209,14 @@ impl Validator {
         // step 3: merge extend blocks
         self.merge_extend_blocks(&modules);
         // step 4: validate interface implementations
+        self.validate_implementations(&modules);
         // step 5: validate function bodies
 
         if !self.errors.is_empty() {
             return Err(self.errors);
         }
 
-        todo!("phases 4-5 not yet implemented")
+        todo!("phase 5 not yet implemented")
     }
 
     fn register_modules_and_imports(&mut self, modules: &[Module]) {
@@ -315,7 +332,12 @@ impl Validator {
                                 implements: Vec::new(),
                             },
                         );
-                        self.hir.modules.get_mut(&module_id).unwrap().structs.push(id);
+                        self.hir
+                            .modules
+                            .get_mut(&module_id)
+                            .unwrap()
+                            .structs
+                            .push(id);
                         scope.direct.insert(decl.name.clone(), ScopeEntry::Type(id));
                     }
                     Item::Interface(decl) => {
@@ -378,7 +400,9 @@ impl Validator {
                             .unwrap()
                             .functions
                             .push(id);
-                        scope.direct.insert(decl.name.clone(), ScopeEntry::Function(id));
+                        scope
+                            .direct
+                            .insert(decl.name.clone(), ScopeEntry::Function(id));
                         self.pending_function_bodies.insert(id, decl.clone());
                     }
                     Item::TypeAlias(decl) => {
@@ -509,7 +533,14 @@ impl Validator {
                         self.hir.structs.get_mut(&type_id).unwrap().type_params = ids;
                         self.type_generics.insert(type_id, scope);
 
-                        self.mint_methods(module_id, type_id, &module.name, &decl.name, &decl.methods, /*is_struct=*/ true);
+                        self.mint_methods(
+                            module_id,
+                            type_id,
+                            &module.name,
+                            &decl.name,
+                            &decl.methods,
+                            /*is_struct=*/ true,
+                        );
                     }
                     Item::Interface(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
@@ -522,7 +553,14 @@ impl Validator {
                         self.hir.interfaces.get_mut(&type_id).unwrap().type_params = ids;
                         self.type_generics.insert(type_id, scope);
 
-                        self.mint_methods(module_id, type_id, &module.name, &decl.name, &decl.methods, /*is_struct=*/ false);
+                        self.mint_methods(
+                            module_id,
+                            type_id,
+                            &module.name,
+                            &decl.name,
+                            &decl.methods,
+                            /*is_struct=*/ false,
+                        );
                     }
                     Item::Function(decl) => {
                         let fn_id = match self.find_fn_id(module_id, &decl.name) {
@@ -559,7 +597,10 @@ impl Validator {
                         self.resolve_generic_bounds(
                             module_id,
                             &decl.generics,
-                            self.type_generics.get(&type_id).cloned().unwrap_or_default(),
+                            self.type_generics
+                                .get(&type_id)
+                                .cloned()
+                                .unwrap_or_default(),
                             &scope_name,
                         );
                     }
@@ -572,7 +613,10 @@ impl Validator {
                         self.resolve_generic_bounds(
                             module_id,
                             &decl.generics,
-                            self.type_generics.get(&type_id).cloned().unwrap_or_default(),
+                            self.type_generics
+                                .get(&type_id)
+                                .cloned()
+                                .unwrap_or_default(),
                             &scope_name,
                         );
                     }
@@ -791,6 +835,264 @@ impl Validator {
         }
     }
 
+    fn validate_implementations(&mut self, modules: &[Module]) {
+        // 4a: Resolve struct/interface declared implements clauses.
+        for module in modules {
+            let module_id = match self.module_ids.get(&module.name) {
+                Some(id) => *id,
+                None => continue,
+            };
+            for item in &module.program.items {
+                match item {
+                    Item::Struct(decl) => {
+                        let type_id = match self.find_type_id(module_id, &decl.name) {
+                            Some(id) => id,
+                            None => continue,
+                        };
+                        let type_label = format!("{}::{}", module.name, decl.name);
+                        let scope = self
+                            .type_generics
+                            .get(&type_id)
+                            .cloned()
+                            .unwrap_or_default();
+                        let resolved =
+                            self.resolve_implements_list(module_id, &decl.implements, scope, &type_label);
+                        self.hir
+                            .structs
+                            .get_mut(&type_id)
+                            .unwrap()
+                            .implements
+                            .extend(resolved);
+                    }
+                    Item::Interface(decl) => {
+                        let type_id = match self.find_type_id(module_id, &decl.name) {
+                            Some(id) => id,
+                            None => continue,
+                        };
+                        let type_label = format!("{}::{}", module.name, decl.name);
+                        let scope = self
+                            .type_generics
+                            .get(&type_id)
+                            .cloned()
+                            .unwrap_or_default();
+                        let resolved =
+                            self.resolve_implements_list(module_id, &decl.implements, scope, &type_label);
+                        self.hir
+                            .interfaces
+                            .get_mut(&type_id)
+                            .unwrap()
+                            .extends
+                            .extend(resolved);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        // 4a (cont.): drain extend-contributed implements.
+        let pending = std::mem::take(&mut self.pending_extend_implements);
+        for (target_id, resolveds) in pending {
+            let target_label = self
+                .hir
+                .structs
+                .get(&target_id)
+                .map(|s| {
+                    let mname = self.hir.modules[&s.module].name.clone();
+                    format!("{}::{}", mname, s.name)
+                })
+                .unwrap_or_default();
+            let mut filtered: Vec<(TypeId, Vec<ResolvedType>)> = Vec::new();
+            for r in resolveds {
+                match r {
+                    ResolvedType::Interface(id, args) => filtered.push((id, args)),
+                    ResolvedType::Null => {}
+                    _ => {
+                        self.errors.push(ValidationError::ImplementsNotInterface {
+                            type_name: target_label.clone(),
+                        });
+                    }
+                }
+            }
+            if let Some(s) = self.hir.structs.get_mut(&target_id) {
+                s.implements.extend(filtered);
+            }
+        }
+
+        // 4b: For each struct, verify it provides every required field and
+        //     non-default method from each (transitively) implemented interface.
+        let struct_ids: Vec<TypeId> = self.hir.structs.keys().cloned().collect();
+        for sid in struct_ids {
+            let struct_def = self.hir.structs[&sid].clone();
+            let required = self.collect_required_interfaces(&struct_def.implements);
+            for (interface_id, interface_args) in required {
+                self.check_struct_implements_interface(&struct_def, interface_id, &interface_args);
+            }
+        }
+    }
+
+    fn resolve_implements_list(
+        &mut self,
+        module: ModuleId,
+        list: &[TypeExpr],
+        scope: Vec<(String, TypeParamId)>,
+        type_label: &str,
+    ) -> Vec<(TypeId, Vec<ResolvedType>)> {
+        let ctx = TypeResolveCtx {
+            module,
+            generics: vec![scope],
+            local_subst: HashMap::new(),
+            allow_pointer: false,
+        };
+        let mut out = Vec::new();
+        for expr in list {
+            match self.resolve_type_expr(expr, &ctx) {
+                ResolvedType::Interface(id, args) => out.push((id, args)),
+                ResolvedType::Null => {}
+                _ => {
+                    self.errors.push(ValidationError::ImplementsNotInterface {
+                        type_name: type_label.to_string(),
+                    });
+                }
+            }
+        }
+        out
+    }
+
+    fn collect_required_interfaces(
+        &self,
+        direct: &[(TypeId, Vec<ResolvedType>)],
+    ) -> Vec<(TypeId, Vec<ResolvedType>)> {
+        let mut result: Vec<(TypeId, Vec<ResolvedType>)> = Vec::new();
+        let mut visited: HashSet<TypeId> = HashSet::new();
+        let mut stack: Vec<(TypeId, Vec<ResolvedType>)> = direct.to_vec();
+        while let Some((id, args)) = stack.pop() {
+            if !visited.insert(id) {
+                continue;
+            }
+            result.push((id, args.clone()));
+            if let Some(iface) = self.hir.interfaces.get(&id) {
+                let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+                for (tp, arg) in iface.type_params.iter().zip(args.iter()) {
+                    subst.insert(*tp, arg.clone());
+                }
+                for (parent_id, parent_args) in &iface.extends {
+                    let substituted: Vec<ResolvedType> =
+                        parent_args.iter().map(|a| substitute(a, &subst)).collect();
+                    stack.push((*parent_id, substituted));
+                }
+            }
+        }
+        result
+    }
+
+    fn check_struct_implements_interface(
+        &mut self,
+        struct_def: &HirStruct,
+        interface_id: TypeId,
+        interface_args: &[ResolvedType],
+    ) {
+        let interface = match self.hir.interfaces.get(&interface_id).cloned() {
+            Some(i) => i,
+            None => return,
+        };
+
+        let module_name = self.hir.modules[&struct_def.module].name.clone();
+        let type_label = format!("{}::{}", module_name, struct_def.name);
+        let iface_module_name = self.hir.modules[&interface.module].name.clone();
+        let iface_label = format!("{}::{}", iface_module_name, interface.name);
+
+        let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+        for (tp, arg) in interface.type_params.iter().zip(interface_args.iter()) {
+            subst.insert(*tp, arg.clone());
+        }
+
+        for iface_field in &interface.fields {
+            let expected_ty = substitute(&iface_field.ty, &subst);
+            let struct_field = struct_def.fields.iter().find(|f| f.name == iface_field.name);
+            match struct_field {
+                None => {
+                    self.errors.push(ValidationError::MissingInterfaceMember {
+                        type_name: type_label.clone(),
+                        interface: iface_label.clone(),
+                        member: iface_field.name.clone(),
+                    });
+                }
+                Some(sf) => {
+                    if sf.ty != expected_ty || sf.is_pointer != iface_field.is_pointer {
+                        self.errors.push(ValidationError::InterfaceMemberMismatch {
+                            type_name: type_label.clone(),
+                            interface: iface_label.clone(),
+                            member: iface_field.name.clone(),
+                        });
+                    }
+                }
+            }
+        }
+
+        for &iface_method_id in &interface.methods {
+            let iface_method = match self.hir.functions.get(&iface_method_id).cloned() {
+                Some(m) => m,
+                None => continue,
+            };
+
+            let has_default = self
+                .pending_function_bodies
+                .get(&iface_method_id)
+                .is_some_and(|d| d.body.is_some());
+            if has_default {
+                continue;
+            }
+
+            let provider = self.find_struct_method(struct_def, &iface_method.name);
+            match provider {
+                None => {
+                    self.errors.push(ValidationError::MissingInterfaceMember {
+                        type_name: type_label.clone(),
+                        interface: iface_label.clone(),
+                        member: iface_method.name.clone(),
+                    });
+                }
+                Some((provider_fn_id, extend_subst)) => {
+                    let provider_fn = self.hir.functions.get(&provider_fn_id).cloned().unwrap();
+                    if !signatures_match(&iface_method, &provider_fn, &subst, &extend_subst) {
+                        self.errors.push(ValidationError::InterfaceMemberMismatch {
+                            type_name: type_label.clone(),
+                            interface: iface_label.clone(),
+                            member: iface_method.name.clone(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    /// Locate a struct method satisfying the given name. Returns the method's
+    /// `FnId` and a substitution mapping from extend-generic ids onto the
+    /// struct's own type params (empty for inline methods). Only inline
+    /// methods and "universal" extends — those whose target args bijectively
+    /// map the struct's type params — are considered, since only they apply
+    /// to the struct's abstract self.
+    fn find_struct_method(
+        &self,
+        struct_def: &HirStruct,
+        name: &str,
+    ) -> Option<(FnId, HashMap<TypeParamId, ResolvedType>)> {
+        for fn_id in &struct_def.methods {
+            if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) == Some(name) {
+                return Some((*fn_id, HashMap::new()));
+            }
+        }
+        for (target_args, fn_id) in &struct_def.specialised_methods {
+            if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) != Some(name) {
+                continue;
+            }
+            if let Some(mapping) = universal_extend_mapping(target_args, &struct_def.type_params) {
+                return Some((*fn_id, mapping));
+            }
+        }
+        None
+    }
+
     fn resolve_function_signature(
         &mut self,
         fn_id: FnId,
@@ -875,7 +1177,12 @@ impl Validator {
             );
 
             if is_struct {
-                self.hir.structs.get_mut(&owner).unwrap().methods.push(fn_id);
+                self.hir
+                    .structs
+                    .get_mut(&owner)
+                    .unwrap()
+                    .methods
+                    .push(fn_id);
             } else {
                 self.hir
                     .interfaces
@@ -993,7 +1300,11 @@ impl Validator {
         module_name: &str,
         type_name: &str,
     ) -> Vec<HirField> {
-        let scope = self.type_generics.get(&type_id).cloned().unwrap_or_default();
+        let scope = self
+            .type_generics
+            .get(&type_id)
+            .cloned()
+            .unwrap_or_default();
         let ctx = TypeResolveCtx {
             module,
             generics: vec![scope],
@@ -1030,7 +1341,10 @@ impl Validator {
         match expr {
             TypeExpr::Primitive(p) => resolve_primitive(p),
             TypeExpr::Union(types) => {
-                let resolved: Vec<_> = types.iter().map(|t| self.resolve_type_expr(t, ctx)).collect();
+                let resolved: Vec<_> = types
+                    .iter()
+                    .map(|t| self.resolve_type_expr(t, ctx))
+                    .collect();
                 ResolvedType::Union(resolved)
             }
             TypeExpr::Named(name, args) => self.resolve_named(name, args, ctx),
@@ -1146,13 +1460,17 @@ impl Validator {
             }
             ScopeEntry::Function(_) => {
                 let module_name = self.hir.modules[&ctx.module].name.clone();
-                self.errors.push(ValidationError::ExpectedTypeFoundFunction {
-                    module: module_name,
-                    name: name.to_string(),
-                });
+                self.errors
+                    .push(ValidationError::ExpectedTypeFoundFunction {
+                        module: module_name,
+                        name: name.to_string(),
+                    });
                 ResolvedType::Null
             }
-            ScopeEntry::Alias { source, name: alias_name } => {
+            ScopeEntry::Alias {
+                source,
+                name: alias_name,
+            } => {
                 let alias_decl = self
                     .module_aliases
                     .get(&source)
@@ -1247,6 +1565,97 @@ impl Validator {
         self.next_tp_id += 1;
         id
     }
+}
+
+fn substitute(ty: &ResolvedType, subst: &HashMap<TypeParamId, ResolvedType>) -> ResolvedType {
+    match ty {
+        ResolvedType::TypeParam(id) => subst.get(id).cloned().unwrap_or_else(|| ty.clone()),
+        ResolvedType::Struct(id, args) => ResolvedType::Struct(
+            *id,
+            args.iter().map(|a| substitute(a, subst)).collect(),
+        ),
+        ResolvedType::Interface(id, args) => ResolvedType::Interface(
+            *id,
+            args.iter().map(|a| substitute(a, subst)).collect(),
+        ),
+        ResolvedType::Union(types) => {
+            ResolvedType::Union(types.iter().map(|t| substitute(t, subst)).collect())
+        }
+        ResolvedType::Function(params, ret) => ResolvedType::Function(
+            params.iter().map(|p| substitute(p, subst)).collect(),
+            Box::new(substitute(ret, subst)),
+        ),
+        ResolvedType::Primitive(_) | ResolvedType::Null => ty.clone(),
+    }
+}
+
+/// Returns Some(mapping) if `target_args` is a bijective list of distinct
+/// `TypeParam(_)` values matching `struct_type_params` 1:1 by position.
+/// The mapping sends each extend generic id to a `ResolvedType::TypeParam` of
+/// the corresponding struct generic id, so the extend method's signature can
+/// be re-expressed in the struct's own generic vocabulary.
+fn universal_extend_mapping(
+    target_args: &[ResolvedType],
+    struct_type_params: &[TypeParamId],
+) -> Option<HashMap<TypeParamId, ResolvedType>> {
+    if target_args.len() != struct_type_params.len() {
+        return None;
+    }
+    let mut seen: HashSet<TypeParamId> = HashSet::new();
+    let mut mapping: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+    for (i, arg) in target_args.iter().enumerate() {
+        match arg {
+            ResolvedType::TypeParam(p) => {
+                if !seen.insert(*p) {
+                    return None;
+                }
+                mapping.insert(*p, ResolvedType::TypeParam(struct_type_params[i]));
+            }
+            _ => return None,
+        }
+    }
+    Some(mapping)
+}
+
+fn signatures_match(
+    iface_method: &crate::hir::HirFunction,
+    provider: &crate::hir::HirFunction,
+    iface_subst: &HashMap<TypeParamId, ResolvedType>,
+    provider_subst: &HashMap<TypeParamId, ResolvedType>,
+) -> bool {
+    if iface_method.has_self != provider.has_self {
+        return false;
+    }
+    if iface_method.params.len() != provider.params.len() {
+        return false;
+    }
+    if iface_method.type_params.len() != provider.type_params.len() {
+        return false;
+    }
+
+    let mut method_subst = iface_subst.clone();
+    for (iface_tp, provider_tp) in iface_method
+        .type_params
+        .iter()
+        .zip(provider.type_params.iter())
+    {
+        method_subst.insert(*iface_tp, ResolvedType::TypeParam(*provider_tp));
+    }
+
+    for (i_param, p_param) in iface_method.params.iter().zip(provider.params.iter()) {
+        let expected_ty = substitute(&i_param.ty, &method_subst);
+        let provided_ty = substitute(&p_param.ty, provider_subst);
+        if expected_ty != provided_ty {
+            return false;
+        }
+        if i_param.is_pointer != p_param.is_pointer {
+            return false;
+        }
+    }
+
+    let expected_ret = substitute(&iface_method.return_type, &method_subst);
+    let provided_ret = substitute(&provider.return_type, provider_subst);
+    expected_ret == provided_ret
 }
 
 fn resolve_primitive(p: &ast::PrimitiveType) -> ResolvedType {
