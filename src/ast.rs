@@ -10,13 +10,28 @@ pub struct Program {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum Item {
+pub enum ItemKind {
     TypeAlias(TypeAliasDecl),
     Interface(InterfaceDecl),
     Struct(StructDecl),
     Function(FunctionDecl),
     Extend(ExtendDecl),
     Import(ImportDecl),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Item {
+    pub kind: ItemKind,
+    pub span: Span,
+}
+
+impl Item {
+    pub fn dummy(kind: ItemKind) -> Self {
+        Self {
+            kind,
+            span: Span::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -27,14 +42,14 @@ pub struct ImportDecl {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ImportSymbols {
-    Glob,                        // import "utils"
-    Named(Vec<ImportSymbol>),    // import { Foo, bar } from "utils"
+    Glob,                     // import "utils"
+    Named(Vec<ImportSymbol>), // import { Foo, bar } from "utils"
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ImportSymbol {
     pub name: String,
-    pub alias: Option<String>,   // import { Foo as Bar } from "utils"
+    pub alias: Option<String>, // import { Foo as Bar } from "utils"
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -116,6 +131,7 @@ pub struct FunctionDecl {
     pub return_type: Option<TypeExpr>,
     pub params: Vec<ParamDecl>,
     pub body: Option<Block>,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -203,4 +219,11 @@ pub struct ExtendDecl {
     pub generic_params: Vec<GenericParam>,
     pub implements: Vec<TypeExpr>,
     pub methods: Vec<FunctionDecl>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Span {
+    pub line: usize,
+    pub col: usize,
+    pub len: usize,
 }

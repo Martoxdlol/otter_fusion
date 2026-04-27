@@ -1,5 +1,7 @@
 use std::fmt;
 
+use crate::ast::Span;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Token {
     pub token_type: TokenType,
@@ -213,6 +215,14 @@ impl Token {
 
     pub fn eof(position: usize, line: usize, column: usize) -> Self {
         Self::new(TokenType::EOF, position, line, column)
+    }
+
+    pub fn span(&self) -> Span {
+        Span {
+            line: self.line,
+            col: self.column,
+            len: self.token_type.text_len(),
+        }
     }
 }
 

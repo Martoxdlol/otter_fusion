@@ -3,8 +3,8 @@ use std::fmt;
 use crate::{
     ast::{
         BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
-        GenericParam, InterfaceDecl, Item, Literal, ParamDecl, PrimitiveType, Program, Statement,
-        StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
+        GenericParam, InterfaceDecl, Item, ItemKind, Literal, ParamDecl, PrimitiveType, Program,
+        Statement, StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -65,38 +65,51 @@ impl Parser {
     }
 
     pub fn parse_item(&mut self) -> Result<Item, ParserError> {
-        // Implement item parsing logic here
-        let token = self.peek();
-        match &token.token_type {
+        let span = self.peek().span();
+        match self.peek().token_type.clone() {
             TokenType::Type => self.parse_type_decl(),
-            TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl(false)?)),
+            TokenType::Struct => Ok(Item {
+                kind: ItemKind::Struct(self.parse_struct_decl(false)?),
+                span,
+            }),
             TokenType::Interface => self.parse_interface_decl(),
-            TokenType::Function => Ok(Item::Function(self.parse_function_decl(false)?)),
+            TokenType::Function => Ok(Item {
+                kind: ItemKind::Function(self.parse_function_decl(false)?),
+                span,
+            }),
             TokenType::Extend => self.parse_extend_decl(),
             TokenType::Extern => {
                 self.advance();
-                let next = self.peek();
-                match &next.token_type {
-                    TokenType::Struct => Ok(Item::Struct(self.parse_struct_decl(true)?)),
-                    TokenType::Function => {
-                        Ok(Item::Function(self.parse_function_decl(true)?))
-                    }
-                    _ => Err(ParserError::UnexpectedToken(next.clone())),
+                let next_span = self.peek().span();
+                match self.peek().token_type.clone() {
+                    TokenType::Struct => Ok(Item {
+                        kind: ItemKind::Struct(self.parse_struct_decl(true)?),
+                        span: next_span,
+                    }),
+                    TokenType::Function => Ok(Item {
+                        kind: ItemKind::Function(self.parse_function_decl(true)?),
+                        span: next_span,
+                    }),
+                    _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
                 }
             }
-            _ => Err(ParserError::UnexpectedToken(token.clone())),
+            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
         }
     }
 
     // Items
     pub fn parse_type_decl(&mut self) -> Result<Item, ParserError> {
+        let span = self.peek().span();
         self.expect(TokenType::Type)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
         self.expect(TokenType::Eq)?;
         let ty = self.parse_type_expr()?;
         self.expect(TokenType::Semicolon)?;
-        Ok(Item::TypeAlias(TypeAliasDecl { name, generics, ty }))
+        Ok(Item {
+            kind: ItemKind::TypeAlias(TypeAliasDecl { name, generics, ty }),
+            span,
+        })
     }
 
     pub fn parse_struct_decl(&mut self, is_extern: bool) -> Result<StructDecl, ParserError> {
@@ -116,21 +129,26 @@ impl Parser {
     }
 
     pub fn parse_interface_decl(&mut self) -> Result<Item, ParserError> {
+        let span = self.peek().span();
         self.expect(TokenType::Interface)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
         let implements = self.parse_implements()?;
         let (fields, methods) = self.parse_struct_body(false)?;
-        Ok(Item::Interface(InterfaceDecl {
-            name,
-            generics,
-            implements,
-            fields,
-            methods,
-        }))
+        Ok(Item {
+            kind: ItemKind::Interface(InterfaceDecl {
+                name,
+                generics,
+                implements,
+                fields,
+                methods,
+            }),
+            span,
+        })
     }
 
     pub fn parse_function_decl(&mut self, is_extern: bool) -> Result<FunctionDecl, ParserError> {
+        let span = self.peek().span();
         self.expect(TokenType::Function)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
@@ -161,6 +179,7 @@ impl Parser {
             return_type,
             params,
             body,
+            span,
         })
     }
 
@@ -211,6 +230,7 @@ impl Parser {
     }
 
     pub fn parse_extend_decl(&mut self) -> Result<Item, ParserError> {
+        let span = self.peek().span();
         self.expect(TokenType::Extend)?;
         let generics = self.parse_generic_params()?;
         let name = self.expect_identifier()?;
@@ -219,12 +239,15 @@ impl Parser {
 
         let methods = self.parse_extend_body()?;
 
-        Ok(Item::Extend(ExtendDecl {
-            target: TypeExpr::Named(name, type_args),
-            generic_params: generics,
-            implements,
-            methods,
-        }))
+        Ok(Item {
+            kind: ItemKind::Extend(ExtendDecl {
+                target: TypeExpr::Named(name, type_args),
+                generic_params: generics,
+                implements,
+                methods,
+            }),
+            span,
+        })
     }
 
     // Types
@@ -873,7 +896,7 @@ impl Parser {
         };
         Ok(Expr::If(Box::new(cond), Box::new(then_branch), else_branch))
     }
-fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
+    fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
         self.expect(TokenType::LeftBrace)?;
         if self.peek().token_type == TokenType::RightBrace {
             self.advance();
@@ -1073,12 +1096,12 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let program = parser.parse().expect("Fallo al parsear struct básico");
 
-        if let Item::Struct(s) = &program.items[0] {
+        if let ItemKind::Struct(s) = &program.items[0].kind {
             assert_eq!(s.name, "Point");
             assert_eq!(s.fields.len(), 1);
             assert_eq!(s.fields[0].name, "x");
         } else {
-            panic!("Se esperaba un Item::Struct");
+            panic!("Se esperaba un ItemKind::Struct");
         }
     }
 
@@ -1114,7 +1137,7 @@ mod tests {
         };
 
         assert_eq!(program.items.len(), 1);
-        assert_eq!(program.items[0], Item::TypeAlias(expected_alias));
+        assert_eq!(program.items[0].kind, ItemKind::TypeAlias(expected_alias));
     }
 
     #[test]
@@ -1182,10 +1205,11 @@ mod tests {
                     Box::new(Expr::Variable(String::from("b"))),
                 )),
             }),
+            span: Span::default(),
         };
 
         assert_eq!(program.items.len(), 1);
-        assert_eq!(program.items[0], Item::Function(expected_func));
+        assert_eq!(program.items[0].kind, ItemKind::Function(expected_func));
     }
 
     #[test]
@@ -1255,13 +1279,13 @@ mod tests {
         // Consumimos directamente la declaración de tipo
         let result = parser.parse_type_decl().unwrap();
 
-        let expected = Item::TypeAlias(TypeAliasDecl {
+        let expected = ItemKind::TypeAlias(TypeAliasDecl {
             name: "Age".to_string(),
             generics: vec![],
             ty: TypeExpr::Primitive(PrimitiveType::Int32),
         });
 
-        assert_eq!(result, expected);
+        assert_eq!(result.kind, expected);
     }
 
     #[test]
@@ -1286,7 +1310,7 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let result = parser.parse_interface_decl().unwrap();
 
-        let expected = Item::Interface(InterfaceDecl {
+        let expected = ItemKind::Interface(InterfaceDecl {
             name: "Named".to_string(),
             generics: vec![],
             fields: vec![FieldDecl {
@@ -1298,7 +1322,7 @@ mod tests {
             implements: vec![],
         });
 
-        assert_eq!(result, expected);
+        assert_eq!(result.kind, expected);
     }
 
     #[test]
@@ -1320,14 +1344,14 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let result = parser.parse_extend_decl().unwrap();
 
-        let expected = Item::Extend(ExtendDecl {
+        let expected = ItemKind::Extend(ExtendDecl {
             target: TypeExpr::Named("Vehicle".to_string(), vec![]),
             generic_params: vec![],
             implements: vec![TypeExpr::Named("Movable".to_string(), vec![])],
             methods: vec![],
         });
 
-        assert_eq!(result, expected);
+        assert_eq!(result.kind, expected);
     }
 
     #[test]
@@ -1413,8 +1437,8 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let result = parser.parse_type_decl().unwrap();
         assert_eq!(
-            result,
-            Item::TypeAlias(TypeAliasDecl {
+            result.kind,
+            ItemKind::TypeAlias(TypeAliasDecl {
                 name: "Option".to_string(),
                 generics: vec![GenericParam {
                     name: "T".to_string(),
@@ -1483,6 +1507,7 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let result = parser.parse_function_decl(false).unwrap();
+        let span = result.span.clone();
         assert_eq!(
             result,
             FunctionDecl {
@@ -1497,6 +1522,7 @@ mod tests {
                     is_pointer: false,
                 }],
                 body: None,
+                span,
             }
         );
     }
@@ -1626,11 +1652,11 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let result = parser.parse_extend_decl().unwrap();
-        if let Item::Extend(ext) = result {
+        if let ItemKind::Extend(ext) = result.kind {
             assert_eq!(ext.methods.len(), 1);
             assert_eq!(ext.methods[0].name, "baz");
         } else {
-            panic!("Expected Item::Extend");
+            panic!("Expected ItemKind::Extend");
         }
     }
 
@@ -1819,7 +1845,11 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
 
-        let expected = Item::Function(FunctionDecl {
+        let fn_span = match &item.kind {
+            ItemKind::Function(f) => f.span.clone(),
+            _ => panic!("expected ItemKind::Function"),
+        };
+        let expected = ItemKind::Function(FunctionDecl {
             name: "print".to_string(),
             has_self_param: false,
             is_extern: true,
@@ -1831,8 +1861,9 @@ mod tests {
                 is_pointer: false,
             }],
             body: None,
+            span: fn_span,
         });
-        assert_eq!(item, expected);
+        assert_eq!(item.kind, expected);
     }
 
     #[test]
@@ -1860,7 +1891,7 @@ mod tests {
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
 
-        if let Item::Function(f) = item {
+        if let ItemKind::Function(f) = item.kind {
             assert_eq!(f.name, "malloc");
             assert!(f.is_extern);
             assert_eq!(f.params.len(), 1);
@@ -1873,7 +1904,7 @@ mod tests {
                 ))))
             );
         } else {
-            panic!("expected Item::Function");
+            panic!("expected ItemKind::Function");
         }
     }
 
@@ -1905,7 +1936,7 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::Function(f) = item {
+        if let ItemKind::Function(f) = item.kind {
             assert!(f.is_extern);
             assert_eq!(f.params.len(), 2);
             assert!(f.params[0].is_pointer);
@@ -1916,7 +1947,7 @@ mod tests {
                 TypeExpr::Named("MyStruct".to_string(), vec![])
             );
         } else {
-            panic!("expected Item::Function");
+            panic!("expected ItemKind::Function");
         }
     }
 
@@ -1951,13 +1982,13 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::Function(f) = item {
+        if let ItemKind::Function(f) = item.kind {
             assert!(f.is_extern);
             assert_eq!(f.generics.len(), 1);
             assert!(f.params[1].is_pointer);
             assert_eq!(f.params[1].ty, TypeExpr::Named("T".to_string(), vec![]));
         } else {
-            panic!("expected Item::Function");
+            panic!("expected ItemKind::Function");
         }
     }
 
@@ -1989,19 +2020,16 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::Function(f) = item {
+        if let ItemKind::Function(f) = item.kind {
             assert_eq!(
                 f.return_type,
                 Some(TypeExpr::Union(vec![
-                    TypeExpr::Pointer(Box::new(TypeExpr::Named(
-                        "Buffer".to_string(),
-                        vec![]
-                    ))),
+                    TypeExpr::Pointer(Box::new(TypeExpr::Named("Buffer".to_string(), vec![]))),
                     TypeExpr::Primitive(PrimitiveType::Null),
                 ]))
             );
         } else {
-            panic!("expected Item::Function");
+            panic!("expected ItemKind::Function");
         }
     }
 
@@ -2033,14 +2061,14 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::Struct(s) = item {
+        if let ItemKind::Struct(s) = item.kind {
             assert!(s.is_extern);
             assert_eq!(s.fields.len(), 2);
             assert!(!s.fields[0].is_pointer);
             assert!(s.fields[1].is_pointer);
             assert_eq!(s.fields[1].ty, TypeExpr::Primitive(PrimitiveType::String));
         } else {
-            panic!("expected Item::Struct");
+            panic!("expected ItemKind::Struct");
         }
     }
 
@@ -2071,7 +2099,7 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::TypeAlias(alias) = item {
+        if let ItemKind::TypeAlias(alias) = item.kind {
             assert_eq!(alias.name, "Fun");
             match alias.ty {
                 TypeExpr::ExternFunction(params, ret) => {
@@ -2118,7 +2146,7 @@ mod tests {
             .build();
         let mut parser = Parser::new(tokens);
         let item = parser.parse_item().unwrap();
-        if let Item::Function(f) = item {
+        if let ItemKind::Function(f) = item.kind {
             assert!(f.is_extern);
             assert_eq!(f.name, "on_tick");
             assert_eq!(f.params.len(), 1);
@@ -2128,7 +2156,7 @@ mod tests {
             assert_eq!(body.statements.len(), 1);
             assert!(matches!(body.statements[0], Statement::Return(None)));
         } else {
-            panic!("expected Item::Function");
+            panic!("expected ItemKind::Function");
         }
     }
 

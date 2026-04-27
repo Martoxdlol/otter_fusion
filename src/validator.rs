@@ -3,8 +3,8 @@ use std::fmt;
 
 use crate::{
     ast::{
-        self, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, Item, Module, TypeAliasDecl,
-        TypeExpr,
+        self, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, ItemKind, Module,
+        TypeAliasDecl, TypeExpr,
     },
     hir::{
         BinaryOperator as HirBinOp, ExprKind, FnId, Hir, HirBlock, HirField, HirFunction,
@@ -489,7 +489,7 @@ impl Validator {
             };
 
             for item in &module.program.items {
-                let Item::Import(import) = item else { continue };
+                let ItemKind::Import(import) = &item.kind else { continue };
 
                 if import.module == module.name {
                     self.errors.push(ValidationError::SelfImport {
@@ -548,8 +548,8 @@ impl Validator {
                 .collect();
 
             for item in &module.program.items {
-                match item {
-                    Item::Struct(decl) => {
+                match &item.kind {
+                    ItemKind::Struct(decl) => {
                         if scope.direct.contains_key(&decl.name) {
                             self.errors.push(ValidationError::DuplicateName {
                                 module: module.name.clone(),
@@ -579,7 +579,7 @@ impl Validator {
                             .push(id);
                         scope.direct.insert(decl.name.clone(), ScopeEntry::Type(id));
                     }
-                    Item::Interface(decl) => {
+                    ItemKind::Interface(decl) => {
                         if scope.direct.contains_key(&decl.name) {
                             self.errors.push(ValidationError::DuplicateName {
                                 module: module.name.clone(),
@@ -608,7 +608,7 @@ impl Validator {
                             .push(id);
                         scope.direct.insert(decl.name.clone(), ScopeEntry::Type(id));
                     }
-                    Item::Function(decl) => {
+                    ItemKind::Function(decl) => {
                         if scope.direct.contains_key(&decl.name) {
                             self.errors.push(ValidationError::DuplicateName {
                                 module: module.name.clone(),
@@ -644,7 +644,7 @@ impl Validator {
                             .insert(decl.name.clone(), ScopeEntry::Function(id));
                         self.pending_function_bodies.insert(id, decl.clone());
                     }
-                    Item::TypeAlias(decl) => {
+                    ItemKind::TypeAlias(decl) => {
                         if scope.direct.contains_key(&decl.name) {
                             self.errors.push(ValidationError::DuplicateName {
                                 module: module.name.clone(),
@@ -664,7 +664,7 @@ impl Validator {
                             },
                         );
                     }
-                    Item::Extend(_) | Item::Import(_) => {}
+                    ItemKind::Extend(_) | ItemKind::Import(_) => {}
                 }
             }
 
@@ -760,8 +760,8 @@ impl Validator {
             };
 
             for item in &module.program.items {
-                match item {
-                    Item::Struct(decl) => {
+                match &item.kind {
+                    ItemKind::Struct(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -781,7 +781,7 @@ impl Validator {
                             /*is_struct=*/ true,
                         );
                     }
-                    Item::Interface(decl) => {
+                    ItemKind::Interface(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -801,7 +801,7 @@ impl Validator {
                             /*is_struct=*/ false,
                         );
                     }
-                    Item::Function(decl) => {
+                    ItemKind::Function(decl) => {
                         let fn_id = match self.find_fn_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -812,7 +812,7 @@ impl Validator {
                         self.hir.functions.get_mut(&fn_id).unwrap().type_params = ids;
                         self.fn_generics.insert(fn_id, scope);
                     }
-                    Item::TypeAlias(_) | Item::Extend(_) | Item::Import(_) => {}
+                    ItemKind::TypeAlias(_) | ItemKind::Extend(_) | ItemKind::Import(_) => {}
                 }
             }
         }
@@ -826,8 +826,8 @@ impl Validator {
                 None => continue,
             };
             for item in &module.program.items {
-                match item {
-                    Item::Struct(decl) => {
+                match &item.kind {
+                    ItemKind::Struct(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -843,7 +843,7 @@ impl Validator {
                             &scope_name,
                         );
                     }
-                    Item::Interface(decl) => {
+                    ItemKind::Interface(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -899,8 +899,8 @@ impl Validator {
                 None => continue,
             };
             for item in &module.program.items {
-                match item {
-                    Item::Struct(decl) => {
+                match &item.kind {
+                    ItemKind::Struct(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -915,7 +915,7 @@ impl Validator {
                         );
                         self.hir.structs.get_mut(&type_id).unwrap().fields = fields;
                     }
-                    Item::Interface(decl) => {
+                    ItemKind::Interface(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -968,7 +968,7 @@ impl Validator {
             };
 
             for item in &module.program.items {
-                let Item::Extend(decl) = item else { continue };
+                let ItemKind::Extend(decl) = &item.kind else { continue };
 
                 let extend_label = format!("{}::extend", module.name);
                 let extend_scope = self.mint_generics(&decl.generic_params, extend_label.clone());
@@ -1082,8 +1082,8 @@ impl Validator {
                 None => continue,
             };
             for item in &module.program.items {
-                match item {
-                    Item::Struct(decl) => {
+                match &item.kind {
+                    ItemKind::Struct(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -1103,7 +1103,7 @@ impl Validator {
                             .implements
                             .extend(resolved);
                     }
-                    Item::Interface(decl) => {
+                    ItemKind::Interface(decl) => {
                         let type_id = match self.find_type_id(module_id, &decl.name) {
                             Some(id) => id,
                             None => continue,
@@ -3040,7 +3040,7 @@ mod tests {
     use super::*;
     use crate::ast::{
         BinaryOperator as AstBinOp, Block, Expr, ExtendDecl, FieldDecl, ImportDecl,
-        InterfaceDecl, Literal, ParamDecl, Program, Statement, StructDecl,
+        InterfaceDecl, Item, Literal, ParamDecl, Program, Statement, StructDecl,
     };
 
     // ---- AST construction helpers ----
@@ -3134,6 +3134,7 @@ mod tests {
             return_type: None,
             params: vec![],
             body: None,
+            span: ast::Span::default(),
         }
     }
     fn body(stmts: Vec<Statement>, ret: Option<Expr>) -> Block {
@@ -3182,20 +3183,20 @@ mod tests {
 
     #[test]
     fn p0_self_import_errors() {
-        let imp = Item::Import(ImportDecl {
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "m".into(),
             symbols: ImportSymbols::Glob,
-        });
+        }));
         let errs = run(vec![module("m", vec![imp])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::SelfImport { .. })));
     }
 
     #[test]
     fn p0_unknown_import_module_errors() {
-        let imp = Item::Import(ImportDecl {
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "missing".into(),
             symbols: ImportSymbols::Glob,
-        });
+        }));
         let errs = run(vec![module("m", vec![imp])]).unwrap_err();
         assert!(err_any(&errs, |e| {
             matches!(e, ValidationError::UnknownImportModule { .. })
@@ -3204,10 +3205,10 @@ mod tests {
 
     #[test]
     fn p0_glob_import_recorded_in_hir() {
-        let imp = Item::Import(ImportDecl {
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Glob,
-        });
+        }));
         let hir = run(vec![module("lib", vec![]), module("main", vec![imp])]).unwrap();
         let main = hir.modules.values().find(|m| m.name == "main").unwrap();
         assert!(matches!(main.imports.first(), Some(HirImport::Glob(_))));
@@ -3219,7 +3220,7 @@ mod tests {
 
     #[test]
     fn p1_struct_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::Struct(empty_struct("Foo"))])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))])]).unwrap();
         assert_eq!(hir.structs.len(), 1);
         let s = hir.structs.values().next().unwrap();
         assert_eq!(s.name, "Foo");
@@ -3228,13 +3229,13 @@ mod tests {
 
     #[test]
     fn p1_interface_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::Interface(empty_iface("Show"))])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(empty_iface("Show")))])]).unwrap();
         assert_eq!(hir.interfaces.len(), 1);
     }
 
     #[test]
     fn p1_function_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::Function(empty_fn("foo"))])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(empty_fn("foo")))])]).unwrap();
         assert_eq!(hir.functions.len(), 1);
     }
 
@@ -3243,8 +3244,8 @@ mod tests {
         let errs = run(vec![module(
             "m",
             vec![
-                Item::Struct(empty_struct("X")),
-                Item::Function(empty_fn("X")),
+                Item::dummy(ItemKind::Struct(empty_struct("X"))),
+                Item::dummy(ItemKind::Function(empty_fn("X"))),
             ],
         )])
         .unwrap_err();
@@ -3253,14 +3254,14 @@ mod tests {
 
     #[test]
     fn p1_named_import_resolves_type() {
-        let lib = module("lib", vec![Item::Struct(empty_struct("Foo"))]);
-        let imp = Item::Import(ImportDecl {
+        let lib = module("lib", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))]);
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
                 name: "Foo".into(),
                 alias: None,
             }]),
-        });
+        }));
         let hir = run(vec![lib, module("main", vec![imp])]).unwrap();
         let main = hir.modules.values().find(|m| m.name == "main").unwrap();
         match main.imports.first() {
@@ -3273,14 +3274,14 @@ mod tests {
 
     #[test]
     fn p1_named_import_with_alias() {
-        let lib = module("lib", vec![Item::Function(empty_fn("foo"))]);
-        let imp = Item::Import(ImportDecl {
+        let lib = module("lib", vec![Item::dummy(ItemKind::Function(empty_fn("foo")))]);
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
                 name: "foo".into(),
                 alias: Some("bar".into()),
             }]),
-        });
+        }));
         let hir = run(vec![lib, module("main", vec![imp])]).unwrap();
         let main = hir.modules.values().find(|m| m.name == "main").unwrap();
         match main.imports.first() {
@@ -3295,13 +3296,13 @@ mod tests {
     #[test]
     fn p1_unknown_imported_symbol_errors() {
         let lib = module("lib", vec![]);
-        let imp = Item::Import(ImportDecl {
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
                 name: "Missing".into(),
                 alias: None,
             }]),
-        });
+        }));
         let errs = run(vec![lib, module("main", vec![imp])]).unwrap_err();
         assert!(err_any(&errs, |e| {
             matches!(e, ValidationError::UnknownImportSymbol { .. })
@@ -3310,18 +3311,18 @@ mod tests {
 
     #[test]
     fn p1_alias_import_classified_as_alias() {
-        let alias = Item::TypeAlias(TypeAliasDecl {
+        let alias = Item::dummy(ItemKind::TypeAlias(TypeAliasDecl {
             name: "MyInt".into(),
             generics: vec![],
             ty: i64_t(),
-        });
-        let imp = Item::Import(ImportDecl {
+        }));
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
                 name: "MyInt".into(),
                 alias: None,
             }]),
-        });
+        }));
         let hir = run(vec![module("lib", vec![alias]), module("main", vec![imp])]).unwrap();
         let main = hir.modules.values().find(|m| m.name == "main").unwrap();
         match main.imports.first() {
@@ -3339,7 +3340,7 @@ mod tests {
         let mut s = empty_struct("Box");
         s.generics = vec![generic("T")];
         s.fields = vec![field("value", named("T"))];
-        let hir = run(vec![module("m", vec![Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let b = hir.structs.values().next().unwrap();
         assert_eq!(b.type_params.len(), 1);
         assert!(matches!(b.fields[0].ty, ResolvedType::TypeParam(_)));
@@ -3351,7 +3352,7 @@ mod tests {
         f.params = vec![param("a", i64_t()), param("b", i64_t())];
         f.return_type = Some(i64_t());
         f.body = Some(body(vec![], Some(var("a"))));
-        let hir = run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         let func = hir.functions.values().next().unwrap();
         assert_eq!(func.params.len(), 2);
         assert_eq!(func.return_type, ResolvedType::Primitive(PrimitiveType::Int64));
@@ -3361,17 +3362,17 @@ mod tests {
     fn p2_bound_must_be_interface() {
         let mut s = empty_struct("Foo");
         s.generics = vec![generic_bound("T", vec![named("Bar")])];
-        let bar = Item::Struct(empty_struct("Bar"));
-        let errs = run(vec![module("m", vec![bar, Item::Struct(s)])]).unwrap_err();
+        let bar = Item::dummy(ItemKind::Struct(empty_struct("Bar")));
+        let errs = run(vec![module("m", vec![bar, Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::BoundNotInterface { .. })));
     }
 
     #[test]
     fn p2_bound_referencing_interface_ok() {
-        let iface = Item::Interface(empty_iface("Show"));
+        let iface = Item::dummy(ItemKind::Interface(empty_iface("Show")));
         let mut s = empty_struct("Foo");
         s.generics = vec![generic_bound("T", vec![named("Show")])];
-        let hir = run(vec![module("m", vec![iface, Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![iface, Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         let tp = &hir.type_params[&foo.type_params[0]];
         assert_eq!(tp.bounds.len(), 1);
@@ -3385,7 +3386,7 @@ mod tests {
             ty: i64_t(),
             is_pointer: true,
         }];
-        let errs = run(vec![module("m", vec![Item::Struct(s)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::PointerOutsideExtern { .. })));
     }
 
@@ -3398,7 +3399,7 @@ mod tests {
             ty: i64_t(),
             is_pointer: true,
         }];
-        let hir = run(vec![module("m", vec![Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let s = hir.structs.values().next().unwrap();
         assert!(s.fields[0].is_pointer);
     }
@@ -3411,7 +3412,7 @@ mod tests {
         user.return_type = Some(named_args("Wrapper", vec![i64_t(), i64_t()]));
         user.body = None;
         let errs = run(vec![
-            module("m", vec![Item::Struct(wrap), Item::Function(user)]),
+            module("m", vec![Item::dummy(ItemKind::Struct(wrap)), Item::dummy(ItemKind::Function(user))]),
         ])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::GenericArityMismatch { .. })));
@@ -3419,28 +3420,28 @@ mod tests {
 
     #[test]
     fn p2_type_alias_inlined_in_signature() {
-        let alias = Item::TypeAlias(TypeAliasDecl {
+        let alias = Item::dummy(ItemKind::TypeAlias(TypeAliasDecl {
             name: "MyInt".into(),
             generics: vec![],
             ty: i64_t(),
-        });
+        }));
         let mut f = empty_fn("foo");
         f.return_type = Some(named("MyInt"));
-        let hir = run(vec![module("m", vec![alias, Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![alias, Item::dummy(ItemKind::Function(f))])]).unwrap();
         let func = hir.functions.values().next().unwrap();
         assert_eq!(func.return_type, ResolvedType::Primitive(PrimitiveType::Int64));
     }
 
     #[test]
     fn p2_glob_import_provides_type() {
-        let lib = module("lib", vec![Item::Struct(empty_struct("Foo"))]);
-        let imp = Item::Import(ImportDecl {
+        let lib = module("lib", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))]);
+        let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Glob,
-        });
+        }));
         let mut f = empty_fn("use_foo");
         f.return_type = Some(named("Foo"));
-        let hir = run(vec![lib, module("main", vec![imp, Item::Function(f)])]).unwrap();
+        let hir = run(vec![lib, module("main", vec![imp, Item::dummy(ItemKind::Function(f))])]).unwrap();
         let func = hir.functions.values().find(|f| f.name == "use_foo").unwrap();
         assert!(matches!(func.return_type, ResolvedType::Struct(_, _)));
     }
@@ -3449,7 +3450,7 @@ mod tests {
     fn p2_unknown_type_errors() {
         let mut f = empty_fn("foo");
         f.return_type = Some(named("Nope"));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownType { .. })));
     }
 
@@ -3461,7 +3462,7 @@ mod tests {
         m.return_type = Some(i64_t());
         m.body = Some(body(vec![], Some(int_lit("0"))));
         s.methods = vec![m];
-        let hir = run(vec![module("m", vec![Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let foo = hir.structs.values().next().unwrap();
         assert_eq!(foo.methods.len(), 1);
         let method = &hir.functions[&foo.methods[0]];
@@ -3475,16 +3476,16 @@ mod tests {
 
     #[test]
     fn p3_extend_adds_specialised_method() {
-        let s = Item::Struct(empty_struct("Foo"));
+        let s = Item::dummy(ItemKind::Struct(empty_struct("Foo")));
         let mut m = empty_fn("greet");
         m.return_type = Some(str_t());
         m.body = Some(body(vec![], Some(str_lit("hi"))));
-        let ext = Item::Extend(ExtendDecl {
+        let ext = Item::dummy(ItemKind::Extend(ExtendDecl {
             target: named("Foo"),
             generic_params: vec![],
             implements: vec![],
             methods: vec![m],
-        });
+        }));
         let hir = run(vec![module("m", vec![s, ext])]).unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         assert_eq!(foo.specialised_methods.len(), 1);
@@ -3500,13 +3501,13 @@ mod tests {
         m.has_self_param = true;
         m.return_type = Some(i64_t());
         m.body = Some(body(vec![], Some(int_lit("0"))));
-        let ext = Item::Extend(ExtendDecl {
+        let ext = Item::dummy(ItemKind::Extend(ExtendDecl {
             target: named_args("Wrapper", vec![named("U")]),
             generic_params: vec![generic("U")],
             implements: vec![],
             methods: vec![m],
-        });
-        let hir = run(vec![module("m", vec![Item::Struct(wrap), ext])]).unwrap();
+        }));
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(wrap)), ext])]).unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
         let (args, _) = &wrap.specialised_methods[0];
         assert_eq!(args.len(), 1);
@@ -3520,13 +3521,13 @@ mod tests {
         let mut m = empty_fn("get");
         m.return_type = Some(i64_t());
         m.body = Some(body(vec![], Some(int_lit("0"))));
-        let ext = Item::Extend(ExtendDecl {
+        let ext = Item::dummy(ItemKind::Extend(ExtendDecl {
             target: named_args("Wrapper", vec![i64_t()]),
             generic_params: vec![],
             implements: vec![],
             methods: vec![m],
-        });
-        let hir = run(vec![module("m", vec![Item::Struct(wrap), ext])]).unwrap();
+        }));
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(wrap)), ext])]).unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
         let (args, _) = &wrap.specialised_methods[0];
         assert_eq!(args.len(), 1);
@@ -3535,13 +3536,13 @@ mod tests {
 
     #[test]
     fn p3_extend_on_interface_errors() {
-        let i = Item::Interface(empty_iface("Foo"));
-        let ext = Item::Extend(ExtendDecl {
+        let i = Item::dummy(ItemKind::Interface(empty_iface("Foo")));
+        let ext = Item::dummy(ItemKind::Extend(ExtendDecl {
             target: named("Foo"),
             generic_params: vec![],
             implements: vec![],
             methods: vec![],
-        });
+        }));
         let errs = run(vec![module("m", vec![i, ext])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidExtendTarget { .. })));
     }
@@ -3567,7 +3568,7 @@ mod tests {
         sm.body = Some(body(vec![], Some(str_lit("hi"))));
         s.methods = vec![sm];
 
-        let hir = run(vec![module("m", vec![Item::Interface(iface), Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         assert_eq!(foo.implements.len(), 1);
     }
@@ -3584,7 +3585,7 @@ mod tests {
         s.implements = vec![named("Show")];
 
         let errs =
-            run(vec![module("m", vec![Item::Interface(iface), Item::Struct(s)])]).unwrap_err();
+            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingInterfaceMember { .. })));
     }
 
@@ -3605,7 +3606,7 @@ mod tests {
         s.methods = vec![sm];
 
         let errs =
-            run(vec![module("m", vec![Item::Interface(iface), Item::Struct(s)])]).unwrap_err();
+            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::InterfaceMemberMismatch { .. })));
     }
 
@@ -3619,7 +3620,7 @@ mod tests {
         // missing field
 
         let errs =
-            run(vec![module("m", vec![Item::Interface(iface), Item::Struct(s)])]).unwrap_err();
+            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingInterfaceMember { .. })));
     }
 
@@ -3635,17 +3636,17 @@ mod tests {
         let mut s = empty_struct("Foo");
         s.implements = vec![named("Show")];
 
-        let hir = run(vec![module("m", vec![Item::Interface(iface), Item::Struct(s)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         assert_eq!(foo.implements.len(), 1);
     }
 
     #[test]
     fn p4_implements_non_interface_errors() {
-        let other = Item::Struct(empty_struct("Other"));
+        let other = Item::dummy(ItemKind::Struct(empty_struct("Other")));
         let mut s = empty_struct("Foo");
         s.implements = vec![named("Other")];
-        let errs = run(vec![module("m", vec![other, Item::Struct(s)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![other, Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::ImplementsNotInterface { .. })));
     }
 
@@ -3665,16 +3666,16 @@ mod tests {
         method.has_self_param = true;
         method.return_type = Some(i64_t());
         method.body = Some(body(vec![], Some(int_lit("0"))));
-        let ext = Item::Extend(ExtendDecl {
+        let ext = Item::dummy(ItemKind::Extend(ExtendDecl {
             target: named_args("Wrapper", vec![named("U")]),
             generic_params: vec![generic("U")],
             implements: vec![],
             methods: vec![method],
-        });
+        }));
 
         let hir = run(vec![module(
             "m",
-            vec![Item::Interface(iface), Item::Struct(wrap), ext],
+            vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(wrap)), ext],
         )])
         .unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
@@ -3690,7 +3691,7 @@ mod tests {
         let mut f = empty_fn("foo");
         f.return_type = Some(i64_t());
         f.body = Some(body(vec![], Some(int_lit("42"))));
-        let hir = run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         let func = hir.functions.values().next().unwrap();
         assert!(func.body.is_some());
     }
@@ -3707,7 +3708,7 @@ mod tests {
             )],
             Some(var("x")),
         ));
-        let hir = run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         assert!(hir.functions.values().next().unwrap().body.is_some());
     }
 
@@ -3719,7 +3720,7 @@ mod tests {
             vec![Statement::VarDecl("x".into(), None, Some(int_lit("5")))],
             Some(var("x")),
         ));
-        let hir = run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         let body_hir = hir.functions.values().next().unwrap().body.as_ref().unwrap();
         match &body_hir.statements[0] {
             HirStatement::VarDecl(_, ty, _) => {
@@ -3736,7 +3737,7 @@ mod tests {
             vec![Statement::VarDecl("x".into(), None, None)],
             None,
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::VariableNeedsType { .. })));
     }
 
@@ -3751,7 +3752,7 @@ mod tests {
             )],
             None,
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
     }
 
@@ -3760,7 +3761,7 @@ mod tests {
         let mut f = empty_fn("foo");
         f.return_type = Some(i64_t());
         f.body = Some(body(vec![], Some(var("missing"))));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownVariable { .. })));
     }
 
@@ -3772,7 +3773,7 @@ mod tests {
             vec![Statement::Return(Some(str_lit("nope")))],
             None,
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
     }
 
@@ -3780,7 +3781,7 @@ mod tests {
     fn p5_break_outside_loop_errors() {
         let mut f = empty_fn("foo");
         f.body = Some(body(vec![Statement::Break], None));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::BreakOutsideLoop { .. })));
     }
 
@@ -3794,7 +3795,7 @@ mod tests {
             )],
             None,
         ));
-        let hir = run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         assert!(hir.functions.values().next().unwrap().body.is_some());
     }
 
@@ -3805,7 +3806,7 @@ mod tests {
             vec![Statement::While(int_lit("1"), body(vec![], None))],
             None,
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
     }
 
@@ -3829,7 +3830,7 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::Function(adder), Item::Function(caller)],
+            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
         )])
         .unwrap();
         assert!(hir
@@ -3858,7 +3859,7 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::Function(adder), Item::Function(caller)],
+            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
         )])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::CallArityMismatch { .. })));
@@ -3880,7 +3881,7 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::Function(adder), Item::Function(caller)],
+            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
         )])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
@@ -3910,7 +3911,7 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::Struct(s), Item::Function(f)],
+            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
         )])
         .unwrap();
         assert!(hir.functions.values().any(|f| f.name == "main" && f.body.is_some()));
@@ -3933,7 +3934,7 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::Struct(s), Item::Function(f)],
+            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
         )])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingFieldInit { .. })));
@@ -3958,7 +3959,7 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::Struct(s), Item::Function(f)],
+            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
         )])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::ExtraFieldInit { .. })));
@@ -3990,7 +3991,7 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::Struct(s), Item::Function(f)],
+            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
         )])
         .unwrap();
         assert!(hir.functions.values().any(|f| f.name == "main" && f.body.is_some()));
@@ -4010,7 +4011,7 @@ mod tests {
         ));
         let errs = run(vec![module(
             "m",
-            vec![Item::Struct(s), Item::Function(f)],
+            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
         )])
         .unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownMember { .. })));
@@ -4028,7 +4029,7 @@ mod tests {
                 Box::new(int_lit("2")),
             )),
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 
     #[test]
@@ -4043,7 +4044,7 @@ mod tests {
                 Box::new(str_lit("x")),
             )),
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
     }
 
@@ -4058,7 +4059,7 @@ mod tests {
                 Box::new(str_lit("b")),
             )),
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidOperator { .. })));
     }
 
@@ -4073,7 +4074,7 @@ mod tests {
                 Box::new(int_lit("0")),
             )),
         ));
-        let errs = run(vec![module("m", vec![Item::Function(f)])]).unwrap_err();
+        let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
         assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidOperator { .. })));
     }
 
@@ -4089,7 +4090,7 @@ mod tests {
                 Box::new(int_lit("2")),
             )),
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 
     #[test]
@@ -4104,7 +4105,7 @@ mod tests {
                 Some(Box::new(body(vec![], Some(int_lit("2"))))),
             )),
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 
     #[test]
@@ -4115,7 +4116,7 @@ mod tests {
             vec![],
             Some(Expr::As(Box::new(int_lit("5")), i32_t())),
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 
     #[test]
@@ -4126,7 +4127,7 @@ mod tests {
             vec![],
             Some(Expr::Is(Box::new(int_lit("5")), i64_t())),
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 
     #[test]
@@ -4141,7 +4142,7 @@ mod tests {
             Some(Expr::Member(Box::new(var("self")), "age".into())),
         ));
         s.methods = vec![m];
-        run(vec![module("m", vec![Item::Struct(s)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap();
     }
 
     #[test]
@@ -4156,7 +4157,7 @@ mod tests {
             )],
             None,
         ));
-        run(vec![module("m", vec![Item::Function(f)])]).unwrap();
+        run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
     }
 }
 
