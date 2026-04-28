@@ -158,6 +158,27 @@ pub enum ValidationError {
         function: String,
         literal: String,
     },
+    /// `extern struct` declared `: SomeInterface`. Forbidden because virtual
+    /// dispatch reads a type-id header that extern structs don't have.
+    ExternStructImplementsInterface {
+        type_name: String,
+    },
+    /// Field on an `extern struct` whose type is GC-managed (managed struct,
+    /// interface, string, closure, union containing any of those). The GC
+    /// can't trace into headerless extern structs, so any managed ref stored
+    /// inside would dangle.
+    ExternStructFieldManagedRef {
+        type_name: String,
+        field: String,
+        ty: String,
+    },
+    /// `extern struct` used as a generic type argument. Generic code is
+    /// monomorphized assuming managed-ref calling conventions; extern value
+    /// types break that.
+    ExternStructAsGenericArg {
+        module: String,
+        name: String,
+    },
 }
 
 impl fmt::Display for ValidationError {
@@ -327,6 +348,22 @@ impl fmt::Display for ValidationError {
             LiteralOutOfRange { function, literal } => write!(
                 f,
                 "literal '{literal}' is out of range in function '{function}'"
+            ),
+            ExternStructImplementsInterface { type_name } => write!(
+                f,
+                "extern struct '{type_name}' cannot implement interfaces (no GC header for virtual dispatch)"
+            ),
+            ExternStructFieldManagedRef {
+                type_name,
+                field,
+                ty,
+            } => write!(
+                f,
+                "extern struct '{type_name}' field '{field}' has GC-managed type '{ty}' (extern structs cannot hold managed refs — GC can't trace them)"
+            ),
+            ExternStructAsGenericArg { module, name } => write!(
+                f,
+                "extern struct '{name}' in module '{module}' cannot be used as a generic type argument"
             ),
         }
     }
@@ -564,6 +601,7 @@ impl Validator {
                                 id,
                                 module: module_id,
                                 name: decl.name.clone(),
+                                is_extern: decl.is_extern,
                                 type_params: Vec::new(),
                                 fields: Vec::new(),
                                 methods: Vec::new(),
@@ -893,6 +931,14 @@ impl Validator {
         }
 
         // 2c: Resolve struct/interface field types.
+        //
+        // FOREIGN STRUCT RULE: extern structs have no GC header, so the
+        // collector can't scan them. Their fields can't hold managed refs
+        // (lists, maps, strings, regular structs, interfaces, closures)
+        // — anything stored there would be invisible to the GC and end up
+        // dangling. We check that here for extern structs and emit
+        // `ExternStructFieldManagedRef`. `is_pointer` fields are exempt:
+        // raw pointers are FFI-side and not GC-traced anyway.
         for module in modules {
             let module_id = match self.module_ids.get(&module.name) {
                 Some(id) => *id,
@@ -913,6 +959,20 @@ impl Validator {
                             &module.name,
                             &decl.name,
                         );
+                        if decl.is_extern {
+                            let label = format!("{}::{}", module.name, decl.name);
+                            for f in &fields {
+                                if !f.is_pointer && is_managed_ref_type(&f.ty, &self.hir) {
+                                    self.errors.push(
+                                        ValidationError::ExternStructFieldManagedRef {
+                                            type_name: label.clone(),
+                                            field: f.name.clone(),
+                                            ty: format_type(&f.ty),
+                                        },
+                                    );
+                                }
+                            }
+                        }
                         self.hir.structs.get_mut(&type_id).unwrap().fields = fields;
                     }
                     ItemKind::Interface(decl) => {
@@ -1076,6 +1136,13 @@ impl Validator {
 
     fn validate_implementations(&mut self, modules: &[Module]) {
         // 4a: Resolve struct/interface declared implements clauses.
+        //
+        // FOREIGN STRUCT RULE: extern structs may not implement interfaces.
+        // Virtual dispatch reads a type-id header from offset -1 of the
+        // receiver, but extern structs have no header — the lookup would
+        // read garbage. We emit `ExternStructImplementsInterface` and skip
+        // resolving the clause so the resulting `implements` list stays
+        // empty for extern structs.
         for module in modules {
             let module_id = match self.module_ids.get(&module.name) {
                 Some(id) => *id,
@@ -1089,6 +1156,14 @@ impl Validator {
                             None => continue,
                         };
                         let type_label = format!("{}::{}", module.name, decl.name);
+                        if decl.is_extern && !decl.implements.is_empty() {
+                            self.errors.push(
+                                ValidationError::ExternStructImplementsInterface {
+                                    type_name: type_label.clone(),
+                                },
+                            );
+                            continue;
+                        }
                         let scope = self
                             .type_generics
                             .get(&type_id)
@@ -2111,6 +2186,11 @@ impl Validator {
         None
     }
 
+    // FOREIGN STRUCT NOTE: `Foo { ... }` IS allowed for extern structs —
+    // they're value types and can be constructed inline (see example 15's
+    // `Buffer { data: null, size: 0 }`). Codegen lowers `AllocStruct` for
+    // an extern kind to a stack/inline value construction with no GC
+    // header, instead of a heap allocation.
     #[allow(clippy::too_many_arguments)]
     fn check_struct_init(
         &mut self,
@@ -2698,6 +2778,13 @@ impl Validator {
         }
     }
 
+    // FOREIGN STRUCT RULE: extern structs may not appear as generic type
+    // arguments. Generic code is monomorphized assuming the ManagedRef
+    // calling convention (pointer-sized, GC-tracked); plugging in a
+    // foreign value type breaks layout, passing, and allocation. After
+    // resolving the args we walk them and emit
+    // `ExternStructAsGenericArg` for any that resolve to an extern
+    // struct.
     fn resolve_named(
         &mut self,
         name: &str,
@@ -2764,6 +2851,24 @@ impl Validator {
                         actual: resolved_args.len(),
                     });
                     return ResolvedType::Null;
+                }
+
+                // Reject extern structs as generic arguments.
+                for arg in &resolved_args {
+                    if let ResolvedType::Struct(arg_id, _) = arg {
+                        if let Some(s) = self.hir.structs.get(arg_id) {
+                            if s.is_extern {
+                                let module_name =
+                                    self.hir.modules[&s.module].name.clone();
+                                self.errors.push(
+                                    ValidationError::ExternStructAsGenericArg {
+                                        module: module_name,
+                                        name: s.name.clone(),
+                                    },
+                                );
+                            }
+                        }
+                    }
                 }
 
                 if self.hir.structs.contains_key(&id) {
@@ -2881,6 +2986,35 @@ impl Validator {
     }
 }
 
+// Whether a resolved type is represented at runtime as a GC-managed ref
+// (and therefore can't sit inside a header-less extern struct, since the
+// collector wouldn't see it). Strings, interfaces, and managed structs
+// are managed; primitives and extern structs are not. `Function` is
+// ambiguous in `ResolvedType` (covers both extern fn pointers and
+// closures) so we don't reject it here — refine if it ever bites.
+fn is_managed_ref_type(ty: &ResolvedType, hir: &Hir) -> bool {
+    match ty {
+        ResolvedType::Primitive(PrimitiveType::String) => true,
+        ResolvedType::Primitive(_) => false,
+        ResolvedType::Struct(id, _) => hir
+            .structs
+            .get(id)
+            .map(|s| !s.is_extern)
+            .unwrap_or(false),
+        ResolvedType::Interface(_, _) => true,
+        ResolvedType::Union(types) => types.iter().any(|t| is_managed_ref_type(t, hir)),
+        ResolvedType::Function(_, _) => false,
+        ResolvedType::TypeParam(_) => false,
+        ResolvedType::Null => false,
+    }
+}
+
+// FOREIGN STRUCT RULE: when struct→interface coercion gets added here
+// (right now this function is the bare-bones version and doesn't even
+// handle that case), only managed structs may coerce. Extern structs
+// don't have the offset-(-1) type-id header that virtual dispatch needs,
+// so passing an extern value through an interface slot would break at
+// the first method call.
 fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
     if actual == expected {
         return true;

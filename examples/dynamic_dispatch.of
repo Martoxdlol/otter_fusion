@@ -1,0 +1,36 @@
+interface Shape {
+  function area(self): f64
+}
+
+struct Circle: Shape {
+  radius: f64,
+
+  function area(self): f64 {
+    3.14159 * self.radius * self.radius
+  }
+}
+
+struct Square: Shape {
+  side: f64,
+
+  function area(self): f64 {
+    self.side * self.side
+  }
+}
+
+function total_area(shapes: List<Shape>): f64 {
+  var sum: f64 = 0.0;
+  for s in shapes {
+    sum = sum + s.area();   // ← virtual call: which area()?
+  }
+  sum
+}
+
+function main(): i64 {
+  var c = Circle { radius: 2.0 };
+  var sq = Square { side: 3.0 };
+
+  var shapes: List<Shape> = [c, sq];
+  print(total_area(shapes) as str);
+  0
+}

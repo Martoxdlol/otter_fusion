@@ -89,6 +89,9 @@ pub struct HirStruct {
     pub id: TypeId,
     pub module: ModuleId,
     pub name: String,
+    /// `extern struct` — value-typed, C-ABI-compatible, no GC header. See
+    /// the foreign-struct rules enforced in the validator.
+    pub is_extern: bool,
     pub type_params: Vec<TypeParamId>,
     pub fields: Vec<HirField>,
     /// Methods declared inline on the struct.
