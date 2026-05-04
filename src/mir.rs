@@ -27,6 +27,17 @@ pub struct MirProgram {
     pub entry: MirFnId,
 }
 
+impl MirProgram {
+    pub fn new() -> Self {
+        Self {
+            types: HashMap::new(),
+            functions: HashMap::new(),
+            vtables: HashMap::new(),
+            entry: MirFnId(0),
+        }
+    }
+}
+
 /// Types definitions (can be referenced on other parts)
 #[derive(Debug, Clone)]
 pub enum MirTypeDef {
@@ -64,6 +75,19 @@ pub enum MirTypeDef {
         function: MirFnId,
         layout: Layout,
     },
+}
+
+impl MirTypeDef {
+    /// Index of a named field for use with `AssignValue::Field`. Returns
+    /// `None` for unions and closures, or when the field is unknown.
+    pub fn field_index(&self, name: &str) -> Option<u32> {
+        match self {
+            MirTypeDef::Struct { fields, .. } => {
+                fields.iter().position(|f| f.name == name).map(|i| i as u32)
+            }
+            _ => None,
+        }
+    }
 }
 
 /// Struct field
@@ -182,6 +206,9 @@ pub enum AssignValue {
     Bin(BinOp, Operand, Operand),
     /// Unary operation (-, !)
     Un(UnOp, Operand),
+    /// Numeric primitive cast (e.g. `f64 as f32`, `i64 as i8`). The target
+    /// type is the `MirType` of the local this rvalue is assigned to.
+    Cast(Operand, MirType),
     /// Fn call
     Call(Callee, Vec<Operand>),
     /// Struct

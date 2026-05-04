@@ -55,7 +55,7 @@ pub struct Hir {
     pub type_params: HashMap<TypeParamId, TypeParamInfo>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub enum ResolvedType {
     Primitive(PrimitiveType),
     Struct(TypeId, Vec<ResolvedType>), // Foo<i32, str>
@@ -66,7 +66,7 @@ pub enum ResolvedType {
     Null,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub enum PrimitiveType {
     Int8,
     Int16,
