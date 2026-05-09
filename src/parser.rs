@@ -90,10 +90,10 @@ impl Parser {
                         kind: ItemKind::Function(self.parse_function_decl(true)?),
                         span: next_span,
                     }),
-                    _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+                    _ => Err(self.unexpected_token_peek()),
                 }
             }
-            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+            _ => Err(self.unexpected_token_peek()),
         }
     }
 
@@ -105,7 +105,7 @@ impl Parser {
         let generics = self.parse_generic_params()?;
         self.expect(TokenType::Eq)?;
         let ty = self.parse_type_expr()?;
-        self.expect(TokenType::Semicolon)?;
+        self.expect_end_of_statement()?;
         Ok(Item {
             kind: ItemKind::TypeAlias(TypeAliasDecl { name, generics, ty }),
             span,
@@ -152,16 +152,10 @@ impl Parser {
         self.expect(TokenType::Function)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
-        let mut params = self.parse_function_args(is_extern)?;
+        let (has_self_param, params) = self.parse_function_args(is_extern)?;
         let mut return_type = None;
         if self.expect_optional(TokenType::Colon) {
             return_type = Some(self.parse_return_type(is_extern)?);
-        }
-
-        let has_self_param = params.first().map_or(false, |p| p.name == "self");
-
-        if has_self_param {
-            params.remove(0);
         }
 
         let body = if self.peek().token_type == TokenType::Semicolon {
@@ -317,6 +311,19 @@ impl Parser {
         }
     }
 
+    fn parse_optional_has_self_param(&mut self) -> Result<bool, ParserError> {
+        if self.expect_optional(TokenType::SelfRef) {
+            // expect comma or )
+            if self.peek().token_type != TokenType::Comma
+                && self.peek().token_type != TokenType::RightParen
+            {
+                return Err(self.unexpected_token_peek());
+            }
+        }
+
+        Ok(false)
+    }
+
     fn parse_type_atom(&mut self) -> Result<TypeExpr, ParserError> {
         let token = self.peek().clone();
         match &token.token_type {
@@ -367,7 +374,7 @@ impl Parser {
                 let return_type = self.parse_type_expr()?;
                 Ok(TypeExpr::Function(param_types, Box::new(return_type)))
             }
-            _ => Err(ParserError::UnexpectedToken(token)),
+            _ => Err(self.unexpected_token(token)),
         }
     }
 
@@ -411,6 +418,8 @@ impl Parser {
         let mut fields: Vec<FieldDecl> = Vec::new();
         let mut methods: Vec<FunctionDecl> = Vec::new();
 
+        let mut found_comma = false; // To track if we've seen a comma between fields
+
         loop {
             let tok = self.peek();
             match &tok.token_type {
@@ -420,8 +429,18 @@ impl Parser {
                     self.advance();
                     break;
                 }
-                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+                TokenType::Comma => {
+                    if found_comma {
+                        return Err(self.unexpected_token(tok.clone())); // Two commas in a row is an error
+                    }
+
+                    self.advance();
+                    continue;
+                }
+                _ => return Err(self.unexpected_token(tok.clone())),
             }
+
+            found_comma = false;
         }
 
         Ok((fields, methods))
@@ -441,7 +460,7 @@ impl Parser {
                     self.advance();
                     break;
                 }
-                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+                _ => return Err(self.unexpected_token(tok.clone())),
             }
         }
 
@@ -450,8 +469,13 @@ impl Parser {
 
     // Functions
 
-    pub fn parse_function_args(&mut self, in_extern: bool) -> Result<Vec<ParamDecl>, ParserError> {
+    pub fn parse_function_args(
+        &mut self,
+        in_extern: bool,
+    ) -> Result<(bool, Vec<ParamDecl>), ParserError> {
         self.expect(TokenType::LeftParen)?;
+
+        let has_self_param = self.parse_optional_has_self_param()?;
         let mut params = Vec::new();
 
         if self.peek().token_type != TokenType::RightParen {
@@ -462,7 +486,7 @@ impl Parser {
         }
 
         self.expect(TokenType::RightParen)?;
-        Ok(params)
+        Ok((has_self_param, params))
     }
 
     pub fn parse_param_decl(&mut self, in_extern: bool) -> Result<ParamDecl, ParserError> {
@@ -514,7 +538,7 @@ impl Parser {
                 break;
             }
 
-            let stmt = self.parse_statement()?;
+            let stmt: Statement = self.parse_statement()?;
 
             if self.expect_optional(TokenType::Semicolon) {
                 // Semicolon present — it's a regular statement, continue looping
@@ -529,7 +553,7 @@ impl Parser {
                 self.advance();
                 break;
             } else {
-                return Err(ParserError::UnexpectedToken(self.peek().clone()));
+                return Err(self.unexpected_token_peek());
             }
         }
 
@@ -826,7 +850,7 @@ impl Parser {
 
             TokenType::If => self.parse_if_expr(),
 
-            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+            _ => Err(self.unexpected_token_peek()),
         }
     }
 
@@ -958,7 +982,7 @@ impl Parser {
                     self.advance();
                     s
                 }
-                _ => return Err(ParserError::UnexpectedToken(self.peek().clone())),
+                _ => return Err(self.unexpected_token_peek()),
             };
 
             self.expect(TokenType::Colon)?;
@@ -990,8 +1014,15 @@ impl Parser {
     }
 
     pub fn advance(&mut self) {
-        if self.current < self.tokens.len() {
-            self.current += 1;
+        loop {
+            if self.current < self.tokens.len() {
+                self.current += 1;
+            }
+
+            // if not comment break
+            if !matches!(self.peek().token_type, TokenType::Comment(_)) {
+                break;
+            }
         }
     }
 
@@ -1008,7 +1039,12 @@ impl Parser {
             return Ok(());
         }
 
-        Err(ParserError::UnexpectedToken(token.clone()))
+        Err(self.unexpected_token(token.clone()))
+    }
+
+    /// Expect semicolon
+    pub fn expect_end_of_statement(&mut self) -> Result<(), ParserError> {
+        self.expect(TokenType::Semicolon)
     }
 
     pub fn expect_optional(&mut self, token_type: TokenType) -> bool {
@@ -1028,7 +1064,15 @@ impl Parser {
             return Ok(name_cloned);
         }
 
-        Err(ParserError::UnexpectedToken(token.clone()))
+        Err(self.unexpected_token(token.clone()))
+    }
+
+    pub fn unexpected_token_peek(&self) -> ParserError {
+        self.unexpected_token(self.peek().clone())
+    }
+
+    pub fn unexpected_token(&self, token: Token) -> ParserError {
+        ParserError::UnexpectedToken(token)
     }
 
     pub fn parse_optional_primitive(&self, name: &str) -> Option<PrimitiveType> {
