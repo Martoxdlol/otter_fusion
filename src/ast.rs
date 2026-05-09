@@ -168,6 +168,7 @@ pub enum Expr {
     UnaryOp(UnaryOperator, Box<Expr>),              // -x
     FunctionLiteral(Vec<GenericParam>, Vec<ParamDecl>, TypeExpr, Box<Block>), // (x: int): int { ... }
     Block(Box<Block>),
+    SelfRef,
 }
 
 #[derive(Debug, Clone, PartialEq)]

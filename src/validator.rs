@@ -186,15 +186,13 @@ impl fmt::Display for ValidationError {
         use ValidationError::*;
         match self {
             DuplicateModule { name } => write!(f, "duplicate module '{name}'"),
-            UnknownImportModule { in_module, target } => write!(
-                f,
-                "module '{in_module}' imports unknown module '{target}'"
-            ),
+            UnknownImportModule { in_module, target } => {
+                write!(f, "module '{in_module}' imports unknown module '{target}'")
+            }
             SelfImport { module } => write!(f, "module '{module}' cannot import itself"),
-            DuplicateName { module, name } => write!(
-                f,
-                "duplicate top-level name '{name}' in module '{module}'"
-            ),
+            DuplicateName { module, name } => {
+                write!(f, "duplicate top-level name '{name}' in module '{module}'")
+            }
             UnknownImportSymbol {
                 in_module,
                 from_module,
@@ -526,7 +524,9 @@ impl Validator {
             };
 
             for item in &module.program.items {
-                let ItemKind::Import(import) = &item.kind else { continue };
+                let ItemKind::Import(import) = &item.kind else {
+                    continue;
+                };
 
                 if import.module == module.name {
                     self.errors.push(ValidationError::SelfImport {
@@ -1028,7 +1028,9 @@ impl Validator {
             };
 
             for item in &module.program.items {
-                let ItemKind::Extend(decl) = &item.kind else { continue };
+                let ItemKind::Extend(decl) = &item.kind else {
+                    continue;
+                };
 
                 let extend_label = format!("{}::extend", module.name);
                 let extend_scope = self.mint_generics(&decl.generic_params, extend_label.clone());
@@ -1157,11 +1159,10 @@ impl Validator {
                         };
                         let type_label = format!("{}::{}", module.name, decl.name);
                         if decl.is_extern && !decl.implements.is_empty() {
-                            self.errors.push(
-                                ValidationError::ExternStructImplementsInterface {
+                            self.errors
+                                .push(ValidationError::ExternStructImplementsInterface {
                                     type_name: type_label.clone(),
-                                },
-                            );
+                                });
                             continue;
                         }
                         let scope = self
@@ -1169,8 +1170,12 @@ impl Validator {
                             .get(&type_id)
                             .cloned()
                             .unwrap_or_default();
-                        let resolved =
-                            self.resolve_implements_list(module_id, &decl.implements, scope, &type_label);
+                        let resolved = self.resolve_implements_list(
+                            module_id,
+                            &decl.implements,
+                            scope,
+                            &type_label,
+                        );
                         self.hir
                             .structs
                             .get_mut(&type_id)
@@ -1189,8 +1194,12 @@ impl Validator {
                             .get(&type_id)
                             .cloned()
                             .unwrap_or_default();
-                        let resolved =
-                            self.resolve_implements_list(module_id, &decl.implements, scope, &type_label);
+                        let resolved = self.resolve_implements_list(
+                            module_id,
+                            &decl.implements,
+                            scope,
+                            &type_label,
+                        );
                         self.hir
                             .interfaces
                             .get_mut(&type_id)
@@ -1322,7 +1331,10 @@ impl Validator {
 
         for iface_field in &interface.fields {
             let expected_ty = substitute(&iface_field.ty, &subst);
-            let struct_field = struct_def.fields.iter().find(|f| f.name == iface_field.name);
+            let struct_field = struct_def
+                .fields
+                .iter()
+                .find(|f| f.name == iface_field.name);
             match struct_field {
                 None => {
                     self.errors.push(ValidationError::MissingInterfaceMember {
@@ -1501,18 +1513,34 @@ impl Validator {
         locals.push(HashMap::new());
         let mut statements = Vec::new();
         for stmt in &block.statements {
-            if let Some(s) =
-                self.check_statement(stmt, fn_label, module, generics, locals, return_type, loop_depth)
-            {
+            if let Some(s) = self.check_statement(
+                stmt,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
+            ) {
                 statements.push(s);
             }
         }
-        let returns = block
-            .returns
-            .as_ref()
-            .map(|e| self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth));
+        let returns = block.returns.as_ref().map(|e| {
+            self.check_expr(
+                e,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
+            )
+        });
         locals.pop();
-        HirBlock { statements, returns }
+        HirBlock {
+            statements,
+            returns,
+        }
     }
 
     fn check_statement(
@@ -1537,7 +1565,15 @@ impl Validator {
                     self.resolve_type_expr(t, &ctx)
                 });
                 let init_typed = init.as_ref().map(|e| {
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_expr(
+                        e,
+                        fn_label,
+                        module,
+                        generics,
+                        locals,
+                        return_type,
+                        loop_depth,
+                    )
                 });
 
                 let final_ty = match (&annotated, &init_typed) {
@@ -1571,7 +1607,15 @@ impl Validator {
             }
             ast::Statement::Return(expr) => {
                 let typed = expr.as_ref().map(|e| {
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_expr(
+                        e,
+                        fn_label,
+                        module,
+                        generics,
+                        locals,
+                        return_type,
+                        loop_depth,
+                    )
                 });
                 let actual = typed
                     .as_ref()
@@ -1588,13 +1632,27 @@ impl Validator {
                 Some(HirStatement::Return(typed))
             }
             ast::Statement::Expr(e) => {
-                let typed =
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+                let typed = self.check_expr(
+                    e,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
+                );
                 Some(HirStatement::Expr(typed))
             }
             ast::Statement::While(cond, body) => {
-                let typed_cond =
-                    self.check_expr(cond, fn_label, module, generics, locals, return_type, loop_depth);
+                let typed_cond = self.check_expr(
+                    cond,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
+                );
                 if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
@@ -1616,16 +1674,19 @@ impl Validator {
             }
             ast::Statement::For(name, iter_expr, body) => {
                 let typed_iter = self.check_expr(
-                    iter_expr, fn_label, module, generics, locals, return_type, loop_depth,
+                    iter_expr,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 // v1 limitation: element type isn't extracted from `Iterator<T>`
                 // (the prelude that would define it isn't injected yet).
                 let elem_ty = ResolvedType::Null;
                 locals.push(HashMap::new());
-                locals
-                    .last_mut()
-                    .unwrap()
-                    .insert(name.clone(), elem_ty);
+                locals.last_mut().unwrap().insert(name.clone(), elem_ty);
                 let body_block = self.check_block(
                     body,
                     fn_label,
@@ -1672,7 +1733,13 @@ impl Validator {
             ast::Expr::Variable(name) => self.check_variable(name, fn_label, module, locals),
             ast::Expr::If(cond, then_b, else_b) => {
                 let typed_cond = self.check_expr(
-                    cond, fn_label, module, generics, locals, return_type, loop_depth,
+                    cond,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
                     self.errors.push(ValidationError::TypeMismatch {
@@ -1683,10 +1750,24 @@ impl Validator {
                     });
                 }
                 let then_block = self.check_block(
-                    then_b, fn_label, module, generics, locals, return_type, loop_depth,
+                    then_b,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 let else_block = else_b.as_ref().map(|b| {
-                    self.check_block(b, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_block(
+                        b,
+                        fn_label,
+                        module,
+                        generics,
+                        locals,
+                        return_type,
+                        loop_depth,
+                    )
                 });
                 let ty = then_block
                     .returns
@@ -1703,13 +1784,29 @@ impl Validator {
                 }
             }
             ast::Expr::Call(callee, type_args, args) => self.check_call(
-                callee, type_args, args, fn_label, module, generics, locals, return_type, loop_depth,
+                callee,
+                type_args,
+                args,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             ),
             ast::Expr::LiteralList(elems) => {
                 let typed_elems: Vec<TypedExpr> = elems
                     .iter()
                     .map(|e| {
-                        self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                        self.check_expr(
+                            e,
+                            fn_label,
+                            module,
+                            generics,
+                            locals,
+                            return_type,
+                            loop_depth,
+                        )
                     })
                     .collect();
                 // v1: no `List<T>` type yet (it lives in std). Element type is
@@ -1735,10 +1832,22 @@ impl Validator {
                     .iter()
                     .map(|(k, v)| {
                         let tk = self.check_expr(
-                            k, fn_label, module, generics, locals, return_type, loop_depth,
+                            k,
+                            fn_label,
+                            module,
+                            generics,
+                            locals,
+                            return_type,
+                            loop_depth,
                         );
                         let tv = self.check_expr(
-                            v, fn_label, module, generics, locals, return_type, loop_depth,
+                            v,
+                            fn_label,
+                            module,
+                            generics,
+                            locals,
+                            return_type,
+                            loop_depth,
                         );
                         (tk, tv)
                     })
@@ -1749,11 +1858,24 @@ impl Validator {
                 }
             }
             ast::Expr::StructInit(ty_expr, fields) => self.check_struct_init(
-                ty_expr, fields, fn_label, module, generics, locals, return_type, loop_depth,
+                ty_expr,
+                fields,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             ),
             ast::Expr::As(inner, ty) => {
                 let typed_inner = self.check_expr(
-                    inner, fn_label, module, generics, locals, return_type, loop_depth,
+                    inner,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 let ctx = TypeResolveCtx {
                     module,
@@ -1769,7 +1891,13 @@ impl Validator {
             }
             ast::Expr::Is(inner, ty) => {
                 let typed_inner = self.check_expr(
-                    inner, fn_label, module, generics, locals, return_type, loop_depth,
+                    inner,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 let ctx = TypeResolveCtx {
                     module,
@@ -1784,13 +1912,35 @@ impl Validator {
                 }
             }
             ast::Expr::Member(receiver, name) => self.check_member(
-                receiver, name, fn_label, module, generics, locals, return_type, loop_depth,
+                receiver,
+                name,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             ),
             ast::Expr::BinaryOp(l, op, r) => self.check_binary(
-                l, op, r, fn_label, module, generics, locals, return_type, loop_depth,
+                l,
+                op,
+                r,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             ),
             ast::Expr::UnaryOp(op, e) => self.check_unary(
-                op, e, fn_label, module, generics, locals, return_type, loop_depth,
+                op,
+                e,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             ),
             ast::Expr::FunctionLiteral(_, _, _, _) => {
                 // v1: function literals are accepted but bodies aren't
@@ -1802,7 +1952,13 @@ impl Validator {
             }
             ast::Expr::Block(b) => {
                 let block = self.check_block(
-                    b, fn_label, module, generics, locals, return_type, loop_depth,
+                    b,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 let ty = block
                     .returns
@@ -1814,6 +1970,7 @@ impl Validator {
                     ty,
                 }
             }
+            ast::Expr::SelfRef => self.check_variable("self", fn_label, module, locals),
         }
     }
 
@@ -1890,8 +2047,7 @@ impl Validator {
             match entry {
                 ScopeEntry::Function(fn_id) => {
                     let f = &self.hir.functions[&fn_id];
-                    let params: Vec<ResolvedType> =
-                        f.params.iter().map(|p| p.ty.clone()).collect();
+                    let params: Vec<ResolvedType> = f.params.iter().map(|p| p.ty.clone()).collect();
                     let ret = f.return_type.clone();
                     return TypedExpr {
                         kind: ExprKind::Variable(name.to_string()),
@@ -1948,7 +2104,15 @@ impl Validator {
         let typed_args: Vec<TypedExpr> = args
             .iter()
             .map(|a| {
-                self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth)
+                self.check_expr(
+                    a,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
+                )
             })
             .collect();
 
@@ -1971,14 +2135,17 @@ impl Validator {
                                 context: name.clone(),
                             });
                             return TypedExpr {
-                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                                kind: ExprKind::Call(
+                                    Box::new(typed),
+                                    resolved_type_args,
+                                    typed_args,
+                                ),
                                 ty: ResolvedType::Null,
                             };
                         }
                     };
                     (typed, name.clone(), HashMap::new(), params, ret)
-                } else if let Some(ScopeEntry::Function(fn_id)) =
-                    self.lookup_in_scope(module, name)
+                } else if let Some(ScopeEntry::Function(fn_id)) = self.lookup_in_scope(module, name)
                 {
                     let func = self.hir.functions[&fn_id].clone();
                     let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
@@ -1991,8 +2158,7 @@ impl Validator {
                                 actual: resolved_type_args.len(),
                             });
                         } else {
-                            for (tp, arg) in
-                                func.type_params.iter().zip(resolved_type_args.iter())
+                            for (tp, arg) in func.type_params.iter().zip(resolved_type_args.iter())
                             {
                                 subst.insert(*tp, arg.clone());
                             }
@@ -2026,7 +2192,13 @@ impl Validator {
             }
             ast::Expr::Member(receiver, member_name) => {
                 let typed_recv = self.check_expr(
-                    receiver, fn_label, module, generics, locals, return_type, loop_depth,
+                    receiver,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 if let Some((fn_id, owner_subst)) =
                     self.find_method_for_call(&typed_recv.ty, member_name)
@@ -2042,8 +2214,7 @@ impl Validator {
                                 actual: resolved_type_args.len(),
                             });
                         } else {
-                            for (tp, arg) in
-                                func.type_params.iter().zip(resolved_type_args.iter())
+                            for (tp, arg) in func.type_params.iter().zip(resolved_type_args.iter())
                             {
                                 subst.insert(*tp, arg.clone());
                             }
@@ -2080,7 +2251,13 @@ impl Validator {
             }
             other => {
                 let typed = self.check_expr(
-                    other, fn_label, module, generics, locals, return_type, loop_depth,
+                    other,
+                    fn_label,
+                    module,
+                    generics,
+                    locals,
+                    return_type,
+                    loop_depth,
                 );
                 let (params, ret) = match &typed.ty {
                     ResolvedType::Function(p, r) => (p.clone(), (**r).clone()),
@@ -2162,9 +2339,7 @@ impl Validator {
                 if self.hir.functions.get(fn_id).map(|f| f.name.as_str()) != Some(name) {
                     continue;
                 }
-                if let Some(extend_subst) =
-                    universal_extend_mapping(target_args, &s.type_params)
-                {
+                if let Some(extend_subst) = universal_extend_mapping(target_args, &s.type_params) {
                     let mut combined = subst.clone();
                     for (k, v) in extend_subst {
                         combined.insert(k, substitute(&v, &subst));
@@ -2223,7 +2398,13 @@ impl Validator {
                         (
                             n.clone(),
                             self.check_expr(
-                                e, fn_label, module, generics, locals, return_type, loop_depth,
+                                e,
+                                fn_label,
+                                module,
+                                generics,
+                                locals,
+                                return_type,
+                                loop_depth,
                             ),
                         )
                     })
@@ -2246,7 +2427,13 @@ impl Validator {
         let mut provided: HashSet<String> = HashSet::new();
         for (fname, fexpr) in fields {
             let typed = self.check_expr(
-                fexpr, fn_label, module, generics, locals, return_type, loop_depth,
+                fexpr,
+                fn_label,
+                module,
+                generics,
+                locals,
+                return_type,
+                loop_depth,
             );
             if !provided.insert(fname.clone()) {
                 self.errors.push(ValidationError::ExtraFieldInit {
@@ -2308,7 +2495,13 @@ impl Validator {
         loop_depth: u32,
     ) -> TypedExpr {
         let typed_recv = self.check_expr(
-            receiver, fn_label, module, generics, locals, return_type, loop_depth,
+            receiver,
+            fn_label,
+            module,
+            generics,
+            locals,
+            return_type,
+            loop_depth,
         );
         let recv_ty = typed_recv.ty.clone();
 
@@ -2379,8 +2572,24 @@ impl Validator {
         return_type: &ResolvedType,
         loop_depth: u32,
     ) -> TypedExpr {
-        let lt = self.check_expr(l, fn_label, module, generics, locals, return_type, loop_depth);
-        let rt = self.check_expr(r, fn_label, module, generics, locals, return_type, loop_depth);
+        let lt = self.check_expr(
+            l,
+            fn_label,
+            module,
+            generics,
+            locals,
+            return_type,
+            loop_depth,
+        );
+        let rt = self.check_expr(
+            r,
+            fn_label,
+            module,
+            generics,
+            locals,
+            return_type,
+            loop_depth,
+        );
         let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
 
         let (hir_op, result_ty) = match op {
@@ -2454,7 +2663,15 @@ impl Validator {
         return_type: &ResolvedType,
         loop_depth: u32,
     ) -> TypedExpr {
-        let typed = self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+        let typed = self.check_expr(
+            e,
+            fn_label,
+            module,
+            generics,
+            locals,
+            return_type,
+            loop_depth,
+        );
         let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
         match op {
             ast::UnaryOperator::Neg => {
@@ -2858,14 +3075,11 @@ impl Validator {
                     if let ResolvedType::Struct(arg_id, _) = arg {
                         if let Some(s) = self.hir.structs.get(arg_id) {
                             if s.is_extern {
-                                let module_name =
-                                    self.hir.modules[&s.module].name.clone();
-                                self.errors.push(
-                                    ValidationError::ExternStructAsGenericArg {
-                                        module: module_name,
-                                        name: s.name.clone(),
-                                    },
-                                );
+                                let module_name = self.hir.modules[&s.module].name.clone();
+                                self.errors.push(ValidationError::ExternStructAsGenericArg {
+                                    module: module_name,
+                                    name: s.name.clone(),
+                                });
                             }
                         }
                     }
@@ -2996,11 +3210,7 @@ fn is_managed_ref_type(ty: &ResolvedType, hir: &Hir) -> bool {
     match ty {
         ResolvedType::Primitive(PrimitiveType::String) => true,
         ResolvedType::Primitive(_) => false,
-        ResolvedType::Struct(id, _) => hir
-            .structs
-            .get(id)
-            .map(|s| !s.is_extern)
-            .unwrap_or(false),
+        ResolvedType::Struct(id, _) => hir.structs.get(id).map(|s| !s.is_extern).unwrap_or(false),
         ResolvedType::Interface(_, _) => true,
         ResolvedType::Union(types) => types.iter().any(|t| is_managed_ref_type(t, hir)),
         ResolvedType::Function(_, _) => false,
@@ -3057,7 +3267,11 @@ fn format_type(ty: &ResolvedType) -> String {
             .join(" | "),
         ResolvedType::Function(params, ret) => format!(
             "({}) -> {}",
-            params.iter().map(format_type).collect::<Vec<_>>().join(", "),
+            params
+                .iter()
+                .map(format_type)
+                .collect::<Vec<_>>()
+                .join(", "),
             format_type(ret)
         ),
         ResolvedType::TypeParam(id) => format!("'tp{}", id.0),
@@ -3081,14 +3295,12 @@ fn format_named(kind: &str, id: u32, args: &[ResolvedType]) -> String {
 fn substitute(ty: &ResolvedType, subst: &HashMap<TypeParamId, ResolvedType>) -> ResolvedType {
     match ty {
         ResolvedType::TypeParam(id) => subst.get(id).cloned().unwrap_or_else(|| ty.clone()),
-        ResolvedType::Struct(id, args) => ResolvedType::Struct(
-            *id,
-            args.iter().map(|a| substitute(a, subst)).collect(),
-        ),
-        ResolvedType::Interface(id, args) => ResolvedType::Interface(
-            *id,
-            args.iter().map(|a| substitute(a, subst)).collect(),
-        ),
+        ResolvedType::Struct(id, args) => {
+            ResolvedType::Struct(*id, args.iter().map(|a| substitute(a, subst)).collect())
+        }
+        ResolvedType::Interface(id, args) => {
+            ResolvedType::Interface(*id, args.iter().map(|a| substitute(a, subst)).collect())
+        }
         ResolvedType::Union(types) => {
             ResolvedType::Union(types.iter().map(|t| substitute(t, subst)).collect())
         }
@@ -3173,8 +3385,8 @@ fn signatures_match(
 mod tests {
     use super::*;
     use crate::ast::{
-        BinaryOperator as AstBinOp, Block, Expr, ExtendDecl, FieldDecl, ImportDecl,
-        InterfaceDecl, Item, Literal, ParamDecl, Program, Statement, StructDecl,
+        BinaryOperator as AstBinOp, Block, Expr, ExtendDecl, FieldDecl, ImportDecl, InterfaceDecl,
+        Item, Literal, ParamDecl, Program, Statement, StructDecl,
     };
 
     // ---- AST construction helpers ----
@@ -3312,7 +3524,10 @@ mod tests {
     #[test]
     fn p0_duplicate_module_errors() {
         let errs = run(vec![module("m", vec![]), module("m", vec![])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::DuplicateModule { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::DuplicateModule { .. }
+        )));
     }
 
     #[test]
@@ -3322,7 +3537,10 @@ mod tests {
             symbols: ImportSymbols::Glob,
         }));
         let errs = run(vec![module("m", vec![imp])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::SelfImport { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::SelfImport { .. }
+        )));
     }
 
     #[test]
@@ -3354,7 +3572,11 @@ mod tests {
 
     #[test]
     fn p1_struct_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))],
+        )])
+        .unwrap();
         assert_eq!(hir.structs.len(), 1);
         let s = hir.structs.values().next().unwrap();
         assert_eq!(s.name, "Foo");
@@ -3363,13 +3585,21 @@ mod tests {
 
     #[test]
     fn p1_interface_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(empty_iface("Show")))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![Item::dummy(ItemKind::Interface(empty_iface("Show")))],
+        )])
+        .unwrap();
         assert_eq!(hir.interfaces.len(), 1);
     }
 
     #[test]
     fn p1_function_skeleton_inserted() {
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(empty_fn("foo")))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![Item::dummy(ItemKind::Function(empty_fn("foo")))],
+        )])
+        .unwrap();
         assert_eq!(hir.functions.len(), 1);
     }
 
@@ -3383,12 +3613,18 @@ mod tests {
             ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::DuplicateName { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::DuplicateName { .. }
+        )));
     }
 
     #[test]
     fn p1_named_import_resolves_type() {
-        let lib = module("lib", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))]);
+        let lib = module(
+            "lib",
+            vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))],
+        );
         let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
@@ -3408,7 +3644,10 @@ mod tests {
 
     #[test]
     fn p1_named_import_with_alias() {
-        let lib = module("lib", vec![Item::dummy(ItemKind::Function(empty_fn("foo")))]);
+        let lib = module(
+            "lib",
+            vec![Item::dummy(ItemKind::Function(empty_fn("foo")))],
+        );
         let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Named(vec![ImportSymbol {
@@ -3460,7 +3699,9 @@ mod tests {
         let hir = run(vec![module("lib", vec![alias]), module("main", vec![imp])]).unwrap();
         let main = hir.modules.values().find(|m| m.name == "main").unwrap();
         match main.imports.first() {
-            Some(HirImport::Named(_, syms)) => assert!(matches!(syms[0], HirImportSymbol::Alias { .. })),
+            Some(HirImport::Named(_, syms)) => {
+                assert!(matches!(syms[0], HirImportSymbol::Alias { .. }))
+            }
             _ => panic!("expected named import"),
         }
     }
@@ -3489,7 +3730,10 @@ mod tests {
         let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
         let func = hir.functions.values().next().unwrap();
         assert_eq!(func.params.len(), 2);
-        assert_eq!(func.return_type, ResolvedType::Primitive(PrimitiveType::Int64));
+        assert_eq!(
+            func.return_type,
+            ResolvedType::Primitive(PrimitiveType::Int64)
+        );
     }
 
     #[test]
@@ -3497,8 +3741,15 @@ mod tests {
         let mut s = empty_struct("Foo");
         s.generics = vec![generic_bound("T", vec![named("Bar")])];
         let bar = Item::dummy(ItemKind::Struct(empty_struct("Bar")));
-        let errs = run(vec![module("m", vec![bar, Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::BoundNotInterface { .. })));
+        let errs = run(vec![module(
+            "m",
+            vec![bar, Item::dummy(ItemKind::Struct(s))],
+        )])
+        .unwrap_err();
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::BoundNotInterface { .. }
+        )));
     }
 
     #[test]
@@ -3506,7 +3757,11 @@ mod tests {
         let iface = Item::dummy(ItemKind::Interface(empty_iface("Show")));
         let mut s = empty_struct("Foo");
         s.generics = vec![generic_bound("T", vec![named("Show")])];
-        let hir = run(vec![module("m", vec![iface, Item::dummy(ItemKind::Struct(s))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![iface, Item::dummy(ItemKind::Struct(s))],
+        )])
+        .unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         let tp = &hir.type_params[&foo.type_params[0]];
         assert_eq!(tp.bounds.len(), 1);
@@ -3521,7 +3776,10 @@ mod tests {
             is_pointer: true,
         }];
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::PointerOutsideExtern { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::PointerOutsideExtern { .. }
+        )));
     }
 
     #[test]
@@ -3545,11 +3803,18 @@ mod tests {
         let mut user = empty_fn("u");
         user.return_type = Some(named_args("Wrapper", vec![i64_t(), i64_t()]));
         user.body = None;
-        let errs = run(vec![
-            module("m", vec![Item::dummy(ItemKind::Struct(wrap)), Item::dummy(ItemKind::Function(user))]),
-        ])
+        let errs = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Struct(wrap)),
+                Item::dummy(ItemKind::Function(user)),
+            ],
+        )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::GenericArityMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::GenericArityMismatch { .. }
+        )));
     }
 
     #[test]
@@ -3561,22 +3826,40 @@ mod tests {
         }));
         let mut f = empty_fn("foo");
         f.return_type = Some(named("MyInt"));
-        let hir = run(vec![module("m", vec![alias, Item::dummy(ItemKind::Function(f))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![alias, Item::dummy(ItemKind::Function(f))],
+        )])
+        .unwrap();
         let func = hir.functions.values().next().unwrap();
-        assert_eq!(func.return_type, ResolvedType::Primitive(PrimitiveType::Int64));
+        assert_eq!(
+            func.return_type,
+            ResolvedType::Primitive(PrimitiveType::Int64)
+        );
     }
 
     #[test]
     fn p2_glob_import_provides_type() {
-        let lib = module("lib", vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))]);
+        let lib = module(
+            "lib",
+            vec![Item::dummy(ItemKind::Struct(empty_struct("Foo")))],
+        );
         let imp = Item::dummy(ItemKind::Import(ImportDecl {
             module: "lib".into(),
             symbols: ImportSymbols::Glob,
         }));
         let mut f = empty_fn("use_foo");
         f.return_type = Some(named("Foo"));
-        let hir = run(vec![lib, module("main", vec![imp, Item::dummy(ItemKind::Function(f))])]).unwrap();
-        let func = hir.functions.values().find(|f| f.name == "use_foo").unwrap();
+        let hir = run(vec![
+            lib,
+            module("main", vec![imp, Item::dummy(ItemKind::Function(f))]),
+        ])
+        .unwrap();
+        let func = hir
+            .functions
+            .values()
+            .find(|f| f.name == "use_foo")
+            .unwrap();
         assert!(matches!(func.return_type, ResolvedType::Struct(_, _)));
     }
 
@@ -3585,7 +3868,10 @@ mod tests {
         let mut f = empty_fn("foo");
         f.return_type = Some(named("Nope"));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownType { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::UnknownType { .. }
+        )));
     }
 
     #[test]
@@ -3641,7 +3927,11 @@ mod tests {
             implements: vec![],
             methods: vec![m],
         }));
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(wrap)), ext])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![Item::dummy(ItemKind::Struct(wrap)), ext],
+        )])
+        .unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
         let (args, _) = &wrap.specialised_methods[0];
         assert_eq!(args.len(), 1);
@@ -3661,7 +3951,11 @@ mod tests {
             implements: vec![],
             methods: vec![m],
         }));
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Struct(wrap)), ext])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![Item::dummy(ItemKind::Struct(wrap)), ext],
+        )])
+        .unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
         let (args, _) = &wrap.specialised_methods[0];
         assert_eq!(args.len(), 1);
@@ -3678,7 +3972,10 @@ mod tests {
             methods: vec![],
         }));
         let errs = run(vec![module("m", vec![i, ext])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidExtendTarget { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::InvalidExtendTarget { .. }
+        )));
     }
 
     // =========================================================================
@@ -3702,7 +3999,14 @@ mod tests {
         sm.body = Some(body(vec![], Some(str_lit("hi"))));
         s.methods = vec![sm];
 
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(s)),
+            ],
+        )])
+        .unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         assert_eq!(foo.implements.len(), 1);
     }
@@ -3718,9 +4022,18 @@ mod tests {
         let mut s = empty_struct("Foo");
         s.implements = vec![named("Show")];
 
-        let errs =
-            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingInterfaceMember { .. })));
+        let errs = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(s)),
+            ],
+        )])
+        .unwrap_err();
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::MissingInterfaceMember { .. }
+        )));
     }
 
     #[test]
@@ -3739,9 +4052,18 @@ mod tests {
         sm.body = Some(body(vec![], Some(int_lit("0"))));
         s.methods = vec![sm];
 
-        let errs =
-            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::InterfaceMemberMismatch { .. })));
+        let errs = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(s)),
+            ],
+        )])
+        .unwrap_err();
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::InterfaceMemberMismatch { .. }
+        )));
     }
 
     #[test]
@@ -3753,9 +4075,18 @@ mod tests {
         s.implements = vec![named("HasId")];
         // missing field
 
-        let errs =
-            run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingInterfaceMember { .. })));
+        let errs = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(s)),
+            ],
+        )])
+        .unwrap_err();
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::MissingInterfaceMember { .. }
+        )));
     }
 
     #[test]
@@ -3770,7 +4101,14 @@ mod tests {
         let mut s = empty_struct("Foo");
         s.implements = vec![named("Show")];
 
-        let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(s))])]).unwrap();
+        let hir = run(vec![module(
+            "m",
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(s)),
+            ],
+        )])
+        .unwrap();
         let foo = hir.structs.values().find(|s| s.name == "Foo").unwrap();
         assert_eq!(foo.implements.len(), 1);
     }
@@ -3780,8 +4118,15 @@ mod tests {
         let other = Item::dummy(ItemKind::Struct(empty_struct("Other")));
         let mut s = empty_struct("Foo");
         s.implements = vec![named("Other")];
-        let errs = run(vec![module("m", vec![other, Item::dummy(ItemKind::Struct(s))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::ImplementsNotInterface { .. })));
+        let errs = run(vec![module(
+            "m",
+            vec![other, Item::dummy(ItemKind::Struct(s))],
+        )])
+        .unwrap_err();
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::ImplementsNotInterface { .. }
+        )));
     }
 
     #[test]
@@ -3809,7 +4154,11 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Interface(iface)), Item::dummy(ItemKind::Struct(wrap)), ext],
+            vec![
+                Item::dummy(ItemKind::Interface(iface)),
+                Item::dummy(ItemKind::Struct(wrap)),
+                ext,
+            ],
         )])
         .unwrap();
         let wrap = hir.structs.values().find(|s| s.name == "Wrapper").unwrap();
@@ -3855,7 +4204,14 @@ mod tests {
             Some(var("x")),
         ));
         let hir = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap();
-        let body_hir = hir.functions.values().next().unwrap().body.as_ref().unwrap();
+        let body_hir = hir
+            .functions
+            .values()
+            .next()
+            .unwrap()
+            .body
+            .as_ref()
+            .unwrap();
         match &body_hir.statements[0] {
             HirStatement::VarDecl(_, ty, _) => {
                 assert_eq!(*ty, ResolvedType::Primitive(PrimitiveType::Int64))
@@ -3867,12 +4223,12 @@ mod tests {
     #[test]
     fn p5_var_decl_no_type_no_init_errors() {
         let mut f = empty_fn("foo");
-        f.body = Some(body(
-            vec![Statement::VarDecl("x".into(), None, None)],
-            None,
-        ));
+        f.body = Some(body(vec![Statement::VarDecl("x".into(), None, None)], None));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::VariableNeedsType { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::VariableNeedsType { .. }
+        )));
     }
 
     #[test]
@@ -3887,7 +4243,10 @@ mod tests {
             None,
         ));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::TypeMismatch { .. }
+        )));
     }
 
     #[test]
@@ -3896,19 +4255,22 @@ mod tests {
         f.return_type = Some(i64_t());
         f.body = Some(body(vec![], Some(var("missing"))));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownVariable { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::UnknownVariable { .. }
+        )));
     }
 
     #[test]
     fn p5_return_type_mismatch_errors() {
         let mut f = empty_fn("foo");
         f.return_type = Some(i64_t());
-        f.body = Some(body(
-            vec![Statement::Return(Some(str_lit("nope")))],
-            None,
-        ));
+        f.body = Some(body(vec![Statement::Return(Some(str_lit("nope")))], None));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::TypeMismatch { .. }
+        )));
     }
 
     #[test]
@@ -3916,7 +4278,10 @@ mod tests {
         let mut f = empty_fn("foo");
         f.body = Some(body(vec![Statement::Break], None));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::BreakOutsideLoop { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::BreakOutsideLoop { .. }
+        )));
     }
 
     #[test]
@@ -3941,7 +4306,10 @@ mod tests {
             None,
         ));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::TypeMismatch { .. }
+        )));
     }
 
     #[test]
@@ -3964,13 +4332,17 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
+            vec![
+                Item::dummy(ItemKind::Function(adder)),
+                Item::dummy(ItemKind::Function(caller)),
+            ],
         )])
         .unwrap();
-        assert!(hir
-            .functions
-            .values()
-            .any(|f| f.name == "main" && f.body.is_some()));
+        assert!(
+            hir.functions
+                .values()
+                .any(|f| f.name == "main" && f.body.is_some())
+        );
     }
 
     #[test]
@@ -3993,10 +4365,16 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
+            vec![
+                Item::dummy(ItemKind::Function(adder)),
+                Item::dummy(ItemKind::Function(caller)),
+            ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::CallArityMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::CallArityMismatch { .. }
+        )));
     }
 
     #[test]
@@ -4015,10 +4393,16 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Function(adder)), Item::dummy(ItemKind::Function(caller))],
+            vec![
+                Item::dummy(ItemKind::Function(adder)),
+                Item::dummy(ItemKind::Function(caller)),
+            ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::TypeMismatch { .. }
+        )));
     }
 
     #[test]
@@ -4034,10 +4418,7 @@ mod tests {
                 None,
                 Some(Expr::StructInit(
                     named("Point"),
-                    vec![
-                        ("x".into(), int_lit("1")),
-                        ("y".into(), int_lit("2")),
-                    ],
+                    vec![("x".into(), int_lit("1")), ("y".into(), int_lit("2"))],
                 )),
             )],
             Some(Expr::Member(Box::new(var("p")), "x".into())),
@@ -4045,10 +4426,17 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
+            vec![
+                Item::dummy(ItemKind::Struct(s)),
+                Item::dummy(ItemKind::Function(f)),
+            ],
         )])
         .unwrap();
-        assert!(hir.functions.values().any(|f| f.name == "main" && f.body.is_some()));
+        assert!(
+            hir.functions
+                .values()
+                .any(|f| f.name == "main" && f.body.is_some())
+        );
     }
 
     #[test]
@@ -4068,10 +4456,16 @@ mod tests {
 
         let errs = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
+            vec![
+                Item::dummy(ItemKind::Struct(s)),
+                Item::dummy(ItemKind::Function(f)),
+            ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::MissingFieldInit { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::MissingFieldInit { .. }
+        )));
     }
 
     #[test]
@@ -4084,19 +4478,22 @@ mod tests {
             vec![],
             Some(Expr::StructInit(
                 named("Point"),
-                vec![
-                    ("x".into(), int_lit("1")),
-                    ("z".into(), int_lit("2")),
-                ],
+                vec![("x".into(), int_lit("1")), ("z".into(), int_lit("2"))],
             )),
         ));
 
         let errs = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
+            vec![
+                Item::dummy(ItemKind::Struct(s)),
+                Item::dummy(ItemKind::Function(f)),
+            ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::ExtraFieldInit { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::ExtraFieldInit { .. }
+        )));
     }
 
     #[test]
@@ -4125,10 +4522,17 @@ mod tests {
 
         let hir = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
+            vec![
+                Item::dummy(ItemKind::Struct(s)),
+                Item::dummy(ItemKind::Function(f)),
+            ],
         )])
         .unwrap();
-        assert!(hir.functions.values().any(|f| f.name == "main" && f.body.is_some()));
+        assert!(
+            hir.functions
+                .values()
+                .any(|f| f.name == "main" && f.body.is_some())
+        );
     }
 
     #[test]
@@ -4145,10 +4549,16 @@ mod tests {
         ));
         let errs = run(vec![module(
             "m",
-            vec![Item::dummy(ItemKind::Struct(s)), Item::dummy(ItemKind::Function(f))],
+            vec![
+                Item::dummy(ItemKind::Struct(s)),
+                Item::dummy(ItemKind::Function(f)),
+            ],
         )])
         .unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::UnknownMember { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::UnknownMember { .. }
+        )));
     }
 
     #[test]
@@ -4179,7 +4589,10 @@ mod tests {
             )),
         ));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::TypeMismatch { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::TypeMismatch { .. }
+        )));
     }
 
     #[test]
@@ -4194,7 +4607,10 @@ mod tests {
             )),
         ));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidOperator { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::InvalidOperator { .. }
+        )));
     }
 
     #[test]
@@ -4209,7 +4625,10 @@ mod tests {
             )),
         ));
         let errs = run(vec![module("m", vec![Item::dummy(ItemKind::Function(f))])]).unwrap_err();
-        assert!(err_any(&errs, |e| matches!(e, ValidationError::InvalidOperator { .. })));
+        assert!(err_any(&errs, |e| matches!(
+            e,
+            ValidationError::InvalidOperator { .. }
+        )));
     }
 
     #[test]
@@ -4282,7 +4701,8 @@ mod tests {
     #[test]
     fn p5_null_assignable_to_nullable_union() {
         let mut f = empty_fn("foo");
-        let nullable = TypeExpr::Union(vec![i64_t(), TypeExpr::Primitive(ast::PrimitiveType::Null)]);
+        let nullable =
+            TypeExpr::Union(vec![i64_t(), TypeExpr::Primitive(ast::PrimitiveType::Null)]);
         f.body = Some(body(
             vec![Statement::VarDecl(
                 "x".into(),

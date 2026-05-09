@@ -850,6 +850,11 @@ impl Parser {
                 Ok(Expr::Variable(name))
             }
 
+            TokenType::SelfRef => {
+                self.advance();
+                Ok(Expr::SelfRef)
+            }
+
             TokenType::If => self.parse_if_expr(),
 
             _ => Err(self.unexpected_token_peek()),
@@ -1074,6 +1079,10 @@ impl Parser {
     }
 
     pub fn unexpected_token(&self, token: Token) -> ParserError {
+        panic!(
+            "Unexpected token at line {}, column {}: {:?}",
+            token.line, token.column, token.token_type
+        );
         ParserError::UnexpectedToken(token)
     }
 
