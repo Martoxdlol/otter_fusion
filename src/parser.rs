@@ -158,8 +158,10 @@ impl Parser {
             return_type = Some(self.parse_return_type(is_extern)?);
         }
 
-        let body = if self.peek().token_type == TokenType::Semicolon {
+        let body = if self.peek().token_type == TokenType::Comma {
             self.advance();
+            None
+        } else if self.peek().token_type == TokenType::RightBrace {
             None
         } else {
             Some(self.parse_block()?)
