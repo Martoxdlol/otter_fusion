@@ -9,8 +9,8 @@ use cranelift_object::{ObjectBuilder, ObjectModule};
 
 use crate::hir::PrimitiveType;
 use crate::mir::{
-    Abi, AssignValue, BinOp, BlockId, Callee, LocalId, MirConst, MirFnId, MirFunction, MirProgram,
-    MirType, MirTypeDef, MirTypeId, Operand, Stmt, Terminator, TrapReason, UnOp,
+    Abi, AssignValue, BinOp, BlockId, Callee, Layout, LocalId, MirConst, MirFnId, MirFunction,
+    MirProgram, MirType, MirTypeDef, MirTypeId, Operand, Stmt, Terminator, TrapReason, UnOp,
 };
 
 /// Symbol exported for the program's entry function. The runtime crate
@@ -208,13 +208,23 @@ fn declare_helpers<M: Module>(module: &mut M, ptr: Type) -> Result<Helpers, Stri
     }
 
     Ok(Helpers {
-        alloc_struct: dec(module, "otter_alloc_struct", &[types::I32], Some(ptr))?,
+        alloc_struct: dec(
+            module,
+            "otter_alloc_struct",
+            &[types::I32, types::I32, types::I32],
+            Some(ptr),
+        )?,
         alloc_closure: dec(module, "otter_alloc_closure", &[ptr, ptr], Some(ptr))?,
-        alloc_env: dec(module, "otter_alloc_env", &[types::I32], Some(ptr))?,
+        alloc_env: dec(
+            module,
+            "otter_alloc_env",
+            &[types::I32, types::I32, types::I32],
+            Some(ptr),
+        )?,
         union_construct: dec(
             module,
             "otter_union_construct",
-            &[types::I32, types::I32, ptr],
+            &[types::I32, types::I32, types::I32, types::I32, ptr],
             Some(ptr),
         )?,
         union_tag: dec(module, "otter_union_tag", &[ptr], Some(types::I32))?,
@@ -660,11 +670,14 @@ impl<'a, 'b, M: Module> FnTrans<'a, 'b, M> {
     }
 
     fn alloc_struct(&mut self, tid: MirTypeId, fields: &[Operand]) -> Value {
+        let layout = type_layout(self.program, tid);
         let helper = self
             .module
             .declare_func_in_func(self.helpers.alloc_struct, self.builder.func);
+        let size_v = self.builder.ins().iconst(types::I32, layout.size as i64);
+        let align_v = self.builder.ins().iconst(types::I32, layout.align as i64);
         let tid_v = self.builder.ins().iconst(types::I32, tid.0 as i64);
-        let inst = self.builder.ins().call(helper, &[tid_v]);
+        let inst = self.builder.ins().call(helper, &[size_v, align_v, tid_v]);
         let base = self.builder.inst_results(inst)[0];
 
         let offsets = field_offsets(self.program, tid);
@@ -678,11 +691,17 @@ impl<'a, 'b, M: Module> FnTrans<'a, 'b, M> {
 
     fn alloc_closure(&mut self, fid: MirFnId, env: &[Operand]) -> Value {
         let env_mid = closure_env_type(self.program, fid);
+        let env_layout = type_layout(self.program, env_mid);
         let alloc_env = self
             .module
             .declare_func_in_func(self.helpers.alloc_env, self.builder.func);
+        let size_v = self.builder.ins().iconst(types::I32, env_layout.size as i64);
+        let align_v = self.builder.ins().iconst(types::I32, env_layout.align as i64);
         let env_tid_v = self.builder.ins().iconst(types::I32, env_mid.0 as i64);
-        let inst = self.builder.ins().call(alloc_env, &[env_tid_v]);
+        let inst = self
+            .builder
+            .ins()
+            .call(alloc_env, &[size_v, align_v, env_tid_v]);
         let env_base = self.builder.inst_results(inst)[0];
 
         let offsets = field_offsets(self.program, env_mid);
@@ -721,6 +740,7 @@ impl<'a, 'b, M: Module> FnTrans<'a, 'b, M> {
     }
 
     fn union_construct(&mut self, tid: MirTypeId, tag: u32, payload: &Operand) -> Value {
+        let layout = type_layout(self.program, tid);
         let p = self.operand(payload);
         let p = if self.builder.func.dfg.value_type(p) != self.ptr {
             self.builder.ins().uextend(self.ptr, p)
@@ -730,10 +750,24 @@ impl<'a, 'b, M: Module> FnTrans<'a, 'b, M> {
         let helper = self
             .module
             .declare_func_in_func(self.helpers.union_construct, self.builder.func);
+        let size_v = self.builder.ins().iconst(types::I32, layout.size as i64);
+        let align_v = self.builder.ins().iconst(types::I32, layout.align as i64);
         let tid_v = self.builder.ins().iconst(types::I32, tid.0 as i64);
         let tag_v = self.builder.ins().iconst(types::I32, tag as i64);
-        let inst = self.builder.ins().call(helper, &[tid_v, tag_v, p]);
+        let inst = self
+            .builder
+            .ins()
+            .call(helper, &[size_v, align_v, tid_v, tag_v, p]);
         self.builder.inst_results(inst)[0]
+    }
+}
+
+fn type_layout(program: &MirProgram, mid: MirTypeId) -> Layout {
+    match program.types.get(&mid) {
+        Some(MirTypeDef::Struct { layout, .. }) => *layout,
+        Some(MirTypeDef::Union { layout, .. }) => *layout,
+        Some(MirTypeDef::Closure { layout, .. }) => *layout,
+        None => panic!("no layout for type {:?}", mid),
     }
 }
 
