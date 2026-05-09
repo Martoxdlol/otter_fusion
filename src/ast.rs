@@ -146,6 +146,7 @@ pub enum Statement {
     VarDecl(String, Option<TypeExpr>, Option<Expr>), // var x: int = 5; / var x = 5;
     Return(Option<Expr>),                            // return 5;
     Expr(Expr),                                      // x + 5;
+    Assign(Expr, Expr),                              // target = value
     While(Expr, Block),                              // while x < 10 { ... }
     For(String, Expr, Block),                        // for (item in items) { ... }
     Break,                                           // break

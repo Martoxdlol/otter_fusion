@@ -1715,6 +1715,7 @@ impl Validator {
                 }
                 Some(HirStatement::Continue)
             }
+            ast::Statement::Assign(_, _) => None,
         }
     }
 

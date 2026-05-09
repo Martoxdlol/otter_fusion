@@ -23,6 +23,8 @@ pub enum TokenType {
     // Operators
     LT,        // <
     GT,        // >
+    LtEq,      // <=
+    GtEq,      // >=
     Eq,        // =
     EqEq,      // ==
     FatArrow,  // =>
@@ -237,6 +239,8 @@ impl fmt::Display for TokenType {
             TokenType::RightBracket => f.write_str("']'"),
             TokenType::LT => f.write_str("'<'"),
             TokenType::GT => f.write_str("'>'"),
+            TokenType::LtEq => f.write_str("'<='"),
+            TokenType::GtEq => f.write_str("'>='"),
             TokenType::Eq => f.write_str("'='"),
             TokenType::EqEq => f.write_str("'=='"),
             TokenType::FatArrow => f.write_str("'=>'"),
@@ -316,6 +320,8 @@ impl TokenType {
             // Two-character
             TokenType::EqEq
             | TokenType::BangEq
+            | TokenType::LtEq
+            | TokenType::GtEq
             | TokenType::And
             | TokenType::Or
             | TokenType::FatArrow => 2,
