@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function main(): i64 {
   var numbers: List<i64> = [1, 2, 3, 4, 5, 6, 7, 8];
 

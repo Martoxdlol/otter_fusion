@@ -1,43 +1,54 @@
-// Recursive union of every primitive plus collections.
-type Json = null | bool | i64 | f64 | str | List<Json> | Map<str, Json>;
+import { print } from "of:core";
 
-function describe(v: Json): str {
-  if (v is null) {
-    "null"
-  } else if (v is bool) {
-    if (v as bool) { "true" } else { "false" }
-  } else if (v is i64) {
-    "int(" + ((v as i64) as str) + ")"
-  } else if (v is f64) {
-    "float(" + ((v as f64) as str) + ")"
-  } else if (v is str) {
-    "str(\"" + (v as str) + "\")"
-  } else if (v is List<Json>) {
-    var list = v as List<Json>;
+// JSON-ish value built from a struct wrapper instead of a recursive alias.
+// (The compiler doesn't yet support recursive aliases — wrap a single
+// scalar/list/map slot inside a struct and let the struct close the cycle.)
+
+struct JsonNull {}
+
+struct JsonValue {
+  scalar: bool | i64 | f64 | str | null,
+  list:   List<JsonValue> | null,
+  map:    Map<str, JsonValue> | null,
+}
+
+function describe(v: JsonValue): str {
+  if (v.list is null) {
+    if (v.map is null) {
+      var s = v.scalar;
+      if (s is null)  { "null" }
+      else if (s is bool) { if (s as bool) { "true" } else { "false" } }
+      else if (s is i64) { "int(" + ((s as i64) as str) + ")" }
+      else if (s is f64) { "float(" + ((s as f64) as str) + ")" }
+      else { "str(\"" + (s as str) + "\")" }
+    } else {
+      var m = v.map as Map<str, JsonValue>;
+      var out = "map{";
+      for (entry in m) {
+        out = out + entry.key + ":" + describe(entry.value) + ",";
+      }
+      out + "}"
+    }
+  } else {
+    var l = v.list as List<JsonValue>;
     var out = "list[";
-    for (item in list) {
+    for (item in l) {
       out = out + describe(item) + ",";
     }
     out + "]"
-  } else {
-    var map = v as Map<str, Json>;
-    var out = "map{";
-    for (entry in map) {
-      out = out + entry.key + ":" + describe(entry.value) + ",";
-    }
-    out + "}"
   }
 }
 
 function main(): i64 {
-  var doc: Json = {
-    "name": "Alice",
-    "age": 30,
-    "active": true,
-    "score": 9.5,
-    "tags": ["admin", "user"],
-    "extra": null,
+  var alice = JsonValue { scalar: "Alice", list: null, map: null };
+  var thirty = JsonValue { scalar: 30,     list: null, map: null };
+
+  var entries: Map<str, JsonValue> = {
+    "name": alice,
+    "age":  thirty,
   };
+  var doc = JsonValue { scalar: null, list: null, map: entries };
+
   print(describe(doc));
   0
 }

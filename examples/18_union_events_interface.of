@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 // Union of structs that all implement a shared interface.
 // You can narrow to the interface for shared behavior, or to the
 // concrete struct for variant-specific fields.

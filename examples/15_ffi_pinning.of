@@ -1,11 +1,7 @@
-extern struct Buffer {
-  data: *u8,
-  size: u64,
-}
+import { print } from "of:core";
 
-extern function malloc(size: u64): *Buffer | null;
-extern function free(buf: *Buffer);
-extern function print(value: str);
+// `Buffer` is provided by the of:core prelude (an extern struct
+// `{ data: *u8, size: u64 }` with `alloc`, `get`, `set`, `free`).
 
 type TickCb = extern (d: *MyStruct) => void;
 
@@ -21,7 +17,7 @@ extern function on_tick(d: *MyStruct) {
 }
 
 function allocate(size: u64): Buffer {
-  var maybe = malloc(size);
+  var maybe = Buffer.alloc(size);
   if (maybe is null) {
     return Buffer { data: null, size: 0 };
   }
@@ -45,6 +41,7 @@ function remove(state: MyStruct) {
 function main(): i64 {
   var buf = allocate(1024 as u64);
   print("buffer size: " + (buf.size as str));
+  buf.free();
 
   var state = install();
   print("counter: " + (state.counter as str));

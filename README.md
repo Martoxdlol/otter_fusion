@@ -297,9 +297,166 @@ struct Box<T> {
 }
 ```
 
+## Imports
+
+Modules are imported by string-literal name. There are two forms:
+
+```typescript
+import "utils";                            // glob — pulls in every public name
+import { Foo, bar }       from "utils";    // named
+import { Foo as Bar }     from "utils";    // named with alias
+```
+
+Local definitions silently shadow imports. Importing the same local name
+twice (from any combination of imports) is an error.
+
+## The `of:core` prelude
+
+A synthetic module named `of:core` is auto-imported into every user
+module. It provides:
+
+- Auto-imported into every user module:
+    - FFI primitives `pin<T>(value: T): *T` and `unpin<T>(ptr: *T)`
+    - Container types `List<T>`, `Map<K, V>`, `Entry<K, V>`
+    - The `Iterator<T>` interface (any value implementing it works in `for x in …`)
+    - The `Buffer` extern struct (a contiguous byte array with C layout)
+    - Built-in methods on the primitive `str` type
+- Available but **must be imported explicitly**:
+    - `print(value: str)` and `println(value: str)`
+
+```typescript
+import { print, println } from "of:core";
+```
+
+You can't shadow or re-import `of:core`; the name is reserved.
+
+### Failure semantics
+
+Every method that can fail (out-of-bounds, missing key, empty pop)
+returns `T | null` rather than panicking. The language has no
+exceptions — checking `is null` is the way to handle failure.
+
+### `str` methods
+
+`str` is immutable; mutating methods return a new string.
+
+| Method | Returns | Notes |
+|---|---|---|
+| `size()` | `i64` | number of characters |
+| `is_empty()` | `bool` | |
+| `get(i: i64)` | `char \| null` | out-of-range → null |
+| `contains(s: str)` | `bool` | |
+| `starts_with(s: str)` | `bool` | |
+| `ends_with(s: str)` | `bool` | |
+| `index_of(s: str)` | `i64 \| null` | |
+| `substring(start: i64, end: i64)` | `str` | half-open range |
+| `concat(s: str)` | `str` | same as `+` |
+| `split(sep: str)` | `List<str>` | |
+| `trim()` | `str` | |
+| `to_upper()` | `str` | |
+| `to_lower()` | `str` | |
+| `replace(old: str, new: str)` | `str` | replaces all occurrences |
+| `repeat(n: i64)` | `str` | |
+
+`+` on two strings is a shortcut for `concat`.
+
+### `List<T>`
+
+Construct via the literal `[…]` or the static method `List.new<T>()`:
+
+```typescript
+var a: List<i64> = [1, 2, 3];
+var b = List.new<i64>();
+```
+
+| Method | Returns |
+|---|---|
+| `new()` (static) | `List<T>` — empty list, called as `List.new<T>()` |
+| `size()` | `i64` |
+| `is_empty()` | `bool` |
+| `clear()` | `null` |
+| `get(i: i64)` | `T \| null` |
+| `set(i: i64, v: T)` | `null` (silent no-op if out of range) |
+| `push(v: T)` | `null` |
+| `pop()` | `T \| null` |
+| `insert(i: i64, v: T)` | `null` |
+| `remove(i: i64)` | `T \| null` (returns the removed element) |
+| `truncate(n: i64)` | `null` |
+| `contains(v: T)` | `bool` |
+| `index_of(v: T)` | `i64 \| null` |
+
+### `Map<K, V>`
+
+Construct via the literal `{ k: v, … }` or the static method `Map.new<K, V>()`:
+
+```typescript
+var a: Map<str, i64> = { "x": 1, "y": 2 };
+var b = Map.new<str, i64>();
+```
+
+| Method | Returns |
+|---|---|
+| `new()` (static) | `Map<K, V>` — empty map, called as `Map.new<K, V>()` |
+| `size()` | `i64` |
+| `is_empty()` | `bool` |
+| `clear()` | `null` |
+| `get(k: K)` | `V \| null` |
+| `set(k: K, v: V)` | `null` |
+| `remove(k: K)` | `V \| null` |
+| `contains(k: K)` | `bool` |
+| `keys()` | `List<K>` |
+| `values()` | `List<V>` |
+
+### `Buffer`
+
+A contiguous byte array with guaranteed C layout. Defined as an extern
+struct, so:
+
+- it passes to/from extern functions by value or by pointer with no shim;
+- its bytes live on the foreign heap (manual `alloc` / `free`, the GC
+  does not trace them);
+- it cannot implement interfaces and cannot be a generic type argument
+  (no GC header).
+
+```typescript
+extern struct Buffer {
+  data: *u8,
+  size: u64,
+}
+```
+
+| Method | Returns | Notes |
+|---|---|---|
+| `alloc(size: u64)` (static) | `Buffer \| null` | foreign-heap allocation; `null` on OOM |
+| `get(self, i: u64)` | `u8 \| null` | out-of-range → `null` |
+| `set(self, i: u64, v: u8)` | `null` | out-of-range → silent no-op |
+| `free(self)` | `null` | release the foreign-heap region |
+
+```typescript
+var maybe = Buffer.alloc(1024 as u64);
+if (maybe is null) {
+  // allocation failed
+} else {
+  var buf = maybe as Buffer;
+  buf.set(0 as u64, 65 as u8);  // 'A'
+  buf.free();
+}
+```
+
+### `Entry<K, V>`
+
+`for entry in <map>` yields `Entry<K, V>` values with two fields:
+
+```typescript
+struct Entry<K, V> {
+  key: K,
+  value: V,
+}
+```
+
 ## Lists
 
-Lists are defined using square brackets and can hold any type of value.
+Lists are defined using square brackets and resolve to `List<T>`.
 
 ```typescript
 var numbers: List<i64> = [1, 2, 3, 4, 5];
@@ -307,10 +464,11 @@ var mixed: List<i64 | str> = [1, "two", 3, "four"];
 ```
 
 ## Maps
-Maps are defined using curly braces and hold key-value pairs.
+
+Maps are defined using curly braces and resolve to `Map<K, V>`.
 
 ```typescript
-var user_ages: Map<str, i32> = {
+var user_ages: Map<str, i64> = {
   "Alice": 30,
   "Bob": 25,
 };
@@ -361,17 +519,36 @@ for (num in numbers) {
 
 ## Iterator
 
-The `Iterator<T>` type provides a way to iterate over collections.
+`Iterator<T>` is provided by the `of:core` prelude:
 
 ```typescript
-// Internal type
 interface Iterator<T> {
-  next(self): T | null,
+  function next(self): T | null
+}
+```
+
+`for x in <value>` accepts any value whose type implements `Iterator<T>`
+(directly or transitively), and yields `T`.
+
+```typescript
+struct Range: Iterator<i64> {
+  current: i64,
+  end:     i64,
+
+  function next(self): i64 | null {
+    if (self.current >= self.end) {
+      null
+    } else {
+      var v = self.current;
+      self.current = self.current + 1;
+      v
+    }
+  }
 }
 
 function print_all<T>(iter: Iterator<T>) {
   for (item in iter) {
-    print(item);
+    print(item as str);
   }
 }
 ```

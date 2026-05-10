@@ -77,6 +77,8 @@ pub enum TokenType {
     Continue,  // continue
     Break,     // break
     Extern,    // extern
+    Import,    // import
+    From,      // from
 
     EOF,
 }
@@ -287,6 +289,8 @@ impl fmt::Display for TokenType {
             TokenType::Continue => f.write_str("'continue'"),
             TokenType::Break => f.write_str("'break'"),
             TokenType::Extern => f.write_str("'extern'"),
+            TokenType::Import => f.write_str("'import'"),
+            TokenType::From => f.write_str("'from'"),
             TokenType::EOF => f.write_str("end of file"),
         }
     }
@@ -360,6 +364,8 @@ impl TokenType {
             TokenType::Continue => 8,
             TokenType::Break => 5,
             TokenType::Extern => 6,
+            TokenType::Import => 6,
+            TokenType::From => 4,
 
             TokenType::EOF => 0,
         }

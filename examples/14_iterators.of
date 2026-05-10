@@ -1,6 +1,8 @@
-interface Iterator<T> {
-  function next(self): T | null
-}
+import { print } from "of:core";
+
+// `Iterator<T>` is provided by the of:core prelude — no local declaration
+// needed. `for x in iter` knows to pull `T` out of any value that
+// implements it.
 
 struct Range: Iterator<i64> {
   current: i64,

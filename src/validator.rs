@@ -12,7 +12,80 @@ use crate::{
         HirStruct, ModuleId, PrimitiveType, ResolvedType, TypeId, TypeParamId, TypeParamInfo,
         TypedExpr, UnaryOperator as HirUnOp,
     },
+    lexer::Lexer,
+    parser::Parser,
 };
+
+pub const CORE_MODULE_NAME: &str = "of:core";
+
+/// Names auto-imported from `of:core` into every user module. New entries
+/// in `of:core` are NOT auto-imported unless added here — that way the
+/// prelude can grow without polluting every module's scope. `print` and
+/// `println` are intentionally NOT in this list; user modules must
+/// `import { print, println } from "of:core";` explicitly.
+pub const CORE_AUTO_IMPORT_NAMES: &[&str] = &[
+    "pin",
+    "unpin",
+    "List",
+    "Map",
+    "Entry",
+    "Iterator",
+    "Buffer",
+];
+
+/// Synthetic prelude module. Auto-imported (glob) into every user module so
+/// `print`, `List<T>`, `Map<K,V>`, `Entry<K,V>` resolve without an `import`.
+pub const CORE_MODULE_SOURCE: &str = include_str!("of_core.of");
+
+fn parse_core_module() -> Module {
+    let tokens = Lexer::new(CORE_MODULE_SOURCE)
+        .scan_all()
+        .expect("of:core source must lex");
+    let program = Parser::new(tokens)
+        .parse()
+        .expect("of:core source must parse");
+    Module {
+        name: CORE_MODULE_NAME.to_string(),
+        program,
+    }
+}
+
+/// String primitive method table. Each entry is (name, params, ret).
+/// Params do NOT include `self` — the receiver is the string itself.
+fn string_method_signature(name: &str) -> Option<(Vec<ResolvedType>, ResolvedType)> {
+    let s = ResolvedType::Primitive(PrimitiveType::String);
+    let i64_ty = ResolvedType::Primitive(PrimitiveType::Int64);
+    let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
+    let char_ty = ResolvedType::Primitive(PrimitiveType::Char);
+    let nullable_char = ResolvedType::Union(vec![char_ty, ResolvedType::Null]);
+    let nullable_i64 = ResolvedType::Union(vec![i64_ty.clone(), ResolvedType::Null]);
+
+    Some(match name {
+        "size" => (vec![], i64_ty),
+        "is_empty" => (vec![], bool_ty),
+        "get" => (vec![ResolvedType::Primitive(PrimitiveType::Int64)], nullable_char),
+        "contains" => (vec![s.clone()], bool_ty),
+        "starts_with" => (vec![s.clone()], bool_ty),
+        "ends_with" => (vec![s.clone()], bool_ty),
+        "index_of" => (vec![s.clone()], nullable_i64),
+        "substring" => (
+            vec![
+                ResolvedType::Primitive(PrimitiveType::Int64),
+                ResolvedType::Primitive(PrimitiveType::Int64),
+            ],
+            s.clone(),
+        ),
+        "concat" => (vec![s.clone()], s.clone()),
+        "trim" => (vec![], s.clone()),
+        "to_upper" => (vec![], s.clone()),
+        "to_lower" => (vec![], s.clone()),
+        "replace" => (vec![s.clone(), s.clone()], s.clone()),
+        "repeat" => (vec![ResolvedType::Primitive(PrimitiveType::Int64)], s.clone()),
+        // `split(sep) -> List<str>` — handled at the dispatch site because the
+        // returned type needs the Map/List type ids that aren't available here.
+        _ => return None,
+    })
+}
 
 #[derive(Debug, Clone)]
 pub enum ValidationError {
@@ -176,6 +249,10 @@ pub enum ValidationError {
     /// monomorphized assuming managed-ref calling conventions; extern value
     /// types break that.
     ExternStructAsGenericArg {
+        module: String,
+        name: String,
+    },
+    RecursiveTypeAlias {
         module: String,
         name: String,
     },
@@ -363,6 +440,10 @@ impl fmt::Display for ValidationError {
                 f,
                 "extern struct '{name}' in module '{module}' cannot be used as a generic type argument"
             ),
+            RecursiveTypeAlias { module, name } => write!(
+                f,
+                "type alias '{name}' in module '{module}' refers to itself; recursive aliases are not supported (use a struct or interface instead)"
+            ),
         }
     }
 }
@@ -443,6 +524,19 @@ pub struct Validator {
     /// `implements` list.
     pending_extend_implements: Vec<(TypeId, Vec<ResolvedType>)>,
 
+    /// Resolved ids of of:core's built-in types, looked up after phase 1.
+    core_module_id: Option<ModuleId>,
+    core_list_id: Option<TypeId>,
+    core_map_id: Option<TypeId>,
+    core_entry_id: Option<TypeId>,
+    core_iterator_id: Option<TypeId>,
+
+    /// Aliases currently being inlined while resolving a type expression.
+    /// Recursive aliases (`type Json = ... | List<Json>`) would otherwise
+    /// recurse forever — when we re-enter a name already on the stack we
+    /// emit an error and return `Null`.
+    alias_expansion_stack: Vec<(ModuleId, String)>,
+
     next_module_id: u32,
     next_type_id: u32,
     next_fn_id: u32,
@@ -451,8 +545,13 @@ pub struct Validator {
 
 impl Validator {
     pub fn new(modules: Vec<Module>) -> Self {
+        // Prepend the synthetic of:core module so it gets the lowest module id
+        // and is visible to every user module via auto-glob import.
+        let mut all_modules = Vec::with_capacity(modules.len() + 1);
+        all_modules.push(parse_core_module());
+        all_modules.extend(modules.into_iter().filter(|m| m.name != CORE_MODULE_NAME));
         Self {
-            modules,
+            modules: all_modules,
             hir: Hir::default(),
             errors: Vec::new(),
             module_ids: HashMap::new(),
@@ -463,6 +562,12 @@ impl Validator {
             type_generics: HashMap::new(),
             fn_generics: HashMap::new(),
             pending_extend_implements: Vec::new(),
+            core_module_id: None,
+            core_list_id: None,
+            core_map_id: None,
+            core_entry_id: None,
+            core_iterator_id: None,
+            alias_expansion_stack: Vec::new(),
             next_module_id: 0,
             next_type_id: 0,
             next_fn_id: 0,
@@ -477,6 +582,11 @@ impl Validator {
         self.register_modules_and_imports(&modules);
         // step 1: register type names
         self.register_type_names(&modules);
+        // step 1b: cache of:core's built-in type ids for later dispatch
+        self.cache_core_type_ids();
+        // step 1c: auto-import the curated subset of `of:core` symbols into
+        //         every user module
+        self.auto_import_core_symbols();
         // step 2: register type params, resolve fields & signatures
         self.register_type_params_and_signatures(&modules);
         // step 3: merge extend blocks
@@ -491,6 +601,89 @@ impl Validator {
         }
 
         Ok(self.hir)
+    }
+
+    fn cache_core_type_ids(&mut self) {
+        let Some(core_id) = self.core_module_id else {
+            return;
+        };
+        let Some(scope) = self.module_scopes.get(&core_id) else {
+            return;
+        };
+        let lookup = |name: &str| match scope.direct.get(name) {
+            Some(ScopeEntry::Type(id)) => Some(*id),
+            _ => None,
+        };
+        self.core_list_id = lookup("List");
+        self.core_map_id = lookup("Map");
+        self.core_entry_id = lookup("Entry");
+        self.core_iterator_id = lookup("Iterator");
+    }
+
+    /// For every user module, inject named imports for the `of:core`
+    /// symbols listed in `CORE_AUTO_IMPORT_NAMES`. Anything in `of:core`
+    /// not on that list stays inaccessible until the user writes an
+    /// explicit import — same way Rust's prelude handles new additions.
+    fn auto_import_core_symbols(&mut self) {
+        let Some(core_id) = self.core_module_id else {
+            return;
+        };
+
+        let resolved: Vec<(String, ScopeEntry, HirImportSymbol)> = {
+            let Some(scope) = self.module_scopes.get(&core_id) else {
+                return;
+            };
+            let mut out = Vec::new();
+            for name in CORE_AUTO_IMPORT_NAMES {
+                let Some(entry) = scope.direct.get(*name).cloned() else {
+                    continue;
+                };
+                let hir_sym = match &entry {
+                    ScopeEntry::Type(id) => HirImportSymbol::Type(*id, name.to_string()),
+                    ScopeEntry::Function(id) => {
+                        HirImportSymbol::Function(*id, name.to_string())
+                    }
+                    ScopeEntry::Alias { source, name: orig } => HirImportSymbol::Alias {
+                        source: *source,
+                        original: orig.clone(),
+                        local: name.to_string(),
+                    },
+                };
+                out.push((name.to_string(), entry, hir_sym));
+            }
+            out
+        };
+
+        let user_module_ids: Vec<ModuleId> = self
+            .hir
+            .modules
+            .keys()
+            .copied()
+            .filter(|id| *id != core_id)
+            .collect();
+
+        for importer in user_module_ids {
+            let scope = self.module_scopes.entry(importer).or_default();
+            let mut hir_symbols: Vec<HirImportSymbol> = Vec::new();
+            for (name, entry, hir_sym) in &resolved {
+                // Local definitions and explicit imports win — auto-import
+                // never overrides what the user already put in scope.
+                if scope.direct.contains_key(name) {
+                    continue;
+                }
+                scope.direct.insert(name.clone(), entry.clone());
+                scope.imported_names.insert(name.clone());
+                hir_symbols.push(hir_sym.clone());
+            }
+            if !hir_symbols.is_empty() {
+                self.hir
+                    .modules
+                    .get_mut(&importer)
+                    .unwrap()
+                    .imports
+                    .push(HirImport::Named(core_id, hir_symbols));
+            }
+        }
     }
 
     fn register_modules_and_imports(&mut self, modules: &[Module]) {
@@ -515,6 +708,10 @@ impl Validator {
                     imports: Vec::new(),
                 },
             );
+
+            if module.name == CORE_MODULE_NAME {
+                self.core_module_id = Some(id);
+            }
         }
 
         for module in modules {
@@ -1337,11 +1534,24 @@ impl Validator {
                 .find(|f| f.name == iface_field.name);
             match struct_field {
                 None => {
-                    self.errors.push(ValidationError::MissingInterfaceMember {
-                        type_name: type_label.clone(),
-                        interface: iface_label.clone(),
-                        member: iface_field.name.clone(),
-                    });
+                    // No matching field — accept a method with the same name
+                    // and signature `(self) -> field_ty` as a "getter".
+                    let provided_by_method = self
+                        .find_struct_method(struct_def, &iface_field.name)
+                        .and_then(|(fn_id, extend_subst)| {
+                            let f = self.hir.functions.get(&fn_id)?.clone();
+                            let ret = substitute(&f.return_type, &extend_subst);
+                            let ret = substitute(&ret, &subst);
+                            Some(f.has_self && f.params.is_empty() && ret == expected_ty)
+                        })
+                        .unwrap_or(false);
+                    if !provided_by_method {
+                        self.errors.push(ValidationError::MissingInterfaceMember {
+                            type_name: type_label.clone(),
+                            interface: iface_label.clone(),
+                            member: iface_field.name.clone(),
+                        });
+                    }
                 }
                 Some(sf) => {
                     if sf.ty != expected_ty || sf.is_pointer != iface_field.is_pointer {
@@ -1443,7 +1653,7 @@ impl Validator {
             let mut locals: Vec<HashMap<String, ResolvedType>> = vec![HashMap::new()];
             if func.has_self {
                 if let Some(owner) = func.owner {
-                    let self_ty = self.self_type_for(owner);
+                    let self_ty = self.self_type_for_method(owner, *fn_id);
                     locals[0].insert("self".to_string(), self_ty);
                 }
             }
@@ -1476,6 +1686,30 @@ impl Validator {
             self.hir.functions.get_mut(fn_id).unwrap().body = Some(block);
         }
         self.pending_function_bodies = pending;
+    }
+
+    /// Self type for a method whose body is being type-checked. For inline
+    /// methods and universal extends this is `Owner<...struct type params...>`,
+    /// but for concrete specialisations (`extend Wrapper<i32> { ... }`) the
+    /// self type must reflect the extend's target args so the body sees
+    /// `Wrapper<i32>` (and `self.value: i32`) instead of the abstract `T`.
+    fn self_type_for_method(&self, owner: TypeId, fn_id: FnId) -> ResolvedType {
+        if let Some(s) = self.hir.structs.get(&owner) {
+            for (target_args, sid) in &s.specialised_methods {
+                if *sid != fn_id {
+                    continue;
+                }
+                // Treat as concrete only when at least one arg isn't a bare
+                // TypeParam — otherwise universal mapping is the right view.
+                let is_concrete = target_args
+                    .iter()
+                    .any(|a| !matches!(a, ResolvedType::TypeParam(_)));
+                if is_concrete {
+                    return ResolvedType::Struct(owner, target_args.clone());
+                }
+            }
+        }
+        self.self_type_for(owner)
     }
 
     fn self_type_for(&self, owner: TypeId) -> ResolvedType {
@@ -1578,7 +1812,8 @@ impl Validator {
 
                 let final_ty = match (&annotated, &init_typed) {
                     (Some(a), Some(typed)) => {
-                        if !types_compatible(&typed.ty, a) {
+                        let actual = self.coerce_expr_to_target(typed, a);
+                        if !types_compatible(&actual, a, &self.hir) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
                                 context: format!("var {}", name),
@@ -1619,9 +1854,9 @@ impl Validator {
                 });
                 let actual = typed
                     .as_ref()
-                    .map(|t| t.ty.clone())
+                    .map(|t| self.coerce_expr_to_target(t, return_type))
                     .unwrap_or(ResolvedType::Null);
-                if !types_compatible(&actual, return_type) {
+                if !types_compatible(&actual, return_type, &self.hir) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
                         context: "return".to_string(),
@@ -1682,9 +1917,7 @@ impl Validator {
                     return_type,
                     loop_depth,
                 );
-                // v1 limitation: element type isn't extracted from `Iterator<T>`
-                // (the prelude that would define it isn't injected yet).
-                let elem_ty = ResolvedType::Null;
+                let elem_ty = self.iter_element_type(&typed_iter.ty);
                 locals.push(HashMap::new());
                 locals.last_mut().unwrap().insert(name.clone(), elem_ty);
                 let body_block = self.check_block(
@@ -1810,22 +2043,14 @@ impl Validator {
                         )
                     })
                     .collect();
-                // v1: no `List<T>` type yet (it lives in std). Element type is
-                // recorded as a union of element types; the container type
-                // itself is `Null` until prelude/std lookup is wired up.
-                let _elem_ty = if typed_elems.is_empty() {
-                    ResolvedType::Null
-                } else {
-                    let tys: Vec<_> = typed_elems.iter().map(|e| e.ty.clone()).collect();
-                    if tys.iter().all(|t| t == &tys[0]) {
-                        tys[0].clone()
-                    } else {
-                        ResolvedType::Union(tys)
-                    }
+                let elem_ty = unify_element_types(typed_elems.iter().map(|e| &e.ty));
+                let list_ty = match self.core_list_id {
+                    Some(id) => ResolvedType::Struct(id, vec![elem_ty]),
+                    None => ResolvedType::Null,
                 };
                 TypedExpr {
                     kind: ExprKind::LiteralList(typed_elems),
-                    ty: ResolvedType::Null,
+                    ty: list_ty,
                 }
             }
             ast::Expr::LiteralMap(entries) => {
@@ -1853,9 +2078,15 @@ impl Validator {
                         (tk, tv)
                     })
                     .collect();
+                let key_ty = unify_element_types(typed_entries.iter().map(|(k, _)| &k.ty));
+                let val_ty = unify_element_types(typed_entries.iter().map(|(_, v)| &v.ty));
+                let map_ty = match self.core_map_id {
+                    Some(id) => ResolvedType::Struct(id, vec![key_ty, val_ty]),
+                    None => ResolvedType::Null,
+                };
                 TypedExpr {
                     kind: ExprKind::LiteralMap(typed_entries),
-                    ty: ResolvedType::Null,
+                    ty: map_ty,
                 }
             }
             ast::Expr::StructInit(ty_expr, fields) => self.check_struct_init(
@@ -1943,12 +2174,25 @@ impl Validator {
                 return_type,
                 loop_depth,
             ),
-            ast::Expr::FunctionLiteral(_, _, _, _) => {
-                // v1: function literals are accepted but bodies aren't
-                // type-checked yet (captures + nested scope handling deferred).
+            ast::Expr::FunctionLiteral(_generics, params, ret_ty, _body) => {
+                // v1: bodies aren't type-checked yet (captures + nested scope
+                // deferred). The literal's *type*, however, is well-defined
+                // from its declared signature so callers can pass it as a
+                // function-typed argument.
+                let ctx = TypeResolveCtx {
+                    module,
+                    generics: generics.to_vec(),
+                    local_subst: HashMap::new(),
+                    allow_pointer: false,
+                };
+                let resolved_params: Vec<ResolvedType> = params
+                    .iter()
+                    .map(|p| self.resolve_type_expr(&p.ty, &ctx))
+                    .collect();
+                let resolved_ret = self.resolve_type_expr(ret_ty, &ctx);
                 TypedExpr {
                     kind: ExprKind::Literal(HirLiteral::Null),
-                    ty: ResolvedType::Null,
+                    ty: ResolvedType::Function(resolved_params, Box::new(resolved_ret)),
                 }
             }
             ast::Expr::Block(b) => {
@@ -2192,6 +2436,26 @@ impl Validator {
                 }
             }
             ast::Expr::Member(receiver, member_name) => {
+                // Static method dispatch: `TypeName.method<...>(args)`. Only
+                // applies when the receiver is a bare `Variable(name)` that
+                // resolves to a type (not a value or function).
+                if let ast::Expr::Variable(type_name) = receiver.as_ref() {
+                    if !locals.iter().any(|s| s.contains_key(type_name)) {
+                        if let Some(ScopeEntry::Type(type_id)) =
+                            self.lookup_in_scope(module, type_name)
+                        {
+                            if let Some(result) = self.try_static_method_call(
+                                type_id,
+                                member_name,
+                                &resolved_type_args,
+                                &typed_args,
+                                fn_label,
+                            ) {
+                                return result;
+                            }
+                        }
+                    }
+                }
                 let typed_recv = self.check_expr(
                     receiver,
                     fn_label,
@@ -2201,7 +2465,15 @@ impl Validator {
                     return_type,
                     loop_depth,
                 );
-                if let Some((fn_id, owner_subst)) =
+                if let Some((params, ret)) =
+                    self.primitive_method(&typed_recv.ty, member_name)
+                {
+                    let typed = TypedExpr {
+                        kind: ExprKind::Member(Box::new(typed_recv), member_name.clone()),
+                        ty: ResolvedType::Function(params.clone(), Box::new(ret.clone())),
+                    };
+                    (typed, member_name.clone(), HashMap::new(), params, ret)
+                } else if let Some((fn_id, owner_subst)) =
                     self.find_method_for_call(&typed_recv.ty, member_name)
                 {
                     let func = self.hir.functions[&fn_id].clone();
@@ -2286,7 +2558,8 @@ impl Validator {
             });
         } else {
             for (i, (arg, expected)) in typed_args.iter().zip(params.iter()).enumerate() {
-                if !types_compatible(&arg.ty, expected) {
+                let actual = self.coerce_expr_to_target(arg, expected);
+                if !types_compatible(&actual, expected, &self.hir) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
                         context: format!("call to {} arg {}", callee_label, i),
@@ -2310,6 +2583,279 @@ impl Validator {
             }
         }
         ResolvedType::Null
+    }
+
+    /// Pick the actual type for `expr` when used in a position that expects
+    /// `target`. Handles:
+    /// - integer/float literal coercion to a smaller numeric type
+    /// - `[a, b]` literal coercion when the target is `List<X>` and every
+    ///   element can coerce to `X`
+    /// - `{k: v}` literal coercion when the target is `Map<K, V>`
+    /// Falls through to `expr.ty` when nothing applies.
+    fn coerce_expr_to_target(
+        &self,
+        expr: &TypedExpr,
+        target: &ResolvedType,
+    ) -> ResolvedType {
+        // Numeric literal coercion (incl. through a unary minus).
+        let inner_lit = match &expr.kind {
+            ExprKind::Literal(lit) => Some(lit),
+            ExprKind::UnaryOp(_, inner) => match &inner.kind {
+                ExprKind::Literal(lit) => Some(lit),
+                _ => None,
+            },
+            _ => None,
+        };
+        if let Some(lit) = inner_lit {
+            match (lit, target) {
+                (HirLiteral::Int(_), ResolvedType::Primitive(p)) if is_integer_primitive(p) => {
+                    return ResolvedType::Primitive(p.clone());
+                }
+                (HirLiteral::Float(_), ResolvedType::Primitive(p)) if is_float_primitive(p) => {
+                    return ResolvedType::Primitive(p.clone());
+                }
+                _ => {}
+            }
+        }
+
+        // List literal → List<X>
+        if let (ExprKind::LiteralList(elems), ResolvedType::Struct(tid, targs)) =
+            (&expr.kind, target)
+        {
+            if Some(*tid) == self.core_list_id && targs.len() == 1 {
+                let elem_target = &targs[0];
+                let all_ok = elems.iter().all(|e| {
+                    let coerced = self.coerce_expr_to_target(e, elem_target);
+                    types_compatible(&coerced, elem_target, &self.hir)
+                });
+                if all_ok {
+                    return target.clone();
+                }
+            }
+        }
+
+        // Map literal → Map<K, V>
+        if let (ExprKind::LiteralMap(entries), ResolvedType::Struct(tid, targs)) =
+            (&expr.kind, target)
+        {
+            if Some(*tid) == self.core_map_id && targs.len() == 2 {
+                let (k_target, v_target) = (&targs[0], &targs[1]);
+                let all_ok = entries.iter().all(|(k, v)| {
+                    let kc = self.coerce_expr_to_target(k, k_target);
+                    let vc = self.coerce_expr_to_target(v, v_target);
+                    types_compatible(&kc, k_target, &self.hir)
+                        && types_compatible(&vc, v_target, &self.hir)
+                });
+                if all_ok {
+                    return target.clone();
+                }
+            }
+        }
+
+        expr.ty.clone()
+    }
+
+    /// Element type produced by `for x in <iter>`. Handles `List<T>` (yields
+    /// `T`), `Map<K, V>` (yields `Entry<K, V>`), and anything that
+    /// implements `Iterator<T>` (yields `T`). Anything else falls back to
+    /// `Null`.
+    fn iter_element_type(&self, ty: &ResolvedType) -> ResolvedType {
+        match ty {
+            ResolvedType::Struct(id, args) => {
+                if Some(*id) == self.core_list_id && args.len() == 1 {
+                    return args[0].clone();
+                }
+                if Some(*id) == self.core_map_id && args.len() == 2 {
+                    if let Some(entry_id) = self.core_entry_id {
+                        return ResolvedType::Struct(entry_id, args.clone());
+                    }
+                }
+                if let Some(iter_args) = self.iterator_args_for_struct(*id, args) {
+                    if iter_args.len() == 1 {
+                        return iter_args[0].clone();
+                    }
+                }
+            }
+            ResolvedType::Interface(id, args) => {
+                if Some(*id) == self.core_iterator_id && args.len() == 1 {
+                    return args[0].clone();
+                }
+            }
+            _ => {}
+        }
+        ResolvedType::Null
+    }
+
+    /// If `struct_id<args>` (transitively) implements `Iterator<T>`, return
+    /// the `[T]` arg list (with the struct's type params substituted).
+    fn iterator_args_for_struct(
+        &self,
+        struct_id: TypeId,
+        args: &[ResolvedType],
+    ) -> Option<Vec<ResolvedType>> {
+        let iter_id = self.core_iterator_id?;
+        let s = self.hir.structs.get(&struct_id)?;
+        let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+        for (tp, arg) in s.type_params.iter().zip(args.iter()) {
+            subst.insert(*tp, arg.clone());
+        }
+        let mut stack: Vec<(TypeId, Vec<ResolvedType>)> = s.implements.clone();
+        let mut visited: HashSet<TypeId> = HashSet::new();
+        while let Some((id, ifargs)) = stack.pop() {
+            if !visited.insert(id) {
+                continue;
+            }
+            let resolved: Vec<ResolvedType> =
+                ifargs.iter().map(|a| substitute(a, &subst)).collect();
+            if id == iter_id {
+                return Some(resolved);
+            }
+            if let Some(parent) = self.hir.interfaces.get(&id) {
+                let mut next: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+                for (tp, arg) in parent.type_params.iter().zip(resolved.iter()) {
+                    next.insert(*tp, arg.clone());
+                }
+                for (pid, pargs) in &parent.extends {
+                    let substituted: Vec<ResolvedType> =
+                        pargs.iter().map(|a| substitute(a, &next)).collect();
+                    stack.push((*pid, substituted));
+                }
+            }
+        }
+        None
+    }
+
+    /// Resolve a primitive-receiver method (currently only string). Returns
+    /// the method's parameter types and return type, with `T | null` etc.
+    /// already concretized.
+    fn primitive_method(
+        &self,
+        ty: &ResolvedType,
+        name: &str,
+    ) -> Option<(Vec<ResolvedType>, ResolvedType)> {
+        match ty {
+            ResolvedType::Primitive(PrimitiveType::String) => {
+                if name == "split" {
+                    let list_ty = self.core_list_id.map(|id| {
+                        ResolvedType::Struct(
+                            id,
+                            vec![ResolvedType::Primitive(PrimitiveType::String)],
+                        )
+                    })?;
+                    return Some((
+                        vec![ResolvedType::Primitive(PrimitiveType::String)],
+                        list_ty,
+                    ));
+                }
+                string_method_signature(name)
+            }
+            _ => None,
+        }
+    }
+
+    /// Resolve `TypeName.method<args>(values)` against a struct's static
+    /// methods (methods declared without `self`). Returns the typed call
+    /// expression on success; `None` if the struct has no static method
+    /// with that name (the caller falls back to the generic Member path,
+    /// which will report a useful error).
+    fn try_static_method_call(
+        &mut self,
+        type_id: TypeId,
+        method_name: &str,
+        type_args: &[ResolvedType],
+        value_args: &[TypedExpr],
+        fn_label: &str,
+    ) -> Option<TypedExpr> {
+        let s = self.hir.structs.get(&type_id)?.clone();
+        let mut found: Option<(FnId, Vec<ResolvedType>)> = None;
+        for fn_id in &s.methods {
+            let f = self.hir.functions.get(fn_id)?;
+            if f.name == method_name && !f.has_self {
+                found = Some((*fn_id, Vec::new()));
+                break;
+            }
+        }
+        if found.is_none() {
+            for (target_args, fn_id) in &s.specialised_methods {
+                let f = self.hir.functions.get(fn_id)?;
+                if f.name != method_name || f.has_self {
+                    continue;
+                }
+                if universal_extend_mapping(target_args, &s.type_params).is_some() {
+                    found = Some((*fn_id, Vec::new()));
+                    break;
+                }
+            }
+        }
+        let (fn_id, _) = found?;
+        let func = self.hir.functions.get(&fn_id)?.clone();
+
+        // Type args bind to the STRUCT's type params (so the body sees the
+        // same `T` it would see on an instance method).
+        let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+        if !type_args.is_empty() {
+            if type_args.len() != s.type_params.len() {
+                self.errors.push(ValidationError::CallArityMismatch {
+                    function: fn_label.to_string(),
+                    callee: format!("{}.{} (type args)", s.name, method_name),
+                    expected: s.type_params.len(),
+                    actual: type_args.len(),
+                });
+            } else {
+                for (tp, arg) in s.type_params.iter().zip(type_args.iter()) {
+                    subst.insert(*tp, arg.clone());
+                }
+            }
+        }
+
+        let params: Vec<ResolvedType> = func
+            .params
+            .iter()
+            .map(|p| substitute(&p.ty, &subst))
+            .collect();
+        let ret = substitute(&func.return_type, &subst);
+
+        let callee_label = format!("{}.{}", s.name, method_name);
+        if value_args.len() != params.len() {
+            self.errors.push(ValidationError::CallArityMismatch {
+                function: fn_label.to_string(),
+                callee: callee_label.clone(),
+                expected: params.len(),
+                actual: value_args.len(),
+            });
+        } else {
+            for (i, (arg, expected)) in value_args.iter().zip(params.iter()).enumerate() {
+                let actual = self.coerce_expr_to_target(arg, expected);
+                if !types_compatible(&actual, expected, &self.hir) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: format!("call to {} arg {}", callee_label, i),
+                        expected: format_type(expected),
+                        actual: format_type(&arg.ty),
+                    });
+                }
+            }
+        }
+
+        // The HIR keeps the call shape `Call(Member(<recv>, name), …)` —
+        // synthesize a placeholder receiver so codegen can still detect the
+        // static path by inspecting the type-of-receiver.
+        let recv = TypedExpr {
+            kind: ExprKind::Variable(s.name.clone()),
+            ty: ResolvedType::Null,
+        };
+        let callee_typed = TypedExpr {
+            kind: ExprKind::Member(Box::new(recv), method_name.to_string()),
+            ty: ResolvedType::Function(params, Box::new(ret.clone())),
+        };
+        Some(TypedExpr {
+            kind: ExprKind::Call(
+                Box::new(callee_typed),
+                type_args.to_vec(),
+                value_args.to_vec(),
+            ),
+            ty: ret,
+        })
     }
 
     /// Locate a method `name` on a value of type `ty` for call-site dispatch.
@@ -2346,6 +2892,11 @@ impl Validator {
                         combined.insert(k, substitute(&v, &subst));
                     }
                     return Some((*fn_id, combined));
+                }
+                // Concrete specialisation — applies only when the receiver's
+                // type args exactly match this extend's target args.
+                if target_args == &owner_args {
+                    return Some((*fn_id, HashMap::new()));
                 }
             }
         } else if let Some(i) = self.hir.interfaces.get(&owner_id) {
@@ -2447,7 +2998,12 @@ impl Validator {
             match struct_def.fields.iter().find(|f| &f.name == fname) {
                 Some(field) => {
                     let expected = substitute(&field.ty, &subst);
-                    if !types_compatible(&typed.ty, &expected) {
+                    let actual = self.coerce_expr_to_target(&typed, &expected);
+                    let null_ok_for_pointer =
+                        field.is_pointer && actual == ResolvedType::Null;
+                    if !null_ok_for_pointer
+                        && !types_compatible(&actual, &expected, &self.hir)
+                    {
                         self.errors.push(ValidationError::TypeMismatch {
                             function: fn_label.to_string(),
                             context: format!("field {}", fname),
@@ -2534,6 +3090,15 @@ impl Validator {
             }
         }
 
+        // Primitive (string) methods first — they're synthesized, not real
+        // FnIds in the HIR.
+        if let Some((params, ret)) = self.primitive_method(&recv_ty, name) {
+            return TypedExpr {
+                kind: ExprKind::Member(Box::new(typed_recv), name.to_string()),
+                ty: ResolvedType::Function(params, Box::new(ret)),
+            };
+        }
+
         // Methods: produce a Function type (with implicit self bound).
         if let Some((fn_id, subst)) = self.find_method_for_call(&recv_ty, name) {
             let func = self.hir.functions[&fn_id].clone();
@@ -2609,6 +3174,11 @@ impl Validator {
             ast::BinaryOperator::Ge => (HirBinOp::Ge, bool_ty.clone()),
         };
 
+        let string_ty = ResolvedType::Primitive(PrimitiveType::String);
+        let is_string_concat = matches!(op, ast::BinaryOperator::Add)
+            && lt.ty == string_ty
+            && rt.ty == string_ty;
+
         let needs_numeric = matches!(
             op,
             ast::BinaryOperator::Add
@@ -2620,7 +3190,7 @@ impl Validator {
                 | ast::BinaryOperator::Le
                 | ast::BinaryOperator::Gt
                 | ast::BinaryOperator::Ge
-        );
+        ) && !is_string_concat;
         let needs_bool = matches!(op, ast::BinaryOperator::And | ast::BinaryOperator::Or);
 
         if needs_numeric && !is_numeric(&lt.ty) {
@@ -2637,7 +3207,9 @@ impl Validator {
                 operand_ty: format_type(&lt.ty),
             });
         }
-        if lt.ty != rt.ty {
+        let rt_coerced = self.coerce_expr_to_target(&rt, &lt.ty);
+        let lt_coerced = self.coerce_expr_to_target(&lt, &rt.ty);
+        if rt_coerced != lt.ty && rt.ty != lt_coerced {
             self.errors.push(ValidationError::TypeMismatch {
                 function: fn_label.to_string(),
                 context: format!("binary {:?}", op),
@@ -3105,6 +3677,19 @@ impl Validator {
                 source,
                 name: alias_name,
             } => {
+                if self
+                    .alias_expansion_stack
+                    .iter()
+                    .any(|(m, n)| *m == source && n == &alias_name)
+                {
+                    let module_name = self.hir.modules[&source].name.clone();
+                    self.errors.push(ValidationError::RecursiveTypeAlias {
+                        module: module_name,
+                        name: alias_name.clone(),
+                    });
+                    return ResolvedType::Null;
+                }
+
                 let alias_decl = self
                     .module_aliases
                     .get(&source)
@@ -3141,7 +3726,10 @@ impl Validator {
                     local_subst,
                     allow_pointer: false,
                 };
-                self.resolve_type_expr(&alias_decl.ty, &alias_ctx)
+                self.alias_expansion_stack.push((source, alias_name.clone()));
+                let result = self.resolve_type_expr(&alias_decl.ty, &alias_ctx);
+                self.alias_expansion_stack.pop();
+                result
             }
         }
     }
@@ -3220,22 +3808,108 @@ fn is_managed_ref_type(ty: &ResolvedType, hir: &Hir) -> bool {
     }
 }
 
-// FOREIGN STRUCT RULE: when struct→interface coercion gets added here
-// (right now this function is the bare-bones version and doesn't even
-// handle that case), only managed structs may coerce. Extern structs
-// don't have the offset-(-1) type-id header that virtual dispatch needs,
-// so passing an extern value through an interface slot would break at
-// the first method call.
-fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
+// FOREIGN STRUCT RULE: only managed structs may coerce to interfaces.
+// Extern structs don't have the offset-(-1) type-id header that virtual
+// dispatch needs, so passing an extern value through an interface slot
+// would break at the first method call.
+fn types_compatible(actual: &ResolvedType, expected: &ResolvedType, hir: &Hir) -> bool {
     if actual == expected {
         return true;
     }
     if let ResolvedType::Union(types) = expected {
-        if types.iter().any(|t| t == actual) {
+        if types.iter().any(|t| types_compatible(actual, t, hir)) {
+            return true;
+        }
+    }
+    if let (ResolvedType::Struct(struct_id, struct_args), ResolvedType::Interface(iface_id, iface_args)) =
+        (actual, expected)
+    {
+        if let Some(s) = hir.structs.get(struct_id) {
+            if s.is_extern {
+                return false;
+            }
+            // direct or transitive implementation
+            let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+            for (tp, arg) in s.type_params.iter().zip(struct_args.iter()) {
+                subst.insert(*tp, arg.clone());
+            }
+            for (impl_id, impl_args) in &s.implements {
+                if struct_implements_interface(*impl_id, impl_args, &subst, *iface_id, iface_args, hir) {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+/// Returns true if interface `impl_id<impl_args>` (with substitutions
+/// applied) is the same as `target_id<target_args>`, walking up `extends`.
+fn struct_implements_interface(
+    impl_id: TypeId,
+    impl_args: &[ResolvedType],
+    subst: &HashMap<TypeParamId, ResolvedType>,
+    target_id: TypeId,
+    target_args: &[ResolvedType],
+    hir: &Hir,
+) -> bool {
+    let substituted_args: Vec<ResolvedType> =
+        impl_args.iter().map(|a| substitute(a, subst)).collect();
+    if impl_id == target_id && substituted_args == target_args {
+        return true;
+    }
+    let Some(iface) = hir.interfaces.get(&impl_id) else {
+        return false;
+    };
+    let mut next_subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+    for (tp, arg) in iface.type_params.iter().zip(substituted_args.iter()) {
+        next_subst.insert(*tp, arg.clone());
+    }
+    for (parent_id, parent_args) in &iface.extends {
+        if struct_implements_interface(
+            *parent_id,
+            parent_args,
+            &next_subst,
+            target_id,
+            target_args,
+            hir,
+        ) {
             return true;
         }
     }
     false
+}
+
+fn is_integer_primitive(p: &PrimitiveType) -> bool {
+    matches!(
+        p,
+        PrimitiveType::Int8
+            | PrimitiveType::Int16
+            | PrimitiveType::Int32
+            | PrimitiveType::Int64
+            | PrimitiveType::Uint8
+            | PrimitiveType::Uint16
+            | PrimitiveType::Uint32
+            | PrimitiveType::Uint64
+    )
+}
+
+fn is_float_primitive(p: &PrimitiveType) -> bool {
+    matches!(p, PrimitiveType::Float32 | PrimitiveType::Float64)
+}
+
+fn unify_element_types<'a, I: Iterator<Item = &'a ResolvedType>>(types: I) -> ResolvedType {
+    let mut unique: Vec<ResolvedType> = Vec::new();
+    for ty in types {
+        if !unique.iter().any(|t| t == ty) {
+            unique.push(ty.clone());
+        }
+    }
+    match unique.len() {
+        0 => ResolvedType::Null,
+        1 => unique.into_iter().next().unwrap(),
+        _ => ResolvedType::Union(unique),
+    }
 }
 
 fn is_numeric(ty: &ResolvedType) -> bool {
@@ -3393,7 +4067,60 @@ mod tests {
     // ---- AST construction helpers ----
 
     fn run(modules: Vec<Module>) -> Result<Hir, Vec<ValidationError>> {
-        Validator::new(modules).validate()
+        // Tests assert on user-visible HIR contents only — strip the
+        // auto-injected `of:core` module so the existing assertions keep
+        // working as if no prelude existed.
+        Validator::new(modules).validate().map(strip_core)
+    }
+
+    fn strip_core(mut hir: Hir) -> Hir {
+        let core_id = hir
+            .modules
+            .iter()
+            .find(|(_, m)| m.name == CORE_MODULE_NAME)
+            .map(|(id, _)| *id);
+        let Some(core_id) = core_id else {
+            return hir;
+        };
+        // Rip core's structs, interfaces, and functions out so other tests
+        // don't trip on them.
+        let core_struct_ids: HashSet<TypeId> =
+            hir.modules[&core_id].structs.iter().copied().collect();
+        let core_iface_ids: HashSet<TypeId> =
+            hir.modules[&core_id].interfaces.iter().copied().collect();
+        for id in &core_struct_ids {
+            hir.structs.remove(id);
+        }
+        for id in &core_iface_ids {
+            hir.interfaces.remove(id);
+        }
+        // Drop every function owned by a core type or living in the core
+        // module (struct methods aren't tracked on `module.functions`).
+        let drop_fn_ids: Vec<FnId> = hir
+            .functions
+            .iter()
+            .filter(|(_, f)| {
+                f.module == core_id
+                    || f.owner
+                        .map(|o| core_struct_ids.contains(&o) || core_iface_ids.contains(&o))
+                        .unwrap_or(false)
+            })
+            .map(|(id, _)| *id)
+            .collect();
+        for id in drop_fn_ids {
+            hir.functions.remove(&id);
+        }
+        hir.modules.remove(&core_id);
+        // Drop the auto-imported named symbols from `of:core` in every
+        // other module so existing tests that count `imports` see empty
+        // lists.
+        for module in hir.modules.values_mut() {
+            module.imports.retain(|imp| match imp {
+                HirImport::Named(src, _) => *src != core_id,
+                HirImport::Glob(id) => *id != core_id,
+            });
+        }
+        hir
     }
 
     fn err_any<F: Fn(&ValidationError) -> bool>(errs: &[ValidationError], pred: F) -> bool {

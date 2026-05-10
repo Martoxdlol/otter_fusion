@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function apply<T>(value: T, f: (T) -> T): T {
   f(value)
 }

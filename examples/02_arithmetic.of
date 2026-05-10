@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function describe(a: i64, b: i64): str {
   var sum = a + b;
   var diff = a - b;

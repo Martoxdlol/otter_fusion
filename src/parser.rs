@@ -3,8 +3,9 @@ use std::fmt;
 use crate::{
     ast::{
         BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
-        GenericParam, InterfaceDecl, Item, ItemKind, Literal, ParamDecl, PrimitiveType, Program,
-        Statement, StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
+        GenericParam, ImportDecl, ImportSymbol, ImportSymbols, InterfaceDecl, Item, ItemKind,
+        Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl,
+        TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -67,6 +68,10 @@ impl Parser {
     pub fn parse_item(&mut self) -> Result<Item, ParserError> {
         let span = self.peek().span();
         match self.peek().token_type.clone() {
+            TokenType::Import => Ok(Item {
+                kind: ItemKind::Import(self.parse_import_decl()?),
+                span,
+            }),
             TokenType::Type => self.parse_type_decl(),
             TokenType::Struct => Ok(Item {
                 kind: ItemKind::Struct(self.parse_struct_decl(false)?),
@@ -95,6 +100,59 @@ impl Parser {
             }
             _ => Err(self.unexpected_token_peek()),
         }
+    }
+
+    /// Parses one of:
+    ///   - `import "module";`                    (glob)
+    ///   - `import { Foo, bar } from "module";`  (named, with optional aliases)
+    ///   - `import { Foo as Bar } from "module";`
+    pub fn parse_import_decl(&mut self) -> Result<ImportDecl, ParserError> {
+        self.expect(TokenType::Import)?;
+
+        // Glob form: `import "<module>";`
+        if let TokenType::StringLit(name) = self.peek().token_type.clone() {
+            self.advance();
+            self.expect_end_of_statement()?;
+            return Ok(ImportDecl {
+                module: name,
+                symbols: ImportSymbols::Glob,
+            });
+        }
+
+        // Named form: `import { a, b as c } from "<module>";`
+        self.expect(TokenType::LeftBrace)?;
+        let mut symbols: Vec<ImportSymbol> = Vec::new();
+        if self.peek().token_type != TokenType::RightBrace {
+            loop {
+                let name = self.expect_identifier()?;
+                let alias = if self.expect_optional(TokenType::As) {
+                    Some(self.expect_identifier()?)
+                } else {
+                    None
+                };
+                symbols.push(ImportSymbol { name, alias });
+                if !self.expect_optional(TokenType::Comma) {
+                    break;
+                }
+                if self.peek().token_type == TokenType::RightBrace {
+                    break;
+                }
+            }
+        }
+        self.expect(TokenType::RightBrace)?;
+        self.expect(TokenType::From)?;
+        let module = match self.peek().token_type.clone() {
+            TokenType::StringLit(s) => {
+                self.advance();
+                s
+            }
+            _ => return Err(self.unexpected_token_peek()),
+        };
+        self.expect_end_of_statement()?;
+        Ok(ImportDecl {
+            module,
+            symbols: ImportSymbols::Named(symbols),
+        })
     }
 
     // Items
@@ -314,16 +372,17 @@ impl Parser {
     }
 
     fn parse_optional_has_self_param(&mut self) -> Result<bool, ParserError> {
-        if self.expect_optional(TokenType::SelfRef) {
-            // expect comma or )
-            if self.peek().token_type != TokenType::Comma
-                && self.peek().token_type != TokenType::RightParen
-            {
-                return Err(self.unexpected_token_peek());
-            }
+        if !self.expect_optional(TokenType::SelfRef) {
+            return Ok(false);
         }
-
-        Ok(false)
+        match self.peek().token_type {
+            TokenType::Comma => {
+                self.advance();
+                Ok(true)
+            }
+            TokenType::RightParen => Ok(true),
+            _ => Err(self.unexpected_token_peek()),
+        }
     }
 
     fn parse_type_atom(&mut self) -> Result<TypeExpr, ParserError> {
@@ -1236,6 +1295,7 @@ impl Parser {
             "char" => Some(PrimitiveType::Char),
             "bool" => Some(PrimitiveType::Bool),
             "null" => Some(PrimitiveType::Null),
+            "void" => Some(PrimitiveType::Null),
             _ => return None,
         };
     }

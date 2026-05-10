@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 struct Person {
   name: str
   age: i32
