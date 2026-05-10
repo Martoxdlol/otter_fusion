@@ -2,6 +2,31 @@ use std::collections::HashMap;
 
 use crate::hir::PrimitiveType;
 
+// 64-bit target. Sizes and aligns in bytes.
+// Fields go in declaration order with natural alignment, no reordering.
+// Extern structs follow the same rules but carry no GC header.
+
+pub const POINTER_SIZE: u32 = 8;
+pub const POINTER_ALIGN: u32 = 8;
+
+// GC header sits at obj_ptr - 16: [gc_meta:8 | type_id:8].
+// Object pointer points at field 0; type id at obj_ptr - 8.
+pub const GC_HEADER_SIZE: u32 = 16;
+
+// Tagged union: { tag:u16, _pad:6, payload:8 }, total 16, align 8.
+// Payload holds a pointer or any <=8-byte primitive directly.
+// Tags assigned in lexicographic order of the variants' stringified
+// ResolvedType, so `A | B` and `B | A` agree.
+// `T | null` where T is a managed ref skips this and lowers to
+// NullableRef instead (null = pointer 0).
+pub const UNION_TAG_SIZE: u32 = 2;
+pub const UNION_PAYLOAD_SIZE: u32 = 8;
+pub const UNION_TOTAL_SIZE: u32 = 16;
+pub const UNION_ALIGN: u32 = 8;
+
+// Reserved for the `null` variant when present in a tagged union.
+pub const NULL_TAG: u16 = 0;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MirTypeId(pub u32);
 
