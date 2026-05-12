@@ -10,7 +10,9 @@ pub mod subst;
 pub mod unions;
 pub mod vtables;
 
-use crate::hir::{FnId, Hir, ResolvedType, TypeId, TypeParamId};
+use crate::ast::PrimitiveType;
+use crate::hir::{FnId, Hir, PrimitiveType, ResolvedType, TypeId, TypeParamId};
+use crate::lower::subst::Subst;
 use crate::mir::*;
 use std::collections::{HashMap, VecDeque};
 
@@ -97,8 +99,8 @@ impl Lower {
                     type_args,
                     mir_id,
                 } => {
-                    // let f = self.lower_function(fn_id, type_args, mir_id);
-                    //self.mir.functions.insert(mir_id, f);
+                    let f = self.lower_function(fn_id, type_args, mir_id);
+                    self.mir.functions.insert(mir_id, f);
                 }
                 MonoTask::VTable { .. } => {
                     // TODO: implement vtables
@@ -129,6 +131,68 @@ impl Lower {
         });
         mid
     }
+
+    pub fn lower_function(
+        &mut self,
+        fn_id: FnId,
+        type_args: Vec<ResolvedType>,
+        mir_id: MirFnId,
+    ) -> MirFunction {
+        let f = self.hir.functions[&fn_id].clone();
+
+        // f.type_params -> vec de params. Esos params pueden tener genéricos
+        // type_args -> vec de tipos concretos. No pueden tener genéricos.
+        let subst = Subst::new(f.type_params.clone(), type_args);
+
+        let ret_ty = self.lower_type(&f.return_type, &subst);
+    }
+
+    pub fn lower_type(&mut self, ty: &ResolvedType, subst: &Subst) -> MirType {
+        let ty = subst.apply(ty); // remove every TypeParam first
+        self.lower_concrete_type(&ty)
+    }
+
+    pub fn lower_concrete_type(&mut self, ty: &ResolvedType) -> MirType {
+        match ty {
+            ResolvedType::Primitive(p) => MirType::Primitive(*p),
+            ResolvedType::Primitive(p) => MirType::Primitive(p.clone()),
+
+            ResolvedType::Struct(hir_id, args) => {
+                let _is_extern = self.hir.structs[hir_id].is_extern;
+                let mid = self.get_or_create_struct(*hir_id, args.clone());
+                // TODO: Hacer algo con is_extern
+                MirType::ManagedRef(mid)
+            }
+
+            ResolvedType::Interface(hir_id, args) => {
+                let mid = self.get_or_create_interface(*hir_id, args.clone());
+                MirType::ManagedRef(mid) // dispatched virtually at call sites
+            }
+
+            ResolvedType::Union(variants) => {
+                // Phase 2 implements the T|null specialisation here;
+                // for now everything goes through the tagged path.
+                let mid = self.get_or_create_union(variants.clone());
+                MirType::Union(mid)
+            }
+
+            ResolvedType::Function(args, ret) => {
+                // Default: assume closure (managed). FFI lowering (Phase 4)
+                // overrides this to FnPtr at extern boundaries.
+                let mid = self.get_or_create_function_type(args, ret);
+                MirType::Closure(mid)
+            }
+
+            ResolvedType::Null => {
+                panic!("Null must be part of a union type");
+            }
+
+            ResolvedType::TypeParam(id) => {
+                panic!("non-concrete TypeParam({:?}) reached lowering", id);
+            }
+        }
+    }
+
     // utils
 
     // main named function (we don't actually have a way of knowing if it is the entrypoint module :/ )
