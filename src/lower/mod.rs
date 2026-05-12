@@ -11,7 +11,7 @@ pub mod unions;
 pub mod vtables;
 
 use crate::ast::PrimitiveType;
-use crate::hir::{FnId, Hir, ResolvedType, TypeId, TypeParamId};
+use crate::hir::{FnId, Hir, HirBlock, HirStatement, ResolvedType, TypeId, TypeParamId};
 use crate::lower::builder::FnBuilder;
 use crate::lower::layout::compute_struct_layout;
 use crate::lower::mangling::{name_function, name_struct};
@@ -213,6 +213,21 @@ impl Lower {
         }
 
         b.finish()
+    }
+
+    pub fn lower_block(
+        &mut self,
+        block: &HirBlock,
+        subst: &Subst,
+        b: &mut FnBuilder,
+    ) -> Option<Operand> {
+        b.push_scope();
+        for s in &block.statements {
+            self.lower_stmt(s, subst, b);
+        }
+        let trailing = block.returns.as_ref().map(|e| self.lower_expr(e, subst, b));
+        b.pop_scope();
+        trailing
     }
 
     pub fn lower_type(&mut self, ty: &ResolvedType, subst: &Subst) -> MirType {
