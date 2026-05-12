@@ -11,9 +11,10 @@ pub mod unions;
 pub mod vtables;
 
 use crate::ast::PrimitiveType;
-use crate::hir::{FnId, Hir, PrimitiveType, ResolvedType, TypeId, TypeParamId};
+use crate::hir::{FnId, Hir, ResolvedType, TypeId, TypeParamId};
+use crate::lower::builder::FnBuilder;
 use crate::lower::layout::compute_struct_layout;
-use crate::lower::mangling::name_struct;
+use crate::lower::mangling::{name_function, name_struct};
 use crate::lower::subst::Subst;
 use crate::mir::*;
 use std::collections::{HashMap, VecDeque};
@@ -147,6 +148,71 @@ impl Lower {
         let subst = Subst::new(f.type_params.clone(), type_args);
 
         let ret_ty = self.lower_type(&f.return_type, &subst);
+
+        let name = name_function(&self.hir, fn_id, &type_args);
+
+        let abi = Abi::Otter;
+
+        let mut b = FnBuilder::new(mir_id, name, abi, ret_ty);
+
+        // Definir y bindear parámetros
+        for p in &f.params {
+            let ty = self.lower_type(&p.ty, &subst);
+            let local = b.new_local(Some(p.name.clone()), ty);
+            b.params.push(local);
+            b.bind(p.name.clone(), local);
+        }
+
+        // handle self param
+        if f.has_self {
+            // Member of struct
+            let owner = f.owner.expect("has_self => owner present");
+            // Owner's concrete type args come from the method's enclosing
+            // monomorphization. For inherent methods the owner's type_params
+            // are a prefix of the function's type_params, so we recover
+            // them from `subst`.
+            let st = &self.hir.structs[&owner];
+            let owner_args: Vec<ResolvedType> = st
+                .type_params
+                .iter()
+                .map(|tp| {
+                    subst
+                        .mappings
+                        .get(tp)
+                        .cloned()
+                        .expect("specialized methods not implemented yet")
+                })
+                .collect();
+            let mir_struct = self.get_or_create_struct(owner, owner_args);
+            let self_ty = MirType::ManagedRef(mir_struct);
+            let local = b.new_local(Some("self".to_string()), self_ty);
+            // self is the first parameter, before any user-declared ones.
+            // We pushed user params already, so insert at index 0 and rebind.
+            b.params.insert(0, local);
+            b.bind("self".to_string(), local);
+        }
+
+        if let Some(body) = &(&f.body).clone() {
+            let trailing: Option<Operand> = self.lower_block(body, &subst, &mut b);
+            // implicit return of the trailing expression
+            let term = match trailing {
+                Some(op) => Terminator::Return(Some(op)),
+                None => Terminator::Return(None),
+            };
+            // Only terminate if current block isn't already terminated.
+            // (An early `return` inside the body would have set a terminator
+            // and switched to a fresh unreachable block.)
+            if matches!(
+                b.blocks[&b.current_block].terminator,
+                Terminator::Unreachable
+            ) {
+                b.terminate(term);
+            }
+        } else {
+            panic!("cannot handle bodyless/extern yet");
+        }
+
+        b.finish()
     }
 
     pub fn lower_type(&mut self, ty: &ResolvedType, subst: &Subst) -> MirType {
@@ -156,7 +222,7 @@ impl Lower {
 
     pub fn lower_concrete_type(&mut self, ty: &ResolvedType) -> MirType {
         match ty {
-            ResolvedType::Primitive(p) => MirType::Primitive(*p),
+            ResolvedType::Primitive(p) => MirType::Primitive(p.clone()),
             ResolvedType::Primitive(p) => MirType::Primitive(p.clone()),
 
             ResolvedType::Struct(hir_id, args) => {
@@ -167,22 +233,25 @@ impl Lower {
             }
 
             ResolvedType::Interface(hir_id, args) => {
-                let mid = self.get_or_create_interface(*hir_id, args.clone());
-                MirType::ManagedRef(mid) // dispatched virtually at call sites
+                todo!("interface lowering not implemented yet")
+                // let mid = self.get_or_create_interface(*hir_id, args.clone());
+                // MirType::ManagedRef(mid) // dispatched virtually at call sites
             }
 
             ResolvedType::Union(variants) => {
                 // Phase 2 implements the T|null specialisation here;
                 // for now everything goes through the tagged path.
-                let mid = self.get_or_create_union(variants.clone());
-                MirType::Union(mid)
+                // let mid = self.get_or_create_union(variants.clone());
+                // MirType::Union(mid)
+                todo!("union lowering not implemented yet")
             }
 
             ResolvedType::Function(args, ret) => {
                 // Default: assume closure (managed). FFI lowering (Phase 4)
                 // overrides this to FnPtr at extern boundaries.
-                let mid = self.get_or_create_function_type(args, ret);
-                MirType::Closure(mid)
+                // let mid = self.get_or_create_function_type(args, ret);
+                // MirType::Closure(mid)
+                todo!("function type lowering not implemented yet")
             }
 
             ResolvedType::Null => {

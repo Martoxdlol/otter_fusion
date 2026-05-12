@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// En este caso, el `T` dentro de la función `foo` se va a sustituir por `int` cuando monomorfizamos la llamada `foo<int>(42)`.
 #[derive(Debug, Clone)]
 pub struct Subst {
-    mappings: HashMap<TypeParamId, ResolvedType>,
+    pub mappings: HashMap<TypeParamId, ResolvedType>,
 }
 
 // Esto lo que hace es
