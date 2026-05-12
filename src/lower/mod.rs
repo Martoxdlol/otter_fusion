@@ -12,6 +12,8 @@ pub mod vtables;
 
 use crate::ast::PrimitiveType;
 use crate::hir::{FnId, Hir, PrimitiveType, ResolvedType, TypeId, TypeParamId};
+use crate::lower::layout::compute_struct_layout;
+use crate::lower::mangling::name_struct;
 use crate::lower::subst::Subst;
 use crate::mir::*;
 use std::collections::{HashMap, VecDeque};
@@ -190,6 +192,76 @@ impl Lower {
             ResolvedType::TypeParam(id) => {
                 panic!("non-concrete TypeParam({:?}) reached lowering", id);
             }
+        }
+    }
+
+    pub fn get_or_create_struct(&mut self, hir_id: TypeId, args: Vec<ResolvedType>) -> MirTypeId {
+        // struct cache key
+        let key = (hir_id, args);
+
+        // use cache if available
+        if let Some(&mid) = self.mono_types.get(&key) {
+            return mid;
+        }
+        // Allocate id
+        let mid = self.alloc_type_id();
+        self.mono_types.insert(key.clone(), mid);
+
+        // we do this because we may need to reference it before building it
+        self.mir.types.insert(
+            mid,
+            MirTypeDef::Struct {
+                name: String::new(),
+                fields: vec![],
+                layout: Layout { size: 0, align: 1 },
+                kind: StructKind::Managed,
+            },
+        ); // insert empty struct
+
+        let (hir_id, args) = key;
+        let def = self.build_struct_def(hir_id, &args);
+        self.mir.types.insert(mid, def);
+        mid
+    }
+
+    pub fn build_struct_def(&mut self, hir_id: TypeId, args: &[ResolvedType]) -> MirTypeDef {
+        let s = self.hir.structs[&hir_id].clone();
+        let subst = Subst::new(s.type_params.clone(), args.to_vec());
+
+        let field_types: Vec<MirType> = s
+            .fields
+            .iter()
+            .map(|f| self.lower_type(&f.ty, &subst))
+            .collect();
+
+        let (offsets, layout) = compute_struct_layout(&self.mir, &field_types);
+
+        let fields: Vec<MirField> = s
+            .fields
+            .iter()
+            .zip(field_types)
+            .zip(offsets)
+            .map(|((hf, ty), offset)| MirField {
+                name: hf.name.clone(),
+                ty,
+                offset,
+            })
+            .collect();
+
+        let kind = if s.is_extern {
+            StructKind::Extern
+        } else {
+            StructKind::Managed
+        };
+
+        // module + name + (args)
+        let name = name_struct(&self.hir, &s, args);
+
+        MirTypeDef::Struct {
+            name,
+            fields,
+            layout,
+            kind,
         }
     }
 

@@ -120,6 +120,7 @@ impl MirTypeDef {
 pub struct MirField {
     pub name: String,
     pub ty: MirType,
+    pub offset: u32,
 }
 
 /// Union variant
