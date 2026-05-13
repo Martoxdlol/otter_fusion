@@ -300,11 +300,7 @@ impl Lower {
                 todo!("function type lowering not implemented yet")
             }
 
-            ResolvedType::Null => {
-                // Validator uses `Null` for void function returns. A real
-                // Unit type would be cleaner; until then, Bool stands in.
-                MirType::Primitive(PrimitiveType::Bool)
-            }
+            ResolvedType::Null => MirType::Unit,
 
             ResolvedType::TypeParam(id) => {
                 panic!("non-concrete TypeParam({:?}) reached lowering", id);

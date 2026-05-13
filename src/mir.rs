@@ -148,6 +148,8 @@ pub struct Layout {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MirType {
+    /// Zero-sized. Function returns with no value, expressions that produce nothing.
+    Unit,
     /// Numbers, chars, bools
     Primitive(PrimitiveType),
     /// GC-managed reference: structs, lists, maps, strings, closures.

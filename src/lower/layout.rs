@@ -21,6 +21,7 @@ pub fn primitive_size_align(p: &PrimitiveType) -> (u32, u32) {
 // en el MirTypeDef, así que lo leemos directo de ahí.
 pub fn type_size_align(prog: &MirProgram, ty: &MirType) -> (u32, u32) {
     match ty {
+        MirType::Unit => (0, 1),
         MirType::Primitive(p) => primitive_size_align(p),
         MirType::ManagedRef(_) => (POINTER_SIZE, POINTER_ALIGN),
         MirType::Pointer(_) => (POINTER_SIZE, POINTER_ALIGN),
