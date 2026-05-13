@@ -145,7 +145,7 @@ impl Lower {
 
         // f.type_params -> vec de params. Esos params pueden tener genéricos
         // type_args -> vec de tipos concretos. No pueden tener genéricos.
-        let subst = Subst::new(f.type_params.clone(), type_args);
+        let subst = Subst::new(f.type_params.clone(), type_args.clone());
 
         let ret_ty = self.lower_type(&f.return_type, &subst);
 
