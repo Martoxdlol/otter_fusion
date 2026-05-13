@@ -1,15 +1,15 @@
 use std::collections::HashMap;
 
 use cranelift_codegen::{
-    ir::{self, AbiParam, Signature, Type, types},
+    ir::{self, AbiParam, Block, Signature, Type, types},
     isa::CallConv,
 };
-use cranelift_frontend::FunctionBuilderContext;
+use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
 use cranelift_module::{Linkage, Module, ModuleError};
 
 use crate::{
     hir::PrimitiveType,
-    mir::{self, Abi, MirProgram, MirType},
+    mir::{self, Abi, BlockId, LocalId, MirProgram, MirType},
 };
 
 pub struct Codegen<M: Module> {
@@ -46,7 +46,7 @@ impl<M: Module> Codegen<M> {
             } // import only
 
             ctx.func.signature = self.build_signature(f);
-            self.lower_function(&mut ctx.func, &mut builder_ctx, f)?;
+            self.lower_function(&mut ctx.func, &mut builder_ctx, function_ids, f)?;
             self.module.define_function(function_ids[id], &mut ctx)?;
             self.module.clear_context(&mut ctx);
         }
@@ -75,9 +75,57 @@ impl<M: Module> Codegen<M> {
         &self,
         func: &mut ir::Function,
         builder_ctx: &mut FunctionBuilderContext,
+        function_ids: &HashMap<mir::MirFnId, cranelift_module::FuncId>,
         mir_func: &mir::MirFunction,
     ) -> Result<(), ModuleError> {
+        let mut b = FunctionBuilder::new(func, builder_ctx);
+
+        let mut blocks: HashMap<BlockId, Block> = HashMap::new();
+        for &bid in mir_func.blocks.keys() {
+            blocks.insert(bid, b.create_block());
+        }
+
+        let entry = blocks[&mir_func.entry];
+
+        b.append_block_params_for_function_params(entry);
+        b.switch_to_block(entry);
+
+        let mut vars: HashMap<LocalId, Variable> = HashMap::new();
+        for (lid, loc) in &mir_func.locals {
+            let v = Variable::from_u32(lid.0);
+            b.declare_var(v, Codegen::<M>::clif_type(&loc.ty));
+            vars.insert(*lid, v);
+        }
+
+        let entry_args = b.block_params(entry).to_vec();
+        for (param_lid, val) in mir_func.params.iter().zip(entry_args) {
+            b.def_var(vars[param_lid], val);
+        }
+
+        for (bid, blk) in &mir_func.blocks {
+            let cb = blocks[bid];
+            b.switch_to_block(cb);
+            for stmt in &blk.stmts {
+                self.lower_stmt(&mut b, function_ids, &vars, &blocks, mir_func, stmt);
+            }
+            self.lower_terminator(&mut b, &vars, &blocks, &blk.terminator);
+        }
+
+        b.seal_all_blocks();
+        b.finalize();
+
         todo!()
+    }
+
+    fn lower_stmt(
+        &mut self,
+        b: &mut FunctionBuilder,
+        func_ids: &HashMap<mir::MirFnId, cranelift_module::FuncId>,
+        vars: &HashMap<LocalId, Variable>,
+        blocks: &HashMap<BlockId, Block>,
+        mir_func: &mir::MirFunction,
+        stmt: &mir::Stmt,
+    ) {
     }
 
     pub fn clif_type(t: &MirType) -> Type {
