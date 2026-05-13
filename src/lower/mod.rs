@@ -10,8 +10,7 @@ pub mod subst;
 pub mod unions;
 pub mod vtables;
 
-use crate::ast::PrimitiveType;
-use crate::hir::{FnId, Hir, HirBlock, HirStatement, ResolvedType, TypeId, TypeParamId};
+use crate::hir::{FnId, Hir, HirBlock, HirStatement, PrimitiveType, ResolvedType, TypeId, TypeParamId};
 use crate::lower::builder::FnBuilder;
 use crate::lower::layout::compute_struct_layout;
 use crate::lower::mangling::{name_function, name_struct};
@@ -143,6 +142,16 @@ impl Lower {
     ) -> MirFunction {
         let f = self.hir.functions[&fn_id].clone();
 
+        // extern functions: imports (empty body) become forward-declared
+        // stubs; exports (with body) are Phase 4 — panic for now to surface
+        // them if they appear.
+        if f.is_extern {
+            if f.body.as_ref().map(|b| b.statements.is_empty() && b.returns.is_none()).unwrap_or(true) {
+                return self.lower_extern_import(fn_id, type_args, mir_id);
+            }
+            panic!("extern function with body (exported callback) — Phase 4");
+        }
+
         // f.type_params -> vec de params. Esos params pueden tener genéricos
         // type_args -> vec de tipos concretos. No pueden tener genéricos.
         let subst = Subst::new(f.type_params.clone(), type_args.clone());
@@ -192,27 +201,49 @@ impl Lower {
             b.bind("self".to_string(), local);
         }
 
-        if let Some(body) = &(&f.body).clone() {
-            let trailing: Option<Operand> = self.lower_block(body, &subst, &mut b);
-            // implicit return of the trailing expression
-            let term = match trailing {
-                Some(op) => Terminator::Return(Some(op)),
-                None => Terminator::Return(None),
-            };
-            // Only terminate if current block isn't already terminated.
-            // (An early `return` inside the body would have set a terminator
-            // and switched to a fresh unreachable block.)
-            if matches!(
-                b.blocks[&b.current_block].terminator,
-                Terminator::Unreachable
-            ) {
-                b.terminate(term);
-            }
-        } else {
-            panic!("cannot handle bodyless/extern yet");
+        let body = f.body.as_ref().expect("body-having function (extern handled above)");
+        let trailing: Option<Operand> = self.lower_block(body, &subst, &mut b);
+        // implicit return of the trailing expression
+        let term = match trailing {
+            Some(op) => Terminator::Return(Some(op)),
+            None => Terminator::Return(None),
+        };
+        // Only terminate if current block isn't already terminated.
+        // (An early `return` inside the body would have set a terminator
+        // and switched to a fresh unreachable block.)
+        if matches!(
+            b.blocks[&b.current_block].terminator,
+            Terminator::Unreachable
+        ) {
+            b.terminate(term);
         }
 
         b.finish()
+    }
+
+    /// Body-less function = extern import. Lowers to an `Abi::Extern`
+    /// MirFunction with declared params, lowered return type, and no blocks
+    /// — codegen treats this as a forward declaration of the C symbol.
+    /// The name stays unmangled so the linker matches the C side.
+    fn lower_extern_import(
+        &mut self,
+        fn_id: FnId,
+        type_args: Vec<ResolvedType>,
+        mir_id: MirFnId,
+    ) -> MirFunction {
+        let f = self.hir.functions[&fn_id].clone();
+        let subst = Subst::new(f.type_params.clone(), type_args);
+        let ret_ty = self.lower_type(&f.return_type, &subst);
+        let name = f.name.clone();
+        let mut b = FnBuilder::new(mir_id, name, Abi::Extern, ret_ty);
+        for p in &f.params {
+            let ty = self.lower_type(&p.ty, &subst);
+            let local = b.new_local(Some(p.name.clone()), ty);
+            b.params.push(local);
+        }
+        let mut out = b.finish();
+        out.blocks.clear();
+        out
     }
 
     pub fn lower_block(
@@ -270,7 +301,9 @@ impl Lower {
             }
 
             ResolvedType::Null => {
-                panic!("Null must be part of a union type");
+                // Validator uses `Null` for void function returns. A real
+                // Unit type would be cleaner; until then, Bool stands in.
+                MirType::Primitive(PrimitiveType::Bool)
             }
 
             ResolvedType::TypeParam(id) => {

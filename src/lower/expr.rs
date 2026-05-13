@@ -132,7 +132,7 @@ impl Lower {
             arg_ops.push(self.lower_expr(a, subst, b));
         }
 
-        let result_mir = lower_value_type(self, result_ty, subst);
+        let result_mir = self.lower_type(result_ty, subst);
         let tmp = b.new_temp(result_mir);
         b.push_stmt(Stmt::Assign(
             tmp,
@@ -246,7 +246,7 @@ impl Lower {
         let else_bb = b.new_block();
         let join_bb = b.new_block();
 
-        let result_mir = lower_value_type(self, result_ty, subst);
+        let result_mir = self.lower_type(result_ty, subst);
         let result = b.new_temp(result_mir);
 
         b.terminate(Terminator::CondBr(cond_op, then_bb, else_bb));
@@ -409,13 +409,3 @@ fn map_binop(op: &BinaryOperator) -> BinOp {
     }
 }
 
-// `Null` is how the validator types void returns. The MIR has no Unit, so
-// at value-producing positions (call results, if-result temps) we fall back
-// to a Bool placeholder until a real Unit type lands.
-fn lower_value_type(lower: &mut Lower, ty: &ResolvedType, subst: &Subst) -> MirType {
-    let ty = subst.apply(ty);
-    if matches!(ty, ResolvedType::Null) {
-        return MirType::Primitive(PrimitiveType::Bool);
-    }
-    lower.lower_concrete_type(&ty)
-}

@@ -4,7 +4,7 @@ use otter_fusion::{
     lexer::Lexer,
     lower::Lower,
     mir::{
-        AssignValue, BinOp, Callee, MirConst, MirProgram, MirType, MirTypeDef, Operand, Stmt,
+        Abi, AssignValue, BinOp, Callee, MirConst, MirProgram, MirType, MirTypeDef, Operand, Stmt,
         Terminator,
     },
     parser::Parser,
@@ -261,6 +261,36 @@ fn lowers_while_loop() {
         .filter(|bb| matches!(bb.terminator, Terminator::Goto(_)))
         .count();
     assert!(gotos >= 1, "expected at least one Goto");
+}
+
+#[test]
+fn lowers_call_to_void_extern_via_print() {
+    let mir = lower_source(
+        r#"import { print } from "of:core";
+        function main(): i64 {
+            print("hello");
+            0
+        }"#,
+    );
+
+    let names: Vec<&str> = mir.functions.values().map(|f| f.name.as_str()).collect();
+    let stub = mir
+        .functions
+        .values()
+        .find(|f| f.name == "__of_print")
+        .unwrap_or_else(|| panic!("__of_print stub not found; have: {:?}", names));
+    assert!(matches!(stub.abi, Abi::Extern));
+    assert_eq!(stub.blocks.len(), 0, "extern stub has no body");
+    assert_eq!(stub.params.len(), 1);
+
+    // The intermediate `print` wrapper has a body (calls __of_print).
+    let wrapper = mir
+        .functions
+        .values()
+        .find(|f| f.name.ends_with("::print"))
+        .expect("print wrapper");
+    assert!(matches!(wrapper.abi, Abi::Otter));
+    assert!(!wrapper.blocks.is_empty());
 }
 
 #[test]
