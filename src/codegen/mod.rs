@@ -10,8 +10,8 @@ use cranelift_module::{DataDescription, FuncId, Linkage, Module, ModuleError};
 use crate::{
     hir::PrimitiveType,
     mir::{
-        self, Abi, BlockId, LocalId, MirConst, MirFnId, MirProgram, MirType, Operand, Terminator,
-        TrapReason,
+        self, Abi, BlockId, LocalId, MirConst, MirFnId, MirProgram, MirType, Operand, Stmt,
+        Terminator, TrapReason,
     },
 };
 
@@ -131,6 +131,12 @@ fn lower_stmt<M: Module>(
     mir_func: &mir::MirFunction,
     stmt: &mir::Stmt,
 ) {
+    match stmt {
+        Stmt::Assign(lid, av) => {
+            let v = lower_rvalue(b, module, rt, func_ids, vars, blocks, mir, f, av);
+            b.def_var(vars[lid], v);
+        }
+    }
 }
 
 pub fn clif_type(t: &MirType) -> Type {
