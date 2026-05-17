@@ -5,5 +5,6 @@ pub mod lexer;
 pub mod lower;
 pub mod mir;
 pub mod parser;
+pub mod source_map;
 pub mod tokens;
 pub mod validator;

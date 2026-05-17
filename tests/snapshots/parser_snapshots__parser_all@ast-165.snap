@@ -3,6 +3,61 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/validator/p5_self_member_access_in_method.of
 ---
-Err(
-    "unexpected token 'self'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "m",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                Member(
+                                                    SelfRef,
+                                                    "x",
+                                                ),
+                                            ),
+                                        ],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 1,
+                                    col: 27,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
 )

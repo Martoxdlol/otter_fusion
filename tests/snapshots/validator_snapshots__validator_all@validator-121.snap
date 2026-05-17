@@ -4,5 +4,5 @@ expression: result
 input_file: examples/spec/14_ffi/pin_unpin.of
 ---
 ParserError(
-    "unexpected token ','",
+    "unexpected token '*'",
 )

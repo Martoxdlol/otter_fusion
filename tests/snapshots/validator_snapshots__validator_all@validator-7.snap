@@ -3,6 +3,24 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/07_structs.of
 ---
-ParserError(
-    "unexpected token 'self'",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::Person::birthday'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Person::greet'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Person::greet'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Person::greet'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Person::greet'",
+        "type mismatch in function 'test_module::Person::birthday' (binary Add): expected 'null', found 'int64'",
+        "type mismatch in function 'test_module::Person::birthday' (field age): expected 'int32', found 'null'",
+        "type mismatch in function 'test_module::Person::birthday' (field name): expected 'string', found 'null'",
+        "type mismatch in function 'test_module::Person::greet' (binary Add): expected 'string', found 'null'",
+        "type mismatch in function 'test_module::main' (field age): expected 'int32', found 'int64'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'age' on 'null' in function 'test_module::Person::birthday'",
+        "unknown member 'name' on 'null' in function 'test_module::Person::birthday'",
+        "unknown member 'age' on 'null' in function 'test_module::Person::greet'",
+        "unknown member 'name' on 'null' in function 'test_module::Person::greet'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

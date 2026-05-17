@@ -3,6 +3,706 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/15_ffi_pinning.of
 ---
-Err(
-    "unexpected token ','",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "TickCb",
+                        generics: [],
+                        ty: ExternFunction(
+                            [
+                                ExternParam {
+                                    name: "d",
+                                    ty: Named(
+                                        "MyStruct",
+                                        [],
+                                    ),
+                                    is_pointer: true,
+                                },
+                            ],
+                            Primitive(
+                                Null,
+                            ),
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 5,
+                    len: 4,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "register_callback",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "data",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
+                            ParamDecl {
+                                name: "cb",
+                                ty: Named(
+                                    "TickCb",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 8,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 16,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "unregister_callback",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "data",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 9,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 9,
+                    col: 16,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "MyStruct",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "counter",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "on_tick",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "d",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Assign(
+                                        Member(
+                                            Variable(
+                                                "d",
+                                            ),
+                                            "counter",
+                                        ),
+                                        BinaryOp(
+                                            Member(
+                                                Variable(
+                                                    "d",
+                                                ),
+                                                "counter",
+                                            ),
+                                            Add,
+                                            Literal(
+                                                Int(
+                                                    "1",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 15,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 15,
+                    col: 16,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "allocate",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "Buffer",
+                                [],
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "size",
+                                ty: Primitive(
+                                    Uint64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "maybe",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "Buffer",
+                                                    ),
+                                                    "alloc",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "size",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "maybe",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            StructInit(
+                                                                Named(
+                                                                    "Buffer",
+                                                                    [],
+                                                                ),
+                                                                [
+                                                                    (
+                                                                        "data",
+                                                                        Literal(
+                                                                            Null,
+                                                                        ),
+                                                                    ),
+                                                                    (
+                                                                        "size",
+                                                                        Literal(
+                                                                            Int(
+                                                                                "0",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    As(
+                                        Variable(
+                                            "maybe",
+                                        ),
+                                        Named(
+                                            "Buffer",
+                                            [],
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 19,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 19,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "install",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "MyStruct",
+                                [],
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "state",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "MyStruct",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "counter",
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "ptr",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "pin",
+                                                ),
+                                                [
+                                                    Named(
+                                                        "MyStruct",
+                                                        [],
+                                                    ),
+                                                ],
+                                                [
+                                                    Variable(
+                                                        "state",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "register_callback",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "ptr",
+                                                ),
+                                                Variable(
+                                                    "on_tick",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Variable(
+                                        "state",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 27,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 27,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "remove",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "state",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "ptr",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "pin",
+                                                ),
+                                                [
+                                                    Named(
+                                                        "MyStruct",
+                                                        [],
+                                                    ),
+                                                ],
+                                                [
+                                                    Variable(
+                                                        "state",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "unregister_callback",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "ptr",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "unpin",
+                                            ),
+                                            [
+                                                Named(
+                                                    "MyStruct",
+                                                    [],
+                                                ),
+                                            ],
+                                            [
+                                                Variable(
+                                                    "ptr",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "unpin",
+                                            ),
+                                            [
+                                                Named(
+                                                    "MyStruct",
+                                                    [],
+                                                ),
+                                            ],
+                                            [
+                                                Variable(
+                                                    "ptr",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 34,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 34,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "buf",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "allocate",
+                                                ),
+                                                [],
+                                                [
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "1024",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint64,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "buffer size: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Member(
+                                                            Variable(
+                                                                "buf",
+                                                            ),
+                                                            "size",
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "buf",
+                                                ),
+                                                "free",
+                                            ),
+                                            [],
+                                            [],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "state",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "install",
+                                                ),
+                                                [],
+                                                [],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "counter: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Member(
+                                                            Variable(
+                                                                "state",
+                                                            ),
+                                                            "counter",
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "remove",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "state",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 41,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 41,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

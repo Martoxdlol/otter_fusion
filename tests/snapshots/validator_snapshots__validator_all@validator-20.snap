@@ -3,6 +3,18 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/20_union_config_constraints.of
 ---
-ParserError(
-    "unexpected token comment",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::check'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::check'",
+        "type mismatch in function 'test_module::in_choices' (binary Eq): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::main' (call to check arg 0): expected 'struct#2', found 'null'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

@@ -3,6 +3,16 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/01_primitives.of
 ---
-ParserError(
-    "unexpected token comment",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "type mismatch in function 'test_module::main' (var height): expected 'float32', found 'float64'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

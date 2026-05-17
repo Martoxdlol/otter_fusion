@@ -4,5 +4,5 @@ expression: result
 input_file: examples/spec/04_structs_interfaces/struct_instantiation.of
 ---
 ParserError(
-    "unexpected token ','",
+    "unexpected token 'var'",
 )

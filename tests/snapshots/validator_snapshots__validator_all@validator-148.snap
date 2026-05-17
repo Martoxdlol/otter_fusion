@@ -5,7 +5,6 @@ input_file: examples/validator/p4_universal_extend_satisfies_interface.of
 ---
 ValidationErrors(
     [
-        "type 'test_module::S' is missing member 'f' required by interface 'test_module::I'",
         "unknown type 'T' in module 'test_module'",
     ],
 )

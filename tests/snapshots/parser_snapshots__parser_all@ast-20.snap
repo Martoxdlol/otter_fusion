@@ -3,6 +3,1073 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/20_union_config_constraints.of
 ---
-Err(
-    "unexpected token comment",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Range",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "min",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "max",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Choices",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "values",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Primitive(
+                                            String,
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Constraint",
+                        generics: [],
+                        ty: Union(
+                            [
+                                Named(
+                                    "Range",
+                                    [],
+                                ),
+                                Named(
+                                    "Choices",
+                                    [],
+                                ),
+                                Primitive(
+                                    Null,
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 15,
+                    col: 5,
+                    len: 4,
+                },
+            },
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "ConfigValue",
+                        generics: [],
+                        ty: Union(
+                            [
+                                Primitive(
+                                    Bool,
+                                ),
+                                Primitive(
+                                    Int64,
+                                ),
+                                Primitive(
+                                    Float64,
+                                ),
+                                Primitive(
+                                    String,
+                                ),
+                                Named(
+                                    "List",
+                                    [
+                                        Primitive(
+                                            String,
+                                        ),
+                                    ],
+                                ),
+                                Primitive(
+                                    Null,
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 16,
+                    col: 5,
+                    len: 4,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Setting",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "ConfigValue",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "constraint",
+                                ty: Named(
+                                    "Constraint",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 18,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "in_range",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Bool,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "ConfigValue",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "r",
+                                ty: Named(
+                                    "Range",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "value",
+                                            ),
+                                            Primitive(
+                                                Float64,
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "v",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "value",
+                                                            ),
+                                                            Primitive(
+                                                                Float64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: Some(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "v",
+                                                        ),
+                                                        Ge,
+                                                        Member(
+                                                            Variable(
+                                                                "r",
+                                                            ),
+                                                            "min",
+                                                        ),
+                                                    ),
+                                                    And,
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "v",
+                                                        ),
+                                                        Le,
+                                                        Member(
+                                                            Variable(
+                                                                "r",
+                                                            ),
+                                                            "max",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "value",
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                VarDecl(
+                                                                    "v",
+                                                                    None,
+                                                                    Some(
+                                                                        As(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "value",
+                                                                                ),
+                                                                                Primitive(
+                                                                                    Int64,
+                                                                                ),
+                                                                            ),
+                                                                            Primitive(
+                                                                                Float64,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: Some(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Variable(
+                                                                            "v",
+                                                                        ),
+                                                                        Ge,
+                                                                        Member(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            "min",
+                                                                        ),
+                                                                    ),
+                                                                    And,
+                                                                    BinaryOp(
+                                                                        Variable(
+                                                                            "v",
+                                                                        ),
+                                                                        Le,
+                                                                        Member(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            "max",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                        Some(
+                                                            Block {
+                                                                statements: [],
+                                                                returns: Some(
+                                                                    Literal(
+                                                                        Bool(
+                                                                            false,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 24,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 24,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "in_choices",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Bool,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "ConfigValue",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "c",
+                                ty: Named(
+                                    "Choices",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "value",
+                                            ),
+                                            Primitive(
+                                                String,
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "sv",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "value",
+                                                            ),
+                                                            Primitive(
+                                                                String,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                VarDecl(
+                                                    "ok",
+                                                    None,
+                                                    Some(
+                                                        Literal(
+                                                            Bool(
+                                                                false,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                For(
+                                                    "option",
+                                                    Member(
+                                                        Variable(
+                                                            "c",
+                                                        ),
+                                                        "values",
+                                                    ),
+                                                    Block {
+                                                        statements: [],
+                                                        returns: Some(
+                                                            If(
+                                                                BinaryOp(
+                                                                    Variable(
+                                                                        "option",
+                                                                    ),
+                                                                    Eq,
+                                                                    Variable(
+                                                                        "sv",
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [
+                                                                        Assign(
+                                                                            Variable(
+                                                                                "ok",
+                                                                            ),
+                                                                            Literal(
+                                                                                Bool(
+                                                                                    true,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                    returns: None,
+                                                                },
+                                                                None,
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ],
+                                            returns: Some(
+                                                Variable(
+                                                    "ok",
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    Literal(
+                                                        Bool(
+                                                            false,
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 36,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 36,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "check",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Named(
+                                    "Setting",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "valid",
+                                        None,
+                                        Some(
+                                            If(
+                                                Is(
+                                                    Member(
+                                                        Variable(
+                                                            "s",
+                                                        ),
+                                                        "constraint",
+                                                    ),
+                                                    Primitive(
+                                                        Null,
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Literal(
+                                                            Bool(
+                                                                true,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                                Some(
+                                                    Block {
+                                                        statements: [],
+                                                        returns: Some(
+                                                            If(
+                                                                Is(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "s",
+                                                                        ),
+                                                                        "constraint",
+                                                                    ),
+                                                                    Named(
+                                                                        "Range",
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [],
+                                                                    returns: Some(
+                                                                        Call(
+                                                                            Variable(
+                                                                                "in_range",
+                                                                            ),
+                                                                            [],
+                                                                            [
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "s",
+                                                                                    ),
+                                                                                    "value",
+                                                                                ),
+                                                                                As(
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "s",
+                                                                                        ),
+                                                                                        "constraint",
+                                                                                    ),
+                                                                                    Named(
+                                                                                        "Range",
+                                                                                        [],
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Some(
+                                                                    Block {
+                                                                        statements: [],
+                                                                        returns: Some(
+                                                                            Call(
+                                                                                Variable(
+                                                                                    "in_choices",
+                                                                                ),
+                                                                                [],
+                                                                                [
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "s",
+                                                                                        ),
+                                                                                        "value",
+                                                                                    ),
+                                                                                    As(
+                                                                                        Member(
+                                                                                            Variable(
+                                                                                                "s",
+                                                                                            ),
+                                                                                            "constraint",
+                                                                                        ),
+                                                                                        Named(
+                                                                                            "Choices",
+                                                                                            [],
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                            ),
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    BinaryOp(
+                                        BinaryOp(
+                                            Member(
+                                                Variable(
+                                                    "s",
+                                                ),
+                                                "name",
+                                            ),
+                                            Add,
+                                            Literal(
+                                                String(
+                                                    " = ",
+                                                ),
+                                            ),
+                                        ),
+                                        Add,
+                                        If(
+                                            Variable(
+                                                "valid",
+                                            ),
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    Literal(
+                                                        String(
+                                                            "ok",
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                            Some(
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Literal(
+                                                            String(
+                                                                "INVALID",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 49,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 49,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "settings",
+                                        Some(
+                                            Named(
+                                                "List",
+                                                [
+                                                    Named(
+                                                        "Setting",
+                                                        [],
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Some(
+                                            LiteralList(
+                                                [
+                                                    StructInit(
+                                                        Named(
+                                                            "Setting",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Literal(
+                                                                    String(
+                                                                        "volume",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "value",
+                                                                Literal(
+                                                                    Float(
+                                                                        "0.7",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "constraint",
+                                                                StructInit(
+                                                                    Named(
+                                                                        "Range",
+                                                                        [],
+                                                                    ),
+                                                                    [
+                                                                        (
+                                                                            "min",
+                                                                            Literal(
+                                                                                Float(
+                                                                                    "0.0",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        (
+                                                                            "max",
+                                                                            Literal(
+                                                                                Float(
+                                                                                    "1.0",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "Setting",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Literal(
+                                                                    String(
+                                                                        "mode",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "value",
+                                                                Literal(
+                                                                    String(
+                                                                        "fast",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "constraint",
+                                                                StructInit(
+                                                                    Named(
+                                                                        "Choices",
+                                                                        [],
+                                                                    ),
+                                                                    [
+                                                                        (
+                                                                            "values",
+                                                                            LiteralList(
+                                                                                [
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "slow",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "fast",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "auto",
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "Setting",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Literal(
+                                                                    String(
+                                                                        "debug",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "value",
+                                                                Literal(
+                                                                    Bool(
+                                                                        true,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "constraint",
+                                                                Literal(
+                                                                    Null,
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "Setting",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Literal(
+                                                                    String(
+                                                                        "speed",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "value",
+                                                                Literal(
+                                                                    Int(
+                                                                        "200",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "constraint",
+                                                                StructInit(
+                                                                    Named(
+                                                                        "Range",
+                                                                        [],
+                                                                    ),
+                                                                    [
+                                                                        (
+                                                                            "min",
+                                                                            Literal(
+                                                                                Float(
+                                                                                    "0.0",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        (
+                                                                            "max",
+                                                                            Literal(
+                                                                                Float(
+                                                                                    "100.0",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "Setting",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Literal(
+                                                                    String(
+                                                                        "mode2",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "value",
+                                                                Literal(
+                                                                    String(
+                                                                        "warp",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "constraint",
+                                                                StructInit(
+                                                                    Named(
+                                                                        "Choices",
+                                                                        [],
+                                                                    ),
+                                                                    [
+                                                                        (
+                                                                            "values",
+                                                                            LiteralList(
+                                                                                [
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "slow",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "fast",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "auto",
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    For(
+                                        "s",
+                                        Variable(
+                                            "settings",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Call(
+                                                                Variable(
+                                                                    "check",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    Variable(
+                                                                        "s",
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 61,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 61,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

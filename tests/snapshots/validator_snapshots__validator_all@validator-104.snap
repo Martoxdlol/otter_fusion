@@ -4,5 +4,5 @@ expression: result
 input_file: examples/spec/07_error_management/error_checking.of
 ---
 ParserError(
-    "unexpected token ','",
+    "unexpected token 'var'",
 )

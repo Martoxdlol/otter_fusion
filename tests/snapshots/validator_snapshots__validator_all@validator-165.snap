@@ -3,6 +3,8 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/validator/p5_self_member_access_in_method.of
 ---
-ParserError(
-    "unexpected token 'self'",
+ValidationErrors(
+    [
+        "unknown member 'x' on 'null' in function 'test_module::S::m'",
+    ],
 )

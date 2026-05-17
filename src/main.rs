@@ -66,11 +66,13 @@ fn run_validate(file: &str) -> i32 {
         }
     };
 
+    let sm = otter_fusion::source_map::SourceMap::new(file, &source);
+
     let tokens = match Lexer::new(&source).scan_all() {
         Ok(t) => t,
         Err(e) => {
             let (line, col) = e.span();
-            println!("{file}:{line}:{col}: error: {e}");
+            print!("{}", sm.render_error(line, col, &format!("{e}")));
             return 1;
         }
     };
@@ -79,7 +81,7 @@ fn run_validate(file: &str) -> i32 {
         Ok(p) => p,
         Err(e) => {
             let (line, col) = e.span();
-            println!("{file}:{line}:{col}: error: {e}");
+            print!("{}", sm.render_error(line, col, &format!("{e}")));
             return 1;
         }
     };
@@ -99,7 +101,8 @@ fn run_validate(file: &str) -> i32 {
         Ok(_) => 0,
         Err(errors) => {
             for err in &errors {
-                println!("{file}:1:1: error: {err}");
+                let (line, col) = err.span();
+                print!("{}", sm.render_error(line, col, &format!("{err}")));
             }
             1
         }

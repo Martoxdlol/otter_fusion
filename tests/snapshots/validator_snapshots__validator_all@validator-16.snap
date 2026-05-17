@@ -3,6 +3,33 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/16_union_json_value.of
 ---
-ParserError(
-    "unexpected token comment",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
+        "type mismatch in function 'test_module::describe' (binary Add): expected 'string', found 'null'",
+        "type mismatch in function 'test_module::describe' (call to describe arg 0): expected 'struct#1', found 'null'",
+        "type mismatch in function 'test_module::describe' (call to describe arg 0): expected 'struct#1', found 'null'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'key' on 'null' in function 'test_module::describe'",
+        "unknown member 'value' on 'null' in function 'test_module::describe'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'Map' in module 'test_module'",
+        "unknown type 'Map' in module 'test_module'",
+        "unknown type 'Map' in module 'test_module'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

@@ -4,5 +4,5 @@ expression: ast
 input_file: examples/spec/07_error_management/error_checking.of
 ---
 Err(
-    "unexpected token ','",
+    "unexpected token 'var'",
 )

@@ -3,6 +3,323 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/05_if_block_expressions.of
 ---
-Err(
-    "unexpected token '='",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "classify",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "age",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "status",
+                                        None,
+                                        Some(
+                                            If(
+                                                BinaryOp(
+                                                    Variable(
+                                                        "age",
+                                                    ),
+                                                    Ge,
+                                                    Literal(
+                                                        Int(
+                                                            "65",
+                                                        ),
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Literal(
+                                                            String(
+                                                                "Senior",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                                Some(
+                                                    Block {
+                                                        statements: [],
+                                                        returns: Some(
+                                                            If(
+                                                                BinaryOp(
+                                                                    Variable(
+                                                                        "age",
+                                                                    ),
+                                                                    Ge,
+                                                                    Literal(
+                                                                        Int(
+                                                                            "18",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [],
+                                                                    returns: Some(
+                                                                        Literal(
+                                                                            String(
+                                                                                "Adult",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                Some(
+                                                                    Block {
+                                                                        statements: [],
+                                                                        returns: Some(
+                                                                            Literal(
+                                                                                String(
+                                                                                    "Minor",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "msg",
+                                        None,
+                                        Some(
+                                            Block(
+                                                Block {
+                                                    statements: [
+                                                        VarDecl(
+                                                            "prefix",
+                                                            None,
+                                                            Some(
+                                                                Literal(
+                                                                    String(
+                                                                        "Status: ",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        VarDecl(
+                                                            "suffix",
+                                                            None,
+                                                            Some(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Literal(
+                                                                            String(
+                                                                                " (age ",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            Variable(
+                                                                                "age",
+                                                                            ),
+                                                                            Primitive(
+                                                                                String,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            ")",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: Some(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                Variable(
+                                                                    "prefix",
+                                                                ),
+                                                                Add,
+                                                                Variable(
+                                                                    "status",
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Variable(
+                                                                "suffix",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Variable(
+                                        "msg",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 3,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "classify",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Literal(
+                                                            Int(
+                                                                "8",
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "classify",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Literal(
+                                                            Int(
+                                                                "30",
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "classify",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Literal(
+                                                            Int(
+                                                                "72",
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 21,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 21,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

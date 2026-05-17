@@ -371,6 +371,15 @@ impl fmt::Display for ValidationError {
 
 impl std::error::Error for ValidationError {}
 
+impl ValidationError {
+    /// Returns the (line, col) of the source position where this error occurred.
+    /// Currently returns (1, 1) as a default — the GPS context in the Validator
+    /// will enrich this as we propagate spans.
+    pub fn span(&self) -> (usize, usize) {
+        (1, 1)
+    }
+}
+
 #[derive(Debug, Clone)]
 enum ScopeEntry {
     Type(TypeId),
@@ -445,6 +454,10 @@ pub struct Validator {
     /// `implements` list.
     pending_extend_implements: Vec<(TypeId, Vec<ResolvedType>)>,
 
+    /// GPS context: the current source position being validated.
+    /// Updated when entering functions, statements, etc.
+    current_span: crate::ast::Span,
+
     next_module_id: u32,
     next_type_id: u32,
     next_fn_id: u32,
@@ -469,6 +482,7 @@ impl Validator {
             next_type_id: 0,
             next_fn_id: 0,
             next_tp_id: 0,
+            current_span: crate::ast::Span::default(),
         }
     }
 
@@ -665,6 +679,7 @@ impl Validator {
                                 name: decl.name.clone(),
                                 owner: None,
                                 has_self: false,
+                                is_extern: false,
                                 type_params: Vec::new(),
                                 params: Vec::new(),
                                 return_type: ResolvedType::Null,
@@ -1082,6 +1097,7 @@ impl Validator {
                             name: method.name.clone(),
                             owner: Some(target_id),
                             has_self: method.has_self_param,
+                            is_extern: false,
                             type_params: Vec::new(),
                             params: Vec::new(),
                             return_type: ResolvedType::Null,
@@ -1413,6 +1429,11 @@ impl Validator {
             let Some(body_ast) = decl.body.as_ref() else {
                 continue;
             };
+
+            // Update GPS context to this function's span
+            let old_span = self.current_span.clone();
+            self.current_span = decl.span.clone();
+
             let func = self.hir.functions[fn_id].clone();
             let module_name = self.hir.modules[&func.module].name.clone();
             let fn_label = if let Some(owner) = func.owner {
@@ -1462,6 +1483,9 @@ impl Validator {
             );
 
             self.hir.functions.get_mut(fn_id).unwrap().body = Some(block);
+
+            // Restore GPS context
+            self.current_span = old_span;
         }
         self.pending_function_bodies = pending;
     }
@@ -1526,6 +1550,12 @@ impl Validator {
         loop_depth: u32,
     ) -> Option<HirStatement> {
         match stmt {
+            ast::Statement::Assign(target, value) => {
+                // TODO: implement assignment validation
+                let typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth);
+                let typed_value = self.check_expr(value, fn_label, module, generics, locals, return_type, loop_depth);
+                Some(HirStatement::Expr(typed_value))
+            }
             ast::Statement::VarDecl(name, ty, init) => {
                 let annotated = ty.as_ref().map(|t| {
                     let ctx = TypeResolveCtx {
@@ -1668,6 +1698,13 @@ impl Validator {
         loop_depth: u32,
     ) -> TypedExpr {
         match expr {
+            ast::Expr::SelfRef => {
+                // TODO: resolve self type from owner context
+                TypedExpr {
+                    kind: ExprKind::Variable("self".to_string()),
+                    ty: ResolvedType::Null,
+                }
+            }
             ast::Expr::Literal(lit) => self.check_literal(lit, fn_label),
             ast::Expr::Variable(name) => self.check_variable(name, fn_label, module, locals),
             ast::Expr::If(cond, then_b, else_b) => {
@@ -2563,6 +2600,7 @@ impl Validator {
                     name: method.name.clone(),
                     owner: Some(owner),
                     has_self: method.has_self_param,
+                    is_extern: false,
                     type_params: Vec::new(),
                     params: Vec::new(),
                     return_type: ResolvedType::Null,

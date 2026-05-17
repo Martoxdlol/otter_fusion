@@ -3,6 +3,19 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/08_interfaces.of
 ---
-ParserError(
-    "unexpected token ','",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::Book::to_string'",
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::Book::to_string'",
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::Book::to_string'",
+        "type mismatch in function 'test_module::Book::to_string' (binary Add): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::Book::to_string' (binary Add): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::Book::to_string' (binary Add): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::main' (call to show arg 0): expected 'interface#1', found 'struct#2'",
+        "type mismatch in function 'test_module::main' (field pages): expected 'int32', found 'int64'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'name' on 'null' in function 'test_module::Book::to_string'",
+        "unknown member 'pages' on 'null' in function 'test_module::Book::to_string'",
+        "unknown variable 'print' in function 'test_module::show'",
+    ],
 )

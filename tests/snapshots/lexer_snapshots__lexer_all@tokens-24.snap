@@ -4,14 +4,5 @@ expression: tokens
 input_file: examples/lexer/comment_at_end_of_input_results_in_eof.of
 ---
 Ok(
-    [
-        Token {
-            token_type: Comment(
-                " comment",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-    ],
+    [],
 )

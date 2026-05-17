@@ -3,6 +3,93 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/validator/p5_struct_init_and_member_access.of
 ---
-Err(
-    "unexpected token '{'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "test",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "s",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "S",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "x",
+                                                        Literal(
+                                                            Int(
+                                                                "5",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Member(
+                                            Variable(
+                                                "s",
+                                            ),
+                                            "x",
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

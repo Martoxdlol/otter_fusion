@@ -3,6 +3,97 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/spec/03_functions/early_return.of
 ---
-Err(
-    "unexpected token identifier 'current'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "get_ratio",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Float64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "current",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "total",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "total",
+                                                ),
+                                                Eq,
+                                                Literal(
+                                                    Float(
+                                                        "0.0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Float(
+                                                                    "0.0",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    BinaryOp(
+                                        Variable(
+                                            "current",
+                                        ),
+                                        Div,
+                                        Variable(
+                                            "total",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

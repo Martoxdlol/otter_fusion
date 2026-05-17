@@ -3,6 +3,374 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/11_lists_maps_loops.of
 ---
-Err(
-    "unexpected token '('",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "numbers",
+                                        Some(
+                                            Named(
+                                                "List",
+                                                [
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Some(
+                                            LiteralList(
+                                                [
+                                                    Literal(
+                                                        Int(
+                                                            "1",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "2",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "3",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "4",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "5",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "6",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "7",
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "8",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    For(
+                                        "n",
+                                        Variable(
+                                            "numbers",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            Variable(
+                                                                "n",
+                                                            ),
+                                                            Eq,
+                                                            Literal(
+                                                                Int(
+                                                                    "3",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Continue,
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            Variable(
+                                                                "n",
+                                                            ),
+                                                            Gt,
+                                                            Literal(
+                                                                Int(
+                                                                    "6",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Break,
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "n = ",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Variable(
+                                                                        "n",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                    VarDecl(
+                                        "ages",
+                                        Some(
+                                            Named(
+                                                "Map",
+                                                [
+                                                    Primitive(
+                                                        String,
+                                                    ),
+                                                    Primitive(
+                                                        Int32,
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Some(
+                                            LiteralMap(
+                                                [
+                                                    (
+                                                        Literal(
+                                                            String(
+                                                                "Alice",
+                                                            ),
+                                                        ),
+                                                        Literal(
+                                                            Int(
+                                                                "30",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        Literal(
+                                                            String(
+                                                                "Bob",
+                                                            ),
+                                                        ),
+                                                        Literal(
+                                                            Int(
+                                                                "25",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    For(
+                                        "entry",
+                                        Variable(
+                                            "ages",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "entry",
+                                                                        ),
+                                                                        "key",
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            " -> ",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "entry",
+                                                                        ),
+                                                                        "value",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                    VarDecl(
+                                        "i",
+                                        None,
+                                        Some(
+                                            Literal(
+                                                Int(
+                                                    "0",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    While(
+                                        BinaryOp(
+                                            Variable(
+                                                "i",
+                                            ),
+                                            Lt,
+                                            Literal(
+                                                Int(
+                                                    "3",
+                                                ),
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "tick ",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Variable(
+                                                                        "i",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                                Assign(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "i",
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            Int(
+                                                                "1",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 3,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

@@ -4,5 +4,5 @@ expression: result
 input_file: examples/spec/14_ffi/pinning_example.of
 ---
 ParserError(
-    "unexpected token ','",
+    "unexpected token '*'",
 )

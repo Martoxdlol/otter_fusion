@@ -46,13 +46,7 @@ Ok(
             column: 21,
         },
         Token {
-            token_type: GT,
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Eq,
+            token_type: GtEq,
             position: 23,
             line: 1,
             column: 24,

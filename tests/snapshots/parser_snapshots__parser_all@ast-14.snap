@@ -3,6 +3,325 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/14_iterators.of
 ---
-Err(
-    "unexpected token 'self'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Range",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "current",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "end",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "next",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                            Primitive(
+                                                Null,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            If(
+                                                BinaryOp(
+                                                    Member(
+                                                        SelfRef,
+                                                        "current",
+                                                    ),
+                                                    Ge,
+                                                    Member(
+                                                        SelfRef,
+                                                        "end",
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Literal(
+                                                            Null,
+                                                        ),
+                                                    ),
+                                                },
+                                                Some(
+                                                    Block {
+                                                        statements: [
+                                                            VarDecl(
+                                                                "v",
+                                                                None,
+                                                                Some(
+                                                                    Member(
+                                                                        SelfRef,
+                                                                        "current",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Assign(
+                                                                Member(
+                                                                    SelfRef,
+                                                                    "current",
+                                                                ),
+                                                                BinaryOp(
+                                                                    Member(
+                                                                        SelfRef,
+                                                                        "current",
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: Some(
+                                                            Variable(
+                                                                "v",
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 11,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Iterator",
+                                [
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                ],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "print_all",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "iter",
+                                ty: Named(
+                                    "Iterator",
+                                    [
+                                        Named(
+                                            "T",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    For(
+                                        "item",
+                                        Variable(
+                                            "iter",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            As(
+                                                                Variable(
+                                                                    "item",
+                                                                ),
+                                                                Primitive(
+                                                                    String,
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 22,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 22,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "r",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "Range",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "current",
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "end",
+                                                        Literal(
+                                                            Int(
+                                                                "5",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print_all",
+                                            ),
+                                            [
+                                                Primitive(
+                                                    Int64,
+                                                ),
+                                            ],
+                                            [
+                                                Variable(
+                                                    "r",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 28,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 28,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

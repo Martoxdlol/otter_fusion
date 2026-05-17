@@ -3,6 +3,15 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/05_if_block_expressions.of
 ---
-ParserError(
-    "unexpected token '='",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::classify'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::classify'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::classify'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::classify'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

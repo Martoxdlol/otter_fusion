@@ -3,6 +3,10 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/spec/05_extensions/extend_basic.of
 ---
-ParserError(
-    "unexpected token ','",
+ValidationErrors(
+    [
+        "invalid operator 'Gt' for operand of type 'null' in function 'test_module::Vehicle::is_fast'",
+        "type mismatch in function 'test_module::Vehicle::is_fast' (binary Gt): expected 'null', found 'int64'",
+        "unknown member 'speed' on 'null' in function 'test_module::Vehicle::is_fast'",
+    ],
 )

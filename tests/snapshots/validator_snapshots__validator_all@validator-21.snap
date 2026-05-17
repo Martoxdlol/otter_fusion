@@ -3,6 +3,20 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/dynamic_dispatch.of
 ---
-ParserError(
-    "unexpected token 'self'",
+ValidationErrors(
+    [
+        "invalid operator 'Mul' for operand of type 'null' in function 'test_module::Square::area'",
+        "type mismatch in function 'test_module::Circle::area' (binary Mul): expected 'float64', found 'null'",
+        "type mismatch in function 'test_module::Circle::area' (binary Mul): expected 'float64', found 'null'",
+        "type mismatch in function 'test_module::total_area' (binary Add): expected 'float64', found 'null'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'radius' on 'null' in function 'test_module::Circle::area'",
+        "unknown member 'radius' on 'null' in function 'test_module::Circle::area'",
+        "unknown member 'side' on 'null' in function 'test_module::Square::area'",
+        "unknown member 'side' on 'null' in function 'test_module::Square::area'",
+        "unknown member 'area' on 'null' in function 'test_module::total_area'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

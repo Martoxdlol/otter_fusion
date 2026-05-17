@@ -3,6 +3,437 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/dynamic_dispatch.of
 ---
-Err(
-    "unexpected token 'self'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Shape",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "area",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Float64,
+                                    ),
+                                ),
+                                params: [],
+                                body: None,
+                                span: Span {
+                                    line: 4,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Circle",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "radius",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "area",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Float64,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            BinaryOp(
+                                                BinaryOp(
+                                                    Literal(
+                                                        Float(
+                                                            "3.14159",
+                                                        ),
+                                                    ),
+                                                    Mul,
+                                                    Member(
+                                                        SelfRef,
+                                                        "radius",
+                                                    ),
+                                                ),
+                                                Mul,
+                                                Member(
+                                                    SelfRef,
+                                                    "radius",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 10,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Shape",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Square",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "side",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "area",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Float64,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            BinaryOp(
+                                                Member(
+                                                    SelfRef,
+                                                    "side",
+                                                ),
+                                                Mul,
+                                                Member(
+                                                    SelfRef,
+                                                    "side",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 18,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Shape",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 15,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "total_area",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Float64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "shapes",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Named(
+                                            "Shape",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "sum",
+                                        Some(
+                                            Primitive(
+                                                Float64,
+                                            ),
+                                        ),
+                                        Some(
+                                            Literal(
+                                                Float(
+                                                    "0.0",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    For(
+                                        "s",
+                                        Variable(
+                                            "shapes",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Assign(
+                                                    Variable(
+                                                        "sum",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "sum",
+                                                        ),
+                                                        Add,
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "s",
+                                                                ),
+                                                                "area",
+                                                            ),
+                                                            [],
+                                                            [],
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    Variable(
+                                        "sum",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 23,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 23,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "c",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "Circle",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "radius",
+                                                        Literal(
+                                                            Float(
+                                                                "2.0",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "sq",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "Square",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "side",
+                                                        Literal(
+                                                            Float(
+                                                                "3.0",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "shapes",
+                                        Some(
+                                            Named(
+                                                "List",
+                                                [
+                                                    Named(
+                                                        "Shape",
+                                                        [],
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Some(
+                                            LiteralList(
+                                                [
+                                                    Variable(
+                                                        "c",
+                                                    ),
+                                                    Variable(
+                                                        "sq",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                As(
+                                                    Call(
+                                                        Variable(
+                                                            "total_area",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Variable(
+                                                                "shapes",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    Primitive(
+                                                        String,
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 31,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 31,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

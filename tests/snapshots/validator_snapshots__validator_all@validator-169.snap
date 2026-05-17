@@ -3,6 +3,8 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/validator/p5_struct_init_missing_field_errors.of
 ---
-ParserError(
-    "unexpected token '{'",
+ValidationErrors(
+    [
+        "missing field 'x' when initializing 'S' in function 'test_module::test'",
+    ],
 )

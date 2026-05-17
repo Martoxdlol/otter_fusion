@@ -46,7 +46,7 @@ impl<M: Module> Codegen<M> {
             } // import only
 
             ctx.func.signature = self.build_signature(f);
-            self.lower_function(&mut ctx.func, &mut builder_ctx, function_ids, f)?;
+            self.lower_function(&mut ctx.func, &mut builder_ctx, &function_ids, f)?;
             self.module.define_function(function_ids[id], &mut ctx)?;
             self.module.clear_context(&mut ctx);
         }
@@ -117,8 +117,18 @@ impl<M: Module> Codegen<M> {
         todo!()
     }
 
+    fn lower_terminator(
+        &self,
+        _b: &mut FunctionBuilder,
+        _vars: &HashMap<LocalId, Variable>,
+        _blocks: &HashMap<BlockId, Block>,
+        _term: &mir::Terminator,
+    ) {
+        // TODO: implement terminator lowering (branch, return, etc.)
+    }
+
     fn lower_stmt(
-        &mut self,
+        &self,
         b: &mut FunctionBuilder,
         func_ids: &HashMap<mir::MirFnId, cranelift_module::FuncId>,
         vars: &HashMap<LocalId, Variable>,

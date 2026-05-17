@@ -3,6 +3,431 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/12_error_unions.of
 ---
-Err(
-    "unexpected token '{'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Error",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "message",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "code",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "divide",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Union(
+                                [
+                                    Primitive(
+                                        Float64,
+                                    ),
+                                    Named(
+                                        "Error",
+                                        [],
+                                    ),
+                                ],
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "b",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        BinaryOp(
+                                            Variable(
+                                                "b",
+                                            ),
+                                            Eq,
+                                            Literal(
+                                                Float(
+                                                    "0.0",
+                                                ),
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [],
+                                            returns: Some(
+                                                StructInit(
+                                                    Named(
+                                                        "Error",
+                                                        [],
+                                                    ),
+                                                    [
+                                                        (
+                                                            "message",
+                                                            Literal(
+                                                                String(
+                                                                    "Division by zero",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        (
+                                                            "code",
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "a",
+                                                        ),
+                                                        Div,
+                                                        Variable(
+                                                            "b",
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 8,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "format",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "result",
+                                ty: Union(
+                                    [
+                                        Primitive(
+                                            Float64,
+                                        ),
+                                        Named(
+                                            "Error",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "result",
+                                            ),
+                                            Named(
+                                                "Error",
+                                                [],
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "e",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "result",
+                                                            ),
+                                                            Named(
+                                                                "Error",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: Some(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            Literal(
+                                                                String(
+                                                                    "Failed [",
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            As(
+                                                                Member(
+                                                                    Variable(
+                                                                        "e",
+                                                                    ),
+                                                                    "code",
+                                                                ),
+                                                                Primitive(
+                                                                    String,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                "]: ",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Member(
+                                                        Variable(
+                                                            "e",
+                                                        ),
+                                                        "message",
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    BinaryOp(
+                                                        Literal(
+                                                            String(
+                                                                "OK: ",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            As(
+                                                                Variable(
+                                                                    "result",
+                                                                ),
+                                                                Primitive(
+                                                                    Float64,
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                String,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 16,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 16,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "format",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Call(
+                                                            Variable(
+                                                                "divide",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Literal(
+                                                                    Float(
+                                                                        "10.0",
+                                                                    ),
+                                                                ),
+                                                                Literal(
+                                                                    Float(
+                                                                        "2.0",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "format",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Call(
+                                                            Variable(
+                                                                "divide",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Literal(
+                                                                    Float(
+                                                                        "10.0",
+                                                                    ),
+                                                                ),
+                                                                Literal(
+                                                                    Float(
+                                                                        "0.0",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 25,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 25,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

@@ -23,7 +23,12 @@ Ok(
                                 is_pointer: false,
                             },
                         ],
-                        body: None,
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
                         span: Span {
                             line: 1,
                             col: 16,
@@ -61,7 +66,12 @@ Ok(
                                 is_pointer: false,
                             },
                         ],
-                        body: None,
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
                         span: Span {
                             line: 2,
                             col: 16,

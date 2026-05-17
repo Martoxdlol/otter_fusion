@@ -3,6 +3,24 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/11_lists_maps_loops.of
 ---
-ParserError(
-    "unexpected token '('",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Gt' for operand of type 'null' in function 'test_module::main'",
+        "type mismatch in function 'test_module::main' (binary Add): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::main' (binary Add): expected 'null', found 'string'",
+        "type mismatch in function 'test_module::main' (binary Eq): expected 'null', found 'int64'",
+        "type mismatch in function 'test_module::main' (binary Gt): expected 'null', found 'int64'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'key' on 'null' in function 'test_module::main'",
+        "unknown member 'value' on 'null' in function 'test_module::main'",
+        "unknown type 'List' in module 'test_module'",
+        "unknown type 'Map' in module 'test_module'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

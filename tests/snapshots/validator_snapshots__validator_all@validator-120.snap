@@ -3,6 +3,4 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/spec/14_ffi/extern_struct.of
 ---
-ParserError(
-    "unexpected token ','",
-)
+Ok

@@ -3,6 +3,1134 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/17_union_ast.of
 ---
-Err(
-    "unexpected token comment",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "NumLit",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 4,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "StrLit",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 5,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "BinOp",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "op",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "left",
+                                ty: Named(
+                                    "Expr",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "right",
+                                ty: Named(
+                                    "Expr",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Call",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "args",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Named(
+                                            "Expr",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Expr",
+                        generics: [],
+                        ty: Union(
+                            [
+                                Named(
+                                    "NumLit",
+                                    [],
+                                ),
+                                Named(
+                                    "StrLit",
+                                    [],
+                                ),
+                                Named(
+                                    "BinOp",
+                                    [],
+                                ),
+                                Named(
+                                    "Call",
+                                    [],
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 9,
+                    col: 5,
+                    len: 4,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "eval_int",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Union(
+                                [
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                    Primitive(
+                                        Null,
+                                    ),
+                                ],
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "e",
+                                ty: Named(
+                                    "Expr",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "e",
+                                            ),
+                                            Named(
+                                                "NumLit",
+                                                [],
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [],
+                                            returns: Some(
+                                                Member(
+                                                    As(
+                                                        Variable(
+                                                            "e",
+                                                        ),
+                                                        Named(
+                                                            "NumLit",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    "value",
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "BinOp",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                VarDecl(
+                                                                    "b",
+                                                                    None,
+                                                                    Some(
+                                                                        As(
+                                                                            Variable(
+                                                                                "e",
+                                                                            ),
+                                                                            Named(
+                                                                                "BinOp",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                VarDecl(
+                                                                    "l",
+                                                                    None,
+                                                                    Some(
+                                                                        Call(
+                                                                            Variable(
+                                                                                "eval_int",
+                                                                            ),
+                                                                            [],
+                                                                            [
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "b",
+                                                                                    ),
+                                                                                    "left",
+                                                                                ),
+                                                                            ],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                VarDecl(
+                                                                    "r",
+                                                                    None,
+                                                                    Some(
+                                                                        Call(
+                                                                            Variable(
+                                                                                "eval_int",
+                                                                            ),
+                                                                            [],
+                                                                            [
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "b",
+                                                                                    ),
+                                                                                    "right",
+                                                                                ),
+                                                                            ],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Expr(
+                                                                    If(
+                                                                        Is(
+                                                                            Variable(
+                                                                                "l",
+                                                                            ),
+                                                                            Primitive(
+                                                                                Null,
+                                                                            ),
+                                                                        ),
+                                                                        Block {
+                                                                            statements: [
+                                                                                Return(
+                                                                                    Some(
+                                                                                        Literal(
+                                                                                            Null,
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                            returns: None,
+                                                                        },
+                                                                        None,
+                                                                    ),
+                                                                ),
+                                                                Expr(
+                                                                    If(
+                                                                        Is(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            Primitive(
+                                                                                Null,
+                                                                            ),
+                                                                        ),
+                                                                        Block {
+                                                                            statements: [
+                                                                                Return(
+                                                                                    Some(
+                                                                                        Literal(
+                                                                                            Null,
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                            returns: None,
+                                                                        },
+                                                                        None,
+                                                                    ),
+                                                                ),
+                                                                VarDecl(
+                                                                    "lv",
+                                                                    None,
+                                                                    Some(
+                                                                        As(
+                                                                            Variable(
+                                                                                "l",
+                                                                            ),
+                                                                            Primitive(
+                                                                                Int64,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                VarDecl(
+                                                                    "rv",
+                                                                    None,
+                                                                    Some(
+                                                                        As(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            Primitive(
+                                                                                Int64,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: Some(
+                                                                If(
+                                                                    BinaryOp(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "b",
+                                                                            ),
+                                                                            "op",
+                                                                        ),
+                                                                        Eq,
+                                                                        Literal(
+                                                                            String(
+                                                                                "+",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Block {
+                                                                        statements: [],
+                                                                        returns: Some(
+                                                                            BinaryOp(
+                                                                                Variable(
+                                                                                    "lv",
+                                                                                ),
+                                                                                Add,
+                                                                                Variable(
+                                                                                    "rv",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    },
+                                                                    Some(
+                                                                        Block {
+                                                                            statements: [],
+                                                                            returns: Some(
+                                                                                If(
+                                                                                    BinaryOp(
+                                                                                        Member(
+                                                                                            Variable(
+                                                                                                "b",
+                                                                                            ),
+                                                                                            "op",
+                                                                                        ),
+                                                                                        Eq,
+                                                                                        Literal(
+                                                                                            String(
+                                                                                                "-",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                    Block {
+                                                                                        statements: [],
+                                                                                        returns: Some(
+                                                                                            BinaryOp(
+                                                                                                Variable(
+                                                                                                    "lv",
+                                                                                                ),
+                                                                                                Sub,
+                                                                                                Variable(
+                                                                                                    "rv",
+                                                                                                ),
+                                                                                            ),
+                                                                                        ),
+                                                                                    },
+                                                                                    Some(
+                                                                                        Block {
+                                                                                            statements: [],
+                                                                                            returns: Some(
+                                                                                                If(
+                                                                                                    BinaryOp(
+                                                                                                        Member(
+                                                                                                            Variable(
+                                                                                                                "b",
+                                                                                                            ),
+                                                                                                            "op",
+                                                                                                        ),
+                                                                                                        Eq,
+                                                                                                        Literal(
+                                                                                                            String(
+                                                                                                                "*",
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                    Block {
+                                                                                                        statements: [],
+                                                                                                        returns: Some(
+                                                                                                            BinaryOp(
+                                                                                                                Variable(
+                                                                                                                    "lv",
+                                                                                                                ),
+                                                                                                                Mul,
+                                                                                                                Variable(
+                                                                                                                    "rv",
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    },
+                                                                                                    Some(
+                                                                                                        Block {
+                                                                                                            statements: [],
+                                                                                                            returns: Some(
+                                                                                                                Literal(
+                                                                                                                    Null,
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        },
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ),
+                                                                                        },
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                        Some(
+                                                            Block {
+                                                                statements: [],
+                                                                returns: Some(
+                                                                    Literal(
+                                                                        Null,
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 11,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "show",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "e",
+                                ty: Named(
+                                    "Expr",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "e",
+                                            ),
+                                            Named(
+                                                "NumLit",
+                                                [],
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [],
+                                            returns: Some(
+                                                As(
+                                                    Member(
+                                                        As(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "NumLit",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        "value",
+                                                    ),
+                                                    Primitive(
+                                                        String,
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "StrLit",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [],
+                                                            returns: Some(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Literal(
+                                                                            String(
+                                                                                "\"",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "e",
+                                                                                ),
+                                                                                Named(
+                                                                                    "StrLit",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "value",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            "\"",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                        Some(
+                                                            Block {
+                                                                statements: [],
+                                                                returns: Some(
+                                                                    If(
+                                                                        Is(
+                                                                            Variable(
+                                                                                "e",
+                                                                            ),
+                                                                            Named(
+                                                                                "BinOp",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                        Block {
+                                                                            statements: [
+                                                                                VarDecl(
+                                                                                    "b",
+                                                                                    None,
+                                                                                    Some(
+                                                                                        As(
+                                                                                            Variable(
+                                                                                                "e",
+                                                                                            ),
+                                                                                            Named(
+                                                                                                "BinOp",
+                                                                                                [],
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                            returns: Some(
+                                                                                BinaryOp(
+                                                                                    BinaryOp(
+                                                                                        BinaryOp(
+                                                                                            BinaryOp(
+                                                                                                BinaryOp(
+                                                                                                    BinaryOp(
+                                                                                                        Literal(
+                                                                                                            String(
+                                                                                                                "(",
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                        Add,
+                                                                                                        Call(
+                                                                                                            Variable(
+                                                                                                                "show",
+                                                                                                            ),
+                                                                                                            [],
+                                                                                                            [
+                                                                                                                Member(
+                                                                                                                    Variable(
+                                                                                                                        "b",
+                                                                                                                    ),
+                                                                                                                    "left",
+                                                                                                                ),
+                                                                                                            ],
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                    Add,
+                                                                                                    Literal(
+                                                                                                        String(
+                                                                                                            " ",
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                                Add,
+                                                                                                Member(
+                                                                                                    Variable(
+                                                                                                        "b",
+                                                                                                    ),
+                                                                                                    "op",
+                                                                                                ),
+                                                                                            ),
+                                                                                            Add,
+                                                                                            Literal(
+                                                                                                String(
+                                                                                                    " ",
+                                                                                                ),
+                                                                                            ),
+                                                                                        ),
+                                                                                        Add,
+                                                                                        Call(
+                                                                                            Variable(
+                                                                                                "show",
+                                                                                            ),
+                                                                                            [],
+                                                                                            [
+                                                                                                Member(
+                                                                                                    Variable(
+                                                                                                        "b",
+                                                                                                    ),
+                                                                                                    "right",
+                                                                                                ),
+                                                                                            ],
+                                                                                        ),
+                                                                                    ),
+                                                                                    Add,
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            ")",
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                        Some(
+                                                                            Block {
+                                                                                statements: [
+                                                                                    VarDecl(
+                                                                                        "c",
+                                                                                        None,
+                                                                                        Some(
+                                                                                            As(
+                                                                                                Variable(
+                                                                                                    "e",
+                                                                                                ),
+                                                                                                Named(
+                                                                                                    "Call",
+                                                                                                    [],
+                                                                                                ),
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                    VarDecl(
+                                                                                        "out",
+                                                                                        None,
+                                                                                        Some(
+                                                                                            BinaryOp(
+                                                                                                Member(
+                                                                                                    Variable(
+                                                                                                        "c",
+                                                                                                    ),
+                                                                                                    "name",
+                                                                                                ),
+                                                                                                Add,
+                                                                                                Literal(
+                                                                                                    String(
+                                                                                                        "(",
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                    For(
+                                                                                        "a",
+                                                                                        Member(
+                                                                                            Variable(
+                                                                                                "c",
+                                                                                            ),
+                                                                                            "args",
+                                                                                        ),
+                                                                                        Block {
+                                                                                            statements: [
+                                                                                                Assign(
+                                                                                                    Variable(
+                                                                                                        "out",
+                                                                                                    ),
+                                                                                                    BinaryOp(
+                                                                                                        BinaryOp(
+                                                                                                            Variable(
+                                                                                                                "out",
+                                                                                                            ),
+                                                                                                            Add,
+                                                                                                            Call(
+                                                                                                                Variable(
+                                                                                                                    "show",
+                                                                                                                ),
+                                                                                                                [],
+                                                                                                                [
+                                                                                                                    Variable(
+                                                                                                                        "a",
+                                                                                                                    ),
+                                                                                                                ],
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                        Add,
+                                                                                                        Literal(
+                                                                                                            String(
+                                                                                                                ",",
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ],
+                                                                                            returns: None,
+                                                                                        },
+                                                                                    ),
+                                                                                ],
+                                                                                returns: Some(
+                                                                                    BinaryOp(
+                                                                                        Variable(
+                                                                                            "out",
+                                                                                        ),
+                                                                                        Add,
+                                                                                        Literal(
+                                                                                            String(
+                                                                                                ")",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 31,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 31,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "expr",
+                                        Some(
+                                            Named(
+                                                "Expr",
+                                                [],
+                                            ),
+                                        ),
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "BinOp",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "op",
+                                                        Literal(
+                                                            String(
+                                                                "+",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "left",
+                                                        StructInit(
+                                                            Named(
+                                                                "NumLit",
+                                                                [],
+                                                            ),
+                                                            [
+                                                                (
+                                                                    "value",
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "right",
+                                                        StructInit(
+                                                            Named(
+                                                                "BinOp",
+                                                                [],
+                                                            ),
+                                                            [
+                                                                (
+                                                                    "op",
+                                                                    Literal(
+                                                                        String(
+                                                                            "*",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "left",
+                                                                    StructInit(
+                                                                        Named(
+                                                                            "NumLit",
+                                                                            [],
+                                                                        ),
+                                                                        [
+                                                                            (
+                                                                                "value",
+                                                                                Literal(
+                                                                                    Int(
+                                                                                        "2",
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "right",
+                                                                    StructInit(
+                                                                        Named(
+                                                                            "NumLit",
+                                                                            [],
+                                                                        ),
+                                                                        [
+                                                                            (
+                                                                                "value",
+                                                                                Literal(
+                                                                                    Int(
+                                                                                        "3",
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "show",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "expr",
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "v",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "eval_int",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "expr",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "v",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "print",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Literal(
+                                                                    String(
+                                                                        "could not eval",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            Some(
+                                                Block {
+                                                    statements: [
+                                                        Expr(
+                                                            Call(
+                                                                Variable(
+                                                                    "print",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    BinaryOp(
+                                                                        Literal(
+                                                                            String(
+                                                                                "result: ",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "v",
+                                                                                ),
+                                                                                Primitive(
+                                                                                    Int64,
+                                                                                ),
+                                                                            ),
+                                                                            Primitive(
+                                                                                String,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: None,
+                                                },
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 49,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 49,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

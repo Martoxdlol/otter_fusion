@@ -7,6 +7,26 @@ Ok(
     Program {
         items: [
             Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
                 kind: Function(
                     FunctionDecl {
                         name: "describe",
@@ -206,14 +226,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 3,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 3,
                     col: 9,
                     len: 8,
                 },
@@ -273,14 +293,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 13,
+                            line: 15,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 13,
+                    line: 15,
                     col: 9,
                     len: 8,
                 },

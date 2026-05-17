@@ -20,7 +20,12 @@ Ok(
                                 generics: [],
                                 return_type: None,
                                 params: [],
-                                body: None,
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
                                 span: Span {
                                     line: 1,
                                     col: 23,

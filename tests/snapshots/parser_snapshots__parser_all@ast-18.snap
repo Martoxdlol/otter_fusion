@@ -3,6 +3,741 @@ source: tests/parser_snapshots.rs
 expression: ast
 input_file: examples/language/18_union_events_interface.of
 ---
-Err(
-    "unexpected token comment",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Event",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "kind",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: None,
+                                span: Span {
+                                    line: 7,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Click",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "y",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "kind",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Literal(
+                                                String(
+                                                    "click",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 14,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Event",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 10,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "KeyPress",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "key",
+                                ty: Primitive(
+                                    Char,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "ctrl",
+                                ty: Primitive(
+                                    Bool,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "kind",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Literal(
+                                                String(
+                                                    "key",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 21,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Event",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 17,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Resize",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "width",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "height",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "kind",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Literal(
+                                                String(
+                                                    "resize",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 28,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Event",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 24,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "AnyEvent",
+                        generics: [],
+                        ty: Union(
+                            [
+                                Named(
+                                    "Click",
+                                    [],
+                                ),
+                                Named(
+                                    "KeyPress",
+                                    [],
+                                ),
+                                Named(
+                                    "Resize",
+                                    [],
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 31,
+                    col: 5,
+                    len: 4,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "describe",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "e",
+                                ty: Named(
+                                    "AnyEvent",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "prefix",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Call(
+                                                    Member(
+                                                        As(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "Event",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        "kind",
+                                                    ),
+                                                    [],
+                                                    [],
+                                                ),
+                                                Add,
+                                                Literal(
+                                                    String(
+                                                        ": ",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "e",
+                                            ),
+                                            Named(
+                                                "Click",
+                                                [],
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "c",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "Click",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: Some(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            Variable(
+                                                                "prefix",
+                                                            ),
+                                                            Add,
+                                                            As(
+                                                                Member(
+                                                                    Variable(
+                                                                        "c",
+                                                                    ),
+                                                                    "x",
+                                                                ),
+                                                                Primitive(
+                                                                    String,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                ",",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Member(
+                                                            Variable(
+                                                                "c",
+                                                            ),
+                                                            "y",
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "e",
+                                                            ),
+                                                            Named(
+                                                                "KeyPress",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                VarDecl(
+                                                                    "k",
+                                                                    None,
+                                                                    Some(
+                                                                        As(
+                                                                            Variable(
+                                                                                "e",
+                                                                            ),
+                                                                            Named(
+                                                                                "KeyPress",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: Some(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            Variable(
+                                                                                "prefix",
+                                                                            ),
+                                                                            Add,
+                                                                            As(
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "k",
+                                                                                    ),
+                                                                                    "key",
+                                                                                ),
+                                                                                Primitive(
+                                                                                    String,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Literal(
+                                                                            String(
+                                                                                " ctrl=",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    As(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "k",
+                                                                            ),
+                                                                            "ctrl",
+                                                                        ),
+                                                                        Primitive(
+                                                                            String,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        },
+                                                        Some(
+                                                            Block {
+                                                                statements: [
+                                                                    VarDecl(
+                                                                        "r",
+                                                                        None,
+                                                                        Some(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "e",
+                                                                                ),
+                                                                                Named(
+                                                                                    "Resize",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: Some(
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            BinaryOp(
+                                                                                Variable(
+                                                                                    "prefix",
+                                                                                ),
+                                                                                Add,
+                                                                                As(
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "r",
+                                                                                        ),
+                                                                                        "width",
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        String,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            Literal(
+                                                                                String(
+                                                                                    "x",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            Member(
+                                                                                Variable(
+                                                                                    "r",
+                                                                                ),
+                                                                                "height",
+                                                                            ),
+                                                                            Primitive(
+                                                                                String,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 33,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 33,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "events",
+                                        Some(
+                                            Named(
+                                                "List",
+                                                [
+                                                    Named(
+                                                        "AnyEvent",
+                                                        [],
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                        Some(
+                                            LiteralList(
+                                                [
+                                                    StructInit(
+                                                        Named(
+                                                            "Click",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "x",
+                                                                Literal(
+                                                                    Int(
+                                                                        "10",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "y",
+                                                                Literal(
+                                                                    Int(
+                                                                        "20",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "KeyPress",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "key",
+                                                                Literal(
+                                                                    Char(
+                                                                        'A',
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "ctrl",
+                                                                Literal(
+                                                                    Bool(
+                                                                        true,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                    StructInit(
+                                                        Named(
+                                                            "Resize",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "width",
+                                                                Literal(
+                                                                    Int(
+                                                                        "1920",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "height",
+                                                                Literal(
+                                                                    Int(
+                                                                        "1080",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    For(
+                                        "e",
+                                        Variable(
+                                            "events",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Call(
+                                                                Variable(
+                                                                    "describe",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    Variable(
+                                                                        "e",
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 50,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 50,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

@@ -3,6 +3,13 @@ source: tests/validator_snapshots.rs
 expression: result
 input_file: examples/language/13_null.of
 ---
-ParserError(
-    "unexpected token 'if'",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::greet'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::greet'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
 )

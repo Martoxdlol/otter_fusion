@@ -4,5 +4,5 @@ expression: result
 input_file: examples/lexer/slash_starts_comment_when_followed_by_slash.of
 ---
 ParserError(
-    "unexpected token comment",
+    "unexpected token 'var'",
 )
