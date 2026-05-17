@@ -23,6 +23,8 @@ pub enum TokenType {
     // Operators
     LT,        // <
     GT,        // >
+    LtEq,      // <=
+    GtEq,      // >=
     Eq,        // =
     EqEq,      // ==
     FatArrow,  // =>
@@ -75,6 +77,8 @@ pub enum TokenType {
     Continue,  // continue
     Break,     // break
     Extern,    // extern
+    Import,    // import
+    From,      // from
 
     EOF,
 }
@@ -237,6 +241,8 @@ impl fmt::Display for TokenType {
             TokenType::RightBracket => f.write_str("']'"),
             TokenType::LT => f.write_str("'<'"),
             TokenType::GT => f.write_str("'>'"),
+            TokenType::LtEq => f.write_str("'<='"),
+            TokenType::GtEq => f.write_str("'>='"),
             TokenType::Eq => f.write_str("'='"),
             TokenType::EqEq => f.write_str("'=='"),
             TokenType::FatArrow => f.write_str("'=>'"),
@@ -283,6 +289,8 @@ impl fmt::Display for TokenType {
             TokenType::Continue => f.write_str("'continue'"),
             TokenType::Break => f.write_str("'break'"),
             TokenType::Extern => f.write_str("'extern'"),
+            TokenType::Import => f.write_str("'import'"),
+            TokenType::From => f.write_str("'from'"),
             TokenType::EOF => f.write_str("end of file"),
         }
     }
@@ -316,6 +324,8 @@ impl TokenType {
             // Two-character
             TokenType::EqEq
             | TokenType::BangEq
+            | TokenType::LtEq
+            | TokenType::GtEq
             | TokenType::And
             | TokenType::Or
             | TokenType::FatArrow => 2,
@@ -354,6 +364,8 @@ impl TokenType {
             TokenType::Continue => 8,
             TokenType::Break => 5,
             TokenType::Extern => 6,
+            TokenType::Import => 6,
+            TokenType::From => 4,
 
             TokenType::EOF => 0,
         }

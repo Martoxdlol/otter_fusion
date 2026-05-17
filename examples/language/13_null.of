@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function find_user(id: i64): str | null {
   if (id == 1) {
     "Admin"

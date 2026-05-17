@@ -105,8 +105,22 @@ impl Lexer {
                     '}' => Some(Ok(self.token(TokenType::RightBrace))),
                     '[' => Some(Ok(self.token(TokenType::LeftBracket))),
                     ']' => Some(Ok(self.token(TokenType::RightBracket))),
-                    '<' => Some(Ok(self.token(TokenType::LT))),
-                    '>' => Some(Ok(self.token(TokenType::GT))),
+                    '<' => {
+                        if self.peek() == Some('=') {
+                            self.advance();
+                            return Some(Ok(self.token(TokenType::LtEq)));
+                        } else {
+                            return Some(Ok(self.token(TokenType::LT)));
+                        }
+                    }
+                    '>' => {
+                        if self.peek() == Some('=') {
+                            self.advance();
+                            return Some(Ok(self.token(TokenType::GtEq)));
+                        } else {
+                            return Some(Ok(self.token(TokenType::GT)));
+                        }
+                    }
                     '=' => {
                         if self.peek() == Some('=') {
                             self.advance();
@@ -167,6 +181,9 @@ impl Lexer {
                     if matches!(token.token_type, TokenType::EOF) {
                         break;
                     }
+                    if matches!(token.token_type, TokenType::Comment(_)) {
+                        continue;
+                    }
                     tokens.push(token);
                 }
                 Err(err) => return Err(err),
@@ -211,6 +228,8 @@ impl Lexer {
             "continue" => self.token(TokenType::Continue),
             "break" => self.token(TokenType::Break),
             "extern" => self.token(TokenType::Extern),
+            "import" => self.token(TokenType::Import),
+            "from" => self.token(TokenType::From),
 
             _ => self.token(TokenType::Identifier(literal)),
         }

@@ -7,6 +7,7 @@
     { "include": "#strings" },
     { "include": "#chars" },
     { "include": "#numbers" },
+    { "include": "#imports" },
     { "include": "#keywords" },
     { "include": "#constants" },
     { "include": "#types" },
@@ -53,6 +54,41 @@
         {
           "name": "constant.numeric.integer.of",
           "match": "\\b[0-9]+\\b"
+        }
+      ]
+    },
+    "imports": {
+      "comment": "import { a, b as c } from \"mod\";",
+      "begin": "\\b(import)\\b",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.import.of" }
+      },
+      "end": ";",
+      "endCaptures": {
+        "0": { "name": "punctuation.terminator.of" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#strings" },
+        {
+          "name": "keyword.control.import.from.of",
+          "match": "\\b(from)\\b"
+        },
+        {
+          "name": "keyword.control.import.as.of",
+          "match": "\\b(as)\\b"
+        },
+        {
+          "name": "punctuation.brace.of",
+          "match": "[{}]"
+        },
+        {
+          "name": "punctuation.separator.of",
+          "match": ","
+        },
+        {
+          "name": "variable.other.import.of",
+          "match": "\\b[A-Za-z_][A-Za-z0-9_]*\\b"
         }
       ]
     },

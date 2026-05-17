@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function classify(age: i64): str {
   var status = if (age >= 65) {
     "Senior"

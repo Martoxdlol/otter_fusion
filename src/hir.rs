@@ -132,6 +132,9 @@ pub struct HirFunction {
     pub name: String,
     pub owner: Option<TypeId>, // None for free functions
     pub has_self: bool,
+    /// `extern function ...` declaration. Imports have an empty body; exports
+    /// (callbacks) have a real body but still cross the C ABI.
+    pub is_extern: bool,
     pub type_params: Vec<TypeParamId>,
     pub params: Vec<HirParam>,
     pub return_type: ResolvedType,

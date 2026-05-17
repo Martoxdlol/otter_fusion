@@ -2,6 +2,49 @@
 
 This document proposes a Mid-level Intermediate Representation (MIR) layer for Otter Fusion, sitting between the existing HIR (`src/hir.rs`) and a future code generator. It is grounded in the current state of the project: HIR is fully resolved and type-safe, generics remain abstract, no backend exists yet, closure captures are collected but unvalidated, and union memory layout is unspecified.
 
+## Frozen design decisions
+
+The rules below are frozen for the v1 lowering pass. Anything else in this document is background discussion; these win when they conflict.
+
+### Target & layout
+
+- **64-bit only.** Pointer / `usize` = 8 bytes, align 8.
+- **GC header = 16 bytes** at negative offset from the object pointer: `[gc_meta:8 | type_id:8]`. Object pointer points at field 0, so the header lives at `obj_ptr - 16` and the type id at `obj_ptr - 8`.
+- **Field layout** is declaration order with natural alignment plus trailing pad to the struct's overall alignment. **No field reordering.**
+- **Extern structs** use the same rules but emit no GC header.
+- **Primitive sizes / aligns** (size = align): `i8`/`u8`/`bool` = 1, `i16`/`u16` = 2, `i32`/`u32`/`f32`/`char` = 4, `i64`/`u64`/`f64` = 8, `String` and any managed ref = 8 (pointer).
+
+### Union layout
+
+- **Default tagged layout:** `{ tag: u16, _pad: 6, payload: 8 }` = 16 bytes, align 8. Payload slot holds a pointer or any ≤ 8-byte primitive directly.
+- **Tag assignment:** stable canonical order — sort variants lexicographically by their stringified `ResolvedType`. Independent of source order, so `A | B` and `B | A` agree.
+- **`null` reserves tag 0** when present in a tagged union.
+- **`T | null` where `T` is a managed ref** lowers to `MirType::NullableRef` (no tag, `null` = pointer 0). Other unions keep the tagged layout.
+
+### Iterator protocol
+
+`Iterator<T>::next(self) -> T | null` (already in `of_core.of`). `for x in iter` desugars to:
+
+```
+let it = <iter>;
+loop {
+  let n = it.next();        // virtual call
+  if n is null { break }
+  let x = n as T;           // under the null-opt, no-op cast
+  <body>
+}
+```
+
+### Closure captures
+
+**Capture by value, always.** Each `FunctionLiteral` materializes a `MirTypeDef::Closure` with one field per `HirCapture`; the literal site emits `AllocClosure(fn_id, [captures...])`; captured reads become `Field(env, idx)`.
+
+Managed refs are pointers, so capturing them by value gives the usual "mutate through the captured ref" behavior. Primitives are snapshots. Stack-escape analysis and ref-captures are out of scope.
+
+### Name mangling
+
+Human-readable form: `module.name<arg1,arg2>`, e.g. `app.foo<i32,str>`, `core.List<i32>::push`. Methods: `module.Type::method<args>`. Closures: `<parent>::closure#<n>`. A separate sanitizer pass will encode `<>,:` for object files when a backend lands; do not encode preemptively.
+
 ## What the MIR needs to make explicit
 
 Working from `src/hir.rs` and the 21 example programs, these are the things HIR leaves implicit that codegen will need spelled out:

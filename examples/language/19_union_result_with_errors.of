@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 // Mixed union: primitives for the success branch, multiple distinct
 // error structs for the failure branch — all errors share an interface
 // so they can be handled uniformly without further narrowing.

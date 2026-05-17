@@ -3,8 +3,9 @@ use std::fmt;
 use crate::{
     ast::{
         BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
-        GenericParam, InterfaceDecl, Item, ItemKind, Literal, ParamDecl, PrimitiveType, Program,
-        Statement, StructDecl, TypeAliasDecl, TypeExpr, UnaryOperator,
+        GenericParam, ImportDecl, ImportSymbol, ImportSymbols, InterfaceDecl, Item, ItemKind,
+        Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl,
+        TypeExpr, UnaryOperator,
     },
     tokens::{Token, TokenType},
 };
@@ -67,6 +68,10 @@ impl Parser {
     pub fn parse_item(&mut self) -> Result<Item, ParserError> {
         let span = self.peek().span();
         match self.peek().token_type.clone() {
+            TokenType::Import => Ok(Item {
+                kind: ItemKind::Import(self.parse_import_decl()?),
+                span,
+            }),
             TokenType::Type => self.parse_type_decl(),
             TokenType::Struct => Ok(Item {
                 kind: ItemKind::Struct(self.parse_struct_decl(false)?),
@@ -90,11 +95,64 @@ impl Parser {
                         kind: ItemKind::Function(self.parse_function_decl(true)?),
                         span: next_span,
                     }),
-                    _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+                    _ => Err(self.unexpected_token_peek()),
                 }
             }
-            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+            _ => Err(self.unexpected_token_peek()),
         }
+    }
+
+    /// Parses one of:
+    ///   - `import "module";`                    (glob)
+    ///   - `import { Foo, bar } from "module";`  (named, with optional aliases)
+    ///   - `import { Foo as Bar } from "module";`
+    pub fn parse_import_decl(&mut self) -> Result<ImportDecl, ParserError> {
+        self.expect(TokenType::Import)?;
+
+        // Glob form: `import "<module>";`
+        if let TokenType::StringLit(name) = self.peek().token_type.clone() {
+            self.advance();
+            self.expect_end_of_statement()?;
+            return Ok(ImportDecl {
+                module: name,
+                symbols: ImportSymbols::Glob,
+            });
+        }
+
+        // Named form: `import { a, b as c } from "<module>";`
+        self.expect(TokenType::LeftBrace)?;
+        let mut symbols: Vec<ImportSymbol> = Vec::new();
+        if self.peek().token_type != TokenType::RightBrace {
+            loop {
+                let name = self.expect_identifier()?;
+                let alias = if self.expect_optional(TokenType::As) {
+                    Some(self.expect_identifier()?)
+                } else {
+                    None
+                };
+                symbols.push(ImportSymbol { name, alias });
+                if !self.expect_optional(TokenType::Comma) {
+                    break;
+                }
+                if self.peek().token_type == TokenType::RightBrace {
+                    break;
+                }
+            }
+        }
+        self.expect(TokenType::RightBrace)?;
+        self.expect(TokenType::From)?;
+        let module = match self.peek().token_type.clone() {
+            TokenType::StringLit(s) => {
+                self.advance();
+                s
+            }
+            _ => return Err(self.unexpected_token_peek()),
+        };
+        self.expect_end_of_statement()?;
+        Ok(ImportDecl {
+            module,
+            symbols: ImportSymbols::Named(symbols),
+        })
     }
 
     // Items
@@ -105,7 +163,7 @@ impl Parser {
         let generics = self.parse_generic_params()?;
         self.expect(TokenType::Eq)?;
         let ty = self.parse_type_expr()?;
-        self.expect(TokenType::Semicolon)?;
+        self.expect_end_of_statement()?;
         Ok(Item {
             kind: ItemKind::TypeAlias(TypeAliasDecl { name, generics, ty }),
             span,
@@ -152,20 +210,16 @@ impl Parser {
         self.expect(TokenType::Function)?;
         let name = self.expect_identifier()?;
         let generics = self.parse_generic_params()?;
-        let mut params = self.parse_function_args(is_extern)?;
+        let (has_self_param, params) = self.parse_function_args(is_extern)?;
         let mut return_type = None;
         if self.expect_optional(TokenType::Colon) {
             return_type = Some(self.parse_return_type(is_extern)?);
         }
 
-        let has_self_param = params.first().map_or(false, |p| p.name == "self");
-
-        if has_self_param {
-            params.remove(0);
-        }
-
-        let body = if self.peek().token_type == TokenType::Semicolon {
+        let body = if self.peek().token_type == TokenType::Comma {
             self.advance();
+            None
+        } else if self.peek().token_type == TokenType::RightBrace {
             None
         } else {
             Some(self.parse_block()?)
@@ -317,6 +371,20 @@ impl Parser {
         }
     }
 
+    fn parse_optional_has_self_param(&mut self) -> Result<bool, ParserError> {
+        if !self.expect_optional(TokenType::SelfRef) {
+            return Ok(false);
+        }
+        match self.peek().token_type {
+            TokenType::Comma => {
+                self.advance();
+                Ok(true)
+            }
+            TokenType::RightParen => Ok(true),
+            _ => Err(self.unexpected_token_peek()),
+        }
+    }
+
     fn parse_type_atom(&mut self) -> Result<TypeExpr, ParserError> {
         let token = self.peek().clone();
         match &token.token_type {
@@ -367,7 +435,22 @@ impl Parser {
                 let return_type = self.parse_type_expr()?;
                 Ok(TypeExpr::Function(param_types, Box::new(return_type)))
             }
-            _ => Err(ParserError::UnexpectedToken(token)),
+            _ => Err(self.unexpected_token(token)),
+        }
+    }
+
+    fn try_parse_type_args_for_call(&mut self) -> Option<Vec<TypeExpr>> {
+        let saved = self.current;
+        match self.parse_type_args() {
+            Ok(args) if !args.is_empty()
+                && self.peek().token_type == TokenType::LeftParen =>
+            {
+                Some(args)
+            }
+            _ => {
+                self.current = saved;
+                None
+            }
         }
     }
 
@@ -411,6 +494,8 @@ impl Parser {
         let mut fields: Vec<FieldDecl> = Vec::new();
         let mut methods: Vec<FunctionDecl> = Vec::new();
 
+        let mut found_comma = false; // To track if we've seen a comma between fields
+
         loop {
             let tok = self.peek();
             match &tok.token_type {
@@ -420,8 +505,18 @@ impl Parser {
                     self.advance();
                     break;
                 }
-                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+                TokenType::Comma => {
+                    if found_comma {
+                        return Err(self.unexpected_token(tok.clone())); // Two commas in a row is an error
+                    }
+
+                    self.advance();
+                    continue;
+                }
+                _ => return Err(self.unexpected_token(tok.clone())),
             }
+
+            found_comma = false;
         }
 
         Ok((fields, methods))
@@ -441,7 +536,7 @@ impl Parser {
                     self.advance();
                     break;
                 }
-                _ => return Err(ParserError::UnexpectedToken(tok.clone())),
+                _ => return Err(self.unexpected_token(tok.clone())),
             }
         }
 
@@ -450,8 +545,13 @@ impl Parser {
 
     // Functions
 
-    pub fn parse_function_args(&mut self, in_extern: bool) -> Result<Vec<ParamDecl>, ParserError> {
+    pub fn parse_function_args(
+        &mut self,
+        in_extern: bool,
+    ) -> Result<(bool, Vec<ParamDecl>), ParserError> {
         self.expect(TokenType::LeftParen)?;
+
+        let has_self_param = self.parse_optional_has_self_param()?;
         let mut params = Vec::new();
 
         if self.peek().token_type != TokenType::RightParen {
@@ -462,7 +562,7 @@ impl Parser {
         }
 
         self.expect(TokenType::RightParen)?;
-        Ok(params)
+        Ok((has_self_param, params))
     }
 
     pub fn parse_param_decl(&mut self, in_extern: bool) -> Result<ParamDecl, ParserError> {
@@ -514,7 +614,7 @@ impl Parser {
                 break;
             }
 
-            let stmt = self.parse_statement()?;
+            let stmt: Statement = self.parse_statement()?;
 
             if self.expect_optional(TokenType::Semicolon) {
                 // Semicolon present — it's a regular statement, continue looping
@@ -528,8 +628,11 @@ impl Parser {
                 }
                 self.advance();
                 break;
+            } else if stmt_allows_no_semicolon(&stmt) {
+                // Block-like expression statements (if, block) don't require a semicolon
+                statements.push(stmt);
             } else {
-                return Err(ParserError::UnexpectedToken(self.peek().clone()));
+                return Err(self.unexpected_token_peek());
             }
         }
 
@@ -576,16 +679,24 @@ impl Parser {
             }
             TokenType::While => {
                 self.expect(TokenType::While)?;
+                let has_paren = self.expect_optional(TokenType::LeftParen);
                 let condition = self.parse_expr()?;
+                if has_paren {
+                    self.expect(TokenType::RightParen)?;
+                }
                 let body = self.parse_block()?;
                 Ok(Statement::While(condition, body))
             }
 
             TokenType::For => {
                 self.expect(TokenType::For)?;
+                let has_paren = self.expect_optional(TokenType::LeftParen);
                 let name = self.expect_identifier()?;
                 self.expect(TokenType::In)?;
                 let iterable = self.parse_expr()?;
+                if has_paren {
+                    self.expect(TokenType::RightParen)?;
+                }
                 let body = self.parse_block()?;
                 Ok(Statement::For(name, iterable, body))
             }
@@ -597,7 +708,15 @@ impl Parser {
                 self.expect(TokenType::Continue)?;
                 Ok(Statement::Continue)
             }
-            _ => Ok(Statement::Expr(self.parse_expr()?)),
+            _ => {
+                let expr = self.parse_expr()?;
+                if self.expect_optional(TokenType::Eq) {
+                    let value = self.parse_expr()?;
+                    Ok(Statement::Assign(expr, value))
+                } else {
+                    Ok(Statement::Expr(expr))
+                }
+            }
         }
     }
 
@@ -644,6 +763,18 @@ impl Parser {
                     lhs = self.parse_call_args(lhs, vec![])?;
                     continue;
                 }
+                // Postfix: generic function call `f<T, U>(args)`. Speculatively
+                // try to parse as type args; if it doesn't end with `(`, fall
+                // back to treating `<` as the less-than operator.
+                TokenType::LT => {
+                    let saved = self.current;
+                    if let Some(type_args) = self.try_parse_type_args_for_call() {
+                        lhs = self.parse_call_args(lhs, type_args)?;
+                        continue;
+                    }
+                    self.current = saved;
+                    BinaryOperator::Lt
+                }
                 // Postfix: as / is
                 TokenType::As => {
                     if 15 < min_bp {
@@ -668,8 +799,9 @@ impl Parser {
                 TokenType::And => BinaryOperator::And,
                 TokenType::EqEq => BinaryOperator::Eq,
                 TokenType::BangEq => BinaryOperator::Neq,
-                TokenType::LT => BinaryOperator::Lt,
                 TokenType::GT => BinaryOperator::Gt,
+                TokenType::LtEq => BinaryOperator::Le,
+                TokenType::GtEq => BinaryOperator::Ge,
                 TokenType::Plus => BinaryOperator::Add,
                 TokenType::Minus => BinaryOperator::Sub,
                 TokenType::Star => BinaryOperator::Mul,
@@ -817,16 +949,43 @@ impl Parser {
             // Block or map literal
             TokenType::LeftBrace => self.parse_block_or_map(),
 
-            // Identifier: variable
+            // Identifier: variable, or struct init `Name { field: val, ... }`
             TokenType::Identifier(name) => {
                 let name = name.clone();
                 self.advance();
+                let type_args_saved = self.current;
+                let type_args = if self.peek().token_type == TokenType::LT {
+                    match self.parse_type_args() {
+                        Ok(args) => args,
+                        Err(_) => {
+                            self.current = type_args_saved;
+                            vec![]
+                        }
+                    }
+                } else {
+                    vec![]
+                };
+                if self.peek().token_type == TokenType::LeftBrace
+                    && self.peek_is_struct_init_body()
+                {
+                    return self.parse_struct_init_body(TypeExpr::Named(name, type_args));
+                }
+                if !type_args.is_empty() {
+                    self.current = type_args_saved;
+                }
                 Ok(Expr::Variable(name))
+            }
+
+            TokenType::SelfRef => {
+                self.advance();
+                Ok(Expr::SelfRef)
             }
 
             TokenType::If => self.parse_if_expr(),
 
-            _ => Err(ParserError::UnexpectedToken(self.peek().clone())),
+            TokenType::Function => self.parse_function_literal(),
+
+            _ => Err(self.unexpected_token_peek()),
         }
     }
 
@@ -867,6 +1026,61 @@ impl Parser {
         Ok(expr)
     }
 
+    fn peek_is_struct_init_body(&mut self) -> bool {
+        // Expect: `{` followed by `identifier :` or empty `{}`
+        let saved = self.current;
+        if self.peek().token_type != TokenType::LeftBrace {
+            return false;
+        }
+        self.advance();
+        let result = match &self.peek().token_type {
+            TokenType::RightBrace => true,
+            TokenType::Identifier(_) => {
+                self.advance();
+                self.peek().token_type == TokenType::Colon
+            }
+            _ => false,
+        };
+        self.current = saved;
+        result
+    }
+
+    fn parse_struct_init_body(&mut self, ty: TypeExpr) -> Result<Expr, ParserError> {
+        self.expect(TokenType::LeftBrace)?;
+        let mut fields = Vec::new();
+        if self.peek().token_type != TokenType::RightBrace {
+            loop {
+                let name = self.expect_identifier()?;
+                self.expect(TokenType::Colon)?;
+                let value = self.parse_expr()?;
+                fields.push((name, value));
+                if !self.expect_optional(TokenType::Comma) {
+                    break;
+                }
+                if self.peek().token_type == TokenType::RightBrace {
+                    break;
+                }
+            }
+        }
+        self.expect(TokenType::RightBrace)?;
+        Ok(Expr::StructInit(ty, fields))
+    }
+
+    fn parse_function_literal(&mut self) -> Result<Expr, ParserError> {
+        self.expect(TokenType::Function)?;
+        let generics = self.parse_generic_params()?;
+        let (_has_self, params) = self.parse_function_args(false)?;
+        self.expect(TokenType::Colon)?;
+        let return_type = self.parse_type_expr()?;
+        let body = self.parse_block()?;
+        Ok(Expr::FunctionLiteral(
+            generics,
+            params,
+            return_type,
+            Box::new(body),
+        ))
+    }
+
     fn parse_list_literal(&mut self) -> Result<Expr, ParserError> {
         self.expect(TokenType::LeftBracket)?;
         let mut elements = Vec::new();
@@ -890,13 +1104,22 @@ impl Parser {
         let cond = self.parse_expr()?;
         let then_branch = self.parse_block()?;
         let else_branch = if self.expect_optional(TokenType::Else) {
-            Some(Box::new(self.parse_block()?))
+            if self.peek().token_type == TokenType::If {
+                let inner = self.parse_if_expr()?;
+                Some(Box::new(Block {
+                    statements: vec![],
+                    returns: Some(inner),
+                }))
+            } else {
+                Some(Box::new(self.parse_block()?))
+            }
         } else {
             None
         };
         Ok(Expr::If(Box::new(cond), Box::new(then_branch), else_branch))
     }
     fn parse_block_or_map(&mut self) -> Result<Expr, ParserError> {
+        let saved = self.current;
         self.expect(TokenType::LeftBrace)?;
         if self.peek().token_type == TokenType::RightBrace {
             self.advance();
@@ -911,6 +1134,7 @@ impl Parser {
         if is_map {
             self.parse_map_literal()
         } else {
+            self.current = saved;
             let block = self.parse_block()?;
             Ok(Expr::Block(Box::new(block)))
         }
@@ -958,7 +1182,7 @@ impl Parser {
                     self.advance();
                     s
                 }
-                _ => return Err(ParserError::UnexpectedToken(self.peek().clone())),
+                _ => return Err(self.unexpected_token_peek()),
             };
 
             self.expect(TokenType::Colon)?;
@@ -966,6 +1190,9 @@ impl Parser {
             entries.push((key, value));
 
             if !self.expect_optional(TokenType::Comma) {
+                break;
+            }
+            if self.peek().token_type == TokenType::RightBrace {
                 break;
             }
         }
@@ -990,8 +1217,15 @@ impl Parser {
     }
 
     pub fn advance(&mut self) {
-        if self.current < self.tokens.len() {
-            self.current += 1;
+        loop {
+            if self.current < self.tokens.len() {
+                self.current += 1;
+            }
+
+            // if not comment break
+            if !matches!(self.peek().token_type, TokenType::Comment(_)) {
+                break;
+            }
         }
     }
 
@@ -1008,7 +1242,12 @@ impl Parser {
             return Ok(());
         }
 
-        Err(ParserError::UnexpectedToken(token.clone()))
+        Err(self.unexpected_token(token.clone()))
+    }
+
+    /// Expect semicolon
+    pub fn expect_end_of_statement(&mut self) -> Result<(), ParserError> {
+        self.expect(TokenType::Semicolon)
     }
 
     pub fn expect_optional(&mut self, token_type: TokenType) -> bool {
@@ -1028,7 +1267,16 @@ impl Parser {
             return Ok(name_cloned);
         }
 
-        Err(ParserError::UnexpectedToken(token.clone()))
+        Err(self.unexpected_token(token.clone()))
+    }
+
+    pub fn unexpected_token_peek(&self) -> ParserError {
+        self.unexpected_token(self.peek().clone())
+    }
+
+    pub fn unexpected_token(&self, token: Token) -> ParserError {
+        // insert panic here for debug
+        ParserError::UnexpectedToken(token)
     }
 
     pub fn parse_optional_primitive(&self, name: &str) -> Option<PrimitiveType> {
@@ -1047,9 +1295,22 @@ impl Parser {
             "char" => Some(PrimitiveType::Char),
             "bool" => Some(PrimitiveType::Bool),
             "null" => Some(PrimitiveType::Null),
+            "void" => Some(PrimitiveType::Null),
             _ => return None,
         };
     }
+}
+
+fn stmt_allows_no_semicolon(stmt: &Statement) -> bool {
+    match stmt {
+        Statement::Expr(expr) => expr_allows_no_semicolon(expr),
+        Statement::While(_, _) | Statement::For(_, _, _) => true,
+        _ => false,
+    }
+}
+
+fn expr_allows_no_semicolon(expr: &Expr) -> bool {
+    matches!(expr, Expr::If(_, _, _) | Expr::Block(_))
 }
 
 /*

@@ -146,6 +146,7 @@ pub enum Statement {
     VarDecl(String, Option<TypeExpr>, Option<Expr>), // var x: int = 5; / var x = 5;
     Return(Option<Expr>),                            // return 5;
     Expr(Expr),                                      // x + 5;
+    Assign(Expr, Expr),                              // target = value
     While(Expr, Block),                              // while x < 10 { ... }
     For(String, Expr, Block),                        // for (item in items) { ... }
     Break,                                           // break
@@ -168,6 +169,7 @@ pub enum Expr {
     UnaryOp(UnaryOperator, Box<Expr>),              // -x
     FunctionLiteral(Vec<GenericParam>, Vec<ParamDecl>, TypeExpr, Box<Block>), // (x: int): int { ... }
     Block(Box<Block>),
+    SelfRef,
 }
 
 #[derive(Debug, Clone, PartialEq)]

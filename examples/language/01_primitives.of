@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function main(): i64 {
   var name: str = "Otter";
   var age = 30;            // inferred i64

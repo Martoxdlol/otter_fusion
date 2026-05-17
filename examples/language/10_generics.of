@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 function identity<T>(value: T): T {
   value
 }

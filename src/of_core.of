@@ -1,0 +1,180 @@
+// `of:core` - auto-imported prelude.
+//
+// Container methods are thin wrappers over free `extern function` symbols
+// that the runtime/codegen will provide. Naming convention: `__of_*`.
+
+function print(value: str) {
+  __of_print(value)
+}
+function println(value: str) {
+  __of_println(value)
+}
+
+extern function __of_print(value: str);
+extern function __of_println(value: str);
+
+extern function pin<T>(value: T): *T;
+extern function unpin<T>(ptr: *T);
+
+interface Iterator<T> {
+  function next(self): T | null
+}
+
+struct Entry<K, V> {
+  key: K,
+  value: V
+}
+
+// ---- Buffer (contiguous bytes, foreign-heap) ----
+//
+// `Buffer` is an extern struct so it has guaranteed C layout — pass it to
+// or return it from extern functions by value or by pointer. It owns a
+// `*u8` into the foreign heap; the GC never touches it. Lifetime is
+// manual: pair every `Buffer.alloc(n)` with a `buf.free()`.
+
+extern struct Buffer {
+  data: *u8,
+  size: u64,
+
+  function alloc(size: u64): Buffer | null {
+    __of_buffer_alloc(size)
+  }
+  function get(self, i: u64): u8 | null {
+    __of_buffer_get(self, i)
+  }
+  function set(self, i: u64, v: u8) {
+    __of_buffer_set(self, i, v)
+  }
+  function free(self) {
+    __of_buffer_free(self)
+  }
+}
+
+extern function __of_buffer_alloc(size: u64): Buffer | null;
+extern function __of_buffer_get(buf: Buffer, i: u64): u8 | null;
+extern function __of_buffer_set(buf: Buffer, i: u64, v: u8);
+extern function __of_buffer_free(buf: Buffer);
+
+struct List<T> {
+  function new(): List<T> {
+    __of_list_new<T>()
+  }
+  function size(self): i64 {
+    __of_list_size<T>(self)
+  }
+  function is_empty(self): bool {
+    __of_list_is_empty<T>(self)
+  }
+  function clear(self) {
+    __of_list_clear<T>(self)
+  }
+  function get(self, i: i64): T | null {
+    __of_list_get<T>(self, i)
+  }
+  function set(self, i: i64, v: T) {
+    __of_list_set<T>(self, i, v)
+  }
+  function push(self, v: T) {
+    __of_list_push<T>(self, v)
+  }
+  function pop(self): T | null {
+    __of_list_pop<T>(self)
+  }
+  function insert(self, i: i64, v: T) {
+    __of_list_insert<T>(self, i, v)
+  }
+  function remove(self, i: i64): T | null {
+    __of_list_remove<T>(self, i)
+  }
+  function truncate(self, n: i64) {
+    __of_list_truncate<T>(self, n)
+  }
+  function contains(self, v: T): bool {
+    __of_list_contains<T>(self, v)
+  }
+  function index_of(self, v: T): i64 | null {
+    __of_list_index_of<T>(self, v)
+  }
+}
+
+extern function __of_list_new<T>(): List<T>;
+extern function __of_list_size<T>(l: List<T>): i64;
+extern function __of_list_is_empty<T>(l: List<T>): bool;
+extern function __of_list_clear<T>(l: List<T>);
+extern function __of_list_get<T>(l: List<T>, i: i64): T | null;
+extern function __of_list_set<T>(l: List<T>, i: i64, v: T);
+extern function __of_list_push<T>(l: List<T>, v: T);
+extern function __of_list_pop<T>(l: List<T>): T | null;
+extern function __of_list_insert<T>(l: List<T>, i: i64, v: T);
+extern function __of_list_remove<T>(l: List<T>, i: i64): T | null;
+extern function __of_list_truncate<T>(l: List<T>, n: i64);
+extern function __of_list_contains<T>(l: List<T>, v: T): bool;
+extern function __of_list_index_of<T>(l: List<T>, v: T): i64 | null;
+
+// ---- Map<K, V> ----
+
+struct Map<K, V> {
+  function new(): Map<K, V> {
+    __of_map_new<K, V>()
+  }
+  function size(self): i64 {
+    __of_map_size<K, V>(self)
+  }
+  function is_empty(self): bool {
+    __of_map_is_empty<K, V>(self)
+  }
+  function clear(self) {
+    __of_map_clear<K, V>(self)
+  }
+  function get(self, k: K): V | null {
+    __of_map_get<K, V>(self, k)
+  }
+  function set(self, k: K, v: V) {
+    __of_map_set<K, V>(self, k, v)
+  }
+  function remove(self, k: K): V | null {
+    __of_map_remove<K, V>(self, k)
+  }
+  function contains(self, k: K): bool {
+    __of_map_contains<K, V>(self, k)
+  }
+  function keys(self): List<K> {
+    __of_map_keys<K, V>(self)
+  }
+  function values(self): List<V> {
+    __of_map_values<K, V>(self)
+  }
+}
+
+extern function __of_map_new<K, V>(): Map<K, V>;
+extern function __of_map_size<K, V>(m: Map<K, V>): i64;
+extern function __of_map_is_empty<K, V>(m: Map<K, V>): bool;
+extern function __of_map_clear<K, V>(m: Map<K, V>);
+extern function __of_map_get<K, V>(m: Map<K, V>, k: K): V | null;
+extern function __of_map_set<K, V>(m: Map<K, V>, k: K, v: V);
+extern function __of_map_remove<K, V>(m: Map<K, V>, k: K): V | null;
+extern function __of_map_contains<K, V>(m: Map<K, V>, k: K): bool;
+extern function __of_map_keys<K, V>(m: Map<K, V>): List<K>;
+extern function __of_map_values<K, V>(m: Map<K, V>): List<V>;
+
+// ---- str primitive methods ----
+//
+// Method dispatch on `str` is hardcoded in the validator (you can't declare
+// methods on a primitive type). These extern symbols are the ABI those
+// dispatched calls bind to at codegen time.
+
+extern function __of_str_size(s: str): i64;
+extern function __of_str_is_empty(s: str): bool;
+extern function __of_str_get(s: str, i: i64): char | null;
+extern function __of_str_contains(s: str, needle: str): bool;
+extern function __of_str_starts_with(s: str, prefix: str): bool;
+extern function __of_str_ends_with(s: str, suffix: str): bool;
+extern function __of_str_index_of(s: str, needle: str): i64 | null;
+extern function __of_str_substring(s: str, start: i64, end: i64): str;
+extern function __of_str_concat(a: str, b: str): str;
+extern function __of_str_split(s: str, sep: str): List<str>;
+extern function __of_str_trim(s: str): str;
+extern function __of_str_to_upper(s: str): str;
+extern function __of_str_to_lower(s: str): str;
+extern function __of_str_replace(s: str, old: str, new: str): str;
+extern function __of_str_repeat(s: str, n: i64): str;

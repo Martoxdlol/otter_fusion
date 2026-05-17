@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 struct Vehicle {
   speed: i32,
 }

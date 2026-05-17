@@ -1,3 +1,5 @@
+import { print } from "of:core";
+
 // Two heterogeneous unions interacting: ConfigValue mixes primitives
 // and a list, while Constraint mixes structs with null. The validator
 // has to discriminate both unions at once.
