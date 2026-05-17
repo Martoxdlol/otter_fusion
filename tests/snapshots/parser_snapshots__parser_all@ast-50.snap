@@ -1,0 +1,10 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/whitespace_only_returns_eof.of
+---
+Ok(
+    Program {
+        items: [],
+    },
+)

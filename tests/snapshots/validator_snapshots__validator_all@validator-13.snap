@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/13_null.of
+---
+ParserError(
+    "unexpected token 'if'",
+)

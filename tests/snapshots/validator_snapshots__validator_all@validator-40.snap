@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/scan_number_invalid_float_none_after_dot.of
+---
+LexerError(
+    "invalid number literal '123.'",
+)

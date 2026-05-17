@@ -1,0 +1,101 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
+---
+Ok(
+    [
+        Token {
+            token_type: Extern,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Star,
+            position: 36,
+            line: 1,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: Pipe,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: Null,
+            position: 49,
+            line: 1,
+            column: 50,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 50,
+            line: 1,
+            column: 51,
+        },
+    ],
+)

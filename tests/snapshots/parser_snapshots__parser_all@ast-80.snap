@@ -1,0 +1,32 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_type_expr_named_with_type_args.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "X",
+                        generics: [],
+                        ty: Named(
+                            "List",
+                            [
+                                Primitive(
+                                    Int32,
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 5,
+                    len: 4,
+                },
+            },
+        ],
+    },
+)

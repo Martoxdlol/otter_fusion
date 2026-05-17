@@ -1,0 +1,111 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/spec/10_generics/generic_function.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "identity",
+            ),
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: LT,
+            position: 18,
+            line: 1,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: GT,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "value",
+            ),
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: Colon,
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 31,
+            line: 1,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "value",
+            ),
+            position: 43,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 45,
+            line: 3,
+            column: 2,
+        },
+    ],
+)

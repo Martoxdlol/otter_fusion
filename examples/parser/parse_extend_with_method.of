@@ -1,0 +1,1 @@
+extend Foo { function baz(): bool; }

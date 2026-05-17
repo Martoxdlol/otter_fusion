@@ -1,0 +1,193 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/spec/04_structs_interfaces/struct_instantiation.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Person",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 22,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 23,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 27,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 28,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 34,
+            line: 3,
+            column: 6,
+        },
+        Token {
+            token_type: Colon,
+            position: 35,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 39,
+            line: 3,
+            column: 11,
+        },
+        Token {
+            token_type: Comma,
+            position: 40,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 42,
+            line: 4,
+            column: 2,
+        },
+        Token {
+            token_type: Var,
+            position: 47,
+            line: 6,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "person",
+            ),
+            position: 54,
+            line: 6,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
+            position: 56,
+            line: 6,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "Person",
+            ),
+            position: 63,
+            line: 6,
+            column: 20,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 65,
+            line: 6,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 72,
+            line: 7,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 73,
+            line: 7,
+            column: 8,
+        },
+        Token {
+            token_type: StringLit(
+                "Alice",
+            ),
+            position: 81,
+            line: 7,
+            column: 16,
+        },
+        Token {
+            token_type: Comma,
+            position: 82,
+            line: 7,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 88,
+            line: 8,
+            column: 6,
+        },
+        Token {
+            token_type: Colon,
+            position: 89,
+            line: 8,
+            column: 7,
+        },
+        Token {
+            token_type: Int(
+                "30",
+            ),
+            position: 92,
+            line: 8,
+            column: 10,
+        },
+        Token {
+            token_type: Comma,
+            position: 93,
+            line: 8,
+            column: 11,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 95,
+            line: 9,
+            column: 2,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 96,
+            line: 9,
+            column: 3,
+        },
+    ],
+)

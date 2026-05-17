@@ -1,0 +1,5 @@
+var status = if (age >= 18) {
+  "Adult"
+} else {
+  "Minor"
+};

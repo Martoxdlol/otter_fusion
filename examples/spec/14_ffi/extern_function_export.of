@@ -1,0 +1,3 @@
+extern function on_tick(d: *MyStruct) {
+  d.counter = d.counter + 1
+}

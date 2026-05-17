@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/mixed_sequence_of_tokens_is_scanned_in_order.of
+---
+Err(
+    "unexpected token 'var'",
+)

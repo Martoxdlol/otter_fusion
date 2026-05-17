@@ -1,0 +1,2 @@
+interface I { function f(a: i64); }
+struct S : I { function f() {} }

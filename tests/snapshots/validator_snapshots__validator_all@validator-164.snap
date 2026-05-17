@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_return_type_mismatch_errors.of
+---
+ValidationErrors(
+    [
+        "type mismatch in function 'test_module::test' (return): expected 'int64', found 'string'",
+    ],
+)

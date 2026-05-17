@@ -1,0 +1,7 @@
+struct Box<T> {
+  content: T,
+
+  function get(self): T {
+    self.content
+  }
+}

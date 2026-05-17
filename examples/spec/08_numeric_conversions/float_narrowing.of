@@ -1,0 +1,2 @@
+var high_precision: f64 = 123.456;
+var low_precision: f32 = high_precision as f32;

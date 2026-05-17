@@ -1,0 +1,8 @@
+function process(input: i64 | str) {
+  if (input is i64) {
+    var value = input as i64;
+    print("Number: " + (value as str));
+  } else {
+    print("String: " + (input as str));
+  }
+}

@@ -1,0 +1,15 @@
+extern struct Buffer {
+  data: *u8,
+  size: u64,
+}
+
+extern function malloc(size: u64): *Buffer | null;
+extern function free(buf: *Buffer);
+
+function allocate(size: u64): *Buffer {
+  var maybe = malloc(size);
+  if (maybe is null) {
+    return null;
+  }
+  maybe as Buffer
+}

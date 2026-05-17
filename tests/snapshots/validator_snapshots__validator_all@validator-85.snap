@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/spec/02_variables/block_expression.of
+---
+ParserError(
+    "unexpected token 'var'",
+)

@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/09_extensions.of
+---
+ParserError(
+    "unexpected token ','",
+)

@@ -1,0 +1,15 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/slash_without_second_slash_is_slash_token.of
+---
+Ok(
+    [
+        Token {
+            token_type: Slash,
+            position: 1,
+            line: 1,
+            column: 2,
+        },
+    ],
+)

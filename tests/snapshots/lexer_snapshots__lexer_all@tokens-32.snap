@@ -1,0 +1,17 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/identifier_with_underscore_dollar_and_digits_is_scanned.of
+---
+Ok(
+    [
+        Token {
+            token_type: Identifier(
+                "_value$123",
+            ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+    ],
+)

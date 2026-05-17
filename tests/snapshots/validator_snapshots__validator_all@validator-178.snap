@@ -1,0 +1,15 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_while_non_bool_cond_errors.of
+---
+Err(
+    [
+        TypeMismatch {
+            function: "test_module::test",
+            context: "while condition",
+            expected: "bool",
+            actual: "int64",
+        },
+    ],
+)

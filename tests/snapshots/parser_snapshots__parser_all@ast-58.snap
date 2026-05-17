@@ -1,0 +1,55 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_extern_function_generic_pointer.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "hashmap_set",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "key",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: true,
+                            },
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        body: None,
+                        span: Span {
+                            line: 1,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 16,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

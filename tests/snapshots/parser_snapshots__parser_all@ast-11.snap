@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/11_lists_maps_loops.of
+---
+Err(
+    "unexpected token '('",
+)

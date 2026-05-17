@@ -1,0 +1,8 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/parser/parse_empty_program.of
+---
+Ok(
+    [],
+)

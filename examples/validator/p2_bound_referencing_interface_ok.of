@@ -1,0 +1,2 @@
+interface Show {}
+struct Foo<T: Show> {}

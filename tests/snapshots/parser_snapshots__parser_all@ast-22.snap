@@ -1,0 +1,180 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/hello.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "Hello, Otter Fusion!",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "x",
+                                        Some(
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                        Some(
+                                            Literal(
+                                                Int(
+                                                    "10",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "y",
+                                        Some(
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                        Some(
+                                            Literal(
+                                                Int(
+                                                    "20",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "sum",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "x",
+                                                ),
+                                                Add,
+                                                Variable(
+                                                    "y",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "Sum: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Variable(
+                                                            "sum",
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "name",
+                                        Some(
+                                            Primitive(
+                                                String,
+                                            ),
+                                        ),
+                                        Some(
+                                            Literal(
+                                                String(
+                                                    "World",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        Literal(
+                                                            String(
+                                                                "Hello, ",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Variable(
+                                                            "name",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Literal(
+                                                        String(
+                                                            "!",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

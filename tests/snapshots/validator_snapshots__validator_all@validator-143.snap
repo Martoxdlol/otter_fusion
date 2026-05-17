@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p4_implements_non_interface_errors.of
+---
+ValidationErrors(
+    [
+        "type 'test_module::B' implements clause references a non-interface",
+    ],
+)

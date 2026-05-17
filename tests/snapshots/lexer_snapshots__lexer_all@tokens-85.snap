@@ -1,0 +1,137 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/spec/02_variables/block_expression.of
+---
+Ok(
+    [
+        Token {
+            token_type: Var,
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "value",
+            ),
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Var,
+            position: 19,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 21,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 23,
+            line: 2,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 26,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 27,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: Var,
+            position: 33,
+            line: 3,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 35,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 37,
+            line: 3,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "20",
+            ),
+            position: 40,
+            line: 3,
+            column: 13,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 41,
+            line: 3,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 45,
+            line: 4,
+            column: 4,
+        },
+        Token {
+            token_type: Plus,
+            position: 47,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 49,
+            line: 4,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 51,
+            line: 5,
+            column: 2,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 52,
+            line: 5,
+            column: 3,
+        },
+    ],
+)

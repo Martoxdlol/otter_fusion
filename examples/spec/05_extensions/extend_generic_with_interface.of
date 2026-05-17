@@ -1,0 +1,13 @@
+struct Wrapper<T> {
+  value: T,
+}
+
+interface Named {
+  function name(self): str,
+}
+
+extend<T> Wrapper<T>: Named {
+  function name(self): str {
+    "Wrapper"
+  }
+}

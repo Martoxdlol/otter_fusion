@@ -1,0 +1,9 @@
+struct Wrapper<T> {
+  value: T,
+}
+
+extend Wrapper<i32> {
+  function double(self): i32 {
+    self.value * 2
+  }
+}

@@ -1,0 +1,2 @@
+var double = function(x: i32): i32 { x * 2 };
+var apply = function<T>(value: T, f: (T) -> T): T { f(value) };

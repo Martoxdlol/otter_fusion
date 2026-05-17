@@ -1,0 +1,1 @@
+type Fun = extern (x: MyStruct) => bool;

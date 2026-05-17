@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/validator/p5_struct_init_and_member_access.of
+---
+Err(
+    "unexpected token '{'",
+)

@@ -1,0 +1,12 @@
+interface Named {
+  name: str,
+}
+
+struct Person: Named {
+  name: str,
+  age: i32,
+
+  function greet(self): str {
+    "Hello, " + self.name
+  }
+}

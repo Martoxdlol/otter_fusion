@@ -1,0 +1,117 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/validator/p5_if_expression_typechecks.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "test",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: If,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: True,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
+            position: 31,
+            line: 1,
+            column: 32,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Else,
+            position: 38,
+            line: 1,
+            column: 39,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 40,
+            line: 1,
+            column: 41,
+        },
+        Token {
+            token_type: Int(
+                "6",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 46,
+            line: 1,
+            column: 47,
+        },
+    ],
+)

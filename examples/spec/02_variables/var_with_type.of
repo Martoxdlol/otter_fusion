@@ -1,0 +1,3 @@
+var name: str = "John Doe";
+var age = 30;
+var price: f32 = 19.99;

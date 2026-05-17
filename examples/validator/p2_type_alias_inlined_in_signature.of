@@ -1,0 +1,2 @@
+type MyInt = i64;
+function foo(): MyInt {}

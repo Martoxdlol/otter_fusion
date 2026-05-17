@@ -1,0 +1,2 @@
+extern function print(value: str);
+extern function malloc(size: u64): *Buffer;

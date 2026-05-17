@@ -1,0 +1,6 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_null_assignable_to_nullable_union.of
+---
+Ok

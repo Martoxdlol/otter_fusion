@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/non_keyword_literal_becomes_identifier.of
+---
+ParserError(
+    "unexpected token identifier 'structure'",
+)

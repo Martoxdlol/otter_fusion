@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/parser/parse_error_unexpected_token_at_item.of
+---
+ParserError(
+    "unexpected token integer '42'",
+)

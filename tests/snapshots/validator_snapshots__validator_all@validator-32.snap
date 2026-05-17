@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/identifier_with_underscore_dollar_and_digits_is_scanned.of
+---
+ParserError(
+    "unexpected token identifier '_value$123'",
+)

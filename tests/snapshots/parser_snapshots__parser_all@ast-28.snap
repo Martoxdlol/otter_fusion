@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/equality_and_negation_tokens_are_recognized.of
+---
+Err(
+    "unexpected token '='",
+)

@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/spec/03_functions/early_return.of
+---
+ParserError(
+    "unexpected token identifier 'current'",
+)

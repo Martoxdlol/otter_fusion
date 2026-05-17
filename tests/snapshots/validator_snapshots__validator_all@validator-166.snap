@@ -1,0 +1,6 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_simple_body_typechecks.of
+---
+Ok

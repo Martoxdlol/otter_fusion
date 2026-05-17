@@ -1,0 +1,6 @@
+function get_ratio(current: f64, total: f64): f64 {
+  if (total == 0.0) {
+    return 0.0;
+  }
+  current / total
+}

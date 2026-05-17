@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/token_position_line_and_column_are_updated.of
+---
+ParserError(
+    "unexpected token identifier 'foo'",
+)

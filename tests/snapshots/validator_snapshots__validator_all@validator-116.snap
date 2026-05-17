@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/spec/13_iterators/iterator_interface.of
+---
+ParserError(
+    "unexpected token '('",
+)

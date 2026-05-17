@@ -1,0 +1,43 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/spec/02_variables/var_inferred.of
+---
+Ok(
+    [
+        Token {
+            token_type: Var,
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 7,
+            line: 1,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "30",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+    ],
+)

@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
+---
+ValidationErrors(
+    [
+        "unknown type 'U' in module 'test_module'",
+    ],
+)

@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_error_unexpected_token_at_item.of
+---
+Err(
+    "unexpected token integer '42'",
+)

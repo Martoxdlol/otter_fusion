@@ -1,0 +1,17 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/scan_number_valid_int.of
+---
+Ok(
+    [
+        Token {
+            token_type: Int(
+                "123",
+            ),
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+    ],
+)

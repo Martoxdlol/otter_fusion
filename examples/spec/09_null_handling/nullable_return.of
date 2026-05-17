@@ -1,0 +1,15 @@
+function find_user(id: i64): str | null {
+  if (id == 1) {
+    "Admin"
+  } else {
+    null
+  }
+}
+
+var user = find_user(5);
+
+if (user is null) {
+  print("No user found");
+} else {
+  print("User: " + (user as str));
+}

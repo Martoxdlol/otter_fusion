@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/comment_at_end_of_input_results_in_eof.of
+---
+ParserError(
+    "unexpected token comment",
+)

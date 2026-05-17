@@ -1,0 +1,37 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_type_expr_function_type.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "X",
+                        generics: [],
+                        ty: Function(
+                            [
+                                Primitive(
+                                    Int32,
+                                ),
+                                Primitive(
+                                    String,
+                                ),
+                            ],
+                            Primitive(
+                                Bool,
+                            ),
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 5,
+                    len: 4,
+                },
+            },
+        ],
+    },
+)

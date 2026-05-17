@@ -1,0 +1,2 @@
+struct S { x: i64 }
+function test() { S { x: 5, y: 6 }; }

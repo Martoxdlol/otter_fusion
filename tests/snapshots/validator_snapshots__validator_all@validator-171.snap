@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_unknown_variable_errors.of
+---
+ValidationErrors(
+    [
+        "unknown variable 'oops' in function 'test_module::test'",
+    ],
+)

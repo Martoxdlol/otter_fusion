@@ -1,0 +1,1 @@
+extern function malloc(size: u64): *Buffer;

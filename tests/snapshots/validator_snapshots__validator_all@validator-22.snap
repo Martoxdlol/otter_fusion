@@ -1,0 +1,15 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/hello.of
+---
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+        "unknown variable 'print' in function 'test_module::main'",
+    ],
+)

@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
+---
+Err(
+    "unexpected token '*'",
+)

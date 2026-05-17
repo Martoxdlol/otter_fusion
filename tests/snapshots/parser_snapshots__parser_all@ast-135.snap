@@ -1,0 +1,42 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/validator/p2_struct_generics_minted_and_field_resolved.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Box",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

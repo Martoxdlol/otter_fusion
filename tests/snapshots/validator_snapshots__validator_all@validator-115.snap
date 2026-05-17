@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/spec/12_control_flow/while_loop.of
+---
+ParserError(
+    "unexpected token 'var'",
+)

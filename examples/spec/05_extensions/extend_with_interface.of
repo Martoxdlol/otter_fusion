@@ -1,0 +1,13 @@
+struct Vehicle {
+  speed: i32,
+}
+
+interface Movable {
+  function move(self): str,
+}
+
+extend Vehicle: Movable {
+  function move(self): str {
+    "The vehicle moves"
+  }
+}

@@ -1,0 +1,2 @@
+interface I { x: i64 }
+struct S : I {}

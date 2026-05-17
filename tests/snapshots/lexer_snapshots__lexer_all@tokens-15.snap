@@ -1,0 +1,1947 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/language/15_ffi_pinning.of
+---
+Ok(
+    [
+        Token {
+            token_type: Extern,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Struct,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "data",
+            ),
+            position: 29,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 30,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Star,
+            position: 32,
+            line: 2,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "u8",
+            ),
+            position: 34,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 35,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 42,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 43,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 47,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 48,
+            line: 3,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 50,
+            line: 4,
+            column: 2,
+        },
+        Token {
+            token_type: Extern,
+            position: 58,
+            line: 6,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 67,
+            line: 6,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 74,
+            line: 6,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 75,
+            line: 6,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 79,
+            line: 6,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 80,
+            line: 6,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 84,
+            line: 6,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 85,
+            line: 6,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 86,
+            line: 6,
+            column: 35,
+        },
+        Token {
+            token_type: Star,
+            position: 88,
+            line: 6,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 94,
+            line: 6,
+            column: 43,
+        },
+        Token {
+            token_type: Pipe,
+            position: 96,
+            line: 6,
+            column: 45,
+        },
+        Token {
+            token_type: Null,
+            position: 101,
+            line: 6,
+            column: 50,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 102,
+            line: 6,
+            column: 51,
+        },
+        Token {
+            token_type: Extern,
+            position: 109,
+            line: 7,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 118,
+            line: 7,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "free",
+            ),
+            position: 123,
+            line: 7,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 124,
+            line: 7,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 127,
+            line: 7,
+            column: 25,
+        },
+        Token {
+            token_type: Colon,
+            position: 128,
+            line: 7,
+            column: 26,
+        },
+        Token {
+            token_type: Star,
+            position: 130,
+            line: 7,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 136,
+            line: 7,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 137,
+            line: 7,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 138,
+            line: 7,
+            column: 36,
+        },
+        Token {
+            token_type: Extern,
+            position: 145,
+            line: 8,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 154,
+            line: 8,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 160,
+            line: 8,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 161,
+            line: 8,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "value",
+            ),
+            position: 166,
+            line: 8,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 167,
+            line: 8,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 171,
+            line: 8,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 172,
+            line: 8,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 173,
+            line: 8,
+            column: 35,
+        },
+        Token {
+            token_type: Type,
+            position: 179,
+            line: 10,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "TickCb",
+            ),
+            position: 186,
+            line: 10,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 188,
+            line: 10,
+            column: 14,
+        },
+        Token {
+            token_type: Extern,
+            position: 195,
+            line: 10,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 197,
+            line: 10,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "d",
+            ),
+            position: 198,
+            line: 10,
+            column: 24,
+        },
+        Token {
+            token_type: Colon,
+            position: 199,
+            line: 10,
+            column: 25,
+        },
+        Token {
+            token_type: Star,
+            position: 201,
+            line: 10,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 209,
+            line: 10,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 210,
+            line: 10,
+            column: 36,
+        },
+        Token {
+            token_type: FatArrow,
+            position: 213,
+            line: 10,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "void",
+            ),
+            position: 218,
+            line: 10,
+            column: 44,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 219,
+            line: 10,
+            column: 45,
+        },
+        Token {
+            token_type: Extern,
+            position: 227,
+            line: 12,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 236,
+            line: 12,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "register_callback",
+            ),
+            position: 254,
+            line: 12,
+            column: 34,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 255,
+            line: 12,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "data",
+            ),
+            position: 259,
+            line: 12,
+            column: 39,
+        },
+        Token {
+            token_type: Colon,
+            position: 260,
+            line: 12,
+            column: 40,
+        },
+        Token {
+            token_type: Star,
+            position: 262,
+            line: 12,
+            column: 42,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 270,
+            line: 12,
+            column: 50,
+        },
+        Token {
+            token_type: Comma,
+            position: 271,
+            line: 12,
+            column: 51,
+        },
+        Token {
+            token_type: Identifier(
+                "cb",
+            ),
+            position: 274,
+            line: 12,
+            column: 54,
+        },
+        Token {
+            token_type: Colon,
+            position: 275,
+            line: 12,
+            column: 55,
+        },
+        Token {
+            token_type: Identifier(
+                "TickCb",
+            ),
+            position: 282,
+            line: 12,
+            column: 62,
+        },
+        Token {
+            token_type: RightParen,
+            position: 283,
+            line: 12,
+            column: 63,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 284,
+            line: 12,
+            column: 64,
+        },
+        Token {
+            token_type: Extern,
+            position: 291,
+            line: 13,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 300,
+            line: 13,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "unregister_callback",
+            ),
+            position: 320,
+            line: 13,
+            column: 36,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 321,
+            line: 13,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "data",
+            ),
+            position: 325,
+            line: 13,
+            column: 41,
+        },
+        Token {
+            token_type: Colon,
+            position: 326,
+            line: 13,
+            column: 42,
+        },
+        Token {
+            token_type: Star,
+            position: 328,
+            line: 13,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 336,
+            line: 13,
+            column: 52,
+        },
+        Token {
+            token_type: RightParen,
+            position: 337,
+            line: 13,
+            column: 53,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 338,
+            line: 13,
+            column: 54,
+        },
+        Token {
+            token_type: Struct,
+            position: 346,
+            line: 15,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 355,
+            line: 15,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 357,
+            line: 15,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "counter",
+            ),
+            position: 367,
+            line: 16,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 368,
+            line: 16,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 372,
+            line: 16,
+            column: 15,
+        },
+        Token {
+            token_type: Comma,
+            position: 373,
+            line: 16,
+            column: 16,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 375,
+            line: 17,
+            column: 2,
+        },
+        Token {
+            token_type: Extern,
+            position: 383,
+            line: 19,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 392,
+            line: 19,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "on_tick",
+            ),
+            position: 400,
+            line: 19,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 401,
+            line: 19,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "d",
+            ),
+            position: 402,
+            line: 19,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 403,
+            line: 19,
+            column: 27,
+        },
+        Token {
+            token_type: Star,
+            position: 405,
+            line: 19,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 413,
+            line: 19,
+            column: 37,
+        },
+        Token {
+            token_type: RightParen,
+            position: 414,
+            line: 19,
+            column: 38,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 416,
+            line: 19,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "d",
+            ),
+            position: 420,
+            line: 20,
+            column: 4,
+        },
+        Token {
+            token_type: Dot,
+            position: 421,
+            line: 20,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "counter",
+            ),
+            position: 428,
+            line: 20,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 430,
+            line: 20,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "d",
+            ),
+            position: 432,
+            line: 20,
+            column: 16,
+        },
+        Token {
+            token_type: Dot,
+            position: 433,
+            line: 20,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "counter",
+            ),
+            position: 440,
+            line: 20,
+            column: 24,
+        },
+        Token {
+            token_type: Plus,
+            position: 442,
+            line: 20,
+            column: 26,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 444,
+            line: 20,
+            column: 28,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 446,
+            line: 21,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 456,
+            line: 23,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "allocate",
+            ),
+            position: 465,
+            line: 23,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 466,
+            line: 23,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 470,
+            line: 23,
+            column: 23,
+        },
+        Token {
+            token_type: Colon,
+            position: 471,
+            line: 23,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 475,
+            line: 23,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 476,
+            line: 23,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 477,
+            line: 23,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 484,
+            line: 23,
+            column: 37,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 486,
+            line: 23,
+            column: 39,
+        },
+        Token {
+            token_type: Var,
+            position: 492,
+            line: 24,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 498,
+            line: 24,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 500,
+            line: 24,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 507,
+            line: 24,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 508,
+            line: 24,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 512,
+            line: 24,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 513,
+            line: 24,
+            column: 27,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 514,
+            line: 24,
+            column: 28,
+        },
+        Token {
+            token_type: If,
+            position: 519,
+            line: 25,
+            column: 5,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 521,
+            line: 25,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 526,
+            line: 25,
+            column: 12,
+        },
+        Token {
+            token_type: Is,
+            position: 529,
+            line: 25,
+            column: 15,
+        },
+        Token {
+            token_type: Null,
+            position: 534,
+            line: 25,
+            column: 20,
+        },
+        Token {
+            token_type: RightParen,
+            position: 535,
+            line: 25,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 537,
+            line: 25,
+            column: 23,
+        },
+        Token {
+            token_type: Return,
+            position: 548,
+            line: 26,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 555,
+            line: 26,
+            column: 18,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 557,
+            line: 26,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "data",
+            ),
+            position: 562,
+            line: 26,
+            column: 25,
+        },
+        Token {
+            token_type: Colon,
+            position: 563,
+            line: 26,
+            column: 26,
+        },
+        Token {
+            token_type: Null,
+            position: 568,
+            line: 26,
+            column: 31,
+        },
+        Token {
+            token_type: Comma,
+            position: 569,
+            line: 26,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 574,
+            line: 26,
+            column: 37,
+        },
+        Token {
+            token_type: Colon,
+            position: 575,
+            line: 26,
+            column: 38,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 577,
+            line: 26,
+            column: 40,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 579,
+            line: 26,
+            column: 42,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 580,
+            line: 26,
+            column: 43,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 584,
+            line: 27,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 592,
+            line: 28,
+            column: 8,
+        },
+        Token {
+            token_type: As,
+            position: 595,
+            line: 28,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 602,
+            line: 28,
+            column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 604,
+            line: 29,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 614,
+            line: 31,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "install",
+            ),
+            position: 622,
+            line: 31,
+            column: 17,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 623,
+            line: 31,
+            column: 18,
+        },
+        Token {
+            token_type: RightParen,
+            position: 624,
+            line: 31,
+            column: 19,
+        },
+        Token {
+            token_type: Colon,
+            position: 625,
+            line: 31,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 634,
+            line: 31,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 636,
+            line: 31,
+            column: 31,
+        },
+        Token {
+            token_type: Var,
+            position: 642,
+            line: 32,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 648,
+            line: 32,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 650,
+            line: 32,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 659,
+            line: 32,
+            column: 23,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 661,
+            line: 32,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "counter",
+            ),
+            position: 669,
+            line: 32,
+            column: 33,
+        },
+        Token {
+            token_type: Colon,
+            position: 670,
+            line: 32,
+            column: 34,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 672,
+            line: 32,
+            column: 36,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 674,
+            line: 32,
+            column: 38,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 675,
+            line: 32,
+            column: 39,
+        },
+        Token {
+            token_type: Var,
+            position: 681,
+            line: 33,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 685,
+            line: 33,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 687,
+            line: 33,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "pin",
+            ),
+            position: 691,
+            line: 33,
+            column: 16,
+        },
+        Token {
+            token_type: LT,
+            position: 692,
+            line: 33,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 700,
+            line: 33,
+            column: 25,
+        },
+        Token {
+            token_type: GT,
+            position: 701,
+            line: 33,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 702,
+            line: 33,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 707,
+            line: 33,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 708,
+            line: 33,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 709,
+            line: 33,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "register_callback",
+            ),
+            position: 729,
+            line: 34,
+            column: 20,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 730,
+            line: 34,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 733,
+            line: 34,
+            column: 24,
+        },
+        Token {
+            token_type: Comma,
+            position: 734,
+            line: 34,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "on_tick",
+            ),
+            position: 742,
+            line: 34,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 743,
+            line: 34,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 744,
+            line: 34,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 752,
+            line: 35,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 754,
+            line: 36,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 764,
+            line: 38,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "remove",
+            ),
+            position: 771,
+            line: 38,
+            column: 16,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 772,
+            line: 38,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 777,
+            line: 38,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 778,
+            line: 38,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 787,
+            line: 38,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 788,
+            line: 38,
+            column: 33,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 790,
+            line: 38,
+            column: 35,
+        },
+        Token {
+            token_type: Var,
+            position: 796,
+            line: 39,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 800,
+            line: 39,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 802,
+            line: 39,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "pin",
+            ),
+            position: 806,
+            line: 39,
+            column: 16,
+        },
+        Token {
+            token_type: LT,
+            position: 807,
+            line: 39,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 815,
+            line: 39,
+            column: 25,
+        },
+        Token {
+            token_type: GT,
+            position: 816,
+            line: 39,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 817,
+            line: 39,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 822,
+            line: 39,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 823,
+            line: 39,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 824,
+            line: 39,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "unregister_callback",
+            ),
+            position: 846,
+            line: 40,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 847,
+            line: 40,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 850,
+            line: 40,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 851,
+            line: 40,
+            column: 27,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 852,
+            line: 40,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "unpin",
+            ),
+            position: 860,
+            line: 41,
+            column: 8,
+        },
+        Token {
+            token_type: LT,
+            position: 861,
+            line: 41,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 869,
+            line: 41,
+            column: 17,
+        },
+        Token {
+            token_type: GT,
+            position: 870,
+            line: 41,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 871,
+            line: 41,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 874,
+            line: 41,
+            column: 22,
+        },
+        Token {
+            token_type: RightParen,
+            position: 875,
+            line: 41,
+            column: 23,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 876,
+            line: 41,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "unpin",
+            ),
+            position: 884,
+            line: 42,
+            column: 8,
+        },
+        Token {
+            token_type: LT,
+            position: 885,
+            line: 42,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 893,
+            line: 42,
+            column: 17,
+        },
+        Token {
+            token_type: GT,
+            position: 894,
+            line: 42,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 895,
+            line: 42,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "ptr",
+            ),
+            position: 898,
+            line: 42,
+            column: 22,
+        },
+        Token {
+            token_type: RightParen,
+            position: 899,
+            line: 42,
+            column: 23,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 900,
+            line: 42,
+            column: 24,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 902,
+            line: 43,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 912,
+            line: 45,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "main",
+            ),
+            position: 917,
+            line: 45,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 918,
+            line: 45,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 919,
+            line: 45,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 920,
+            line: 45,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 924,
+            line: 45,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 926,
+            line: 45,
+            column: 23,
+        },
+        Token {
+            token_type: Var,
+            position: 932,
+            line: 46,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 936,
+            line: 46,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 938,
+            line: 46,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "allocate",
+            ),
+            position: 947,
+            line: 46,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 948,
+            line: 46,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "1024",
+            ),
+            position: 952,
+            line: 46,
+            column: 26,
+        },
+        Token {
+            token_type: As,
+            position: 955,
+            line: 46,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 959,
+            line: 46,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 960,
+            line: 46,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 961,
+            line: 46,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 969,
+            line: 47,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 970,
+            line: 47,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "buffer size: ",
+            ),
+            position: 985,
+            line: 47,
+            column: 24,
+        },
+        Token {
+            token_type: Plus,
+            position: 987,
+            line: 47,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 989,
+            line: 47,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 992,
+            line: 47,
+            column: 31,
+        },
+        Token {
+            token_type: Dot,
+            position: 993,
+            line: 47,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 997,
+            line: 47,
+            column: 36,
+        },
+        Token {
+            token_type: As,
+            position: 1000,
+            line: 47,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1004,
+            line: 47,
+            column: 43,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1005,
+            line: 47,
+            column: 44,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1006,
+            line: 47,
+            column: 45,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1007,
+            line: 47,
+            column: 46,
+        },
+        Token {
+            token_type: Var,
+            position: 1014,
+            line: 49,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 1020,
+            line: 49,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 1022,
+            line: 49,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "install",
+            ),
+            position: 1030,
+            line: 49,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1031,
+            line: 49,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1032,
+            line: 49,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1033,
+            line: 49,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 1041,
+            line: 50,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1042,
+            line: 50,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "counter: ",
+            ),
+            position: 1053,
+            line: 50,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 1055,
+            line: 50,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1057,
+            line: 50,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 1062,
+            line: 50,
+            column: 29,
+        },
+        Token {
+            token_type: Dot,
+            position: 1063,
+            line: 50,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "counter",
+            ),
+            position: 1070,
+            line: 50,
+            column: 37,
+        },
+        Token {
+            token_type: As,
+            position: 1073,
+            line: 50,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1077,
+            line: 50,
+            column: 44,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1078,
+            line: 50,
+            column: 45,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1079,
+            line: 50,
+            column: 46,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1080,
+            line: 50,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "remove",
+            ),
+            position: 1089,
+            line: 51,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1090,
+            line: 51,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "state",
+            ),
+            position: 1095,
+            line: 51,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1096,
+            line: 51,
+            column: 16,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1097,
+            line: 51,
+            column: 17,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 1102,
+            line: 53,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1104,
+            line: 54,
+            column: 2,
+        },
+    ],
+)

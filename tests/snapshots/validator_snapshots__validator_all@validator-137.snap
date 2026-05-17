@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p2_unknown_type_errors.of
+---
+ValidationErrors(
+    [
+        "unknown type 'Nope' in module 'test_module'",
+    ],
+)

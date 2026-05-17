@@ -1,0 +1,34 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_function_no_params.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "noop",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: None,
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

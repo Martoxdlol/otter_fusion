@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/pipe_and_or_tokens_are_recognized.of
+---
+Err(
+    "unexpected token '|'",
+)

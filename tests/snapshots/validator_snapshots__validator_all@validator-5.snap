@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/05_if_block_expressions.of
+---
+ParserError(
+    "unexpected token '='",
+)

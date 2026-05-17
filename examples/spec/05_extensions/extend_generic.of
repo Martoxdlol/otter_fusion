@@ -1,0 +1,9 @@
+struct Wrapper<T> {
+  value: T,
+}
+
+extend<T> Wrapper<T> {
+  function get(self): T {
+    self.value
+  }
+}

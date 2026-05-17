@@ -1,0 +1,2 @@
+type Fun = extern (x: MyStruct) => bool;
+type Callback = extern (data: *MyStruct, size: u64) => *Buffer | null;

@@ -1,0 +1,6 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p2_bound_referencing_interface_ok.of
+---
+Ok

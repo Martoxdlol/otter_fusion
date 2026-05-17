@@ -1,0 +1,1 @@
+struct S { x: i64 function m() { self.x; } }

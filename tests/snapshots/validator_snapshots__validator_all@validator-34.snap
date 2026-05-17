@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/mixed_sequence_of_tokens_is_scanned_in_order.of
+---
+ParserError(
+    "unexpected token 'var'",
+)

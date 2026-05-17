@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/18_union_events_interface.of
+---
+ParserError(
+    "unexpected token comment",
+)

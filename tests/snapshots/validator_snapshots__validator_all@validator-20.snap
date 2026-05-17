@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/20_union_config_constraints.of
+---
+ParserError(
+    "unexpected token comment",
+)

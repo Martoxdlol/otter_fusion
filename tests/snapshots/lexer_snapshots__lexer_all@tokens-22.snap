@@ -1,0 +1,431 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/language/hello.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "main",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 30,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 31,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "Hello, Otter Fusion!",
+            ),
+            position: 53,
+            line: 2,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 54,
+            line: 2,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 55,
+            line: 2,
+            column: 33,
+        },
+        Token {
+            token_type: Var,
+            position: 62,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 64,
+            line: 4,
+            column: 8,
+        },
+        Token {
+            token_type: Colon,
+            position: 65,
+            line: 4,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 69,
+            line: 4,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 71,
+            line: 4,
+            column: 15,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 74,
+            line: 4,
+            column: 18,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 75,
+            line: 4,
+            column: 19,
+        },
+        Token {
+            token_type: Var,
+            position: 81,
+            line: 5,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 83,
+            line: 5,
+            column: 8,
+        },
+        Token {
+            token_type: Colon,
+            position: 84,
+            line: 5,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 88,
+            line: 5,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 90,
+            line: 5,
+            column: 15,
+        },
+        Token {
+            token_type: Int(
+                "20",
+            ),
+            position: 93,
+            line: 5,
+            column: 18,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 94,
+            line: 5,
+            column: 19,
+        },
+        Token {
+            token_type: Var,
+            position: 100,
+            line: 6,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "sum",
+            ),
+            position: 104,
+            line: 6,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 106,
+            line: 6,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 108,
+            line: 6,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 110,
+            line: 6,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 112,
+            line: 6,
+            column: 18,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 113,
+            line: 6,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 121,
+            line: 7,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 122,
+            line: 7,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "Sum: ",
+            ),
+            position: 129,
+            line: 7,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 131,
+            line: 7,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 133,
+            line: 7,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "sum",
+            ),
+            position: 136,
+            line: 7,
+            column: 23,
+        },
+        Token {
+            token_type: As,
+            position: 139,
+            line: 7,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 143,
+            line: 7,
+            column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 144,
+            line: 7,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 145,
+            line: 7,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 146,
+            line: 7,
+            column: 33,
+        },
+        Token {
+            token_type: Var,
+            position: 153,
+            line: 9,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 158,
+            line: 9,
+            column: 11,
+        },
+        Token {
+            token_type: Colon,
+            position: 159,
+            line: 9,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 163,
+            line: 9,
+            column: 16,
+        },
+        Token {
+            token_type: Eq,
+            position: 165,
+            line: 9,
+            column: 18,
+        },
+        Token {
+            token_type: StringLit(
+                "World",
+            ),
+            position: 173,
+            line: 9,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 174,
+            line: 9,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 182,
+            line: 10,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 183,
+            line: 10,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "Hello, ",
+            ),
+            position: 192,
+            line: 10,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 194,
+            line: 10,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 199,
+            line: 10,
+            column: 25,
+        },
+        Token {
+            token_type: Plus,
+            position: 201,
+            line: 10,
+            column: 27,
+        },
+        Token {
+            token_type: StringLit(
+                "!",
+            ),
+            position: 205,
+            line: 10,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 206,
+            line: 10,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 207,
+            line: 10,
+            column: 33,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 212,
+            line: 12,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 214,
+            line: 13,
+            column: 2,
+        },
+    ],
+)

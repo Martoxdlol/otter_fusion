@@ -1,0 +1,2 @@
+var numbers: List<i64> = [1, 2, 3, 4, 5];
+var mixed: List<i64 | str> = [1, "two", 3, "four"];

@@ -1,0 +1,9 @@
+interface Iterator<T> {
+  next(self): T | null,
+}
+
+function print_all<T>(iter: Iterator<T>) {
+  for (item in iter) {
+    print(item);
+  }
+}

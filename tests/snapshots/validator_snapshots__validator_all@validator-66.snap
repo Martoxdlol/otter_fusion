@@ -1,0 +1,6 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/parser/parse_function_no_body.of
+---
+Ok

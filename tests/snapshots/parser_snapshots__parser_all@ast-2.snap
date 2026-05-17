@@ -1,0 +1,290 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/02_arithmetic.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "describe",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "b",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "sum",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "a",
+                                                ),
+                                                Add,
+                                                Variable(
+                                                    "b",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "diff",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "a",
+                                                ),
+                                                Sub,
+                                                Variable(
+                                                    "b",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "prod",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "a",
+                                                ),
+                                                Mul,
+                                                Variable(
+                                                    "b",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "quot",
+                                        None,
+                                        Some(
+                                            If(
+                                                BinaryOp(
+                                                    Variable(
+                                                        "b",
+                                                    ),
+                                                    Eq,
+                                                    Literal(
+                                                        Int(
+                                                            "0",
+                                                        ),
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                                Some(
+                                                    Block {
+                                                        statements: [],
+                                                        returns: Some(
+                                                            BinaryOp(
+                                                                Variable(
+                                                                    "a",
+                                                                ),
+                                                                Div,
+                                                                Variable(
+                                                                    "b",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    BinaryOp(
+                                        BinaryOp(
+                                            BinaryOp(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "sum=",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Variable(
+                                                                        "sum",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Literal(
+                                                                String(
+                                                                    " diff=",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Variable(
+                                                                "diff",
+                                                            ),
+                                                            Primitive(
+                                                                String,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Literal(
+                                                        String(
+                                                            " prod=",
+                                                        ),
+                                                    ),
+                                                ),
+                                                Add,
+                                                As(
+                                                    Variable(
+                                                        "prod",
+                                                    ),
+                                                    Primitive(
+                                                        String,
+                                                    ),
+                                                ),
+                                            ),
+                                            Add,
+                                            Literal(
+                                                String(
+                                                    " quot=",
+                                                ),
+                                            ),
+                                        ),
+                                        Add,
+                                        As(
+                                            Variable(
+                                                "quot",
+                                            ),
+                                            Primitive(
+                                                String,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                Call(
+                                                    Variable(
+                                                        "describe",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Literal(
+                                                            Int(
+                                                                "10",
+                                                            ),
+                                                        ),
+                                                        Literal(
+                                                            Int(
+                                                                "3",
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 13,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 13,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

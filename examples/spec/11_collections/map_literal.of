@@ -1,0 +1,4 @@
+var user_ages: Map<str, i32> = {
+  "Alice": 30,
+  "Bob": 25,
+};

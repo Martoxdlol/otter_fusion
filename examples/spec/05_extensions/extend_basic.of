@@ -1,0 +1,9 @@
+struct Vehicle {
+  speed: i32,
+}
+
+extend Vehicle {
+  function is_fast(self): bool {
+    self.speed > 100
+  }
+}

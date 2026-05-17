@@ -1,0 +1,119 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/spec/08_numeric_conversions/int_narrowing.of
+---
+Ok(
+    [
+        Token {
+            token_type: Var,
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "large_int",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 18,
+            line: 1,
+            column: 19,
+        },
+        Token {
+            token_type: Eq,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: Int(
+                "1000",
+            ),
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: Var,
+            position: 30,
+            line: 2,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "small_int",
+            ),
+            position: 40,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 41,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "i8",
+            ),
+            position: 44,
+            line: 2,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 46,
+            line: 2,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "large_int",
+            ),
+            position: 56,
+            line: 2,
+            column: 30,
+        },
+        Token {
+            token_type: As,
+            position: 59,
+            line: 2,
+            column: 33,
+        },
+        Token {
+            token_type: Identifier(
+                "i8",
+            ),
+            position: 62,
+            line: 2,
+            column: 36,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 63,
+            line: 2,
+            column: 37,
+        },
+    ],
+)

@@ -1,0 +1,2 @@
+type Opt = i64 | null;
+function test() { var x: Opt = null; }

@@ -1,0 +1,2 @@
+struct S { function m() {} }
+function test(s: S) { s.m(); }

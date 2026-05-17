@@ -1,0 +1,2 @@
+struct Foo {}
+extend Foo { function m() {} }

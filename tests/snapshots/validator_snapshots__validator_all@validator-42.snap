@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/scan_number_valid_int.of
+---
+ParserError(
+    "unexpected token integer '123'",
+)

@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/parser/parse_extern_function_with_body.of
+---
+ValidationErrors(
+    [
+        "unknown type 'MyStruct' in module 'test_module'",
+    ],
+)

@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
+---
+ValidationErrors(
+    [
+        "unknown type 'Buffer' in module 'test_module'",
+    ],
+)

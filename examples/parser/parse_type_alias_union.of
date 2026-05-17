@@ -1,0 +1,1 @@
+type Result = i64 | str;

@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/pipe_and_or_tokens_are_recognized.of
+---
+ParserError(
+    "unexpected token '|'",
+)

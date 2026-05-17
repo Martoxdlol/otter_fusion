@@ -1,0 +1,5 @@
+function process(input: i64 | str) {
+  if (input is i64) {
+    var value = input as i64;
+  }
+}

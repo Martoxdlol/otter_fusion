@@ -1,0 +1,17 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/scan_number_valid_float.of
+---
+Ok(
+    [
+        Token {
+            token_type: Float(
+                "123.02",
+            ),
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+    ],
+)

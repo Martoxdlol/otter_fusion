@@ -1,0 +1,557 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/language/01_primitives.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "main",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Var,
+            position: 28,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 33,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Colon,
+            position: 34,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 38,
+            line: 2,
+            column: 16,
+        },
+        Token {
+            token_type: Eq,
+            position: 40,
+            line: 2,
+            column: 18,
+        },
+        Token {
+            token_type: StringLit(
+                "Otter",
+            ),
+            position: 48,
+            line: 2,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 49,
+            line: 2,
+            column: 27,
+        },
+        Token {
+            token_type: Var,
+            position: 55,
+            line: 3,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 59,
+            line: 3,
+            column: 10,
+        },
+        Token {
+            token_type: Eq,
+            position: 61,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Int(
+                "30",
+            ),
+            position: 64,
+            line: 3,
+            column: 15,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 65,
+            line: 3,
+            column: 16,
+        },
+        Token {
+            token_type: Comment(
+                " inferred i64",
+            ),
+            position: 92,
+            line: 3,
+            column: 43,
+        },
+        Token {
+            token_type: Var,
+            position: 98,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "height",
+            ),
+            position: 105,
+            line: 4,
+            column: 13,
+        },
+        Token {
+            token_type: Colon,
+            position: 106,
+            line: 4,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 110,
+            line: 4,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 112,
+            line: 4,
+            column: 20,
+        },
+        Token {
+            token_type: Float(
+                "1.78",
+            ),
+            position: 117,
+            line: 4,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 118,
+            line: 4,
+            column: 26,
+        },
+        Token {
+            token_type: Var,
+            position: 124,
+            line: 5,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "alive",
+            ),
+            position: 130,
+            line: 5,
+            column: 12,
+        },
+        Token {
+            token_type: Colon,
+            position: 131,
+            line: 5,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 136,
+            line: 5,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 138,
+            line: 5,
+            column: 20,
+        },
+        Token {
+            token_type: True,
+            position: 143,
+            line: 5,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 144,
+            line: 5,
+            column: 26,
+        },
+        Token {
+            token_type: Var,
+            position: 150,
+            line: 6,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "initial",
+            ),
+            position: 158,
+            line: 6,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 159,
+            line: 6,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "char",
+            ),
+            position: 164,
+            line: 6,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 166,
+            line: 6,
+            column: 22,
+        },
+        Token {
+            token_type: CharLit(
+                'O',
+            ),
+            position: 170,
+            line: 6,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 171,
+            line: 6,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 180,
+            line: 8,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 181,
+            line: 8,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 185,
+            line: 8,
+            column: 13,
+        },
+        Token {
+            token_type: RightParen,
+            position: 186,
+            line: 8,
+            column: 14,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 187,
+            line: 8,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 195,
+            line: 9,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 196,
+            line: 9,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "age: ",
+            ),
+            position: 203,
+            line: 9,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 205,
+            line: 9,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 207,
+            line: 9,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 210,
+            line: 9,
+            column: 23,
+        },
+        Token {
+            token_type: As,
+            position: 213,
+            line: 9,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 217,
+            line: 9,
+            column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 218,
+            line: 9,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 219,
+            line: 9,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 220,
+            line: 9,
+            column: 33,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 228,
+            line: 10,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 229,
+            line: 10,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "height: ",
+            ),
+            position: 239,
+            line: 10,
+            column: 19,
+        },
+        Token {
+            token_type: Plus,
+            position: 241,
+            line: 10,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 243,
+            line: 10,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "height",
+            ),
+            position: 249,
+            line: 10,
+            column: 29,
+        },
+        Token {
+            token_type: As,
+            position: 252,
+            line: 10,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 256,
+            line: 10,
+            column: 36,
+        },
+        Token {
+            token_type: RightParen,
+            position: 257,
+            line: 10,
+            column: 37,
+        },
+        Token {
+            token_type: RightParen,
+            position: 258,
+            line: 10,
+            column: 38,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 259,
+            line: 10,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 267,
+            line: 11,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 268,
+            line: 11,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "alive: ",
+            ),
+            position: 277,
+            line: 11,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 279,
+            line: 11,
+            column: 20,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 281,
+            line: 11,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "alive",
+            ),
+            position: 286,
+            line: 11,
+            column: 27,
+        },
+        Token {
+            token_type: As,
+            position: 289,
+            line: 11,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 293,
+            line: 11,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 294,
+            line: 11,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 295,
+            line: 11,
+            column: 36,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 296,
+            line: 11,
+            column: 37,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 301,
+            line: 13,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 303,
+            line: 14,
+            column: 2,
+        },
+    ],
+)

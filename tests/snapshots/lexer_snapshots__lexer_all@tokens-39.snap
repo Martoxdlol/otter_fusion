@@ -1,0 +1,12 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/scan_number_invalid_float_non_digit_after_dot.of
+---
+Err(
+    InvalidNumber(
+        "123.",
+        1,
+        5,
+    ),
+)

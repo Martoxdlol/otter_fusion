@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/language/15_ffi_pinning.of
+---
+ParserError(
+    "unexpected token ','",
+)

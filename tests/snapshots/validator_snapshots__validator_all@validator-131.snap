@@ -1,0 +1,10 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p2_generic_arity_mismatch_errors.of
+---
+ValidationErrors(
+    [
+        "type 'Wrapper' in module 'test_module' expects 1 generic argument(s), got 2",
+    ],
+)

@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/escaped_backslash_is_kept_inside_string.of
+---
+Err(
+    "unexpected token string literal",
+)

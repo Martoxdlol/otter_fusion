@@ -1,0 +1,6 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/validator/p5_call_resolves_module_function.of
+---
+Ok

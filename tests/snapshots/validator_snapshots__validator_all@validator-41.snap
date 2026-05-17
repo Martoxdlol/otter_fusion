@@ -1,0 +1,8 @@
+---
+source: tests/validator_snapshots.rs
+expression: result
+input_file: examples/lexer/scan_number_valid_float.of
+---
+ParserError(
+    "unexpected token float '123.02'",
+)

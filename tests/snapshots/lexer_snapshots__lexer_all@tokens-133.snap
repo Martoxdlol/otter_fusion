@@ -1,0 +1,69 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
+---
+Ok(
+    [
+        Token {
+            token_type: Extern,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Struct,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "Cfg",
+            ),
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "p",
+            ),
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Star,
+            position: 24,
+            line: 1,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+    ],
+)

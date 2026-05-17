@@ -1,0 +1,7 @@
+interface Named {
+  name: str,
+}
+
+interface Printable: Named {
+  function to_string(self): str
+}

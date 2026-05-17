@@ -1,0 +1,43 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/parser/parse_type_decl_unit.of
+---
+Ok(
+    [
+        Token {
+            token_type: Type,
+            position: 4,
+            line: 1,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "Age",
+            ),
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Eq,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+    ],
+)

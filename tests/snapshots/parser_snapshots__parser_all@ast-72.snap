@@ -1,0 +1,36 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_simple_struct.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Point",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

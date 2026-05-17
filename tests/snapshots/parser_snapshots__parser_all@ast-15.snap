@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/15_ffi_pinning.of
+---
+Err(
+    "unexpected token ','",
+)

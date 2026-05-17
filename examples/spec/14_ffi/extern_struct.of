@@ -1,0 +1,4 @@
+extern struct MyCFunctionArgs {
+  flags: i32,
+  name: *str,
+}

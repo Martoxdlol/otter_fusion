@@ -1,0 +1,23 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/lexer/slash_starts_comment_when_followed_by_slash.of
+---
+Ok(
+    [
+        Token {
+            token_type: Comment(
+                " comment",
+            ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Var,
+            position: 14,
+            line: 2,
+            column: 4,
+        },
+    ],
+)

@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/scan_number_invalid_float_multiple_point.of
+---
+Err(
+    "invalid number literal '123.02'",
+)

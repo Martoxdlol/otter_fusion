@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/12_error_unions.of
+---
+Err(
+    "unexpected token '{'",
+)

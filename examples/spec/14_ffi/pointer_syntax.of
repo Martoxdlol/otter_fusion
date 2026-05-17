@@ -1,0 +1,4 @@
+extern function hashmap_set(key: *str, value: *MyStruct);
+extern function hashmap_set_generic<T>(key: *str, value: *T);
+extern function malloc(size: u64): *Buffer;
+extern function malloc_nullable(size: u64): *Buffer | null;

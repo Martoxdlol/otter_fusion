@@ -1,0 +1,34 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_type_alias_union.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Result",
+                        generics: [],
+                        ty: Union(
+                            [
+                                Primitive(
+                                    Int64,
+                                ),
+                                Primitive(
+                                    String,
+                                ),
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 5,
+                    len: 4,
+                },
+            },
+        ],
+    },
+)

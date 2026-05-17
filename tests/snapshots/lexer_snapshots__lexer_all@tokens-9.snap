@@ -1,0 +1,763 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/language/09_extensions.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "speed",
+            ),
+            position: 24,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Colon,
+            position: 25,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 29,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Comma,
+            position: 30,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 32,
+            line: 3,
+            column: 2,
+        },
+        Token {
+            token_type: Extend,
+            position: 40,
+            line: 5,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 48,
+            line: 5,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 50,
+            line: 5,
+            column: 17,
+        },
+        Token {
+            token_type: Function,
+            position: 61,
+            line: 6,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "is_fast",
+            ),
+            position: 69,
+            line: 6,
+            column: 19,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 70,
+            line: 6,
+            column: 20,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 74,
+            line: 6,
+            column: 24,
+        },
+        Token {
+            token_type: RightParen,
+            position: 75,
+            line: 6,
+            column: 25,
+        },
+        Token {
+            token_type: Colon,
+            position: 76,
+            line: 6,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 81,
+            line: 6,
+            column: 31,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 83,
+            line: 6,
+            column: 33,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 92,
+            line: 7,
+            column: 9,
+        },
+        Token {
+            token_type: Dot,
+            position: 93,
+            line: 7,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "speed",
+            ),
+            position: 98,
+            line: 7,
+            column: 15,
+        },
+        Token {
+            token_type: GT,
+            position: 100,
+            line: 7,
+            column: 17,
+        },
+        Token {
+            token_type: Int(
+                "100",
+            ),
+            position: 104,
+            line: 7,
+            column: 21,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 108,
+            line: 8,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 110,
+            line: 9,
+            column: 2,
+        },
+        Token {
+            token_type: Interface,
+            position: 121,
+            line: 11,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "Movable",
+            ),
+            position: 129,
+            line: 11,
+            column: 18,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 131,
+            line: 11,
+            column: 20,
+        },
+        Token {
+            token_type: Function,
+            position: 142,
+            line: 12,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "move",
+            ),
+            position: 147,
+            line: 12,
+            column: 16,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 148,
+            line: 12,
+            column: 17,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 152,
+            line: 12,
+            column: 21,
+        },
+        Token {
+            token_type: RightParen,
+            position: 153,
+            line: 12,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 154,
+            line: 12,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 158,
+            line: 12,
+            column: 27,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 160,
+            line: 13,
+            column: 2,
+        },
+        Token {
+            token_type: Extend,
+            position: 168,
+            line: 15,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 176,
+            line: 15,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 177,
+            line: 15,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "Movable",
+            ),
+            position: 185,
+            line: 15,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 187,
+            line: 15,
+            column: 26,
+        },
+        Token {
+            token_type: Function,
+            position: 198,
+            line: 16,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "move",
+            ),
+            position: 203,
+            line: 16,
+            column: 16,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 204,
+            line: 16,
+            column: 17,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 208,
+            line: 16,
+            column: 21,
+        },
+        Token {
+            token_type: RightParen,
+            position: 209,
+            line: 16,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 210,
+            line: 16,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 214,
+            line: 16,
+            column: 27,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 216,
+            line: 16,
+            column: 29,
+        },
+        Token {
+            token_type: If,
+            position: 223,
+            line: 17,
+            column: 7,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 225,
+            line: 17,
+            column: 9,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 229,
+            line: 17,
+            column: 13,
+        },
+        Token {
+            token_type: Dot,
+            position: 230,
+            line: 17,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "is_fast",
+            ),
+            position: 237,
+            line: 17,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 238,
+            line: 17,
+            column: 22,
+        },
+        Token {
+            token_type: RightParen,
+            position: 239,
+            line: 17,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 240,
+            line: 17,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 242,
+            line: 17,
+            column: 26,
+        },
+        Token {
+            token_type: StringLit(
+                "The vehicle zooms",
+            ),
+            position: 268,
+            line: 18,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 274,
+            line: 19,
+            column: 6,
+        },
+        Token {
+            token_type: Else,
+            position: 279,
+            line: 19,
+            column: 11,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 281,
+            line: 19,
+            column: 13,
+        },
+        Token {
+            token_type: StringLit(
+                "The vehicle moves",
+            ),
+            position: 307,
+            line: 20,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 313,
+            line: 21,
+            column: 6,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 317,
+            line: 22,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 319,
+            line: 23,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 329,
+            line: 25,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "main",
+            ),
+            position: 334,
+            line: 25,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 335,
+            line: 25,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 336,
+            line: 25,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 337,
+            line: 25,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 341,
+            line: 25,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 343,
+            line: 25,
+            column: 23,
+        },
+        Token {
+            token_type: Var,
+            position: 349,
+            line: 26,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "slow",
+            ),
+            position: 354,
+            line: 26,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
+            position: 356,
+            line: 26,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 364,
+            line: 26,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 366,
+            line: 26,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "speed",
+            ),
+            position: 372,
+            line: 26,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 373,
+            line: 26,
+            column: 30,
+        },
+        Token {
+            token_type: Int(
+                "40",
+            ),
+            position: 376,
+            line: 26,
+            column: 33,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 378,
+            line: 26,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 379,
+            line: 26,
+            column: 36,
+        },
+        Token {
+            token_type: Var,
+            position: 385,
+            line: 27,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "fast",
+            ),
+            position: 390,
+            line: 27,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
+            position: 392,
+            line: 27,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 400,
+            line: 27,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 402,
+            line: 27,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "speed",
+            ),
+            position: 408,
+            line: 27,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 409,
+            line: 27,
+            column: 30,
+        },
+        Token {
+            token_type: Int(
+                "220",
+            ),
+            position: 413,
+            line: 27,
+            column: 34,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 415,
+            line: 27,
+            column: 36,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 416,
+            line: 27,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 424,
+            line: 28,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 425,
+            line: 28,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "slow",
+            ),
+            position: 429,
+            line: 28,
+            column: 13,
+        },
+        Token {
+            token_type: Dot,
+            position: 430,
+            line: 28,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "move",
+            ),
+            position: 434,
+            line: 28,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 435,
+            line: 28,
+            column: 19,
+        },
+        Token {
+            token_type: RightParen,
+            position: 436,
+            line: 28,
+            column: 20,
+        },
+        Token {
+            token_type: RightParen,
+            position: 437,
+            line: 28,
+            column: 21,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 438,
+            line: 28,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 446,
+            line: 29,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 447,
+            line: 29,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "fast",
+            ),
+            position: 451,
+            line: 29,
+            column: 13,
+        },
+        Token {
+            token_type: Dot,
+            position: 452,
+            line: 29,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "move",
+            ),
+            position: 456,
+            line: 29,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 457,
+            line: 29,
+            column: 19,
+        },
+        Token {
+            token_type: RightParen,
+            position: 458,
+            line: 29,
+            column: 20,
+        },
+        Token {
+            token_type: RightParen,
+            position: 459,
+            line: 29,
+            column: 21,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 460,
+            line: 29,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 464,
+            line: 30,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 466,
+            line: 31,
+            column: 2,
+        },
+    ],
+)

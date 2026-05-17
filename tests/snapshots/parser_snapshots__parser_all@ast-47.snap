@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/token_position_line_and_column_are_updated.of
+---
+Err(
+    "unexpected token identifier 'foo'",
+)

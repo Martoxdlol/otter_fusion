@@ -1,0 +1,43 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/parser/parse_struct_with_multiple_fields.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Point",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "y",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

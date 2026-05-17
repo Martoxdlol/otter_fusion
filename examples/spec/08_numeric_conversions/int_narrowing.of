@@ -1,0 +1,2 @@
+var large_int: i64 = 1000;
+var small_int: i8 = large_int as i8;

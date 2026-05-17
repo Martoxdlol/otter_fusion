@@ -1,0 +1,79 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/parser/parse_struct_with_multiple_fields.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Point",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Colon,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Colon,
+            position: 24,
+            line: 1,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+    ],
+)

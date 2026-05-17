@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/single_ampersand_is_unexpected_character.of
+---
+Err(
+    "unexpected character '&'",
+)

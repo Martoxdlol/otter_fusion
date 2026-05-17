@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/language/18_union_events_interface.of
+---
+Err(
+    "unexpected token comment",
+)

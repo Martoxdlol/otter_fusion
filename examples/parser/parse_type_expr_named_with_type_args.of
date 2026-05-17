@@ -1,0 +1,1 @@
+type X = List<i32>;

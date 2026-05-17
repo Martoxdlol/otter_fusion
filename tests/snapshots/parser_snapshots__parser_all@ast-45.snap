@@ -1,0 +1,8 @@
+---
+source: tests/parser_snapshots.rs
+expression: ast
+input_file: examples/lexer/slash_without_second_slash_is_slash_token.of
+---
+Err(
+    "unexpected token '/'",
+)

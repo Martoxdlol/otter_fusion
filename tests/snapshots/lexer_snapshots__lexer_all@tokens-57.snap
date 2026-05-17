@@ -1,0 +1,81 @@
+---
+source: tests/lexer_snapshots.rs
+expression: tokens
+input_file: examples/parser/parse_extend_with_method.of
+---
+Ok(
+    [
+        Token {
+            token_type: Extend,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Foo",
+            ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: Function,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "baz",
+            ),
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 36,
+            line: 1,
+            column: 37,
+        },
+    ],
+)
