@@ -9,7 +9,11 @@ use otter_fusion::{
 enum Commands {
     Scan { file: String },
     Parse { file: String },
-    Validate { file: String },
+    Validate {
+        file: String,
+        #[arg(long)]
+        short: bool,
+    },
     Run { file: String },
     Compile { file: String },
 }
@@ -43,8 +47,8 @@ fn main() -> Result<(), std::io::Error> {
             let ast = parser.parse().expect("Failed to parse source code");
             println!("{ast:#?}");
         }
-        Commands::Validate { file } => {
-            std::process::exit(run_validate(file));
+        Commands::Validate { file, short } => {
+            std::process::exit(run_validate(file, *short));
         }
         Commands::Run { file } => {
             println!("Running: {file}");
@@ -57,7 +61,7 @@ fn main() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn run_validate(file: &str) -> i32 {
+fn run_validate(file: &str, short: bool) -> i32 {
     let source = match read_source_file(file) {
         Ok(s) => s,
         Err(e) => {
@@ -72,7 +76,11 @@ fn run_validate(file: &str) -> i32 {
         Ok(t) => t,
         Err(e) => {
             let (line, col) = e.span();
-            print!("{}", sm.render_error(line, col, &format!("{e}")));
+            if short {
+                println!("{file}:{line}:{col}: error: {e}");
+            } else {
+                print!("{}", sm.render_error(line, col, &format!("{e}")));
+            }
             return 1;
         }
     };
@@ -81,7 +89,11 @@ fn run_validate(file: &str) -> i32 {
         Ok(p) => p,
         Err(e) => {
             let (line, col) = e.span();
-            print!("{}", sm.render_error(line, col, &format!("{e}")));
+            if short {
+                println!("{file}:{line}:{col}: error: {e}");
+            } else {
+                print!("{}", sm.render_error(line, col, &format!("{e}")));
+            }
             return 1;
         }
     };
@@ -102,7 +114,11 @@ fn run_validate(file: &str) -> i32 {
         Err(errors) => {
             for err in &errors {
                 let (line, col) = err.span();
-                print!("{}", sm.render_error(line, col, &format!("{err}")));
+                if short {
+                    println!("{file}:{line}:{col}: error: {err}");
+                } else {
+                    print!("{}", sm.render_error(line, col, &format!("{err}")));
+                }
             }
             1
         }

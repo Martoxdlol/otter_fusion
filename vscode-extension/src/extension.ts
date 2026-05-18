@@ -32,7 +32,7 @@ function validate(doc: vscode.TextDocument): void {
 
   execFile(
     bin,
-    ["validate", doc.fileName],
+    ["validate", doc.fileName, "--short"],
     { timeout: 10_000 },
     (err, stdout, stderr) => {
       if (err && (err as NodeJS.ErrnoException).code === "ENOENT") {
