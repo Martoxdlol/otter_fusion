@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
 use cranelift_codegen::{
-    ir::{self, AbiParam, Block, InstBuilder, Signature, TrapCode, Type, Value, types},
+    ir::{
+        self, AbiParam, Block, InstBuilder, Signature, TrapCode, Type, Value,
+        condcodes::{FloatCC, IntCC},
+        types,
+    },
     isa::CallConv,
 };
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext, Variable};
@@ -10,8 +14,8 @@ use cranelift_module::{DataDescription, FuncId, Linkage, Module, ModuleError};
 use crate::{
     hir::PrimitiveType,
     mir::{
-        self, Abi, BlockId, LocalId, MirConst, MirFnId, MirProgram, MirType, Operand, Stmt,
-        Terminator, TrapReason,
+        self, Abi, AssignValue, BinOp, BlockId, Callee, LocalId, MirConst, MirFnId, MirProgram,
+        MirType, Operand, Stmt, Terminator, TrapReason, UnOp,
     },
 };
 
@@ -119,7 +123,7 @@ fn lower_function<M: Module>(
     b.seal_all_blocks();
     b.finalize();
 
-    todo!()
+    Ok(())
 }
 
 fn lower_stmt<M: Module>(
@@ -127,16 +131,278 @@ fn lower_stmt<M: Module>(
     b: &mut FunctionBuilder,
     func_ids: &HashMap<MirFnId, FuncId>,
     vars: &HashMap<LocalId, Variable>,
-    blocks: &HashMap<BlockId, Block>,
+    _blocks: &HashMap<BlockId, Block>,
     mir_func: &mir::MirFunction,
     stmt: &mir::Stmt,
 ) {
     match stmt {
         Stmt::Assign(lid, av) => {
-            let v = lower_rvalue(b, module, rt, func_ids, vars, blocks, mir, f, av);
+            let v = lower_rvalue(module, b, func_ids, vars, mir_func, av);
             b.def_var(vars[lid], v);
         }
     }
+}
+
+fn lower_rvalue<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    func_ids: &HashMap<MirFnId, FuncId>,
+    vars: &HashMap<LocalId, Variable>,
+    mir_func: &mir::MirFunction,
+    av: &AssignValue,
+) -> Value {
+    match av {
+        AssignValue::Use(op) => use_operand(module, b, func_ids, vars, op),
+        AssignValue::Bin(op, l, r) => lower_bin(module, b, func_ids, vars, mir_func, *op, l, r),
+        AssignValue::Un(op, x) => lower_un(module, b, func_ids, vars, mir_func, *op, x),
+        AssignValue::Cast(op, target) => {
+            lower_cast(module, b, func_ids, vars, mir_func, op, target)
+        }
+        AssignValue::Call(callee, args) => {
+            lower_call(module, b, func_ids, vars, mir_func, callee, args)
+        }
+        AssignValue::AllocStruct(_, _)
+        | AssignValue::AllocList(_, _)
+        | AssignValue::AllocMap(_, _, _)
+        | AssignValue::AllocClosure(_, _)
+        | AssignValue::Field(_, _)
+        | AssignValue::UnionConstruct(_, _, _)
+        | AssignValue::UnionTag(_)
+        | AssignValue::UnionPayload(_, _) => {
+            todo!("rvalue requires runtime/layout context: {av:?}")
+        }
+    }
+}
+
+fn lower_bin<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    func_ids: &HashMap<MirFnId, FuncId>,
+    vars: &HashMap<LocalId, Variable>,
+    mir_func: &mir::MirFunction,
+    op: BinOp,
+    l: &Operand,
+    r: &Operand,
+) -> Value {
+    let prim = operand_prim(mir_func, l);
+    let lv = use_operand(module, b, func_ids, vars, l);
+    let rv = use_operand(module, b, func_ids, vars, r);
+    let ins = b.ins();
+    if is_float(&prim) {
+        match op {
+            BinOp::Add => ins.fadd(lv, rv),
+            BinOp::Sub => ins.fsub(lv, rv),
+            BinOp::Mul => ins.fmul(lv, rv),
+            BinOp::Div => ins.fdiv(lv, rv),
+            BinOp::Mod => unreachable!("float % not supported in MIR"),
+            BinOp::And | BinOp::Or => unreachable!("logical op on float"),
+            BinOp::Eq => ins.fcmp(FloatCC::Equal, lv, rv),
+            BinOp::Neq => ins.fcmp(FloatCC::NotEqual, lv, rv),
+            BinOp::Lt => ins.fcmp(FloatCC::LessThan, lv, rv),
+            BinOp::Le => ins.fcmp(FloatCC::LessThanOrEqual, lv, rv),
+            BinOp::Gt => ins.fcmp(FloatCC::GreaterThan, lv, rv),
+            BinOp::Ge => ins.fcmp(FloatCC::GreaterThanOrEqual, lv, rv),
+        }
+    } else {
+        let signed = is_signed_int(&prim);
+        match op {
+            BinOp::Add => ins.iadd(lv, rv),
+            BinOp::Sub => ins.isub(lv, rv),
+            BinOp::Mul => ins.imul(lv, rv),
+            BinOp::Div => {
+                if signed {
+                    ins.sdiv(lv, rv)
+                } else {
+                    ins.udiv(lv, rv)
+                }
+            }
+            BinOp::Mod => {
+                if signed {
+                    ins.srem(lv, rv)
+                } else {
+                    ins.urem(lv, rv)
+                }
+            }
+            BinOp::And => ins.band(lv, rv),
+            BinOp::Or => ins.bor(lv, rv),
+            BinOp::Eq => ins.icmp(IntCC::Equal, lv, rv),
+            BinOp::Neq => ins.icmp(IntCC::NotEqual, lv, rv),
+            BinOp::Lt => ins.icmp(int_cc(signed, Cmp::Lt), lv, rv),
+            BinOp::Le => ins.icmp(int_cc(signed, Cmp::Le), lv, rv),
+            BinOp::Gt => ins.icmp(int_cc(signed, Cmp::Gt), lv, rv),
+            BinOp::Ge => ins.icmp(int_cc(signed, Cmp::Ge), lv, rv),
+        }
+    }
+}
+
+fn lower_un<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    func_ids: &HashMap<MirFnId, FuncId>,
+    vars: &HashMap<LocalId, Variable>,
+    mir_func: &mir::MirFunction,
+    op: UnOp,
+    x: &Operand,
+) -> Value {
+    let prim = operand_prim(mir_func, x);
+    let xv = use_operand(module, b, func_ids, vars, x);
+    match op {
+        UnOp::Neg if is_float(&prim) => b.ins().fneg(xv),
+        UnOp::Neg => b.ins().ineg(xv),
+        // bool is i8 with values 0/1 → flip the low bit.
+        UnOp::Not => b.ins().bxor_imm(xv, 1),
+    }
+}
+
+fn lower_cast<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    func_ids: &HashMap<MirFnId, FuncId>,
+    vars: &HashMap<LocalId, Variable>,
+    mir_func: &mir::MirFunction,
+    op: &Operand,
+    target: &MirType,
+) -> Value {
+    let src = operand_prim(mir_func, op);
+    let dst = match target {
+        MirType::Primitive(p) => p.clone(),
+        _ => unreachable!("Cast target must be primitive"),
+    };
+    let v = use_operand(module, b, func_ids, vars, op);
+    let src_ty = prim_clif(&src);
+    let dst_ty = prim_clif(&dst);
+
+    let src_float = is_float(&src);
+    let dst_float = is_float(&dst);
+    let src_signed = is_signed_int(&src);
+    let dst_signed = is_signed_int(&dst);
+
+    match (src_float, dst_float) {
+        (false, false) => {
+            if src_ty == dst_ty {
+                v
+            } else if dst_ty.bits() < src_ty.bits() {
+                b.ins().ireduce(dst_ty, v)
+            } else if src_signed {
+                b.ins().sextend(dst_ty, v)
+            } else {
+                b.ins().uextend(dst_ty, v)
+            }
+        }
+        (false, true) => {
+            if src_signed {
+                b.ins().fcvt_from_sint(dst_ty, v)
+            } else {
+                b.ins().fcvt_from_uint(dst_ty, v)
+            }
+        }
+        (true, false) => {
+            if dst_signed {
+                b.ins().fcvt_to_sint_sat(dst_ty, v)
+            } else {
+                b.ins().fcvt_to_uint_sat(dst_ty, v)
+            }
+        }
+        (true, true) => {
+            if src_ty == dst_ty {
+                v
+            } else if dst_ty.bits() > src_ty.bits() {
+                b.ins().fpromote(dst_ty, v)
+            } else {
+                b.ins().fdemote(dst_ty, v)
+            }
+        }
+    }
+}
+
+fn lower_call<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    func_ids: &HashMap<MirFnId, FuncId>,
+    vars: &HashMap<LocalId, Variable>,
+    mir_func: &mir::MirFunction,
+    callee: &Callee,
+    args: &[Operand],
+) -> Value {
+    let arg_vals: Vec<Value> = args
+        .iter()
+        .map(|a| use_operand(module, b, func_ids, vars, a))
+        .collect();
+    match callee {
+        Callee::Static(target) => {
+            let func_ref = module.declare_func_in_func(func_ids[target], b.func);
+            let inst = b.ins().call(func_ref, &arg_vals);
+            b.inst_results(inst)
+                .first()
+                .copied()
+                .expect("static call assigned to local must return a value")
+        }
+        Callee::Indirect(_) | Callee::Virtual(_, _, _) => {
+            let _ = (module, mir_func, arg_vals);
+            todo!("indirect/virtual calls require runtime/vtable lowering")
+        }
+    }
+}
+
+enum Cmp {
+    Lt,
+    Le,
+    Gt,
+    Ge,
+}
+
+fn int_cc(signed: bool, c: Cmp) -> IntCC {
+    match (signed, c) {
+        (true, Cmp::Lt) => IntCC::SignedLessThan,
+        (true, Cmp::Le) => IntCC::SignedLessThanOrEqual,
+        (true, Cmp::Gt) => IntCC::SignedGreaterThan,
+        (true, Cmp::Ge) => IntCC::SignedGreaterThanOrEqual,
+        (false, Cmp::Lt) => IntCC::UnsignedLessThan,
+        (false, Cmp::Le) => IntCC::UnsignedLessThanOrEqual,
+        (false, Cmp::Gt) => IntCC::UnsignedGreaterThan,
+        (false, Cmp::Ge) => IntCC::UnsignedGreaterThanOrEqual,
+    }
+}
+
+fn operand_prim(mir_func: &mir::MirFunction, op: &Operand) -> PrimitiveType {
+    match op {
+        Operand::Copy(l) | Operand::Move(l) => match &mir_func.locals[l].ty {
+            MirType::Primitive(p) => p.clone(),
+            other => panic!("scalar op on non-primitive operand: {other:?}"),
+        },
+        Operand::Const(c) => match c {
+            MirConst::Int(_, p) | MirConst::Float(_, p) => p.clone(),
+            MirConst::Bool(_) => PrimitiveType::Bool,
+            MirConst::Char(_) => PrimitiveType::Char,
+            MirConst::String(_) => PrimitiveType::String,
+            MirConst::Null | MirConst::Fn(_) => {
+                panic!("non-primitive const used in scalar op: {c:?}")
+            }
+        },
+    }
+}
+
+fn prim_clif(p: &PrimitiveType) -> Type {
+    match p {
+        PrimitiveType::Int8 | PrimitiveType::Uint8 | PrimitiveType::Bool => types::I8,
+        PrimitiveType::Int16 | PrimitiveType::Uint16 => types::I16,
+        PrimitiveType::Int32 | PrimitiveType::Uint32 | PrimitiveType::Char => types::I32,
+        PrimitiveType::Int64 | PrimitiveType::Uint64 => types::I64,
+        PrimitiveType::Float32 => types::F32,
+        PrimitiveType::Float64 => types::F64,
+        PrimitiveType::String => types::I64,
+    }
+}
+
+fn is_signed_int(p: &PrimitiveType) -> bool {
+    matches!(
+        p,
+        PrimitiveType::Int8 | PrimitiveType::Int16 | PrimitiveType::Int32 | PrimitiveType::Int64
+    )
+}
+
+fn is_float(p: &PrimitiveType) -> bool {
+    matches!(p, PrimitiveType::Float32 | PrimitiveType::Float64)
 }
 
 pub fn clif_type(t: &MirType) -> Type {
