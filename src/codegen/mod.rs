@@ -19,7 +19,12 @@ use crate::{
     },
 };
 
-pub fn compile<M: Module>(mir: MirProgram, mut module: M) -> Result<M, ModuleError> {
+pub struct Compiled<M: Module> {
+    pub module: M,
+    pub function_ids: HashMap<MirFnId, FuncId>,
+}
+
+pub fn compile<M: Module>(mir: &MirProgram, mut module: M) -> Result<Compiled<M>, ModuleError> {
     let mut function_ids = HashMap::new();
 
     for (id, f) in &mir.functions {
@@ -34,13 +39,12 @@ pub fn compile<M: Module>(mir: MirProgram, mut module: M) -> Result<M, ModuleErr
         function_ids.insert(*id, fid);
     }
 
-    // Context for building functions
     let mut ctx = module.make_context();
     let mut builder_ctx = FunctionBuilderContext::new();
     for (id, f) in &mir.functions {
         if f.abi == Abi::Extern && f.blocks.is_empty() {
             continue;
-        } // import only
+        }
 
         ctx.func.signature = build_signature(&module, f);
         lower_function(
@@ -54,7 +58,10 @@ pub fn compile<M: Module>(mir: MirProgram, mut module: M) -> Result<M, ModuleErr
         module.clear_context(&mut ctx);
     }
 
-    Ok(module)
+    Ok(Compiled {
+        module,
+        function_ids,
+    })
 }
 
 fn build_signature<M: Module>(module: &M, f: &mir::MirFunction) -> Signature {
@@ -83,11 +90,15 @@ fn lower_function<M: Module>(
     let mut b = FunctionBuilder::new(func, builder_ctx);
 
     let mut blocks: HashMap<BlockId, Block> = HashMap::new();
+    // Entry must be created first so it becomes Cranelift's block0;
+    // the verifier forbids branching to block0.
+    let entry = b.create_block();
+    blocks.insert(mir_func.entry, entry);
     for &bid in mir_func.blocks.keys() {
-        blocks.insert(bid, b.create_block());
+        if bid != mir_func.entry {
+            blocks.insert(bid, b.create_block());
+        }
     }
-
-    let entry = blocks[&mir_func.entry];
 
     b.append_block_params_for_function_params(entry);
     b.switch_to_block(entry);
@@ -104,18 +115,32 @@ fn lower_function<M: Module>(
         b.def_var(vars[param_lid], val);
     }
 
-    for (bid, blk) in &mir_func.blocks {
-        let cb = blocks[bid];
+    // Entry must be filled first so it becomes CLIF's layout-entry; other
+    // blocks come in whatever order the HashMap gives.
+    let mut order: Vec<BlockId> = std::iter::once(mir_func.entry)
+        .chain(
+            mir_func
+                .blocks
+                .keys()
+                .copied()
+                .filter(|bid| *bid != mir_func.entry),
+        )
+        .collect();
+    // Re-borrow blocks immutably during iteration.
+    let blocks_ref = &blocks;
+    for bid in order.drain(..) {
+        let cb = blocks_ref[&bid];
+        let blk = &mir_func.blocks[&bid];
         b.switch_to_block(cb);
         for stmt in &blk.stmts {
-            lower_stmt(module, &mut b, function_ids, &vars, &blocks, mir_func, stmt);
+            lower_stmt(module, &mut b, function_ids, &vars, blocks_ref, mir_func, stmt);
         }
         lower_terminator(
             module,
             &mut b,
             function_ids,
             &vars,
-            &blocks,
+            blocks_ref,
             &blk.terminator,
         );
     }
