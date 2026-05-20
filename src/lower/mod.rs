@@ -41,6 +41,10 @@ pub struct Lower {
     // Ids generados para los tipos cores del lenguaje (lo necesitamos para transformar syntaxis del lenguaje)
     pub iterator_interface: Option<TypeId>, // of:core -> Iterator<T>
     pub entry_struct: Option<TypeId>,       // of:core -> Entry<K,V>
+
+    /// HIR return type of the function currently being lowered, post-subst.
+    /// Read by `Return` to coerce the operand into the declared type.
+    pub current_return_type: Option<ResolvedType>,
 }
 
 #[derive(Debug, Clone)]
@@ -78,6 +82,7 @@ impl Lower {
             iterator_interface: None,
             entry_struct: None,
             entry_mir_fn: None,
+            current_return_type: None,
         };
         s.locate_core_types();
         s
@@ -156,6 +161,9 @@ impl Lower {
         // type_args -> vec de tipos concretos. No pueden tener genéricos.
         let subst = Subst::new(f.type_params.clone(), type_args.clone());
 
+        // Concrete return type for `Return`-statement coercion.
+        let prev_ret = self.current_return_type.replace(subst.apply(&f.return_type));
+
         let ret_ty = self.lower_type(&f.return_type, &subst);
 
         let name = name_function(&self.hir, fn_id, &type_args);
@@ -202,22 +210,25 @@ impl Lower {
         }
 
         let body = f.body.as_ref().expect("body-having function (extern handled above)");
+        let trailing_src_ty = body.returns.as_ref().map(|e| subst.apply(&e.ty));
         let trailing: Option<Operand> = self.lower_block(body, &subst, &mut b);
-        // implicit return of the trailing expression
-        let term = match trailing {
-            Some(op) => Terminator::Return(Some(op)),
-            None => Terminator::Return(None),
-        };
-        // Only terminate if current block isn't already terminated.
-        // (An early `return` inside the body would have set a terminator
-        // and switched to a fresh unreachable block.)
-        if matches!(
-            b.blocks[&b.current_block].terminator,
-            Terminator::Unreachable
-        ) {
-            b.terminate(term);
-        }
 
+        // implicit return of the trailing expression — widen to the declared
+        // return type if needed (e.g. trailing `42` in a `-> i32 | null` fn).
+        let ret_target = self.current_return_type.clone().expect("set above");
+        let term = match (trailing, trailing_src_ty) {
+            (Some(op), Some(src)) => {
+                let coerced = self.coerce_to(op, &src, &ret_target, &mut b);
+                Terminator::Return(Some(coerced))
+            }
+            (Some(op), None) => Terminator::Return(Some(op)),
+            (None, _) => Terminator::Return(None),
+        };
+        // An early `return` inside the body would have set a terminator
+        // and switched to a fresh unreachable block.
+        b.terminate_if_open(term);
+
+        self.current_return_type = prev_ret;
         b.finish()
     }
 
@@ -285,11 +296,13 @@ impl Lower {
             }
 
             ResolvedType::Union(variants) => {
-                // Phase 2 implements the T|null specialisation here;
-                // for now everything goes through the tagged path.
-                // let mid = self.get_or_create_union(variants.clone());
-                // MirType::Union(mid)
-                todo!("union lowering not implemented yet")
+                // T | null where T is managed → NullableRef (no MirTypeDef).
+                if let Some(t_mid) = self.try_nullable_ref(variants) {
+                    MirType::NullableRef(t_mid)
+                } else {
+                    let uid = self.get_or_create_union(variants.clone());
+                    MirType::Union(uid)
+                }
             }
 
             ResolvedType::Function(args, ret) => {
