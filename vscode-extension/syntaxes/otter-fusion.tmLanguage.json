@@ -100,7 +100,7 @@
         },
         {
           "name": "storage.type.of",
-          "match": "\\b(function|struct|interface|class|extend|type|extern|var)\\b"
+          "match": "\\b(function|struct|interface|class|extend|type|extern|var|const)\\b"
         },
         {
           "name": "keyword.operator.cast.of",
