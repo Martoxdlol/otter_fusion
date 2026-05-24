@@ -1,0 +1,7 @@
+import { print } from "of:core";
+
+function main(): i32 {
+    var l = [5];
+    l.push(10);
+    return l.get(1) as i32;
+}

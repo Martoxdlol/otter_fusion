@@ -541,6 +541,20 @@ impl Validator {
                 None => continue,
             };
 
+            if module.name != "of:core" {
+                if let Some(core_id) = self.module_ids.get("of:core") {
+                    let implicit_symbols = ["List", "Map", "Entry", "Iterator", "Buffer", "pin", "unpin"];
+                    self.pending_named_imports.push(PendingNamedImport {
+                        importer,
+                        source: *core_id,
+                        symbols: implicit_symbols.iter().map(|&s| ast::ImportSymbol {
+                            name: s.to_string(),
+                            alias: None,
+                        }).collect(),
+                    });
+                }
+            }
+
             for item in &module.program.items {
                 let ItemKind::Import(import) = &item.kind else { continue };
 
@@ -1654,9 +1668,27 @@ impl Validator {
             ast::Statement::For(name, iter_expr, body) => {
                 let typed_iter = self.check_expr(
                     iter_expr, fn_label, module, generics, locals, return_type, loop_depth, None);
-                // v1 limitation: element type isn't extracted from `Iterator<T>`
-                // (the prelude that would define it isn't injected yet).
-                let elem_ty = ResolvedType::Null;
+
+                let elem_ty = match &typed_iter.ty {
+                    ResolvedType::Struct(id, args) => {
+                        let struct_name = self.hir.structs.get(id).map(|s| s.name.as_str()).unwrap_or("");
+                        match struct_name {
+                            "List" => args.first().cloned().unwrap_or(ResolvedType::Null),
+                            "Map" => {
+                                if let Some((entry_id, _)) = self.hir.structs.iter().find(|(_, s)| s.name == "Entry") {
+                                    let k = args.first().cloned().unwrap_or(ResolvedType::Null);
+                                    let v = args.get(1).cloned().unwrap_or(ResolvedType::Null);
+                                    ResolvedType::Struct(*entry_id, vec![k, v])
+                                } else {
+                                    ResolvedType::Null
+                                }
+                            }
+                            _ => ResolvedType::Null,
+                        }
+                    }
+                    _ => ResolvedType::Null,
+                };
+
                 locals.push(HashMap::new());
                 locals
                     .last_mut()
@@ -1747,10 +1779,7 @@ impl Validator {
                         self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, None)
                     })
                     .collect();
-                // v1: no `List<T>` type yet (it lives in std). Element type is
-                // recorded as a union of element types; the container type
-                // itself is `Null` until prelude/std lookup is wired up.
-                let _elem_ty = if typed_elems.is_empty() {
+                let elem_ty = if typed_elems.is_empty() {
                     ResolvedType::Null
                 } else {
                     let tys: Vec<_> = typed_elems.iter().map(|e| e.ty.clone()).collect();
@@ -1760,9 +1789,20 @@ impl Validator {
                         ResolvedType::Union(tys)
                     }
                 };
+
+                let list_ty = if let Some(ResolvedType::Struct(_, _)) = expected {
+                    expected.unwrap().clone()
+                } else {
+                    if let Some((id, _)) = self.hir.structs.iter().find(|(_, s)| s.name == "List") {
+                        ResolvedType::Struct(*id, vec![elem_ty.clone()])
+                    } else {
+                        ResolvedType::Null
+                    }
+                };
+
                 TypedExpr {
                     kind: ExprKind::LiteralList(typed_elems),
-                    ty: ResolvedType::Null,
+                    ty: list_ty,
                 }
             }
             ast::Expr::LiteralMap(entries) => {
@@ -1776,9 +1816,23 @@ impl Validator {
                         (tk, tv)
                     })
                     .collect();
+
+                let key_ty = if typed_entries.is_empty() { ResolvedType::Null } else { typed_entries[0].0.ty.clone() };
+                let val_ty = if typed_entries.is_empty() { ResolvedType::Null } else { typed_entries[0].1.ty.clone() };
+
+                let map_ty = if let Some(ResolvedType::Struct(_, _)) = expected {
+                    expected.unwrap().clone()
+                } else {
+                    if let Some((id, _)) = self.hir.structs.iter().find(|(_, s)| s.name == "Map") {
+                        ResolvedType::Struct(*id, vec![key_ty.clone(), val_ty.clone()])
+                    } else {
+                        ResolvedType::Null
+                    }
+                };
+
                 TypedExpr {
                     kind: ExprKind::LiteralMap(typed_entries),
-                    ty: ResolvedType::Null,
+                    ty: map_ty,
                 }
             }
             ast::Expr::StructInit(ty_expr, fields) => self.check_struct_init(
