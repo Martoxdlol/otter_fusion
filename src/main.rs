@@ -109,15 +109,40 @@ fn run_validate(file: &str, short: bool) -> i32 {
         program,
     };
 
-    match Validator::new(vec![module]).validate() {
+    let modules = vec![
+        otter_fusion::get_core_module(),
+        module,
+    ];
+
+    match Validator::new(modules).validate() {
         Ok(_) => 0,
         Err(errors) => {
+            use otter_fusion::validator::ValidationError;
             for err in &errors {
                 let (line, col) = err.span();
+                
+                // Extract the keyword/lexeme associated with the error
+                let keyword = match err {
+                    ValidationError::UnknownVariable { name, .. } => name.as_str(),
+                    ValidationError::TypeMismatch { context, .. } => {
+                        if context.starts_with("var ") {
+                            context.strip_prefix("var ").unwrap_or("")
+                        } else {
+                            ""
+                        }
+                    }
+                    ValidationError::UnknownMember { member, .. } => member.as_str(),
+                    ValidationError::UnknownImportModule { target, .. } => target.as_str(),
+                    ValidationError::UnknownImportSymbol { symbol, .. } => symbol.as_str(),
+                    _ => "",
+                };
+
+                let (refined_line, refined_col, _len) = sm.find_keyword_span(line, col, keyword);
+
                 if short {
-                    println!("{file}:{line}:{col}: error: {err}");
+                    println!("{file}:{refined_line}:{refined_col}: error: {err}");
                 } else {
-                    print!("{}", sm.render_error(line, col, &format!("{err}")));
+                    print!("{}", sm.render_error(refined_line, refined_col, &format!("{err}")));
                 }
             }
             1
