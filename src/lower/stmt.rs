@@ -11,14 +11,25 @@ impl Lower {
                 let mty = self.lower_type(ty, subst);
                 let local = b.new_local(Some(name.clone()), mty);
                 if let Some(e) = init {
-                    let op = self.lower_expr(e, subst, b);
+                    let raw = self.lower_expr(e, subst, b);
+                    let op = self.coerce_to_subst(raw, &e.ty, ty, subst, b);
                     b.push_stmt(Stmt::Assign(local, AssignValue::Use(op)));
                 }
                 b.bind(name.clone(), local);
             }
 
             HirStatement::Return(opt_e) => {
-                let op = opt_e.as_ref().map(|e| self.lower_expr(e, subst, b));
+                let op = if let Some(e) = opt_e {
+                    let raw = self.lower_expr(e, subst, b);
+                    let target = self
+                        .current_return_type
+                        .clone()
+                        .expect("return outside lower_function");
+                    let from = subst.apply(&e.ty);
+                    Some(self.coerce_to(raw, &from, &target, b))
+                } else {
+                    None
+                };
                 b.terminate(Terminator::Return(op));
                 // Subsequent stmts are unreachable; start a new block so
                 // they have somewhere to go.
@@ -74,12 +85,7 @@ impl Lower {
         let _ = self.lower_block(body, subst, b);
         b.loop_stack.pop();
         // Body falls through → jump to head, unless body terminated already.
-        if matches!(
-            b.blocks[&b.current_block].terminator,
-            Terminator::Unreachable
-        ) {
-            b.terminate(Terminator::Goto(head_bb));
-        }
+        b.terminate_if_open(Terminator::Goto(head_bb));
 
         // Continue lowering after the loop.
         b.switch_to(exit_bb);

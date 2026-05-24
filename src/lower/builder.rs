@@ -88,8 +88,31 @@ impl FnBuilder {
             .push(s);
     }
 
+    /// Allocate a temp, emit `tmp = rv`, return Copy(tmp). Collapses the
+    /// new_temp/push_stmt/Operand::Copy boilerplate.
+    pub fn emit(&mut self, rv: AssignValue, ty: MirType) -> Operand {
+        let tmp = self.new_temp(ty);
+        self.push_stmt(Stmt::Assign(tmp, rv));
+        Operand::Copy(tmp)
+    }
+
     pub fn terminate(&mut self, t: Terminator) {
         self.blocks.get_mut(&self.current_block).unwrap().terminator = t; // pisa el Unreachable inicial
+    }
+
+    /// True iff current block has no terminator yet (still the initial Unreachable).
+    pub fn is_open(&self) -> bool {
+        matches!(
+            self.blocks[&self.current_block].terminator,
+            Terminator::Unreachable
+        )
+    }
+
+    /// Set terminator only if the current block is still open.
+    pub fn terminate_if_open(&mut self, t: Terminator) {
+        if self.is_open() {
+            self.terminate(t);
+        }
     }
 
     pub fn push_scope(&mut self) {

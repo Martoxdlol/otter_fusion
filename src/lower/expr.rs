@@ -62,9 +62,7 @@ impl Lower {
         let lop = self.lower_expr(l, subst, b);
         let rop = self.lower_expr(r, subst, b);
         let mty = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(mty);
-        b.push_stmt(Stmt::Assign(tmp, AssignValue::Bin(map_binop(op), lop, rop)));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::Bin(map_binop(op), lop, rop), mty)
     }
 
     fn lower_unop(
@@ -81,9 +79,7 @@ impl Lower {
             UnaryOperator::Not => UnOp::Not,
         };
         let mty = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(mty);
-        b.push_stmt(Stmt::Assign(tmp, AssignValue::Un(muop, inner)));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::Un(muop, inner), mty)
     }
 
     fn lower_call(
@@ -122,23 +118,27 @@ impl Lower {
         let ta_concrete: Vec<ResolvedType> = type_args.iter().map(|t| subst.apply(t)).collect();
         let mut all_args = owner_args;
         all_args.extend(ta_concrete);
-        let target = self.mono_fn(fn_id, all_args);
+        let target = self.mono_fn(fn_id, all_args.clone());
+
+        // Build callee's substitution for coercing each arg into its param type.
+        let callee = self.hir.functions[&fn_id].clone();
+        let callee_subst = Subst::new(callee.type_params.clone(), all_args);
 
         let mut arg_ops: Vec<Operand> = vec![];
         if let Some(op) = recv_op {
             arg_ops.push(op);
         }
-        for a in args {
-            arg_ops.push(self.lower_expr(a, subst, b));
+        // HirFunction.params are user-declared only — `self` is implicit, so
+        // recv_op is already pushed and we zip args against params directly.
+        for (a, p) in args.iter().zip(callee.params.iter()) {
+            let raw = self.lower_expr(a, subst, b);
+            let from = subst.apply(&a.ty);
+            let to = callee_subst.apply(&p.ty);
+            arg_ops.push(self.coerce_to(raw, &from, &to, b));
         }
 
         let result_mir = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(result_mir);
-        b.push_stmt(Stmt::Assign(
-            tmp,
-            AssignValue::Call(Callee::Static(target), arg_ops),
-        ));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::Call(Callee::Static(target), arg_ops), result_mir)
     }
 
     fn lower_struct_init(
@@ -150,17 +150,31 @@ impl Lower {
         b: &mut FnBuilder,
     ) -> Operand {
         let concrete: Vec<ResolvedType> = type_args.iter().map(|a| subst.apply(a)).collect();
-        let mir_struct = self.get_or_create_struct(id, concrete);
+        let mir_struct = self.get_or_create_struct(id, concrete.clone());
 
         let decl_order: Vec<String> = match &self.mir.types[&mir_struct] {
             MirTypeDef::Struct { fields, .. } => fields.iter().map(|f| f.name.clone()).collect(),
             _ => unreachable!(),
         };
 
+        // Map field name → declared (post-subst) ResolvedType, for widening.
+        let hir_struct = self.hir.structs[&id].clone();
+        let field_subst = Subst::new(hir_struct.type_params.clone(), concrete);
+        let field_decl_ty: HashMap<String, ResolvedType> = hir_struct
+            .fields
+            .iter()
+            .map(|f| (f.name.clone(), field_subst.apply(&f.ty)))
+            .collect();
+
         // Lower in source order so side effects fire as written, then reorder.
         let mut by_name: HashMap<String, Operand> = HashMap::new();
         for (name, e) in fields {
-            let op = self.lower_expr(e, subst, b);
+            let raw = self.lower_expr(e, subst, b);
+            let from = subst.apply(&e.ty);
+            let to = field_decl_ty
+                .get(name)
+                .unwrap_or_else(|| panic!("unknown field `{}` in init", name));
+            let op = self.coerce_to(raw, &from, to, b);
             by_name.insert(name.clone(), op);
         }
         let ordered: Vec<Operand> = decl_order
@@ -173,12 +187,7 @@ impl Lower {
             .collect();
 
         let mty = MirType::ManagedRef(mir_struct);
-        let tmp = b.new_temp(mty);
-        b.push_stmt(Stmt::Assign(
-            tmp,
-            AssignValue::AllocStruct(mir_struct, ordered),
-        ));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::AllocStruct(mir_struct, ordered), mty)
     }
 
     fn lower_member(
@@ -203,9 +212,7 @@ impl Lower {
             _ => unreachable!(),
         };
         let result_mir = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(result_mir);
-        b.push_stmt(Stmt::Assign(tmp, AssignValue::Field(recv_op, idx)));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::Field(recv_op, idx), result_mir)
     }
 
     fn lower_as(
@@ -223,9 +230,7 @@ impl Lower {
             (ResolvedType::Primitive(_), ResolvedType::Primitive(_)) => {
                 let op = self.lower_expr(e, subst, b);
                 let mty = self.lower_type(&target_ty, subst);
-                let tmp = b.new_temp(mty.clone());
-                b.push_stmt(Stmt::Assign(tmp, AssignValue::Cast(op, mty)));
-                Operand::Copy(tmp)
+                b.emit(AssignValue::Cast(op, mty.clone()), mty)
             }
             _ => unimplemented!("Phase 2: as on {:?} -> {:?}", src_ty, target_ty),
         }
@@ -251,29 +256,29 @@ impl Lower {
 
         b.terminate(Terminator::CondBr(cond_op, then_bb, else_bb));
 
+        let target_ty = subst.apply(result_ty);
+
         b.switch_to(then_bb);
+        let t_src_ty = then_blk.returns.as_ref().map(|e| subst.apply(&e.ty));
         let t_val = self.lower_block(then_blk, subst, b);
         // After lowering the arm, current_block may have been split by nested
-        // control flow. Terminate only the still-open tail.
-        if matches!(
-            b.blocks[&b.current_block].terminator,
-            Terminator::Unreachable
-        ) {
-            if let Some(op) = t_val {
-                b.push_stmt(Stmt::Assign(result, AssignValue::Use(op)));
+        // control flow. Touch only the still-open tail.
+        if b.is_open() {
+            if let (Some(op), Some(src)) = (t_val, t_src_ty) {
+                let coerced = self.coerce_to(op, &src, &target_ty, b);
+                b.push_stmt(Stmt::Assign(result, AssignValue::Use(coerced)));
             }
             b.terminate(Terminator::Goto(join_bb));
         }
 
         b.switch_to(else_bb);
         if let Some(eb) = else_blk {
+            let e_src_ty = eb.returns.as_ref().map(|e| subst.apply(&e.ty));
             let e_val = self.lower_block(eb, subst, b);
-            if matches!(
-                b.blocks[&b.current_block].terminator,
-                Terminator::Unreachable
-            ) {
-                if let Some(op) = e_val {
-                    b.push_stmt(Stmt::Assign(result, AssignValue::Use(op)));
+            if b.is_open() {
+                if let (Some(op), Some(src)) = (e_val, e_src_ty) {
+                    let coerced = self.coerce_to(op, &src, &target_ty, b);
+                    b.push_stmt(Stmt::Assign(result, AssignValue::Use(coerced)));
                 }
                 b.terminate(Terminator::Goto(join_bb));
             }
@@ -311,12 +316,17 @@ impl Lower {
         };
         let elem_mir = self.lower_concrete_type(&elem_ty);
 
-        let ops: Vec<Operand> = items.iter().map(|e| self.lower_expr(e, subst, b)).collect();
+        let ops: Vec<Operand> = items
+            .iter()
+            .map(|e| {
+                let raw = self.lower_expr(e, subst, b);
+                let from = subst.apply(&e.ty);
+                self.coerce_to(raw, &from, &elem_ty, b)
+            })
+            .collect();
 
         let result_mir = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(result_mir);
-        b.push_stmt(Stmt::Assign(tmp, AssignValue::AllocList(elem_mir, ops)));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::AllocList(elem_mir, ops), result_mir)
     }
 
     fn lower_map_lit(
@@ -335,13 +345,19 @@ impl Lower {
 
         let ops: Vec<(Operand, Operand)> = pairs
             .iter()
-            .map(|(k, v)| (self.lower_expr(k, subst, b), self.lower_expr(v, subst, b)))
+            .map(|(k, v)| {
+                let k_raw = self.lower_expr(k, subst, b);
+                let k_from = subst.apply(&k.ty);
+                let k_op = self.coerce_to(k_raw, &k_from, &k_ty, b);
+                let v_raw = self.lower_expr(v, subst, b);
+                let v_from = subst.apply(&v.ty);
+                let v_op = self.coerce_to(v_raw, &v_from, &v_ty, b);
+                (k_op, v_op)
+            })
             .collect();
 
         let result_mir = self.lower_type(result_ty, subst);
-        let tmp = b.new_temp(result_mir);
-        b.push_stmt(Stmt::Assign(tmp, AssignValue::AllocMap(k_mir, v_mir, ops)));
-        Operand::Copy(tmp)
+        b.emit(AssignValue::AllocMap(k_mir, v_mir, ops), result_mir)
     }
 
     pub fn lookup_free_function(&self, name: &str) -> Option<FnId> {
