@@ -1,34 +1,32 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_struct_init_extra_field_errors.of
+input_file: examples/validator/p5_null_assignable_to_nullable_union.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Opt",
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
+                        ty: Union(
+                            [
+                                Primitive(
                                     Int64,
                                 ),
-                                is_pointer: false,
-                            },
-                        ],
-                        methods: [],
-                        implements: [],
+                                Primitive(
+                                    Null,
+                                ),
+                            ],
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 5,
+                    len: 4,
                 },
             },
             Item {
@@ -43,30 +41,18 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    Expr(
-                                        StructInit(
+                                    VarDecl(
+                                        "x",
+                                        Some(
                                             Named(
-                                                "S",
+                                                "Opt",
                                                 [],
                                             ),
-                                            [
-                                                (
-                                                    "x",
-                                                    Literal(
-                                                        Int(
-                                                            "5",
-                                                        ),
-                                                    ),
-                                                ),
-                                                (
-                                                    "y",
-                                                    Literal(
-                                                        Int(
-                                                            "6",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ],
+                                        ),
+                                        Some(
+                                            Literal(
+                                                Null,
+                                            ),
                                         ),
                                     ),
                                 ],

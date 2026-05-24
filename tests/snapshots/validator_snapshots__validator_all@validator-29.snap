@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/escaped_backslash_is_kept_inside_string.of
+input_file: examples/lexer/equality_and_negation_tokens_are_recognized.of
 ---
 ParserError(
-    "unexpected token string literal",
+    "unexpected token '='",
 )

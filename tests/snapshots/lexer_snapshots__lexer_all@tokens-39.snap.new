@@ -1,0 +1,13 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/scan_number_invalid_float_multiple_point.of
+---
+Err(
+    InvalidNumber(
+        "123.02",
+        1,
+        7,
+    ),
+)

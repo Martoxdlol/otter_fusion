@@ -1,10 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/10_generics/generic_struct.of
+input_file: examples/spec/07_error_management/error_union_return.of
 ---
-ValidationErrors(
-    [
-        "unknown member 'content' on 'null' in function 'test_module::Box::get'",
-    ],
-)
+Ok

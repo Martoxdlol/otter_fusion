@@ -1,25 +1,40 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_type_decl_unit.of
+input_file: examples/parser/parse_struct_with_generics.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Age",
-                        generics: [],
-                        ty: Primitive(
-                            Int32,
-                        ),
+                kind: Struct(
+                    StructDecl {
+                        name: "Box",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

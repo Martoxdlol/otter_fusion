@@ -1,8 +1,11 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/whitespace_only_returns_eof.of
+input_file: examples/lexer/unterminated_string_returns_error.of
 ---
-Ok(
-    [],
+Err(
+    UnterminatedString(
+        1,
+        14,
+    ),
 )

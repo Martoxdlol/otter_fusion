@@ -1,8 +1,15 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/empty_input_returns_eof.of
+input_file: examples/lexer/double_ampersand_is_and_token.of
 ---
 Ok(
-    [],
+    [
+        Token {
+            token_type: And,
+            position: 2,
+            line: 1,
+            column: 3,
+        },
+    ],
 )

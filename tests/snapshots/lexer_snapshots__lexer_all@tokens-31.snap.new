@@ -1,0 +1,18 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/escaped_quote_is_kept_inside_string.of
+---
+Ok(
+    [
+        Token {
+            token_type: StringLit(
+                "hello \"world\"",
+            ),
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+    ],
+)

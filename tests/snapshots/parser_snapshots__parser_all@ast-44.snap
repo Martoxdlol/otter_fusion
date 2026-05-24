@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/slash_starts_comment_when_followed_by_slash.of
+input_file: examples/lexer/single_ampersand_is_unexpected_character.of
 ---
 Err(
-    "unexpected token 'var'",
+    "unexpected character '&'",
 )

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_continue_inside_while_ok.of
+input_file: examples/validator/p5_break_outside_loop_errors.of
 ---
 Ok(
     [
@@ -38,58 +38,22 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: While,
+            token_type: Break,
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: LeftParen,
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: True,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: RightParen,
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: Continue,
-            position: 41,
-            line: 1,
-            column: 42,
-        },
-        Token {
             token_type: Semicolon,
-            position: 42,
+            position: 24,
             line: 1,
-            column: 43,
+            column: 25,
         },
         Token {
             token_type: RightBrace,
-            position: 44,
+            position: 26,
             line: 1,
-            column: 45,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 46,
-            line: 1,
-            column: 47,
+            column: 27,
         },
     ],
 )

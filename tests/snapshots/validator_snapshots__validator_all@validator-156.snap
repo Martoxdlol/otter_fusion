@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_call_resolves_module_function.of
+input_file: examples/validator/p5_binary_op_arithmetic_on_non_numeric_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "type mismatch in function 'test_module::test' (binary Add): expected 'int64', found 'string'",
+    ],
+)

@@ -1,8 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/equality_and_negation_tokens_are_recognized.of
+input_file: examples/lexer/empty_input_returns_eof.of
 ---
-ParserError(
-    "unexpected token '='",
-)
+Ok

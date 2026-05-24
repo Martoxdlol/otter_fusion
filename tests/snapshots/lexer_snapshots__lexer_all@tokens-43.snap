@@ -1,12 +1,17 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/single_ampersand_is_unexpected_character.of
+input_file: examples/lexer/scan_number_valid_int.of
 ---
-Err(
-    UnexpectedCharacter(
-        '&',
-        1,
-        2,
-    ),
+Ok(
+    [
+        Token {
+            token_type: Int(
+                "123",
+            ),
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+    ],
 )

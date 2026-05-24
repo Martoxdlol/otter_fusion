@@ -1,0 +1,107 @@
+import { Buffer } from "of:core";
+
+// of_io — thin wrappers over POSIX file, networking, and multiplexing
+// syscalls. Link against libotter_io.a.
+//
+// Calling convention:
+//   - `str` lowers to a null-terminated C string (`*const c_char`).
+//   - Raw byte regions (sockaddr, fd_set, timeval) ride on `Buffer`; pass
+//     `Buffer { data: null, size: 0 }` to mean "NULL syscall argument".
+//   - All syscalls return their raw libc result. -1 means error; call
+//     `__of_errno()` to read errno.
+//   - Buffers returned by the helpers (sockaddr_in/timeval/fdset_new) own
+//     foreign-heap memory. Free them with `Buffer.free()`.
+
+// ---- File operations ----
+
+extern function __of_open(path: str, flags: i32, mode: u32): i32;
+extern function __of_read(fd: i32, buf: Buffer, len: u64): i64;
+extern function __of_write(fd: i32, buf: Buffer, len: u64): i64;
+extern function __of_close(fd: i32): i32;
+extern function __of_lseek(fd: i32, offset: i64, whence: i32): i64;
+
+// ---- Networking ----
+
+extern function __of_socket(domain: i32, type_: i32, protocol: i32): i32;
+extern function __of_bind(fd: i32, addr: Buffer, len: u32): i32;
+extern function __of_listen(fd: i32, backlog: i32): i32;
+// `addr` is a sockaddr-sized buffer the kernel writes into. `addrlen` is
+// a 4-byte buffer: caller initializes it to the size of `addr`, kernel
+// overwrites with the actual length.
+extern function __of_accept(fd: i32, addr: Buffer, addrlen: Buffer): i32;
+extern function __of_connect(fd: i32, addr: Buffer, len: u32): i32;
+
+// ---- Multiplexing + non-blocking control ----
+
+// Any of the fd_set / timeout arguments may be `null` to pass NULL to
+// the kernel (meaning "don't watch this kind of event" / "block forever").
+extern function __of_select(nfds: i32, rfds: Buffer | null, wfds: Buffer | null, efds: Buffer | null, timeout: Buffer | null): i32;
+
+// Use `fcntl(fd, F_GETFL(), 0)` to read flags and `fcntl(fd, F_SETFL(), flags)`
+// to set them. To toggle non-blocking: `fcntl(fd, F_SETFL(), flags | O_NONBLOCK())`.
+extern function __of_fcntl(fd: i32, cmd: i32, arg: i64): i32;
+
+// ---- Last syscall error ----
+
+extern function __of_errno(): i32;
+
+// ---- Helpers (build syscall byte arguments without exposing layouts) ----
+
+// IPv4 sockaddr_in (16 bytes). `ip_be` and `port_be` are network-byte-order.
+extern function __of_sockaddr_in(ip_be: u32, port_be: u16): Buffer;
+
+// struct timeval (sec + usec).
+extern function __of_timeval(sec: i64, usec: i64): Buffer;
+
+// fd_set sized for FD_SETSIZE; bits start cleared.
+extern function __of_fdset_new(): Buffer;
+extern function __of_fdset_zero(set: Buffer);
+extern function __of_fdset_set(set: Buffer, fd: i32);
+extern function __of_fdset_clr(set: Buffer, fd: i32);
+extern function __of_fdset_isset(set: Buffer, fd: i32): bool;
+
+// htons / htonl — needed to build a sockaddr_in.
+extern function __of_htons(host_short: u16): u16;
+extern function __of_htonl(host_long: u32): u32;
+
+// Bitwise OR helper — the language doesn't have `|` on integers, but
+// flag combinations need it (e.g. `O_CREAT | O_WRONLY`).
+extern function __of_or_i32(a: i32, b: i32): i32;
+
+// ---- POSIX-stable constants ----
+// These values are guaranteed by POSIX across Linux and macOS, so they
+// can live as compile-time consts.
+
+const O_RDONLY: i32 = 0;
+const O_WRONLY: i32 = 1;
+const O_RDWR: i32 = 2;
+
+const SEEK_SET: i32 = 0;
+const SEEK_CUR: i32 = 1;
+const SEEK_END: i32 = 2;
+
+const STDIN_FILENO: i32 = 0;
+const STDOUT_FILENO: i32 = 1;
+const STDERR_FILENO: i32 = 2;
+
+// ---- Platform-divergent constants ----
+// O_CREAT, O_NONBLOCK, AF_INET, etc. have different bit patterns on
+// Linux vs. macOS; expose them as 0-arg extern functions so Rust picks
+// the right libc value at compile time.
+
+extern function O_CREAT(): i32;
+extern function O_TRUNC(): i32;
+extern function O_APPEND(): i32;
+extern function O_NONBLOCK(): i32;
+
+extern function AF_INET(): i32;
+extern function AF_INET6(): i32;
+extern function AF_UNIX(): i32;
+extern function SOCK_STREAM(): i32;
+extern function SOCK_DGRAM(): i32;
+
+extern function F_GETFL(): i32;
+extern function F_SETFL(): i32;
+
+// Default file mode for created files (rw-r--r--). 0644 octal.
+const MODE_RW_R_R: u32 = 420;

@@ -1,12 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/04_structs_interfaces/struct_implements.of
+input_file: examples/spec/03_functions/implicit_return.of
 ---
-ValidationErrors(
-    [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Person::greet'",
-        "type mismatch in function 'test_module::Person::greet' (binary Add): expected 'string', found 'null'",
-        "unknown member 'name' on 'null' in function 'test_module::Person::greet'",
-    ],
-)
+Ok

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/11_collections/map_literal.of
+input_file: examples/spec/08_numeric_conversions/int_narrowing.of
 ---
 Ok(
     [
@@ -13,7 +13,7 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "user_ages",
+                "large_int",
             ),
             position: 13,
             line: 1,
@@ -27,125 +27,93 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Map",
+                "i64",
             ),
             position: 18,
             line: 1,
             column: 19,
         },
         Token {
-            token_type: LT,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: Identifier(
-                "str",
-            ),
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Comma,
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: Identifier(
-                "i32",
-            ),
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: GT,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
             token_type: Eq,
-            position: 30,
+            position: 20,
             line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: StringLit(
-                "Alice",
-            ),
-            position: 42,
-            line: 2,
-            column: 10,
-        },
-        Token {
-            token_type: Colon,
-            position: 43,
-            line: 2,
-            column: 11,
+            column: 21,
         },
         Token {
             token_type: Int(
-                "30",
+                "1000",
             ),
-            position: 46,
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: Var,
+            position: 30,
+            line: 2,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "small_int",
+            ),
+            position: 40,
             line: 2,
             column: 14,
         },
         Token {
-            token_type: Comma,
-            position: 47,
+            token_type: Colon,
+            position: 41,
             line: 2,
             column: 15,
         },
         Token {
-            token_type: StringLit(
-                "Bob",
+            token_type: Identifier(
+                "i8",
             ),
-            position: 55,
-            line: 3,
-            column: 8,
+            position: 44,
+            line: 2,
+            column: 18,
         },
         Token {
-            token_type: Colon,
+            token_type: Eq,
+            position: 46,
+            line: 2,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "large_int",
+            ),
             position: 56,
-            line: 3,
-            column: 9,
+            line: 2,
+            column: 30,
         },
         Token {
-            token_type: Int(
-                "25",
-            ),
+            token_type: As,
             position: 59,
-            line: 3,
-            column: 12,
+            line: 2,
+            column: 33,
         },
         Token {
-            token_type: Comma,
-            position: 60,
-            line: 3,
-            column: 13,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: Identifier(
+                "i8",
+            ),
             position: 62,
-            line: 4,
-            column: 2,
+            line: 2,
+            column: 36,
         },
         Token {
             token_type: Semicolon,
             position: 63,
-            line: 4,
-            column: 3,
+            line: 2,
+            column: 37,
         },
     ],
 )

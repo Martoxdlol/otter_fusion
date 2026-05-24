@@ -1,0 +1,90 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/parser/parse_extern_function_type_alias.of
+---
+Ok(
+    [
+        Token {
+            token_type: Type,
+            position: 4,
+            line: 1,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "Fun",
+            ),
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Eq,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Extern,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: Colon,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "MyStruct",
+            ),
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 31,
+            line: 1,
+            column: 32,
+        },
+        Token {
+            token_type: FatArrow,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 39,
+            line: 1,
+            column: 40,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 40,
+            line: 1,
+            column: 41,
+        },
+    ],
+)

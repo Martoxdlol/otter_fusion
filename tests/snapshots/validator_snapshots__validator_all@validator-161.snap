@@ -1,10 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
-ValidationErrors(
-    [
-        "invalid operator 'And' for operand of type 'int64' in function 'test_module::test'",
-    ],
-)
+Ok

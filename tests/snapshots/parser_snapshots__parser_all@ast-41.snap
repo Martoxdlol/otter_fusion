@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/scan_number_valid_float.of
+input_file: examples/lexer/scan_number_invalid_float_none_after_dot.of
 ---
 Err(
-    "unexpected token float '123.02'",
+    "invalid number literal '123.'",
 )

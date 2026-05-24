@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_method_minted_with_owner.of
+input_file: examples/validator/p1_struct_skeleton_inserted.of
 ---
 Ok

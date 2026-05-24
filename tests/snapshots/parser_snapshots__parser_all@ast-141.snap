@@ -1,74 +1,58 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Box",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "MyInt",
+                        generics: [],
+                        ty: Primitive(
+                            Int64,
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 5,
+                    len: 4,
                 },
             },
             Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Box",
-                            [
-                                Named(
-                                    "U",
-                                    [],
-                                ),
-                            ],
+                kind: Function(
+                    FunctionDecl {
+                        name: "foo",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "MyInt",
+                                [],
+                            ),
                         ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "peek",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 25,
-                                    len: 8,
-                                },
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
                             },
-                        ],
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

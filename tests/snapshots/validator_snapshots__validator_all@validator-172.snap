@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_var_decl_inferred_from_init.of
+input_file: examples/validator/p5_struct_init_and_member_access.of
 ---
 Ok

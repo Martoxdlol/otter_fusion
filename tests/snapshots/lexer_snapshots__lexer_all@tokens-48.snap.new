@@ -1,0 +1,18 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/token_position_line_and_column_are_updated.of
+---
+Ok(
+    [
+        Token {
+            token_type: Identifier(
+                "foo",
+            ),
+            position: 5,
+            line: 2,
+            column: 4,
+        },
+    ],
+)

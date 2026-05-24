@@ -1,11 +1,12 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/unterminated_string_returns_error.of
+input_file: examples/lexer/unexpected_character_returns_error.of
 ---
 Err(
-    UnterminatedString(
+    UnexpectedCharacter(
+        '@',
         1,
-        14,
+        2,
     ),
 )

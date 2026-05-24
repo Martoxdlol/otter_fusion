@@ -1,20 +1,50 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_missing_interface_method_errors.of
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Interface(
-                    InterfaceDecl {
-                        name: "I",
-                        generics: [],
+                kind: Struct(
+                    StructDecl {
+                        name: "Box",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Box",
+                            [
+                                Named(
+                                    "U",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [],
+                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "f",
+                                name: "peek",
                                 has_self_param: false,
                                 is_extern: false,
                                 generics: [],
@@ -27,34 +57,11 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 1,
-                                    col: 23,
+                                    line: 2,
+                                    col: 25,
                                     len: 8,
                                 },
                             },
-                        ],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 10,
-                    len: 9,
-                },
-            },
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "I",
-                                [],
-                            ),
                         ],
                     },
                 ),

@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/token_position_line_and_column_are_updated.of
+input_file: examples/lexer/string_literal_is_scanned.of
 ---
 ParserError(
-    "unexpected token identifier 'foo'",
+    "unexpected token string literal",
 )

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_function_signature_resolved.of
+input_file: examples/validator/p1_function_skeleton_inserted.of
 ---
 Ok(
     Program {
@@ -9,39 +9,16 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "add",
+                        name: "foo",
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "b",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        return_type: None,
+                        params: [],
                         body: Some(
                             Block {
                                 statements: [],
-                                returns: Some(
-                                    Variable(
-                                        "a",
-                                    ),
-                                ),
+                                returns: None,
                             },
                         ),
                         span: Span {

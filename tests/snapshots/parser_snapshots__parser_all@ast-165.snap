@@ -1,61 +1,50 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_self_member_access_in_method.of
+input_file: examples/validator/p5_is_check_yields_bool.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
+                kind: Function(
+                    FunctionDecl {
+                        name: "test",
+                        has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        methods: [
-                            FunctionDecl {
-                                name: "m",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [
-                                            Expr(
-                                                Member(
-                                                    SelfRef,
-                                                    "x",
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Is(
+                                            Literal(
+                                                Int(
+                                                    "5",
                                                 ),
                                             ),
-                                        ],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 1,
-                                    col: 27,
-                                    len: 8,
-                                },
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
                             },
-                        ],
-                        implements: [],
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

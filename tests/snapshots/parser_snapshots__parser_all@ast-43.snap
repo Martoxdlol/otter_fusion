@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/single_ampersand_is_unexpected_character.of
+input_file: examples/lexer/scan_number_valid_int.of
 ---
 Err(
-    "unexpected character '&'",
+    "unexpected token integer '123'",
 )

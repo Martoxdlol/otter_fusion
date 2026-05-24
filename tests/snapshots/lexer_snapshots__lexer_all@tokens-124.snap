@@ -1,73 +1,149 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p1_duplicate_name_in_module_errors.of
+input_file: examples/spec/14_ffi/extern_function_import.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
+            token_type: Extern,
             position: 6,
             line: 1,
             column: 7,
         },
         Token {
-            token_type: Identifier(
-                "X",
-            ),
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
             token_type: Function,
-            position: 20,
-            line: 2,
-            column: 9,
+            position: 15,
+            line: 1,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "X",
+                "print",
             ),
-            position: 22,
-            line: 2,
-            column: 11,
+            position: 21,
+            line: 1,
+            column: 22,
         },
         Token {
             token_type: LeftParen,
-            position: 23,
-            line: 2,
-            column: 12,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "value",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 32,
+            line: 1,
+            column: 33,
         },
         Token {
             token_type: RightParen,
-            position: 24,
-            line: 2,
-            column: 13,
+            position: 33,
+            line: 1,
+            column: 34,
         },
         Token {
-            token_type: LeftBrace,
-            position: 26,
-            line: 2,
-            column: 15,
+            token_type: Semicolon,
+            position: 34,
+            line: 1,
+            column: 35,
         },
         Token {
-            token_type: RightBrace,
-            position: 27,
+            token_type: Extern,
+            position: 41,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 50,
             line: 2,
             column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 57,
+            line: 2,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 58,
+            line: 2,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 62,
+            line: 2,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 63,
+            line: 2,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 67,
+            line: 2,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 68,
+            line: 2,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 69,
+            line: 2,
+            column: 35,
+        },
+        Token {
+            token_type: Star,
+            position: 71,
+            line: 2,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 77,
+            line: 2,
+            column: 43,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 78,
+            line: 2,
+            column: 44,
         },
     ],
 )

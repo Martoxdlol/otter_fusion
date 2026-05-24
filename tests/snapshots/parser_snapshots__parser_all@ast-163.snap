@@ -1,34 +1,11 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_null_assignable_to_nullable_union.of
+input_file: examples/validator/p5_continue_inside_while_ok.of
 ---
 Ok(
     Program {
         items: [
-            Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Opt",
-                        generics: [],
-                        ty: Union(
-                            [
-                                Primitive(
-                                    Int64,
-                                ),
-                                Primitive(
-                                    Null,
-                                ),
-                            ],
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 5,
-                    len: 4,
-                },
-            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -41,33 +18,32 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    VarDecl(
-                                        "x",
-                                        Some(
-                                            Named(
-                                                "Opt",
-                                                [],
+                                    While(
+                                        Literal(
+                                            Bool(
+                                                true,
                                             ),
                                         ),
-                                        Some(
-                                            Literal(
-                                                Null,
-                                            ),
-                                        ),
+                                        Block {
+                                            statements: [
+                                                Continue,
+                                            ],
+                                            returns: None,
+                                        },
                                     ),
                                 ],
                                 returns: None,
                             },
                         ),
                         span: Span {
-                            line: 2,
+                            line: 1,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 2,
+                    line: 1,
                     col: 9,
                     len: 8,
                 },

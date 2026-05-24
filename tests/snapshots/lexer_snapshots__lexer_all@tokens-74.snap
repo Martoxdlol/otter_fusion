@@ -1,81 +1,57 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_method.of
+input_file: examples/parser/parse_interface_decl_unit.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Interface,
+            position: 9,
             line: 1,
-            column: 7,
+            column: 10,
         },
         Token {
             token_type: Identifier(
-                "Foo",
+                "Named",
             ),
-            position: 10,
+            position: 15,
             line: 1,
-            column: 11,
+            column: 16,
         },
         Token {
             token_type: LeftBrace,
-            position: 12,
+            position: 17,
             line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: Function,
-            position: 21,
-            line: 1,
-            column: 22,
+            column: 18,
         },
         Token {
             token_type: Identifier(
-                "bar",
+                "name",
             ),
-            position: 25,
+            position: 22,
             line: 1,
-            column: 26,
+            column: 23,
         },
         Token {
-            token_type: LeftParen,
-            position: 26,
+            token_type: Colon,
+            position: 23,
             line: 1,
-            column: 27,
+            column: 24,
         },
         Token {
-            token_type: RightParen,
+            token_type: Identifier(
+                "str",
+            ),
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: Colon,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "i32",
-            ),
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
             token_type: RightBrace,
-            position: 35,
+            position: 29,
             line: 1,
-            column: 36,
+            column: 30,
         },
     ],
 )

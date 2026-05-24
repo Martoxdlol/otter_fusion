@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/pipe_and_or_tokens_are_recognized.of
+input_file: examples/lexer/non_keyword_literal_becomes_identifier.of
 ---
 Err(
-    "unexpected token '|'",
+    "unexpected token identifier 'structure'",
 )

@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/13_iterators/iterator_interface.of
+input_file: examples/spec/11_collections/map_literal.of
 ---
 ParserError(
-    "unexpected token '('",
+    "unexpected token 'var'",
 )

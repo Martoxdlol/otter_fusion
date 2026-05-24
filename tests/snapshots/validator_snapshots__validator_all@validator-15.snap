@@ -5,8 +5,6 @@ input_file: examples/language/15_ffi_pinning.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
         "invalid struct initializer in function 'test_module::allocate' (null)",
         "type mismatch in function 'test_module::install' (call to register_callback arg 0): expected 'struct#0', found 'null'",
         "type mismatch in function 'test_module::remove' (call to unregister_callback arg 0): expected 'struct#0', found 'null'",

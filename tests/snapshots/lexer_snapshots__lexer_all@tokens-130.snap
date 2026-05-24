@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p2_function_signature_resolved.of
+input_file: examples/validator/p1_function_skeleton_inserted.of
 ---
 Ok(
     [
@@ -13,7 +13,7 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "add",
+                "foo",
             ),
             position: 12,
             line: 1,
@@ -26,94 +26,22 @@ Ok(
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "a",
-            ),
+            token_type: RightParen,
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Colon,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: Comma,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: Identifier(
-                "b",
-            ),
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Colon,
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: RightParen,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Colon,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
             token_type: LeftBrace,
-            position: 35,
+            position: 16,
             line: 1,
-            column: 36,
-        },
-        Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 37,
-            line: 1,
-            column: 38,
+            column: 17,
         },
         Token {
             token_type: RightBrace,
-            position: 39,
+            position: 17,
             line: 1,
-            column: 40,
+            column: 18,
         },
     ],
 )

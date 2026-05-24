@@ -1,14 +1,27 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_expr_binary_precedence.of
+input_file: examples/networking/of_io.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'null' in function 'test_module::test'",
-        "invalid operator 'Mul' for operand of type 'null' in function 'test_module::test'",
-        "unknown variable 'x' in function 'test_module::test'",
-        "unknown variable 'y' in function 'test_module::test'",
-        "unknown variable 'z' in function 'test_module::test'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
     ],
 )

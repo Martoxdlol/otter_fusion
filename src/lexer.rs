@@ -230,6 +230,7 @@ impl Lexer {
             "extern" => self.token(TokenType::Extern),
             "import" => self.token(TokenType::Import),
             "from" => self.token(TokenType::From),
+            "const" => self.token(TokenType::Const),
 
             _ => self.token(TokenType::Identifier(literal)),
         }
@@ -286,10 +287,28 @@ impl Lexer {
                     continue;
                 }
                 '"' if !escaped => return Ok(self.token(TokenType::StringLit(value))),
-                _ => escaped = false,
+                _ => {
+                    if escaped {
+                        escaped = false;
+                        match c {
+                            'n' => value.push('\n'),
+                            't' => value.push('\t'),
+                            'r' => value.push('\r'),
+                            '\\' => value.push('\\'),
+                            '"' => value.push('"'),
+                            other => {
+                                return Err(LexerError::UnexpectedCharacter(
+                                    other,
+                                    self.line,
+                                    self.column,
+                                ));
+                            }
+                        }
+                    } else {
+                        value.push(c);
+                    }
+                }
             }
-
-            value.push(c);
         }
 
         // end of file
@@ -373,5 +392,3 @@ impl Lexer {
         }
     }
 }
-
-

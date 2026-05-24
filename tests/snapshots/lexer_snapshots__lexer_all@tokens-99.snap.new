@@ -1,0 +1,184 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/spec/04_structs_interfaces/struct_basic.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Person",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 22,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 23,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 27,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 28,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 34,
+            line: 3,
+            column: 6,
+        },
+        Token {
+            token_type: Colon,
+            position: 35,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 39,
+            line: 3,
+            column: 11,
+        },
+        Token {
+            token_type: Comma,
+            position: 40,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Function,
+            position: 52,
+            line: 5,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "greet",
+            ),
+            position: 58,
+            line: 5,
+            column: 17,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 59,
+            line: 5,
+            column: 18,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 63,
+            line: 5,
+            column: 22,
+        },
+        Token {
+            token_type: RightParen,
+            position: 64,
+            line: 5,
+            column: 23,
+        },
+        Token {
+            token_type: Colon,
+            position: 65,
+            line: 5,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 69,
+            line: 5,
+            column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 71,
+            line: 5,
+            column: 30,
+        },
+        Token {
+            token_type: StringLit(
+                "Hello, ",
+            ),
+            position: 85,
+            line: 6,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 87,
+            line: 6,
+            column: 16,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 92,
+            line: 6,
+            column: 21,
+        },
+        Token {
+            token_type: Dot,
+            position: 93,
+            line: 6,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 97,
+            line: 6,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 101,
+            line: 7,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 103,
+            line: 8,
+            column: 2,
+        },
+    ],
+)

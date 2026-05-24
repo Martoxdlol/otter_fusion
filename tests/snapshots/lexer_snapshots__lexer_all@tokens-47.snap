@@ -1,17 +1,17 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/token_position_line_and_column_are_updated.of
+input_file: examples/lexer/string_literal_is_scanned.of
 ---
 Ok(
     [
         Token {
-            token_type: Identifier(
-                "foo",
+            token_type: StringLit(
+                "hello world",
             ),
-            position: 5,
-            line: 2,
-            column: 4,
+            position: 13,
+            line: 1,
+            column: 14,
         },
     ],
 )

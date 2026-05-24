@@ -1,109 +1,49 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_pointer_params.of
+input_file: examples/parser/parse_extend_decl_unit.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
+            token_type: Extend,
             position: 6,
             line: 1,
             column: 7,
         },
         Token {
-            token_type: Function,
-            position: 15,
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 14,
             line: 1,
-            column: 16,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 16,
+            line: 1,
+            column: 17,
         },
         Token {
             token_type: Identifier(
-                "hashmap_set",
+                "Movable",
             ),
+            position: 24,
+            line: 1,
+            column: 25,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: RightBrace,
             position: 27,
             line: 1,
             column: 28,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "key",
-            ),
-            position: 31,
-            line: 1,
-            column: 32,
-        },
-        Token {
-            token_type: Colon,
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: Star,
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: Identifier(
-                "str",
-            ),
-            position: 37,
-            line: 1,
-            column: 38,
-        },
-        Token {
-            token_type: Comma,
-            position: 38,
-            line: 1,
-            column: 39,
-        },
-        Token {
-            token_type: Identifier(
-                "value",
-            ),
-            position: 44,
-            line: 1,
-            column: 45,
-        },
-        Token {
-            token_type: Colon,
-            position: 45,
-            line: 1,
-            column: 46,
-        },
-        Token {
-            token_type: Star,
-            position: 47,
-            line: 1,
-            column: 48,
-        },
-        Token {
-            token_type: Identifier(
-                "MyStruct",
-            ),
-            position: 55,
-            line: 1,
-            column: 56,
-        },
-        Token {
-            token_type: RightParen,
-            position: 56,
-            line: 1,
-            column: 57,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 57,
-            line: 1,
-            column: 58,
         },
     ],
 )

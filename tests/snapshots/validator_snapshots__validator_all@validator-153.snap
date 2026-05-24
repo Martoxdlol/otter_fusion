@@ -1,10 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_break_outside_loop_errors.of
+input_file: examples/validator/p4_universal_extend_satisfies_interface.of
 ---
 ValidationErrors(
     [
-        "'break' used outside of a loop in function 'test_module::test'",
+        "unknown type 'T' in module 'test_module'",
     ],
 )

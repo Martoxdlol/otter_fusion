@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/12_control_flow/break_continue.of
+input_file: examples/spec/09_null_handling/nullable_return.of
 ---
 ParserError(
-    "unexpected token 'for'",
+    "unexpected token 'var'",
 )

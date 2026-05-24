@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_struct_init_and_member_access.of
+input_file: examples/validator/p5_method_call_via_member.of
 ---
 Ok(
     Program {
@@ -12,16 +12,28 @@ Ok(
                         name: "S",
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "m",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
                                 ),
-                                is_pointer: false,
+                                span: Span {
+                                    line: 1,
+                                    col: 20,
+                                    len: 8,
+                                },
                             },
                         ],
-                        methods: [],
                         implements: [],
                     },
                 ),
@@ -39,38 +51,29 @@ Ok(
                         is_extern: false,
                         generics: [],
                         return_type: None,
-                        params: [],
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Named(
+                                    "S",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
                         body: Some(
                             Block {
                                 statements: [
-                                    VarDecl(
-                                        "s",
-                                        None,
-                                        Some(
-                                            StructInit(
-                                                Named(
-                                                    "S",
-                                                    [],
-                                                ),
-                                                [
-                                                    (
-                                                        "x",
-                                                        Literal(
-                                                            Int(
-                                                                "5",
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
                                     Expr(
-                                        Member(
-                                            Variable(
-                                                "s",
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "s",
+                                                ),
+                                                "m",
                                             ),
-                                            "x",
+                                            [],
+                                            [],
                                         ),
                                     ),
                                 ],

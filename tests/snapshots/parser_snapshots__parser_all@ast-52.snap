@@ -1,8 +1,1149 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_error_unexpected_token_at_item.of
+input_file: examples/networking/01_tcp_echo_server.of
 ---
-Err(
-    "unexpected token integer '42'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "println",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "Buffer",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "__of_buffer_alloc",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_buffer_free",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of_io",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "__of_socket",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_bind",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_listen",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_accept",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_close",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_read",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_write",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_errno",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_sockaddr_in",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_htons",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_htonl",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "AF_INET",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "SOCK_STREAM",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "errno_str",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    BinaryOp(
+                                        Literal(
+                                            String(
+                                                "errno=",
+                                            ),
+                                        ),
+                                        Add,
+                                        As(
+                                            Call(
+                                                Variable(
+                                                    "__of_errno",
+                                                ),
+                                                [],
+                                                [],
+                                            ),
+                                            Primitive(
+                                                String,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 15,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 15,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "server",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_socket",
+                                                ),
+                                                [],
+                                                [
+                                                    Call(
+                                                        Variable(
+                                                            "AF_INET",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                    Call(
+                                                        Variable(
+                                                            "SOCK_STREAM",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "0",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "server",
+                                                ),
+                                                Lt,
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "socket() failed ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Variable(
+                                                                            "errno_str",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "ip_be",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_htonl",
+                                                ),
+                                                [],
+                                                [
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "2130706433",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint32,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "port_be",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_htons",
+                                                ),
+                                                [],
+                                                [
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "8080",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint16,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "addr",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_sockaddr_in",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "ip_be",
+                                                    ),
+                                                    Variable(
+                                                        "port_be",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Call(
+                                                    Variable(
+                                                        "__of_bind",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "server",
+                                                        ),
+                                                        Variable(
+                                                            "addr",
+                                                        ),
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "16",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Uint32,
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                                Lt,
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "bind() failed ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Variable(
+                                                                            "errno_str",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_close",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "server",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "addr",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Call(
+                                                    Variable(
+                                                        "__of_listen",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "server",
+                                                        ),
+                                                        Literal(
+                                                            Int(
+                                                                "1",
+                                                            ),
+                                                        ),
+                                                    ],
+                                                ),
+                                                Lt,
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "listen() failed ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Variable(
+                                                                            "errno_str",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_close",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "server",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "addr",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "listening on 127.0.0.1:8080",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "client_addr",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_sockaddr_in",
+                                                ),
+                                                [],
+                                                [
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint32,
+                                                        ),
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint16,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "client_addrlen_maybe",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_buffer_alloc",
+                                                ),
+                                                [],
+                                                [
+                                                    Literal(
+                                                        Int(
+                                                            "4",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "client_addrlen_maybe",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Literal(
+                                                                    String(
+                                                                        "alloc failed",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "client_addrlen",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "client_addrlen_maybe",
+                                                ),
+                                                Named(
+                                                    "Buffer",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "client",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_accept",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "server",
+                                                    ),
+                                                    Variable(
+                                                        "client_addr",
+                                                    ),
+                                                    Variable(
+                                                        "client_addrlen",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "client",
+                                                ),
+                                                Lt,
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "accept() failed ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Variable(
+                                                                            "errno_str",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_close",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "server",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "addr",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "client_addr",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "client_addrlen",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "client connected",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "buf_maybe",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_buffer_alloc",
+                                                ),
+                                                [],
+                                                [
+                                                    Literal(
+                                                        Int(
+                                                            "1024",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "buf_maybe",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Literal(
+                                                                    String(
+                                                                        "alloc failed",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "buf",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "buf_maybe",
+                                                ),
+                                                Named(
+                                                    "Buffer",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "n",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_read",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "client",
+                                                    ),
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "1024",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "n",
+                                                ),
+                                                Gt,
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Literal(
+                                                                            String(
+                                                                                "read ",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            Variable(
+                                                                                "n",
+                                                                            ),
+                                                                            Primitive(
+                                                                                String,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            " bytes; echoing",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_write",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "client",
+                                                                ),
+                                                                Variable(
+                                                                    "buf",
+                                                                ),
+                                                                As(
+                                                                    Variable(
+                                                                        "n",
+                                                                    ),
+                                                                    Primitive(
+                                                                        Uint64,
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            Some(
+                                                Block {
+                                                    statements: [
+                                                        Expr(
+                                                            Call(
+                                                                Variable(
+                                                                    "println",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            BinaryOp(
+                                                                                Literal(
+                                                                                    String(
+                                                                                        "read returned ",
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "n",
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        String,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            Literal(
+                                                                                String(
+                                                                                    " ",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Call(
+                                                                            Variable(
+                                                                                "errno_str",
+                                                                            ),
+                                                                            [],
+                                                                            [],
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: None,
+                                                },
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_close",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "client",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_close",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "server",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "buf",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "addr",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "client_addr",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "client_addrlen",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 19,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 19,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

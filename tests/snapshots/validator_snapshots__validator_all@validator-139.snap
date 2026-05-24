@@ -1,10 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
-ValidationErrors(
-    [
-        "invalid extend target in module 'test_module'",
-    ],
+ParserError(
+    "unexpected token '*'",
 )

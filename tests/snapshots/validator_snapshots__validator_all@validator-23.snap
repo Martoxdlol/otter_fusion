@@ -1,8 +1,12 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/arithmetic_and_comparison_tokens_are_recognized.of
+input_file: examples/language/test_list.of
 ---
-ParserError(
-    "unexpected token '+'",
+ValidationErrors(
+    [
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'get' on 'null' in function 'test_module::main'",
+        "unknown member 'push' on 'null' in function 'test_module::main'",
+    ],
 )

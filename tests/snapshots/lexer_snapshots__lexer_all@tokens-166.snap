@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_simple_body_typechecks.of
+input_file: examples/validator/p5_logical_op_requires_bool.of
 ---
 Ok(
     [
@@ -38,44 +38,38 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Var,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: Identifier(
-                "x",
+            token_type: Int(
+                "5",
             ),
-            position: 23,
+            position: 19,
             line: 1,
-            column: 24,
+            column: 20,
         },
         Token {
-            token_type: Eq,
-            position: 25,
+            token_type: And,
+            position: 22,
             line: 1,
-            column: 26,
+            column: 23,
         },
         Token {
             token_type: Int(
                 "5",
             ),
-            position: 27,
+            position: 24,
             line: 1,
-            column: 28,
+            column: 25,
         },
         Token {
             token_type: Semicolon,
-            position: 28,
+            position: 25,
             line: 1,
-            column: 29,
+            column: 26,
         },
         Token {
             token_type: RightBrace,
-            position: 30,
+            position: 27,
             line: 1,
-            column: 31,
+            column: 28,
         },
     ],
 )

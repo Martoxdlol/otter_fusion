@@ -1,28 +1,21 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/05_extensions/extend_specialized.of
+input_file: examples/spec/04_structs_interfaces/struct_implements.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Wrapper",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
                         fields: [
                             FieldDecl {
-                                name: "value",
-                                ty: Named(
-                                    "T",
-                                    [],
+                                name: "name",
+                                ty: Primitive(
+                                    String,
                                 ),
                                 is_pointer: false,
                             },
@@ -33,32 +26,41 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
             Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Wrapper",
-                            [
-                                Primitive(
+                kind: Struct(
+                    StructDecl {
+                        name: "Person",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "age",
+                                ty: Primitive(
                                     Int32,
                                 ),
-                            ],
-                        ),
-                        generic_params: [],
-                        implements: [],
+                                is_pointer: false,
+                            },
+                        ],
                         methods: [
                             FunctionDecl {
-                                name: "double",
+                                name: "greet",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
                                 return_type: Some(
                                     Primitive(
-                                        Int32,
+                                        String,
                                     ),
                                 ),
                                 params: [],
@@ -67,26 +69,32 @@ Ok(
                                         statements: [],
                                         returns: Some(
                                             BinaryOp(
+                                                Literal(
+                                                    String(
+                                                        "Hello, ",
+                                                    ),
+                                                ),
+                                                Add,
                                                 Member(
                                                     SelfRef,
-                                                    "value",
-                                                ),
-                                                Mul,
-                                                Literal(
-                                                    Int(
-                                                        "2",
-                                                    ),
+                                                    "name",
                                                 ),
                                             ),
                                         ),
                                     },
                                 ),
                                 span: Span {
-                                    line: 6,
+                                    line: 9,
                                     col: 11,
                                     len: 8,
                                 },
                             },
+                        ],
+                        implements: [
+                            Named(
+                                "Named",
+                                [],
+                            ),
                         ],
                     },
                 ),

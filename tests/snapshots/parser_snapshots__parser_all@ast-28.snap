@@ -1,8 +1,10 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/equality_and_negation_tokens_are_recognized.of
+input_file: examples/lexer/empty_input_returns_eof.of
 ---
-Err(
-    "unexpected token '='",
+Ok(
+    Program {
+        items: [],
+    },
 )

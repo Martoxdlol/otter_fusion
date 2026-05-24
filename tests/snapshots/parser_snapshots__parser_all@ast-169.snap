@@ -1,36 +1,11 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_struct_init_missing_field_errors.of
+input_file: examples/validator/p5_return_type_mismatch_errors.of
 ---
 Ok(
     Program {
         items: [
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
-                        generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -38,18 +13,22 @@ Ok(
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        return_type: None,
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
                         params: [],
                         body: Some(
                             Block {
                                 statements: [
-                                    Expr(
-                                        StructInit(
-                                            Named(
-                                                "S",
-                                                [],
+                                    Return(
+                                        Some(
+                                            Literal(
+                                                String(
+                                                    "hi",
+                                                ),
                                             ),
-                                            [],
                                         ),
                                     ),
                                 ],
@@ -57,14 +36,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 2,
+                            line: 1,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 2,
+                    line: 1,
                     col: 9,
                     len: 8,
                 },

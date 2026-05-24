@@ -1,0 +1,252 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/spec/04_structs_interfaces/struct_implements.of
+---
+Ok(
+    [
+        Token {
+            token_type: Interface,
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "Named",
+            ),
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 24,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 25,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 29,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 30,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 32,
+            line: 3,
+            column: 2,
+        },
+        Token {
+            token_type: Struct,
+            position: 40,
+            line: 5,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Person",
+            ),
+            position: 47,
+            line: 5,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 48,
+            line: 5,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "Named",
+            ),
+            position: 54,
+            line: 5,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 56,
+            line: 5,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 63,
+            line: 6,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 64,
+            line: 6,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 68,
+            line: 6,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 69,
+            line: 6,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 75,
+            line: 7,
+            column: 6,
+        },
+        Token {
+            token_type: Colon,
+            position: 76,
+            line: 7,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 80,
+            line: 7,
+            column: 11,
+        },
+        Token {
+            token_type: Comma,
+            position: 81,
+            line: 7,
+            column: 12,
+        },
+        Token {
+            token_type: Function,
+            position: 93,
+            line: 9,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "greet",
+            ),
+            position: 99,
+            line: 9,
+            column: 17,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 100,
+            line: 9,
+            column: 18,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 104,
+            line: 9,
+            column: 22,
+        },
+        Token {
+            token_type: RightParen,
+            position: 105,
+            line: 9,
+            column: 23,
+        },
+        Token {
+            token_type: Colon,
+            position: 106,
+            line: 9,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 110,
+            line: 9,
+            column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 112,
+            line: 9,
+            column: 30,
+        },
+        Token {
+            token_type: StringLit(
+                "Hello, ",
+            ),
+            position: 126,
+            line: 10,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 128,
+            line: 10,
+            column: 16,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 133,
+            line: 10,
+            column: 21,
+        },
+        Token {
+            token_type: Dot,
+            position: 134,
+            line: 10,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 138,
+            line: 10,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 142,
+            line: 11,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 144,
+            line: 12,
+            column: 2,
+        },
+    ],
+)

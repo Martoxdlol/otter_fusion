@@ -1,0 +1,34 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/equality_and_negation_tokens_are_recognized.of
+---
+Ok(
+    [
+        Token {
+            token_type: Eq,
+            position: 1,
+            line: 1,
+            column: 2,
+        },
+        Token {
+            token_type: EqEq,
+            position: 4,
+            line: 1,
+            column: 5,
+        },
+        Token {
+            token_type: Bang,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: BangEq,
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+    ],
+)

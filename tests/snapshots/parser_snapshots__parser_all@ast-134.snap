@@ -1,8 +1,54 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_pointer_outside_extern_errors.of
+input_file: examples/validator/p2_bound_referencing_interface_ok.of
 ---
-Err(
-    "unexpected token '*'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Show",
+                        generics: [],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Foo",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [
+                                    Named(
+                                        "Show",
+                                        [],
+                                    ),
+                                ],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
 )

@@ -1,10 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_unknown_type_errors.of
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'Nope' in module 'test_module'",
-    ],
-)
+Ok

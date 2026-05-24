@@ -1,21 +1,17 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/pipe_and_or_tokens_are_recognized.of
+input_file: examples/lexer/non_keyword_literal_becomes_identifier.of
 ---
 Ok(
     [
         Token {
-            token_type: Pipe,
-            position: 1,
+            token_type: Identifier(
+                "structure",
+            ),
+            position: 9,
             line: 1,
-            column: 2,
-        },
-        Token {
-            token_type: Or,
-            position: 4,
-            line: 1,
-            column: 5,
+            column: 10,
         },
     ],
 )

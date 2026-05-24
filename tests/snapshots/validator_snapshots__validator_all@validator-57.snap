@@ -1,10 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_extend_with_method.of
+input_file: examples/parser/parse_error_unexpected_token_at_item.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'Foo' in module 'test_module'",
-    ],
+ParserError(
+    "unexpected token integer '42'",
 )

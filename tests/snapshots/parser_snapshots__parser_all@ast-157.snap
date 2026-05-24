@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_comparison_yields_bool.of
+input_file: examples/validator/p5_binary_op_type_mismatch_errors.of
 ---
 Ok(
     Program {
@@ -25,10 +25,10 @@ Ok(
                                                     "5",
                                                 ),
                                             ),
-                                            Eq,
+                                            Add,
                                             Literal(
-                                                Int(
-                                                    "5",
+                                                Float(
+                                                    "5.0",
                                                 ),
                                             ),
                                         ),

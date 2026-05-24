@@ -5,7 +5,7 @@ use std::fmt;
 
 use crate::{
     ast::{
-        self, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, ItemKind, Module,
+        self, ConstDecl, FunctionDecl, GenericParam, ImportSymbol, ImportSymbols, ItemKind, Module,
         TypeAliasDecl, TypeExpr,
     },
     hir::{
@@ -179,6 +179,30 @@ pub enum ValidationError {
     /// types break that.
     ExternStructAsGenericArg {
         module: String,
+        name: String,
+    },
+    /// `const` declared with a type the literal can't fit (range or kind).
+    ConstTypeMismatch {
+        module: String,
+        name: String,
+        expected: String,
+        actual: String,
+    },
+    /// `const` declared with a type the language doesn't allow as a
+    /// compile-time constant (e.g. struct, list, function type).
+    ConstUnsupportedType {
+        module: String,
+        name: String,
+        ty: String,
+    },
+    /// Name used in a type position resolved to a `const`.
+    ExpectedTypeFoundConst {
+        module: String,
+        name: String,
+    },
+    /// `const` used as a callee.
+    ConstNotCallable {
+        function: String,
         name: String,
     },
 }
@@ -367,6 +391,27 @@ impl fmt::Display for ValidationError {
                 f,
                 "extern struct '{name}' in module '{module}' cannot be used as a generic type argument"
             ),
+            ConstTypeMismatch {
+                module,
+                name,
+                expected,
+                actual,
+            } => write!(
+                f,
+                "const '{name}' in module '{module}': expected type '{expected}', got literal of type '{actual}'"
+            ),
+            ConstUnsupportedType { module, name, ty } => write!(
+                f,
+                "const '{name}' in module '{module}' has unsupported type '{ty}' (consts must be primitive or null)"
+            ),
+            ExpectedTypeFoundConst { module, name } => write!(
+                f,
+                "expected a type but '{name}' in module '{module}' is a const"
+            ),
+            ConstNotCallable { function, name } => write!(
+                f,
+                "const '{name}' is not callable in function '{function}'"
+            ),
         }
     }
 }
@@ -392,6 +437,13 @@ enum ScopeEntry {
         source: ModuleId,
         name: String,
     },
+    /// Compile-time constant. Resolved value lives in
+    /// `Validator.module_consts[source][name]`; every use site is inlined
+    /// to that literal, so later passes never see the name.
+    Const {
+        source: ModuleId,
+        name: String,
+    },
 }
 
 #[derive(Debug, Default)]
@@ -412,6 +464,12 @@ struct PendingNamedImport {
     importer: ModuleId,
     source: ModuleId,
     symbols: Vec<ImportSymbol>,
+}
+
+#[derive(Debug, Clone)]
+struct ResolvedConst {
+    value: HirLiteral,
+    ty: ResolvedType,
 }
 
 /// Context for resolving an AST `TypeExpr` into a `ResolvedType`.
@@ -438,6 +496,11 @@ pub struct Validator {
     /// Side table of type aliases — never materialized in HIR; inlined at
     /// resolution time.
     module_aliases: HashMap<ModuleId, HashMap<String, TypeAliasDecl>>,
+    /// Side table of `const` declarations. Resolved in phase 1.5; downstream
+    /// passes never see consts — every use site is inlined to its literal.
+    module_consts: HashMap<ModuleId, HashMap<String, ResolvedConst>>,
+    /// AST of each const decl, kept alive for phase 1.5's resolution pass.
+    pending_consts: Vec<(ModuleId, ConstDecl)>,
 
     pending_named_imports: Vec<PendingNamedImport>,
     /// Function (top-level + method) AST decls keyed by their HIR id, kept
@@ -475,6 +538,8 @@ impl Validator {
             module_ids: HashMap::new(),
             module_scopes: HashMap::new(),
             module_aliases: HashMap::new(),
+            module_consts: HashMap::new(),
+            pending_consts: Vec::new(),
             pending_named_imports: Vec::new(),
             pending_function_bodies: HashMap::new(),
             type_generics: HashMap::new(),
@@ -495,6 +560,8 @@ impl Validator {
         self.register_modules_and_imports(&modules);
         // step 1: register type names
         self.register_type_names(&modules);
+        // step 1.5: resolve const decls (types + literal range/kind checks)
+        self.resolve_pending_consts();
         // step 2: register type params, resolve fields & signatures
         self.register_type_params_and_signatures(&modules);
         // step 3: merge extend blocks
@@ -735,6 +802,23 @@ impl Validator {
                             },
                         );
                     }
+                    ItemKind::Const(decl) => {
+                        if scope.direct.contains_key(&decl.name) {
+                            self.errors.push(ValidationError::DuplicateName {
+                                module: module.name.clone(),
+                                name: decl.name.clone(),
+                            });
+                            continue;
+                        }
+                        scope.direct.insert(
+                            decl.name.clone(),
+                            ScopeEntry::Const {
+                                source: module_id,
+                                name: decl.name.clone(),
+                            },
+                        );
+                        self.pending_consts.push((module_id, decl.clone()));
+                    }
                     ItemKind::Extend(_) | ItemKind::Import(_) => {}
                 }
             }
@@ -762,22 +846,27 @@ impl Validator {
                 let (entry, hir_symbol) = match resolved {
                     Some(ScopeEntry::Type(id)) => (
                         ScopeEntry::Type(id),
-                        HirImportSymbol::Type(id, local.clone()),
+                        Some(HirImportSymbol::Type(id, local.clone())),
                     ),
                     Some(ScopeEntry::Function(id)) => (
                         ScopeEntry::Function(id),
-                        HirImportSymbol::Function(id, local.clone()),
+                        Some(HirImportSymbol::Function(id, local.clone())),
                     ),
                     Some(ScopeEntry::Alias { source, name }) => (
                         ScopeEntry::Alias {
                             source,
                             name: name.clone(),
                         },
-                        HirImportSymbol::Alias {
+                        Some(HirImportSymbol::Alias {
                             source,
                             original: name,
                             local: local.clone(),
-                        },
+                        }),
+                    ),
+                    // Consts are fully inlined at use sites; no HIR record.
+                    Some(ScopeEntry::Const { source, name }) => (
+                        ScopeEntry::Const { source, name },
+                        None,
                     ),
                     None => {
                         self.errors.push(ValidationError::UnknownImportSymbol {
@@ -806,7 +895,9 @@ impl Validator {
                     importer_scope.imported_names.insert(local.clone());
                 }
 
-                resolved_symbols.push(hir_symbol);
+                if let Some(sym) = hir_symbol {
+                    resolved_symbols.push(sym);
+                }
             }
 
             if !resolved_symbols.is_empty() {
@@ -817,6 +908,156 @@ impl Validator {
                     .imports
                     .push(HirImport::Named(p.source, resolved_symbols));
             }
+        }
+    }
+
+    /// Phase 1.5: resolve every `const` decl. Type expression is resolved
+    /// against its declaring module's scope, and the literal value is
+    /// type-checked against that declared type. Successes go into
+    /// `module_consts`; failures push errors but still populate a placeholder
+    /// so later use sites get a stable (Null) value instead of cascading.
+    fn resolve_pending_consts(&mut self) {
+        let pending = std::mem::take(&mut self.pending_consts);
+        for (module_id, decl) in pending {
+            let module_name = self.hir.modules[&module_id].name.clone();
+            let ctx = TypeResolveCtx {
+                module: module_id,
+                generics: Vec::new(),
+                local_subst: HashMap::new(),
+                allow_pointer: false,
+            };
+            let resolved_ty = self.resolve_type_expr(&decl.ty, &ctx);
+
+            let (value, value_ty) = match &decl.value {
+                ast::Literal::Int(s) => match s.parse::<i64>() {
+                    Ok(v) => (
+                        HirLiteral::Int(v),
+                        ResolvedType::Primitive(PrimitiveType::Int64),
+                    ),
+                    Err(_) => {
+                        self.errors.push(ValidationError::LiteralOutOfRange {
+                            function: format!("<const {}>", decl.name),
+                            literal: s.clone(),
+                        });
+                        (
+                            HirLiteral::Int(0),
+                            ResolvedType::Primitive(PrimitiveType::Int64),
+                        )
+                    }
+                },
+                ast::Literal::Float(s) => match s.parse::<f64>() {
+                    Ok(v) => (
+                        HirLiteral::Float(v),
+                        ResolvedType::Primitive(PrimitiveType::Float64),
+                    ),
+                    Err(_) => {
+                        self.errors.push(ValidationError::LiteralOutOfRange {
+                            function: format!("<const {}>", decl.name),
+                            literal: s.clone(),
+                        });
+                        (
+                            HirLiteral::Float(0.0),
+                            ResolvedType::Primitive(PrimitiveType::Float64),
+                        )
+                    }
+                },
+                ast::Literal::String(s) => (
+                    HirLiteral::String(s.clone()),
+                    ResolvedType::Primitive(PrimitiveType::String),
+                ),
+                ast::Literal::Char(c) => (
+                    HirLiteral::Char(*c),
+                    ResolvedType::Primitive(PrimitiveType::Char),
+                ),
+                ast::Literal::Bool(b) => (
+                    HirLiteral::Bool(*b),
+                    ResolvedType::Primitive(PrimitiveType::Bool),
+                ),
+                ast::Literal::Null => (HirLiteral::Null, ResolvedType::Null),
+            };
+
+            // The declared type must be a primitive (or Null when value is null).
+            // Numeric coercions (i64 literal → declared narrower int) happen
+            // during the kind check below.
+            let allowed = matches!(
+                resolved_ty,
+                ResolvedType::Primitive(_) | ResolvedType::Null
+            );
+            if !allowed {
+                self.errors.push(ValidationError::ConstUnsupportedType {
+                    module: module_name.clone(),
+                    name: decl.name.clone(),
+                    ty: format_type(&resolved_ty),
+                });
+                self.module_consts.entry(module_id).or_default().insert(
+                    decl.name.clone(),
+                    ResolvedConst {
+                        value: HirLiteral::Null,
+                        ty: ResolvedType::Null,
+                    },
+                );
+                continue;
+            }
+
+            // Final value type = declared type (with numeric range check).
+            let final_value = match (&resolved_ty, &value) {
+                (ResolvedType::Primitive(p), HirLiteral::Int(v))
+                    if matches!(
+                        p,
+                        PrimitiveType::Int8
+                            | PrimitiveType::Int16
+                            | PrimitiveType::Int32
+                            | PrimitiveType::Int64
+                            | PrimitiveType::Uint8
+                            | PrimitiveType::Uint16
+                            | PrimitiveType::Uint32
+                            | PrimitiveType::Uint64
+                    ) =>
+                {
+                    if !int_fits_primitive(*v, p) {
+                        self.errors.push(ValidationError::LiteralOutOfRange {
+                            function: format!("<const {}>", decl.name),
+                            literal: v.to_string(),
+                        });
+                    }
+                    HirLiteral::Int(*v)
+                }
+                (
+                    ResolvedType::Primitive(PrimitiveType::Float32),
+                    HirLiteral::Float(v),
+                )
+                | (
+                    ResolvedType::Primitive(PrimitiveType::Float64),
+                    HirLiteral::Float(v),
+                ) => HirLiteral::Float(*v),
+                (ResolvedType::Primitive(PrimitiveType::String), HirLiteral::String(s)) => {
+                    HirLiteral::String(s.clone())
+                }
+                (ResolvedType::Primitive(PrimitiveType::Char), HirLiteral::Char(c)) => {
+                    HirLiteral::Char(*c)
+                }
+                (ResolvedType::Primitive(PrimitiveType::Bool), HirLiteral::Bool(b)) => {
+                    HirLiteral::Bool(*b)
+                }
+                (ResolvedType::Null, HirLiteral::Null) => HirLiteral::Null,
+                _ => {
+                    self.errors.push(ValidationError::ConstTypeMismatch {
+                        module: module_name.clone(),
+                        name: decl.name.clone(),
+                        expected: format_type(&resolved_ty),
+                        actual: format_type(&value_ty),
+                    });
+                    value.clone()
+                }
+            };
+
+            self.module_consts.entry(module_id).or_default().insert(
+                decl.name.clone(),
+                ResolvedConst {
+                    value: final_value,
+                    ty: resolved_ty,
+                },
+            );
         }
     }
 
@@ -883,7 +1124,10 @@ impl Validator {
                         self.hir.functions.get_mut(&fn_id).unwrap().type_params = ids;
                         self.fn_generics.insert(fn_id, scope);
                     }
-                    ItemKind::TypeAlias(_) | ItemKind::Extend(_) | ItemKind::Import(_) => {}
+                    ItemKind::TypeAlias(_)
+                    | ItemKind::Extend(_)
+                    | ItemKind::Import(_)
+                    | ItemKind::Const(_) => {}
                 }
             }
         }
@@ -1987,6 +2231,21 @@ impl Validator {
                         ty: ResolvedType::Function(params, Box::new(ret)),
                     };
                 }
+                ScopeEntry::Const { source, name: cname } => {
+                    let rc = self
+                        .module_consts
+                        .get(&source)
+                        .and_then(|m| m.get(&cname))
+                        .cloned()
+                        .unwrap_or(ResolvedConst {
+                            value: HirLiteral::Null,
+                            ty: ResolvedType::Null,
+                        });
+                    return TypedExpr {
+                        kind: ExprKind::Literal(rc.value),
+                        ty: rc.ty,
+                    };
+                }
                 ScopeEntry::Type(_) | ScopeEntry::Alias { .. } => {
                     self.errors.push(ValidationError::TypeUsedAsValue {
                         function: fn_label.to_string(),
@@ -2093,6 +2352,22 @@ impl Validator {
                         ty: ResolvedType::Function(params.clone(), Box::new(ret.clone())),
                     };
                     (typed, name.clone(), subst, params, ret)
+                } else if let Some(ScopeEntry::Const { .. }) =
+                    self.lookup_in_scope(module, name)
+                {
+                    self.errors.push(ValidationError::ConstNotCallable {
+                        function: fn_label.to_string(),
+                        name: name.clone(),
+                    });
+                    let typed = TypedExpr {
+                        kind: ExprKind::Variable(name.clone()),
+                        ty: ResolvedType::Null,
+                    };
+                    let fallback_args = args.iter().map(|a| self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth, None)).collect();
+                    return TypedExpr {
+                        kind: ExprKind::Call(Box::new(typed), resolved_type_args, fallback_args),
+                        ty: ResolvedType::Null,
+                    };
                 } else {
                     self.errors.push(ValidationError::UnknownVariable {
                         function: fn_label.to_string(),
@@ -2984,6 +3259,14 @@ impl Validator {
                     });
                 ResolvedType::Null
             }
+            ScopeEntry::Const { .. } => {
+                let module_name = self.hir.modules[&ctx.module].name.clone();
+                self.errors.push(ValidationError::ExpectedTypeFoundConst {
+                    module: module_name,
+                    name: name.to_string(),
+                });
+                ResolvedType::Null
+            }
             ScopeEntry::Alias {
                 source,
                 name: alias_name,
@@ -3139,6 +3422,20 @@ fn is_numeric(ty: &ResolvedType) -> bool {
                 | PrimitiveType::Float64
         )
     )
+}
+
+fn int_fits_primitive(v: i64, p: &PrimitiveType) -> bool {
+    match p {
+        PrimitiveType::Int8 => i8::try_from(v).is_ok(),
+        PrimitiveType::Int16 => i16::try_from(v).is_ok(),
+        PrimitiveType::Int32 => i32::try_from(v).is_ok(),
+        PrimitiveType::Int64 => true,
+        PrimitiveType::Uint8 => u8::try_from(v).is_ok(),
+        PrimitiveType::Uint16 => u16::try_from(v).is_ok(),
+        PrimitiveType::Uint32 => u32::try_from(v).is_ok(),
+        PrimitiveType::Uint64 => u64::try_from(v).is_ok(),
+        _ => false,
+    }
 }
 
 fn format_type(ty: &ResolvedType) -> String {

@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_simple_struct.of
+input_file: examples/parser/parse_function_no_params.of
 ---
 Ok

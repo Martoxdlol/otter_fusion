@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/unexpected_character_returns_error.of
+input_file: examples/lexer/token_position_line_and_column_are_updated.of
 ---
-LexerError(
-    "unexpected character '@'",
+ParserError(
+    "unexpected token identifier 'foo'",
 )

@@ -1,0 +1,9 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/empty_input_returns_eof.of
+---
+Ok(
+    [],
+)

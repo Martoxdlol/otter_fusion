@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_continue_inside_while_ok.of
+input_file: examples/validator/p5_break_outside_loop_errors.of
 ---
 Ok(
     Program {
@@ -18,19 +18,7 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    While(
-                                        Literal(
-                                            Bool(
-                                                true,
-                                            ),
-                                        ),
-                                        Block {
-                                            statements: [
-                                                Continue,
-                                            ],
-                                            returns: None,
-                                        },
-                                    ),
+                                    Break,
                                 ],
                                 returns: None,
                             },

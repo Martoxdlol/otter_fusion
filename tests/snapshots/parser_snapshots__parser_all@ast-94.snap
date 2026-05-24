@@ -1,78 +1,97 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/04_structs_interfaces/struct_basic.of
+input_file: examples/spec/03_functions/early_return.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Person",
+                kind: Function(
+                    FunctionDecl {
+                        name: "get_ratio",
+                        has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "name",
+                        return_type: Some(
+                            Primitive(
+                                Float64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "current",
                                 ty: Primitive(
-                                    String,
+                                    Float64,
                                 ),
                                 is_pointer: false,
                             },
-                            FieldDecl {
-                                name: "age",
+                            ParamDecl {
+                                name: "total",
                                 ty: Primitive(
-                                    Int32,
+                                    Float64,
                                 ),
                                 is_pointer: false,
                             },
                         ],
-                        methods: [
-                            FunctionDecl {
-                                name: "greet",
-                                has_self_param: true,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        String,
-                                    ),
-                                ),
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: Some(
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        If(
                                             BinaryOp(
+                                                Variable(
+                                                    "total",
+                                                ),
+                                                Eq,
                                                 Literal(
-                                                    String(
-                                                        "Hello, ",
+                                                    Float(
+                                                        "0.0",
                                                     ),
                                                 ),
-                                                Add,
-                                                Member(
-                                                    SelfRef,
-                                                    "name",
-                                                ),
                                             ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Float(
+                                                                    "0.0",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
                                         ),
-                                    },
+                                    ),
+                                ],
+                                returns: Some(
+                                    BinaryOp(
+                                        Variable(
+                                            "current",
+                                        ),
+                                        Div,
+                                        Variable(
+                                            "total",
+                                        ),
+                                    ),
                                 ),
-                                span: Span {
-                                    line: 5,
-                                    col: 11,
-                                    len: 8,
-                                },
                             },
-                        ],
-                        implements: [],
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

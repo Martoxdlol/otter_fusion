@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_generics.of
+input_file: examples/parser/parse_implements_clause.of
 ---
 Ok(
     [
@@ -13,65 +13,51 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Box",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
+                "Point",
             ),
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: GT,
-            position: 13,
+            token_type: Colon,
+            position: 14,
             line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 15,
-            line: 1,
-            column: 16,
+            column: 15,
         },
         Token {
             token_type: Identifier(
-                "value",
+                "Movable",
             ),
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: Colon,
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: Plus,
             position: 24,
             line: 1,
             column: 25,
         },
         Token {
-            token_type: RightBrace,
-            position: 26,
+            token_type: Identifier(
+                "Drawable",
+            ),
+            position: 33,
             line: 1,
-            column: 27,
+            column: 34,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 36,
+            line: 1,
+            column: 37,
         },
     ],
 )

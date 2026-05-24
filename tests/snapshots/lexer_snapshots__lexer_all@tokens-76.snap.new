@@ -1,0 +1,70 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/parser/parse_optional_generic_params.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Point",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: LT,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Comma,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "U",
+            ),
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: GT,
+            position: 18,
+            line: 1,
+            column: 19,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+    ],
+)

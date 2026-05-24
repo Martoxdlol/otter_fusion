@@ -1,38 +1,51 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_type_alias_inlined_in_signature.of
+input_file: examples/validator/p2_generic_arity_mismatch_errors.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "MyInt",
-                        generics: [],
-                        ty: Primitive(
-                            Int64,
-                        ),
+                kind: Struct(
+                    StructDecl {
+                        name: "Wrapper",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 7,
+                    len: 6,
                 },
             },
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "foo",
+                        name: "u",
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
                         return_type: Some(
                             Named(
-                                "MyInt",
-                                [],
+                                "Wrapper",
+                                [
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                ],
                             ),
                         ),
                         params: [],

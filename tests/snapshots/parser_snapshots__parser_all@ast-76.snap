@@ -1,32 +1,35 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_type_alias_union.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Result",
-                        generics: [],
-                        ty: Union(
-                            [
-                                Primitive(
-                                    Int64,
-                                ),
-                                Primitive(
-                                    String,
-                                ),
-                            ],
-                        ),
+                kind: Struct(
+                    StructDecl {
+                        name: "Point",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                            GenericParam {
+                                name: "U",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

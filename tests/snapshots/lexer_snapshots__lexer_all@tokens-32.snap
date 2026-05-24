@@ -1,17 +1,17 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/lexer/identifier_with_underscore_dollar_and_digits_is_scanned.of
+input_file: examples/lexer/identifier_is_scanned.of
 ---
 Ok(
     [
         Token {
             token_type: Identifier(
-                "_value$123",
+                "hello",
             ),
-            position: 10,
+            position: 5,
             line: 1,
-            column: 11,
+            column: 6,
         },
     ],
 )

@@ -1,5 +1,5 @@
 [workspace]
-members = ["rt"]
+members = ["rt", "io"]
 
 [package]
 name = "otter_fusion"

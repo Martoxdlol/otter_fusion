@@ -1,0 +1,76 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/validator/p4_implements_non_interface_errors.of
+---
+Ok(
+    [
+        Token {
+            token_type: Struct,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "A",
+            ),
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: Struct,
+            position: 18,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "B",
+            ),
+            position: 20,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: Colon,
+            position: 22,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "A",
+            ),
+            position: 24,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 26,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 27,
+            line: 2,
+            column: 16,
+        },
+    ],
+)

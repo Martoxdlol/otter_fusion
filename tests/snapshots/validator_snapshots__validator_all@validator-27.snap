@@ -1,6 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/empty_input_returns_eof.of
+input_file: examples/lexer/double_ampersand_is_and_token.of
 ---
-Ok
+ParserError(
+    "unexpected token '&&'",
+)

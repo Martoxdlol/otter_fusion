@@ -1,11 +1,39 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_call_resolves_module_function.of
 ---
 Ok(
     Program {
         items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "f",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -19,18 +47,12 @@ Ok(
                             Block {
                                 statements: [
                                     Expr(
-                                        BinaryOp(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
+                                        Call(
+                                            Variable(
+                                                "f",
                                             ),
-                                            And,
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
-                                            ),
+                                            [],
+                                            [],
                                         ),
                                     ),
                                 ],
@@ -38,14 +60,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 2,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

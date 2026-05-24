@@ -1,65 +1,49 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_interface_method_signature_mismatch_errors.of
+input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Interface(
-                    InterfaceDecl {
-                        name: "I",
-                        generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "f",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [
-                                    ParamDecl {
-                                        name: "a",
-                                        ty: Primitive(
-                                            Int64,
-                                        ),
-                                        is_pointer: false,
-                                    },
-                                ],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 1,
-                                    col: 23,
-                                    len: 8,
-                                },
+                kind: Struct(
+                    StructDecl {
+                        name: "Box",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
                             },
                         ],
+                        fields: [],
+                        methods: [],
                         implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 10,
-                    len: 9,
+                    col: 7,
+                    len: 6,
                 },
             },
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Box",
+                            [
+                                Primitive(
+                                    Int64,
+                                ),
+                            ],
+                        ),
+                        generic_params: [],
+                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "f",
+                                name: "is_int",
                                 has_self_param: false,
                                 is_extern: false,
                                 generics: [],
@@ -73,16 +57,10 @@ Ok(
                                 ),
                                 span: Span {
                                     line: 2,
-                                    col: 24,
+                                    col: 27,
                                     len: 8,
                                 },
                             },
-                        ],
-                        implements: [
-                            Named(
-                                "I",
-                                [],
-                            ),
                         ],
                     },
                 ),

@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/identifier_is_scanned.of
+input_file: examples/lexer/escaped_quote_is_kept_inside_string.of
 ---
 ParserError(
-    "unexpected token identifier 'hello'",
+    "unexpected token string literal",
 )

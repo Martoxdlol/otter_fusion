@@ -1,43 +1,69 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/02_variables/var_inferred.of
+input_file: examples/spec/01_type_system/discriminated_unions.of
 ---
 Ok(
     [
         Token {
-            token_type: Var,
-            position: 3,
+            token_type: Type,
+            position: 4,
             line: 1,
-            column: 4,
+            column: 5,
         },
         Token {
             token_type: Identifier(
-                "age",
+                "Result",
             ),
-            position: 7,
+            position: 11,
             line: 1,
-            column: 8,
+            column: 12,
         },
         Token {
             token_type: Eq,
-            position: 9,
-            line: 1,
-            column: 10,
-        },
-        Token {
-            token_type: Int(
-                "30",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: Semicolon,
             position: 13,
             line: 1,
             column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Pipe,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Pipe,
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Null,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 31,
+            line: 1,
+            column: 32,
         },
     ],
 )

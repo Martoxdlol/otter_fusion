@@ -1,0 +1,16 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/double_ampersand_is_and_token.of
+---
+Ok(
+    [
+        Token {
+            token_type: And,
+            position: 2,
+            line: 1,
+            column: 3,
+        },
+    ],
+)

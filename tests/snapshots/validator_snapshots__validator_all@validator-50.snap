@@ -1,6 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/whitespace_only_returns_eof.of
+input_file: examples/lexer/unterminated_string_returns_error.of
 ---
-Ok
+LexerError(
+    "unterminated string literal",
+)

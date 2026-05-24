@@ -1,10 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/comment_at_end_of_input_results_in_eof.of
+input_file: examples/lexer/arithmetic_and_comparison_tokens_are_recognized.of
 ---
-Ok(
-    Program {
-        items: [],
-    },
+Err(
+    "unexpected token '+'",
 )

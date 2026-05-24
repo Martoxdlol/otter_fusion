@@ -1,0 +1,36 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/validator/p1_interface_skeleton_inserted.of
+---
+Ok(
+    [
+        Token {
+            token_type: Interface,
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "Show",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+    ],
+)

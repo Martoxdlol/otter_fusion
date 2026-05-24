@@ -1,10 +1,12 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/spec/14_ffi/pointer_syntax.of
 ---
 ValidationErrors(
     [
-        "bound on type parameter 'T' in test_module::Foo must be an interface",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'MyStruct' in module 'test_module'",
     ],
 )

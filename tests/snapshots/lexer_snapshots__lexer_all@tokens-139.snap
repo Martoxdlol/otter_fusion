@@ -1,99 +1,63 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
 Ok(
     [
         Token {
-            token_type: Interface,
-            position: 9,
+            token_type: Struct,
+            position: 6,
             line: 1,
-            column: 10,
+            column: 7,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "Foo",
             ),
-            position: 11,
+            position: 10,
             line: 1,
-            column: 12,
+            column: 11,
         },
         Token {
             token_type: LeftBrace,
-            position: 13,
+            position: 12,
             line: 1,
-            column: 14,
+            column: 13,
         },
         Token {
-            token_type: RightBrace,
+            token_type: Identifier(
+                "p",
+            ),
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Extend,
-            position: 21,
-            line: 2,
-            column: 7,
+            token_type: Colon,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Star,
+            position: 17,
+            line: 1,
+            column: 18,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "i64",
             ),
-            position: 23,
-            line: 2,
-            column: 9,
+            position: 20,
+            line: 1,
+            column: 21,
         },
         Token {
-            token_type: LeftBrace,
-            position: 25,
-            line: 2,
-            column: 11,
-        },
-        Token {
-            token_type: Function,
-            position: 34,
-            line: 2,
-            column: 20,
-        },
-        Token {
-            token_type: Identifier(
-                "f",
-            ),
-            position: 36,
-            line: 2,
-            column: 22,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 37,
-            line: 2,
+            token_type: RightBrace,
+            position: 22,
+            line: 1,
             column: 23,
-        },
-        Token {
-            token_type: RightParen,
-            position: 38,
-            line: 2,
-            column: 24,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 40,
-            line: 2,
-            column: 26,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 41,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 43,
-            line: 2,
-            column: 29,
         },
     ],
 )

@@ -1,0 +1,3584 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/networking/of_io.of
+---
+Ok(
+    [
+        Token {
+            token_type: Import,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: From,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: StringLit(
+                "of:core",
+            ),
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Extern,
+            position: 670,
+            line: 17,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 679,
+            line: 17,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_open",
+            ),
+            position: 689,
+            line: 17,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 690,
+            line: 17,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "path",
+            ),
+            position: 694,
+            line: 17,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 695,
+            line: 17,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 699,
+            line: 17,
+            column: 36,
+        },
+        Token {
+            token_type: Comma,
+            position: 700,
+            line: 17,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "flags",
+            ),
+            position: 706,
+            line: 17,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 707,
+            line: 17,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 711,
+            line: 17,
+            column: 48,
+        },
+        Token {
+            token_type: Comma,
+            position: 712,
+            line: 17,
+            column: 49,
+        },
+        Token {
+            token_type: Identifier(
+                "mode",
+            ),
+            position: 717,
+            line: 17,
+            column: 54,
+        },
+        Token {
+            token_type: Colon,
+            position: 718,
+            line: 17,
+            column: 55,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 722,
+            line: 17,
+            column: 59,
+        },
+        Token {
+            token_type: RightParen,
+            position: 723,
+            line: 17,
+            column: 60,
+        },
+        Token {
+            token_type: Colon,
+            position: 724,
+            line: 17,
+            column: 61,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 728,
+            line: 17,
+            column: 65,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 729,
+            line: 17,
+            column: 66,
+        },
+        Token {
+            token_type: Extern,
+            position: 736,
+            line: 18,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 745,
+            line: 18,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_read",
+            ),
+            position: 755,
+            line: 18,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 756,
+            line: 18,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 758,
+            line: 18,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 759,
+            line: 18,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 763,
+            line: 18,
+            column: 34,
+        },
+        Token {
+            token_type: Comma,
+            position: 764,
+            line: 18,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 768,
+            line: 18,
+            column: 39,
+        },
+        Token {
+            token_type: Colon,
+            position: 769,
+            line: 18,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 776,
+            line: 18,
+            column: 47,
+        },
+        Token {
+            token_type: Comma,
+            position: 777,
+            line: 18,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "len",
+            ),
+            position: 781,
+            line: 18,
+            column: 52,
+        },
+        Token {
+            token_type: Colon,
+            position: 782,
+            line: 18,
+            column: 53,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 786,
+            line: 18,
+            column: 57,
+        },
+        Token {
+            token_type: RightParen,
+            position: 787,
+            line: 18,
+            column: 58,
+        },
+        Token {
+            token_type: Colon,
+            position: 788,
+            line: 18,
+            column: 59,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 792,
+            line: 18,
+            column: 63,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 793,
+            line: 18,
+            column: 64,
+        },
+        Token {
+            token_type: Extern,
+            position: 800,
+            line: 19,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 809,
+            line: 19,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_write",
+            ),
+            position: 820,
+            line: 19,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 821,
+            line: 19,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 823,
+            line: 19,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 824,
+            line: 19,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 828,
+            line: 19,
+            column: 35,
+        },
+        Token {
+            token_type: Comma,
+            position: 829,
+            line: 19,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 833,
+            line: 19,
+            column: 40,
+        },
+        Token {
+            token_type: Colon,
+            position: 834,
+            line: 19,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 841,
+            line: 19,
+            column: 48,
+        },
+        Token {
+            token_type: Comma,
+            position: 842,
+            line: 19,
+            column: 49,
+        },
+        Token {
+            token_type: Identifier(
+                "len",
+            ),
+            position: 846,
+            line: 19,
+            column: 53,
+        },
+        Token {
+            token_type: Colon,
+            position: 847,
+            line: 19,
+            column: 54,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 851,
+            line: 19,
+            column: 58,
+        },
+        Token {
+            token_type: RightParen,
+            position: 852,
+            line: 19,
+            column: 59,
+        },
+        Token {
+            token_type: Colon,
+            position: 853,
+            line: 19,
+            column: 60,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 857,
+            line: 19,
+            column: 64,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 858,
+            line: 19,
+            column: 65,
+        },
+        Token {
+            token_type: Extern,
+            position: 865,
+            line: 20,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 874,
+            line: 20,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_close",
+            ),
+            position: 885,
+            line: 20,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 886,
+            line: 20,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 888,
+            line: 20,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 889,
+            line: 20,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 893,
+            line: 20,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 894,
+            line: 20,
+            column: 36,
+        },
+        Token {
+            token_type: Colon,
+            position: 895,
+            line: 20,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 899,
+            line: 20,
+            column: 41,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 900,
+            line: 20,
+            column: 42,
+        },
+        Token {
+            token_type: Extern,
+            position: 907,
+            line: 21,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 916,
+            line: 21,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_lseek",
+            ),
+            position: 927,
+            line: 21,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 928,
+            line: 21,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 930,
+            line: 21,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 931,
+            line: 21,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 935,
+            line: 21,
+            column: 35,
+        },
+        Token {
+            token_type: Comma,
+            position: 936,
+            line: 21,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "offset",
+            ),
+            position: 943,
+            line: 21,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 944,
+            line: 21,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 948,
+            line: 21,
+            column: 48,
+        },
+        Token {
+            token_type: Comma,
+            position: 949,
+            line: 21,
+            column: 49,
+        },
+        Token {
+            token_type: Identifier(
+                "whence",
+            ),
+            position: 956,
+            line: 21,
+            column: 56,
+        },
+        Token {
+            token_type: Colon,
+            position: 957,
+            line: 21,
+            column: 57,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 961,
+            line: 21,
+            column: 61,
+        },
+        Token {
+            token_type: RightParen,
+            position: 962,
+            line: 21,
+            column: 62,
+        },
+        Token {
+            token_type: Colon,
+            position: 963,
+            line: 21,
+            column: 63,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 967,
+            line: 21,
+            column: 67,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 968,
+            line: 21,
+            column: 68,
+        },
+        Token {
+            token_type: Extern,
+            position: 1001,
+            line: 25,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1010,
+            line: 25,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_socket",
+            ),
+            position: 1022,
+            line: 25,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1023,
+            line: 25,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "domain",
+            ),
+            position: 1029,
+            line: 25,
+            column: 35,
+        },
+        Token {
+            token_type: Colon,
+            position: 1030,
+            line: 25,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1034,
+            line: 25,
+            column: 40,
+        },
+        Token {
+            token_type: Comma,
+            position: 1035,
+            line: 25,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "type_",
+            ),
+            position: 1041,
+            line: 25,
+            column: 47,
+        },
+        Token {
+            token_type: Colon,
+            position: 1042,
+            line: 25,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1046,
+            line: 25,
+            column: 52,
+        },
+        Token {
+            token_type: Comma,
+            position: 1047,
+            line: 25,
+            column: 53,
+        },
+        Token {
+            token_type: Identifier(
+                "protocol",
+            ),
+            position: 1056,
+            line: 25,
+            column: 62,
+        },
+        Token {
+            token_type: Colon,
+            position: 1057,
+            line: 25,
+            column: 63,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1061,
+            line: 25,
+            column: 67,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1062,
+            line: 25,
+            column: 68,
+        },
+        Token {
+            token_type: Colon,
+            position: 1063,
+            line: 25,
+            column: 69,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1067,
+            line: 25,
+            column: 73,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1068,
+            line: 25,
+            column: 74,
+        },
+        Token {
+            token_type: Extern,
+            position: 1075,
+            line: 26,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1084,
+            line: 26,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_bind",
+            ),
+            position: 1094,
+            line: 26,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1095,
+            line: 26,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 1097,
+            line: 26,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 1098,
+            line: 26,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1102,
+            line: 26,
+            column: 34,
+        },
+        Token {
+            token_type: Comma,
+            position: 1103,
+            line: 26,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "addr",
+            ),
+            position: 1108,
+            line: 26,
+            column: 40,
+        },
+        Token {
+            token_type: Colon,
+            position: 1109,
+            line: 26,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1116,
+            line: 26,
+            column: 48,
+        },
+        Token {
+            token_type: Comma,
+            position: 1117,
+            line: 26,
+            column: 49,
+        },
+        Token {
+            token_type: Identifier(
+                "len",
+            ),
+            position: 1121,
+            line: 26,
+            column: 53,
+        },
+        Token {
+            token_type: Colon,
+            position: 1122,
+            line: 26,
+            column: 54,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 1126,
+            line: 26,
+            column: 58,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1127,
+            line: 26,
+            column: 59,
+        },
+        Token {
+            token_type: Colon,
+            position: 1128,
+            line: 26,
+            column: 60,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1132,
+            line: 26,
+            column: 64,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1133,
+            line: 26,
+            column: 65,
+        },
+        Token {
+            token_type: Extern,
+            position: 1140,
+            line: 27,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1149,
+            line: 27,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_listen",
+            ),
+            position: 1161,
+            line: 27,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1162,
+            line: 27,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 1164,
+            line: 27,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 1165,
+            line: 27,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1169,
+            line: 27,
+            column: 36,
+        },
+        Token {
+            token_type: Comma,
+            position: 1170,
+            line: 27,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "backlog",
+            ),
+            position: 1178,
+            line: 27,
+            column: 45,
+        },
+        Token {
+            token_type: Colon,
+            position: 1179,
+            line: 27,
+            column: 46,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1183,
+            line: 27,
+            column: 50,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1184,
+            line: 27,
+            column: 51,
+        },
+        Token {
+            token_type: Colon,
+            position: 1185,
+            line: 27,
+            column: 52,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1189,
+            line: 27,
+            column: 56,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1190,
+            line: 27,
+            column: 57,
+        },
+        Token {
+            token_type: Extern,
+            position: 1381,
+            line: 31,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1390,
+            line: 31,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_accept",
+            ),
+            position: 1402,
+            line: 31,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1403,
+            line: 31,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 1405,
+            line: 31,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 1406,
+            line: 31,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1410,
+            line: 31,
+            column: 36,
+        },
+        Token {
+            token_type: Comma,
+            position: 1411,
+            line: 31,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "addr",
+            ),
+            position: 1416,
+            line: 31,
+            column: 42,
+        },
+        Token {
+            token_type: Colon,
+            position: 1417,
+            line: 31,
+            column: 43,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1424,
+            line: 31,
+            column: 50,
+        },
+        Token {
+            token_type: Comma,
+            position: 1425,
+            line: 31,
+            column: 51,
+        },
+        Token {
+            token_type: Identifier(
+                "addrlen",
+            ),
+            position: 1433,
+            line: 31,
+            column: 59,
+        },
+        Token {
+            token_type: Colon,
+            position: 1434,
+            line: 31,
+            column: 60,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1441,
+            line: 31,
+            column: 67,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1442,
+            line: 31,
+            column: 68,
+        },
+        Token {
+            token_type: Colon,
+            position: 1443,
+            line: 31,
+            column: 69,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1447,
+            line: 31,
+            column: 73,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1448,
+            line: 31,
+            column: 74,
+        },
+        Token {
+            token_type: Extern,
+            position: 1455,
+            line: 32,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1464,
+            line: 32,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_connect",
+            ),
+            position: 1477,
+            line: 32,
+            column: 29,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1478,
+            line: 32,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 1480,
+            line: 32,
+            column: 32,
+        },
+        Token {
+            token_type: Colon,
+            position: 1481,
+            line: 32,
+            column: 33,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1485,
+            line: 32,
+            column: 37,
+        },
+        Token {
+            token_type: Comma,
+            position: 1486,
+            line: 32,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "addr",
+            ),
+            position: 1491,
+            line: 32,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 1492,
+            line: 32,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1499,
+            line: 32,
+            column: 51,
+        },
+        Token {
+            token_type: Comma,
+            position: 1500,
+            line: 32,
+            column: 52,
+        },
+        Token {
+            token_type: Identifier(
+                "len",
+            ),
+            position: 1504,
+            line: 32,
+            column: 56,
+        },
+        Token {
+            token_type: Colon,
+            position: 1505,
+            line: 32,
+            column: 57,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 1509,
+            line: 32,
+            column: 61,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1510,
+            line: 32,
+            column: 62,
+        },
+        Token {
+            token_type: Colon,
+            position: 1511,
+            line: 32,
+            column: 63,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1515,
+            line: 32,
+            column: 67,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1516,
+            line: 32,
+            column: 68,
+        },
+        Token {
+            token_type: Extern,
+            position: 1721,
+            line: 38,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 1730,
+            line: 38,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_select",
+            ),
+            position: 1742,
+            line: 38,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1743,
+            line: 38,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "nfds",
+            ),
+            position: 1747,
+            line: 38,
+            column: 33,
+        },
+        Token {
+            token_type: Colon,
+            position: 1748,
+            line: 38,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1752,
+            line: 38,
+            column: 38,
+        },
+        Token {
+            token_type: Comma,
+            position: 1753,
+            line: 38,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "rfds",
+            ),
+            position: 1758,
+            line: 38,
+            column: 44,
+        },
+        Token {
+            token_type: Colon,
+            position: 1759,
+            line: 38,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1766,
+            line: 38,
+            column: 52,
+        },
+        Token {
+            token_type: Pipe,
+            position: 1768,
+            line: 38,
+            column: 54,
+        },
+        Token {
+            token_type: Null,
+            position: 1773,
+            line: 38,
+            column: 59,
+        },
+        Token {
+            token_type: Comma,
+            position: 1774,
+            line: 38,
+            column: 60,
+        },
+        Token {
+            token_type: Identifier(
+                "wfds",
+            ),
+            position: 1779,
+            line: 38,
+            column: 65,
+        },
+        Token {
+            token_type: Colon,
+            position: 1780,
+            line: 38,
+            column: 66,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1787,
+            line: 38,
+            column: 73,
+        },
+        Token {
+            token_type: Pipe,
+            position: 1789,
+            line: 38,
+            column: 75,
+        },
+        Token {
+            token_type: Null,
+            position: 1794,
+            line: 38,
+            column: 80,
+        },
+        Token {
+            token_type: Comma,
+            position: 1795,
+            line: 38,
+            column: 81,
+        },
+        Token {
+            token_type: Identifier(
+                "efds",
+            ),
+            position: 1800,
+            line: 38,
+            column: 86,
+        },
+        Token {
+            token_type: Colon,
+            position: 1801,
+            line: 38,
+            column: 87,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1808,
+            line: 38,
+            column: 94,
+        },
+        Token {
+            token_type: Pipe,
+            position: 1810,
+            line: 38,
+            column: 96,
+        },
+        Token {
+            token_type: Null,
+            position: 1815,
+            line: 38,
+            column: 101,
+        },
+        Token {
+            token_type: Comma,
+            position: 1816,
+            line: 38,
+            column: 102,
+        },
+        Token {
+            token_type: Identifier(
+                "timeout",
+            ),
+            position: 1824,
+            line: 38,
+            column: 110,
+        },
+        Token {
+            token_type: Colon,
+            position: 1825,
+            line: 38,
+            column: 111,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 1832,
+            line: 38,
+            column: 118,
+        },
+        Token {
+            token_type: Pipe,
+            position: 1834,
+            line: 38,
+            column: 120,
+        },
+        Token {
+            token_type: Null,
+            position: 1839,
+            line: 38,
+            column: 125,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1840,
+            line: 38,
+            column: 126,
+        },
+        Token {
+            token_type: Colon,
+            position: 1841,
+            line: 38,
+            column: 127,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1845,
+            line: 38,
+            column: 131,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1846,
+            line: 38,
+            column: 132,
+        },
+        Token {
+            token_type: Extern,
+            position: 2021,
+            line: 42,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2030,
+            line: 42,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fcntl",
+            ),
+            position: 2041,
+            line: 42,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2042,
+            line: 42,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2044,
+            line: 42,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 2045,
+            line: 42,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2049,
+            line: 42,
+            column: 35,
+        },
+        Token {
+            token_type: Comma,
+            position: 2050,
+            line: 42,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "cmd",
+            ),
+            position: 2054,
+            line: 42,
+            column: 40,
+        },
+        Token {
+            token_type: Colon,
+            position: 2055,
+            line: 42,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2059,
+            line: 42,
+            column: 45,
+        },
+        Token {
+            token_type: Comma,
+            position: 2060,
+            line: 42,
+            column: 46,
+        },
+        Token {
+            token_type: Identifier(
+                "arg",
+            ),
+            position: 2064,
+            line: 42,
+            column: 50,
+        },
+        Token {
+            token_type: Colon,
+            position: 2065,
+            line: 42,
+            column: 51,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2069,
+            line: 42,
+            column: 55,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2070,
+            line: 42,
+            column: 56,
+        },
+        Token {
+            token_type: Colon,
+            position: 2071,
+            line: 42,
+            column: 57,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2075,
+            line: 42,
+            column: 61,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2076,
+            line: 42,
+            column: 62,
+        },
+        Token {
+            token_type: Extern,
+            position: 2117,
+            line: 46,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2126,
+            line: 46,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_errno",
+            ),
+            position: 2137,
+            line: 46,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2138,
+            line: 46,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2139,
+            line: 46,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 2140,
+            line: 46,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2144,
+            line: 46,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2145,
+            line: 46,
+            column: 35,
+        },
+        Token {
+            token_type: Extern,
+            position: 2309,
+            line: 51,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2318,
+            line: 51,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_sockaddr_in",
+            ),
+            position: 2335,
+            line: 51,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2336,
+            line: 51,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "ip_be",
+            ),
+            position: 2341,
+            line: 51,
+            column: 39,
+        },
+        Token {
+            token_type: Colon,
+            position: 2342,
+            line: 51,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 2346,
+            line: 51,
+            column: 44,
+        },
+        Token {
+            token_type: Comma,
+            position: 2347,
+            line: 51,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "port_be",
+            ),
+            position: 2355,
+            line: 51,
+            column: 53,
+        },
+        Token {
+            token_type: Colon,
+            position: 2356,
+            line: 51,
+            column: 54,
+        },
+        Token {
+            token_type: Identifier(
+                "u16",
+            ),
+            position: 2360,
+            line: 51,
+            column: 58,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2361,
+            line: 51,
+            column: 59,
+        },
+        Token {
+            token_type: Colon,
+            position: 2362,
+            line: 51,
+            column: 60,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2369,
+            line: 51,
+            column: 67,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2370,
+            line: 51,
+            column: 68,
+        },
+        Token {
+            token_type: Extern,
+            position: 2410,
+            line: 54,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2419,
+            line: 54,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_timeval",
+            ),
+            position: 2432,
+            line: 54,
+            column: 29,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2433,
+            line: 54,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "sec",
+            ),
+            position: 2436,
+            line: 54,
+            column: 33,
+        },
+        Token {
+            token_type: Colon,
+            position: 2437,
+            line: 54,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2441,
+            line: 54,
+            column: 38,
+        },
+        Token {
+            token_type: Comma,
+            position: 2442,
+            line: 54,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "usec",
+            ),
+            position: 2447,
+            line: 54,
+            column: 44,
+        },
+        Token {
+            token_type: Colon,
+            position: 2448,
+            line: 54,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2452,
+            line: 54,
+            column: 49,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2453,
+            line: 54,
+            column: 50,
+        },
+        Token {
+            token_type: Colon,
+            position: 2454,
+            line: 54,
+            column: 51,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2461,
+            line: 54,
+            column: 58,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2462,
+            line: 54,
+            column: 59,
+        },
+        Token {
+            token_type: Extern,
+            position: 2522,
+            line: 57,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2531,
+            line: 57,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fdset_new",
+            ),
+            position: 2546,
+            line: 57,
+            column: 31,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2547,
+            line: 57,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2548,
+            line: 57,
+            column: 33,
+        },
+        Token {
+            token_type: Colon,
+            position: 2549,
+            line: 57,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2556,
+            line: 57,
+            column: 41,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2557,
+            line: 57,
+            column: 42,
+        },
+        Token {
+            token_type: Extern,
+            position: 2564,
+            line: 58,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2573,
+            line: 58,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fdset_zero",
+            ),
+            position: 2589,
+            line: 58,
+            column: 32,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2590,
+            line: 58,
+            column: 33,
+        },
+        Token {
+            token_type: Identifier(
+                "set",
+            ),
+            position: 2593,
+            line: 58,
+            column: 36,
+        },
+        Token {
+            token_type: Colon,
+            position: 2594,
+            line: 58,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2601,
+            line: 58,
+            column: 44,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2602,
+            line: 58,
+            column: 45,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2603,
+            line: 58,
+            column: 46,
+        },
+        Token {
+            token_type: Extern,
+            position: 2610,
+            line: 59,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2619,
+            line: 59,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fdset_set",
+            ),
+            position: 2634,
+            line: 59,
+            column: 31,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2635,
+            line: 59,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "set",
+            ),
+            position: 2638,
+            line: 59,
+            column: 35,
+        },
+        Token {
+            token_type: Colon,
+            position: 2639,
+            line: 59,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2646,
+            line: 59,
+            column: 43,
+        },
+        Token {
+            token_type: Comma,
+            position: 2647,
+            line: 59,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2650,
+            line: 59,
+            column: 47,
+        },
+        Token {
+            token_type: Colon,
+            position: 2651,
+            line: 59,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2655,
+            line: 59,
+            column: 52,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2656,
+            line: 59,
+            column: 53,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2657,
+            line: 59,
+            column: 54,
+        },
+        Token {
+            token_type: Extern,
+            position: 2664,
+            line: 60,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2673,
+            line: 60,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fdset_clr",
+            ),
+            position: 2688,
+            line: 60,
+            column: 31,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2689,
+            line: 60,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "set",
+            ),
+            position: 2692,
+            line: 60,
+            column: 35,
+        },
+        Token {
+            token_type: Colon,
+            position: 2693,
+            line: 60,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2700,
+            line: 60,
+            column: 43,
+        },
+        Token {
+            token_type: Comma,
+            position: 2701,
+            line: 60,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2704,
+            line: 60,
+            column: 47,
+        },
+        Token {
+            token_type: Colon,
+            position: 2705,
+            line: 60,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2709,
+            line: 60,
+            column: 52,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2710,
+            line: 60,
+            column: 53,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2711,
+            line: 60,
+            column: 54,
+        },
+        Token {
+            token_type: Extern,
+            position: 2718,
+            line: 61,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2727,
+            line: 61,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_fdset_isset",
+            ),
+            position: 2744,
+            line: 61,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2745,
+            line: 61,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "set",
+            ),
+            position: 2748,
+            line: 61,
+            column: 37,
+        },
+        Token {
+            token_type: Colon,
+            position: 2749,
+            line: 61,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 2756,
+            line: 61,
+            column: 45,
+        },
+        Token {
+            token_type: Comma,
+            position: 2757,
+            line: 61,
+            column: 46,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2760,
+            line: 61,
+            column: 49,
+        },
+        Token {
+            token_type: Colon,
+            position: 2761,
+            line: 61,
+            column: 50,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2765,
+            line: 61,
+            column: 54,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2766,
+            line: 61,
+            column: 55,
+        },
+        Token {
+            token_type: Colon,
+            position: 2767,
+            line: 61,
+            column: 56,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 2772,
+            line: 61,
+            column: 61,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2773,
+            line: 61,
+            column: 62,
+        },
+        Token {
+            token_type: Extern,
+            position: 2831,
+            line: 64,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2840,
+            line: 64,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_htons",
+            ),
+            position: 2851,
+            line: 64,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2852,
+            line: 64,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "host_short",
+            ),
+            position: 2862,
+            line: 64,
+            column: 38,
+        },
+        Token {
+            token_type: Colon,
+            position: 2863,
+            line: 64,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "u16",
+            ),
+            position: 2867,
+            line: 64,
+            column: 43,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2868,
+            line: 64,
+            column: 44,
+        },
+        Token {
+            token_type: Colon,
+            position: 2869,
+            line: 64,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "u16",
+            ),
+            position: 2873,
+            line: 64,
+            column: 49,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2874,
+            line: 64,
+            column: 50,
+        },
+        Token {
+            token_type: Extern,
+            position: 2881,
+            line: 65,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 2890,
+            line: 65,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_htonl",
+            ),
+            position: 2901,
+            line: 65,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2902,
+            line: 65,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "host_long",
+            ),
+            position: 2911,
+            line: 65,
+            column: 37,
+        },
+        Token {
+            token_type: Colon,
+            position: 2912,
+            line: 65,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 2916,
+            line: 65,
+            column: 42,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2917,
+            line: 65,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 2918,
+            line: 65,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 2922,
+            line: 65,
+            column: 48,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2923,
+            line: 65,
+            column: 49,
+        },
+        Token {
+            token_type: Extern,
+            position: 3059,
+            line: 69,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3068,
+            line: 69,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "__of_or_i32",
+            ),
+            position: 3080,
+            line: 69,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3081,
+            line: 69,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "a",
+            ),
+            position: 3082,
+            line: 69,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 3083,
+            line: 69,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3087,
+            line: 69,
+            column: 35,
+        },
+        Token {
+            token_type: Comma,
+            position: 3088,
+            line: 69,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "b",
+            ),
+            position: 3090,
+            line: 69,
+            column: 38,
+        },
+        Token {
+            token_type: Colon,
+            position: 3091,
+            line: 69,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3095,
+            line: 69,
+            column: 43,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3096,
+            line: 69,
+            column: 44,
+        },
+        Token {
+            token_type: Colon,
+            position: 3097,
+            line: 69,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3101,
+            line: 69,
+            column: 49,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3102,
+            line: 69,
+            column: 50,
+        },
+        Token {
+            token_type: Const,
+            position: 3254,
+            line: 75,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "O_RDONLY",
+            ),
+            position: 3263,
+            line: 75,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 3264,
+            line: 75,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3268,
+            line: 75,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 3270,
+            line: 75,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3272,
+            line: 75,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3273,
+            line: 75,
+            column: 25,
+        },
+        Token {
+            token_type: Const,
+            position: 3279,
+            line: 76,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "O_WRONLY",
+            ),
+            position: 3288,
+            line: 76,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 3289,
+            line: 76,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3293,
+            line: 76,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 3295,
+            line: 76,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3297,
+            line: 76,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3298,
+            line: 76,
+            column: 25,
+        },
+        Token {
+            token_type: Const,
+            position: 3304,
+            line: 77,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "O_RDWR",
+            ),
+            position: 3311,
+            line: 77,
+            column: 13,
+        },
+        Token {
+            token_type: Colon,
+            position: 3312,
+            line: 77,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3316,
+            line: 77,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 3318,
+            line: 77,
+            column: 20,
+        },
+        Token {
+            token_type: Int(
+                "2",
+            ),
+            position: 3320,
+            line: 77,
+            column: 22,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3321,
+            line: 77,
+            column: 23,
+        },
+        Token {
+            token_type: Const,
+            position: 3328,
+            line: 79,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "SEEK_SET",
+            ),
+            position: 3337,
+            line: 79,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 3338,
+            line: 79,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3342,
+            line: 79,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 3344,
+            line: 79,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3346,
+            line: 79,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3347,
+            line: 79,
+            column: 25,
+        },
+        Token {
+            token_type: Const,
+            position: 3353,
+            line: 80,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "SEEK_CUR",
+            ),
+            position: 3362,
+            line: 80,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 3363,
+            line: 80,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3367,
+            line: 80,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 3369,
+            line: 80,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3371,
+            line: 80,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3372,
+            line: 80,
+            column: 25,
+        },
+        Token {
+            token_type: Const,
+            position: 3378,
+            line: 81,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "SEEK_END",
+            ),
+            position: 3387,
+            line: 81,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 3388,
+            line: 81,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3392,
+            line: 81,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 3394,
+            line: 81,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "2",
+            ),
+            position: 3396,
+            line: 81,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3397,
+            line: 81,
+            column: 25,
+        },
+        Token {
+            token_type: Const,
+            position: 3404,
+            line: 83,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "STDIN_FILENO",
+            ),
+            position: 3417,
+            line: 83,
+            column: 19,
+        },
+        Token {
+            token_type: Colon,
+            position: 3418,
+            line: 83,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3422,
+            line: 83,
+            column: 24,
+        },
+        Token {
+            token_type: Eq,
+            position: 3424,
+            line: 83,
+            column: 26,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3426,
+            line: 83,
+            column: 28,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3427,
+            line: 83,
+            column: 29,
+        },
+        Token {
+            token_type: Const,
+            position: 3433,
+            line: 84,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "STDOUT_FILENO",
+            ),
+            position: 3447,
+            line: 84,
+            column: 20,
+        },
+        Token {
+            token_type: Colon,
+            position: 3448,
+            line: 84,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3452,
+            line: 84,
+            column: 25,
+        },
+        Token {
+            token_type: Eq,
+            position: 3454,
+            line: 84,
+            column: 27,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3456,
+            line: 84,
+            column: 29,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3457,
+            line: 84,
+            column: 30,
+        },
+        Token {
+            token_type: Const,
+            position: 3463,
+            line: 85,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "STDERR_FILENO",
+            ),
+            position: 3477,
+            line: 85,
+            column: 20,
+        },
+        Token {
+            token_type: Colon,
+            position: 3478,
+            line: 85,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3482,
+            line: 85,
+            column: 25,
+        },
+        Token {
+            token_type: Eq,
+            position: 3484,
+            line: 85,
+            column: 27,
+        },
+        Token {
+            token_type: Int(
+                "2",
+            ),
+            position: 3486,
+            line: 85,
+            column: 29,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3487,
+            line: 85,
+            column: 30,
+        },
+        Token {
+            token_type: Extern,
+            position: 3720,
+            line: 92,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3729,
+            line: 92,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "O_CREAT",
+            ),
+            position: 3737,
+            line: 92,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3738,
+            line: 92,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3739,
+            line: 92,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 3740,
+            line: 92,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3744,
+            line: 92,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3745,
+            line: 92,
+            column: 32,
+        },
+        Token {
+            token_type: Extern,
+            position: 3752,
+            line: 93,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3761,
+            line: 93,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "O_TRUNC",
+            ),
+            position: 3769,
+            line: 93,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3770,
+            line: 93,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3771,
+            line: 93,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 3772,
+            line: 93,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3776,
+            line: 93,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3777,
+            line: 93,
+            column: 32,
+        },
+        Token {
+            token_type: Extern,
+            position: 3784,
+            line: 94,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3793,
+            line: 94,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "O_APPEND",
+            ),
+            position: 3802,
+            line: 94,
+            column: 25,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3803,
+            line: 94,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3804,
+            line: 94,
+            column: 27,
+        },
+        Token {
+            token_type: Colon,
+            position: 3805,
+            line: 94,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3809,
+            line: 94,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3810,
+            line: 94,
+            column: 33,
+        },
+        Token {
+            token_type: Extern,
+            position: 3817,
+            line: 95,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3826,
+            line: 95,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "O_NONBLOCK",
+            ),
+            position: 3837,
+            line: 95,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3838,
+            line: 95,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3839,
+            line: 95,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 3840,
+            line: 95,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3844,
+            line: 95,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3845,
+            line: 95,
+            column: 35,
+        },
+        Token {
+            token_type: Extern,
+            position: 3853,
+            line: 97,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3862,
+            line: 97,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "AF_INET",
+            ),
+            position: 3870,
+            line: 97,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3871,
+            line: 97,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3872,
+            line: 97,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 3873,
+            line: 97,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3877,
+            line: 97,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3878,
+            line: 97,
+            column: 32,
+        },
+        Token {
+            token_type: Extern,
+            position: 3885,
+            line: 98,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3894,
+            line: 98,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "AF_INET6",
+            ),
+            position: 3903,
+            line: 98,
+            column: 25,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3904,
+            line: 98,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3905,
+            line: 98,
+            column: 27,
+        },
+        Token {
+            token_type: Colon,
+            position: 3906,
+            line: 98,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3910,
+            line: 98,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3911,
+            line: 98,
+            column: 33,
+        },
+        Token {
+            token_type: Extern,
+            position: 3918,
+            line: 99,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3927,
+            line: 99,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "AF_UNIX",
+            ),
+            position: 3935,
+            line: 99,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3936,
+            line: 99,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3937,
+            line: 99,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 3938,
+            line: 99,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3942,
+            line: 99,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3943,
+            line: 99,
+            column: 32,
+        },
+        Token {
+            token_type: Extern,
+            position: 3950,
+            line: 100,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3959,
+            line: 100,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "SOCK_STREAM",
+            ),
+            position: 3971,
+            line: 100,
+            column: 28,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3972,
+            line: 100,
+            column: 29,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3973,
+            line: 100,
+            column: 30,
+        },
+        Token {
+            token_type: Colon,
+            position: 3974,
+            line: 100,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 3978,
+            line: 100,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3979,
+            line: 100,
+            column: 36,
+        },
+        Token {
+            token_type: Extern,
+            position: 3986,
+            line: 101,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 3995,
+            line: 101,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "SOCK_DGRAM",
+            ),
+            position: 4006,
+            line: 101,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4007,
+            line: 101,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4008,
+            line: 101,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 4009,
+            line: 101,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 4013,
+            line: 101,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4014,
+            line: 101,
+            column: 35,
+        },
+        Token {
+            token_type: Extern,
+            position: 4022,
+            line: 103,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 4031,
+            line: 103,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "F_GETFL",
+            ),
+            position: 4039,
+            line: 103,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4040,
+            line: 103,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4041,
+            line: 103,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 4042,
+            line: 103,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 4046,
+            line: 103,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4047,
+            line: 103,
+            column: 32,
+        },
+        Token {
+            token_type: Extern,
+            position: 4054,
+            line: 104,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 4063,
+            line: 104,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "F_SETFL",
+            ),
+            position: 4071,
+            line: 104,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4072,
+            line: 104,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4073,
+            line: 104,
+            column: 26,
+        },
+        Token {
+            token_type: Colon,
+            position: 4074,
+            line: 104,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 4078,
+            line: 104,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4079,
+            line: 104,
+            column: 32,
+        },
+        Token {
+            token_type: Const,
+            position: 4150,
+            line: 107,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "MODE_RW_R_R",
+            ),
+            position: 4162,
+            line: 107,
+            column: 18,
+        },
+        Token {
+            token_type: Colon,
+            position: 4163,
+            line: 107,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "u32",
+            ),
+            position: 4167,
+            line: 107,
+            column: 23,
+        },
+        Token {
+            token_type: Eq,
+            position: 4169,
+            line: 107,
+            column: 25,
+        },
+        Token {
+            token_type: Int(
+                "420",
+            ),
+            position: 4173,
+            line: 107,
+            column: 29,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4174,
+            line: 107,
+            column: 30,
+        },
+    ],
+)

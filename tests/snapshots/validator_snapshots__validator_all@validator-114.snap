@@ -1,8 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/12_control_flow/for_loop.of
+input_file: examples/spec/10_generics/generic_struct.of
 ---
-ParserError(
-    "unexpected token 'for'",
-)
+Ok

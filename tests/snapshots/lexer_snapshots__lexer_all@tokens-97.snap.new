@@ -1,0 +1,64 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/spec/04_structs_interfaces/interface_basic.of
+---
+Ok(
+    [
+        Token {
+            token_type: Interface,
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "Named",
+            ),
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 24,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 25,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 29,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 30,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 32,
+            line: 3,
+            column: 2,
+        },
+    ],
+)

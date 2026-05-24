@@ -1,8 +1,10 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/comment_then_identifier_on_later_line_has_correct_line.of
+input_file: examples/lexer/comment_at_end_of_input_results_in_eof.of
 ---
-Err(
-    "unexpected token identifier 'bar'",
+Ok(
+    Program {
+        items: [],
+    },
 )

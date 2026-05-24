@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_with_body.of
+input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
 ---
 Ok(
     [
@@ -19,75 +19,83 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "on_tick",
+                "malloc",
             ),
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: LeftParen,
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
             token_type: Identifier(
-                "d",
+                "size",
             ),
-            position: 25,
+            position: 27,
             line: 1,
-            column: 26,
+            column: 28,
         },
         Token {
             token_type: Colon,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Star,
             position: 28,
             line: 1,
             column: 29,
         },
         Token {
             token_type: Identifier(
-                "MyStruct",
+                "u64",
             ),
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Star,
             position: 36,
             line: 1,
             column: 37,
         },
         Token {
-            token_type: RightParen,
-            position: 37,
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 42,
             line: 1,
-            column: 38,
+            column: 43,
         },
         Token {
-            token_type: LeftBrace,
-            position: 39,
+            token_type: Pipe,
+            position: 44,
             line: 1,
-            column: 40,
+            column: 45,
         },
         Token {
-            token_type: Return,
-            position: 46,
-            line: 1,
-            column: 47,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 47,
-            line: 1,
-            column: 48,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: Null,
             position: 49,
             line: 1,
             column: 50,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 50,
+            line: 1,
+            column: 51,
         },
     ],
 )

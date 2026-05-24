@@ -1,89 +1,81 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_type_expr_function_type.of
+input_file: examples/parser/parse_struct_with_method.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
-            line: 1,
-            column: 5,
-        },
-        Token {
-            token_type: Identifier(
-                "X",
-            ),
+            token_type: Struct,
             position: 6,
             line: 1,
             column: 7,
         },
         Token {
-            token_type: Eq,
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: LeftParen,
+            token_type: Identifier(
+                "Foo",
+            ),
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: Identifier(
-                "i32",
-            ),
-            position: 13,
+            token_type: LeftBrace,
+            position: 12,
             line: 1,
-            column: 14,
+            column: 13,
         },
         Token {
-            token_type: Comma,
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Identifier(
-                "str",
-            ),
-            position: 18,
-            line: 1,
-            column: 19,
-        },
-        Token {
-            token_type: RightParen,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: Minus,
+            token_type: Function,
             position: 21,
             line: 1,
             column: 22,
         },
         Token {
-            token_type: GT,
-            position: 22,
+            token_type: Identifier(
+                "bar",
+            ),
+            position: 25,
             line: 1,
-            column: 23,
+            column: 26,
         },
         Token {
-            token_type: Identifier(
-                "bool",
-            ),
+            token_type: LeftParen,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: Semicolon,
+            token_type: Colon,
             position: 28,
             line: 1,
             column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 35,
+            line: 1,
+            column: 36,
         },
     ],
 )

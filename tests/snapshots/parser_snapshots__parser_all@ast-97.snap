@@ -1,22 +1,21 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/05_extensions/extend_basic.of
+input_file: examples/spec/04_structs_interfaces/interface_basic.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Vehicle",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
                         generics: [],
                         fields: [
                             FieldDecl {
-                                name: "speed",
+                                name: "name",
                                 ty: Primitive(
-                                    Int32,
+                                    String,
                                 ),
                                 is_pointer: false,
                             },
@@ -27,63 +26,8 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Vehicle",
-                            [],
-                        ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "is_fast",
-                                has_self_param: true,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        Bool,
-                                    ),
-                                ),
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: Some(
-                                            BinaryOp(
-                                                Member(
-                                                    SelfRef,
-                                                    "speed",
-                                                ),
-                                                Gt,
-                                                Literal(
-                                                    Int(
-                                                        "100",
-                                                    ),
-                                                ),
-                                            ),
-                                        ),
-                                    },
-                                ),
-                                span: Span {
-                                    line: 6,
-                                    col: 11,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                    },
-                ),
-                span: Span {
-                    line: 5,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

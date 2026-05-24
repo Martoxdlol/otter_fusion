@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/single_ampersand_is_unexpected_character.of
+input_file: examples/lexer/scan_number_valid_int.of
 ---
-LexerError(
-    "unexpected character '&'",
+ParserError(
+    "unexpected token integer '123'",
 )

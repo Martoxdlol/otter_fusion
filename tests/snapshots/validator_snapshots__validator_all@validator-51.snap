@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_empty_program.of
+input_file: examples/lexer/whitespace_only_returns_eof.of
 ---
 Ok

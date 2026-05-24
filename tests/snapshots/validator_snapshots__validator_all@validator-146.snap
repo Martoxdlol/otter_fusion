@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_missing_interface_method_errors.of
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'U' in module 'test_module'",
+    ],
+)

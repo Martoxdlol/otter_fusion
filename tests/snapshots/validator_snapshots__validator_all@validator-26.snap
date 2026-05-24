@@ -1,8 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/lexer/double_ampersand_is_and_token.of
+input_file: examples/lexer/comment_then_identifier_on_later_line_has_correct_line.of
 ---
 ParserError(
-    "unexpected token '&&'",
+    "unexpected token identifier 'bar'",
 )

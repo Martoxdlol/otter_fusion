@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_default_method_does_not_require_struct_impl.of
+input_file: examples/validator/p2_unknown_type_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'Nope' in module 'test_module'",
+    ],
+)

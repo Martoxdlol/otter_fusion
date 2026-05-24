@@ -392,6 +392,12 @@ fn register_runtime_shims(builder: &mut JITBuilder) {
     builder.symbol("__of_print", otter_rt::__of_print as *const u8);
     builder.symbol("__of_println", otter_rt::__of_println as *const u8);
     builder.symbol("__of_str_concat", otter_rt::__of_str_concat as *const u8);
+    builder.symbol("__of_str_eq", otter_rt::__of_str_eq as *const u8);
+    builder.symbol("__of_i64_to_str", otter_rt::__of_i64_to_str as *const u8);
+    builder.symbol("__of_u64_to_str", otter_rt::__of_u64_to_str as *const u8);
+    builder.symbol("__of_f64_to_str", otter_rt::__of_f64_to_str as *const u8);
+    builder.symbol("__of_bool_to_str", otter_rt::__of_bool_to_str as *const u8);
+    builder.symbol("__of_char_to_str", otter_rt::__of_char_to_str as *const u8);
 }
 
 fn build_mir(file: &str) -> Result<MirProgram, i32> {

@@ -1,11 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_implements_clause.of
+input_file: examples/parser/parse_extern_function_type_alias.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'Drawable' in module 'test_module'",
-        "unknown type 'Movable' in module 'test_module'",
-    ],
-)
+Ok

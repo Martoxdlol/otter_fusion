@@ -1,155 +1,35 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/01_type_system/union_error_pattern.of
+input_file: examples/parser/parse_type_expr_function_type.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Error",
-                        is_extern: false,
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "X",
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "message",
-                                ty: Primitive(
-                                    String,
-                                ),
-                                is_pointer: false,
-                            },
-                            FieldDecl {
-                                name: "code",
-                                ty: Primitive(
+                        ty: Function(
+                            [
+                                Primitive(
                                     Int32,
                                 ),
-                                is_pointer: false,
-                            },
-                        ],
-                        methods: [],
-                        implements: [],
+                                Primitive(
+                                    String,
+                                ),
+                            ],
+                            Primitive(
+                                Bool,
+                            ),
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "divide",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Union(
-                                [
-                                    Primitive(
-                                        Float64,
-                                    ),
-                                    Named(
-                                        "Error",
-                                        [],
-                                    ),
-                                ],
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Float64,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "b",
-                                ty: Primitive(
-                                    Float64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: Some(
-                                    If(
-                                        BinaryOp(
-                                            Variable(
-                                                "b",
-                                            ),
-                                            Eq,
-                                            Literal(
-                                                Float(
-                                                    "0.0",
-                                                ),
-                                            ),
-                                        ),
-                                        Block {
-                                            statements: [],
-                                            returns: Some(
-                                                StructInit(
-                                                    Named(
-                                                        "Error",
-                                                        [],
-                                                    ),
-                                                    [
-                                                        (
-                                                            "message",
-                                                            Literal(
-                                                                String(
-                                                                    "Division by zero",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                        (
-                                                            "code",
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ],
-                                                ),
-                                            ),
-                                        },
-                                        Some(
-                                            Block {
-                                                statements: [],
-                                                returns: Some(
-                                                    BinaryOp(
-                                                        Variable(
-                                                            "a",
-                                                        ),
-                                                        Div,
-                                                        Variable(
-                                                            "b",
-                                                        ),
-                                                    ),
-                                                ),
-                                            },
-                                        ),
-                                    ),
-                                ),
-                            },
-                        ),
-                        span: Span {
-                            line: 6,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 6,
-                    col: 9,
-                    len: 8,
+                    col: 5,
+                    len: 4,
                 },
             },
         ],

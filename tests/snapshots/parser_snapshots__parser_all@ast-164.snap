@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_return_type_mismatch_errors.of
+input_file: examples/validator/p5_if_expression_typechecks.of
 ---
 Ok(
     Program {
@@ -13,26 +13,42 @@ Ok(
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
+                        return_type: None,
                         params: [],
                         body: Some(
                             Block {
-                                statements: [
-                                    Return(
-                                        Some(
-                                            Literal(
-                                                String(
-                                                    "hi",
-                                                ),
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Literal(
+                                            Bool(
+                                                true,
                                             ),
                                         ),
+                                        Block {
+                                            statements: [],
+                                            returns: Some(
+                                                Literal(
+                                                    Int(
+                                                        "5",
+                                                    ),
+                                                ),
+                                            ),
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [],
+                                                returns: Some(
+                                                    Literal(
+                                                        Int(
+                                                            "6",
+                                                        ),
+                                                    ),
+                                                ),
+                                            },
+                                        ),
                                     ),
-                                ],
-                                returns: None,
+                                ),
                             },
                         ),
                         span: Span {

@@ -17,6 +17,14 @@ pub enum ItemKind {
     Function(FunctionDecl),
     Extend(ExtendDecl),
     Import(ImportDecl),
+    Const(ConstDecl),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConstDecl {
+    pub name: String,
+    pub ty: TypeExpr,
+    pub value: Literal,
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -1,35 +1,37 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_implements_clause.of
+input_file: examples/parser/parse_extern_function_type_alias.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Point",
-                        is_extern: false,
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Fun",
                         generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "Movable",
-                                [],
+                        ty: ExternFunction(
+                            [
+                                ExternParam {
+                                    name: "x",
+                                    ty: Named(
+                                        "MyStruct",
+                                        [],
+                                    ),
+                                    is_pointer: false,
+                                },
+                            ],
+                            Primitive(
+                                Bool,
                             ),
-                            Named(
-                                "Drawable",
-                                [],
-                            ),
-                        ],
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 5,
+                    len: 4,
                 },
             },
         ],

@@ -1,48 +1,11 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_method_call_via_member.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     Program {
         items: [
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "m",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 1,
-                                    col: 20,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -51,29 +14,23 @@ Ok(
                         is_extern: false,
                         generics: [],
                         return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "s",
-                                ty: Named(
-                                    "S",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        params: [],
                         body: Some(
                             Block {
                                 statements: [
                                     Expr(
-                                        Call(
-                                            Member(
-                                                Variable(
-                                                    "s",
+                                        BinaryOp(
+                                            Literal(
+                                                Int(
+                                                    "5",
                                                 ),
-                                                "m",
                                             ),
-                                            [],
-                                            [],
+                                            Eq,
+                                            Literal(
+                                                Int(
+                                                    "5",
+                                                ),
+                                            ),
                                         ),
                                     ),
                                 ],
@@ -81,14 +38,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 2,
+                            line: 1,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 2,
+                    line: 1,
                     col: 9,
                     len: 8,
                 },

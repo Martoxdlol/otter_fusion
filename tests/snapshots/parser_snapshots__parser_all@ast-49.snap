@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/lexer/unterminated_string_returns_error.of
+input_file: examples/lexer/unexpected_character_returns_error.of
 ---
 Err(
-    "unterminated string literal",
+    "unexpected character '@'",
 )

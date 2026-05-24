@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p4_interface_field_required_on_struct.of
+input_file: examples/validator/p3_extend_on_interface_errors.of
 ---
 Ok(
     [
@@ -26,72 +26,74 @@ Ok(
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Colon,
-            position: 16,
-            line: 1,
-            column: 17,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
             token_type: RightBrace,
-            position: 22,
+            position: 14,
             line: 1,
-            column: 23,
+            column: 15,
         },
         Token {
-            token_type: Struct,
-            position: 29,
+            token_type: Extend,
+            position: 21,
             line: 2,
             column: 7,
         },
         Token {
             token_type: Identifier(
-                "S",
+                "I",
             ),
-            position: 31,
+            position: 23,
             line: 2,
             column: 9,
         },
         Token {
-            token_type: Colon,
-            position: 33,
+            token_type: LeftBrace,
+            position: 25,
             line: 2,
             column: 11,
         },
         Token {
-            token_type: Identifier(
-                "I",
-            ),
-            position: 35,
+            token_type: Function,
+            position: 34,
             line: 2,
-            column: 13,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "f",
+            ),
+            position: 36,
+            line: 2,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 37,
+            line: 2,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 38,
+            line: 2,
+            column: 24,
         },
         Token {
             token_type: LeftBrace,
-            position: 37,
+            position: 40,
             line: 2,
-            column: 15,
+            column: 26,
         },
         Token {
             token_type: RightBrace,
-            position: 38,
+            position: 41,
             line: 2,
-            column: 16,
+            column: 27,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 43,
+            line: 2,
+            column: 29,
         },
     ],
 )

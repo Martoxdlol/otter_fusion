@@ -1,0 +1,12 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/lexer/unterminated_string_returns_error.of
+---
+Err(
+    UnterminatedString(
+        1,
+        14,
+    ),
+)
