@@ -1,11 +1,12 @@
 use crate::{
     hir::{
         BinaryOperator, ExprKind, FnId, HirBlock, HirLiteral, PrimitiveType, ResolvedType, TypeId,
-        TypedExpr, UnaryOperator,
+        TypeParamId, TypedExpr, UnaryOperator,
     },
     lower::{Lower, builder::FnBuilder, subst::Subst},
     mir::{
-        AssignValue, BinOp, Callee, MirConst, MirType, MirTypeDef, Operand, Stmt, Terminator, UnOp,
+        AssignValue, BinOp, Callee, MirConst, MirType, MirTypeDef, MirTypeId, Operand, Stmt,
+        Terminator, TrapReason, UnOp,
     },
 };
 use std::collections::HashMap;
@@ -23,12 +24,18 @@ impl Lower {
             ExprKind::StructInit(id, ta, fs) => self.lower_struct_init(*id, ta, fs, subst, b),
             ExprKind::Member(recv, field) => self.lower_member(recv, field, &expr.ty, subst, b),
             ExprKind::As(e, target) => self.lower_as(e, target, &expr.ty, subst, b),
-            ExprKind::Is(_, _) => unimplemented!("Phase 2: is"),
+            ExprKind::Is(e, target) => self.lower_is(e, target, subst, b),
             ExprKind::If(c, t, e) => self.lower_if(c, t, e.as_deref(), &expr.ty, subst, b),
             ExprKind::Block(blk) => self.lower_block_expr(blk, &expr.ty, subst, b),
             ExprKind::LiteralList(items) => self.lower_list_lit(items, &expr.ty, subst, b),
             ExprKind::LiteralMap(pairs) => self.lower_map_lit(pairs, &expr.ty, subst, b),
-            ExprKind::FunctionLiteral(..) => unimplemented!("Phase 3: closures"),
+            // The validator currently replaces lambda bodies with a null
+            // literal of `Function` type, so a real FunctionLiteral never
+            // reaches lowering. If that changes, this is where closure
+            // env synthesis would go.
+            ExprKind::FunctionLiteral(..) => {
+                panic!("FunctionLiteral in HIR — validator should have erased the body")
+            }
         }
     }
 
@@ -61,7 +68,37 @@ impl Lower {
     ) -> Operand {
         let lop = self.lower_expr(l, subst, b);
         let rop = self.lower_expr(r, subst, b);
-        let mty = self.lower_type(result_ty, subst);
+        let from_l = subst.apply(&l.ty);
+        let from_r = subst.apply(&r.ty);
+
+        // For comparisons the result is `bool`; pick the wider operand
+        // type as the common operand type. For arithmetic / logical ops
+        // the result type *is* the operand type.
+        let result_concrete = subst.apply(result_ty);
+        let common_ty: ResolvedType = match op {
+            BinaryOperator::Eq
+            | BinaryOperator::Neq
+            | BinaryOperator::Lt
+            | BinaryOperator::Le
+            | BinaryOperator::Gt
+            | BinaryOperator::Ge => {
+                // Promote both to the wider primitive (favour left when equal).
+                if let (
+                    ResolvedType::Primitive(pl),
+                    ResolvedType::Primitive(pr),
+                ) = (&from_l, &from_r)
+                {
+                    pick_wider_primitive(pl, pr)
+                } else {
+                    from_l.clone()
+                }
+            }
+            _ => result_concrete.clone(),
+        };
+
+        let lop = self.coerce_to(lop, &from_l, &common_ty, b);
+        let rop = self.coerce_to(rop, &from_r, &common_ty, b);
+        let mty = self.lower_concrete_type(&result_concrete);
         b.emit(AssignValue::Bin(map_binop(op), lop, rop), mty)
     }
 
@@ -91,23 +128,72 @@ impl Lower {
         subst: &Subst,
         b: &mut FnBuilder,
     ) -> Operand {
-        let (fn_id, recv_op, owner_args) = match &callee.kind {
+        let result_mir = self.lower_type(result_ty, subst);
+
+        // Virtual interface dispatch.
+        if let ExprKind::Member(recv, method) = &callee.kind {
+            let recv_ty = subst.apply(&recv.ty);
+            if let ResolvedType::Interface(iface_id, iface_args) = recv_ty.clone() {
+                let recv_op = self.lower_expr(recv, subst, b);
+                let iface_concrete: Vec<ResolvedType> =
+                    iface_args.iter().map(|a| subst.apply(a)).collect();
+                let iface_mir =
+                    self.get_or_create_interface(iface_id, iface_concrete);
+                let (decl_iface, slot) = self
+                    .find_method_slot(iface_mir, method)
+                    .unwrap_or_else(|| panic!("no method `{}` on interface", method));
+
+                // Lower args directly (no coercion against a static param
+                // list — codegen reads the signature from the vtable slot).
+                let mut arg_ops: Vec<Operand> = vec![recv_op.clone()];
+                for a in args {
+                    arg_ops.push(self.lower_expr(a, subst, b));
+                }
+                return b.emit(
+                    AssignValue::Call(Callee::Virtual(recv_op, decl_iface, slot), arg_ops),
+                    result_mir,
+                );
+            }
+        }
+
+        // Indirect call: callee value is of function type.
+        let callee_ty = subst.apply(&callee.ty);
+        let static_callee_var = match &callee.kind {
+            ExprKind::Variable(name) => self.lookup_free_function(name),
+            _ => None,
+        };
+        let is_member_struct = matches!(
+            &callee.kind,
+            ExprKind::Member(recv, _) if matches!(subst.apply(&recv.ty), ResolvedType::Struct(_, _))
+        );
+        let is_static = static_callee_var.is_some() || is_member_struct;
+        if !is_static && matches!(callee_ty, ResolvedType::Function(_, _)) {
+            let callee_op = self.lower_expr(callee, subst, b);
+            let arg_ops: Vec<Operand> = args
+                .iter()
+                .map(|a| self.lower_expr(a, subst, b))
+                .collect();
+            return b.emit(
+                AssignValue::Call(Callee::Indirect(callee_op), arg_ops),
+                result_mir,
+            );
+        }
+
+        let (fn_id, recv_op, owner_args, method_resolved_args) = match &callee.kind {
             ExprKind::Variable(name) => {
                 let fn_id = self
                     .lookup_free_function(name)
                     .unwrap_or_else(|| panic!("unknown function `{}`", name));
-                (fn_id, None, vec![])
+                (fn_id, None, vec![], vec![])
             }
             ExprKind::Member(recv, method) => {
                 let recv_ty = subst.apply(&recv.ty);
                 let recv_op = self.lower_expr(recv, subst, b);
                 match recv_ty {
                     ResolvedType::Struct(owner_id, owner_args) => {
-                        let fn_id = self.resolve_method(owner_id, &owner_args, method);
-                        (fn_id, Some(recv_op), owner_args)
-                    }
-                    ResolvedType::Interface(_, _) => {
-                        unimplemented!("Phase 2: virtual dispatch")
+                        let (fn_id, method_args) =
+                            self.resolve_method_with_args(owner_id, &owner_args, method);
+                        (fn_id, Some(recv_op), owner_args, method_args)
                     }
                     other => panic!("method call on non-struct: {:?}", other),
                 }
@@ -115,12 +201,16 @@ impl Lower {
             other => panic!("unsupported callee shape: {:?}", other),
         };
 
+        // type_args = [owner_args..., method_resolved_args..., explicit_call_args...]
+        // The first two segments bind the owner's params + the method's own
+        // (resolved from a universal extend, if any). The last segment is
+        // what the user wrote at the call site.
         let ta_concrete: Vec<ResolvedType> = type_args.iter().map(|t| subst.apply(t)).collect();
         let mut all_args = owner_args;
+        all_args.extend(method_resolved_args);
         all_args.extend(ta_concrete);
         let target = self.mono_fn(fn_id, all_args.clone());
 
-        // Build callee's substitution for coercing each arg into its param type.
         let callee = self.hir.functions[&fn_id].clone();
         let callee_subst = Subst::new(callee.type_params.clone(), all_args);
 
@@ -128,8 +218,6 @@ impl Lower {
         if let Some(op) = recv_op {
             arg_ops.push(op);
         }
-        // HirFunction.params are user-declared only — `self` is implicit, so
-        // recv_op is already pushed and we zip args against params directly.
         for (a, p) in args.iter().zip(callee.params.iter()) {
             let raw = self.lower_expr(a, subst, b);
             let from = subst.apply(&a.ty);
@@ -137,8 +225,27 @@ impl Lower {
             arg_ops.push(self.coerce_to(raw, &from, &to, b));
         }
 
-        let result_mir = self.lower_type(result_ty, subst);
         b.emit(AssignValue::Call(Callee::Static(target), arg_ops), result_mir)
+    }
+
+    fn find_method_slot(&self, iface_mir: MirTypeId, name: &str) -> Option<(MirTypeId, u32)> {
+        if let MirTypeDef::Interface {
+            method_slots,
+            extends,
+            ..
+        } = &self.mir.types[&iface_mir]
+        {
+            if let Some(i) = method_slots.iter().position(|s| s.name == name) {
+                return Some((iface_mir, i as u32));
+            }
+            let parents = extends.clone();
+            for p in parents {
+                if let Some(found) = self.find_method_slot(p, name) {
+                    return Some(found);
+                }
+            }
+        }
+        None
     }
 
     fn lower_struct_init(
@@ -226,13 +333,195 @@ impl Lower {
         let src_ty = subst.apply(&e.ty);
         let target_ty = subst.apply(target);
 
+        if src_ty == target_ty {
+            return self.lower_expr(e, subst, b);
+        }
+
         match (&src_ty, &target_ty) {
             (ResolvedType::Primitive(_), ResolvedType::Primitive(_)) => {
                 let op = self.lower_expr(e, subst, b);
                 let mty = self.lower_type(&target_ty, subst);
                 b.emit(AssignValue::Cast(op, mty.clone()), mty)
             }
-            _ => unimplemented!("Phase 2: as on {:?} -> {:?}", src_ty, target_ty),
+            // Variant -> union (widen). Reuse the existing widen helper.
+            (_, ResolvedType::Union(_)) => {
+                let op = self.lower_expr(e, subst, b);
+                self.coerce_to(op, &src_ty, &target_ty, b)
+            }
+            // Union -> variant (narrow).
+            (ResolvedType::Union(variants), narrowed) => {
+                let scrutinee = self.lower_expr(e, subst, b);
+                self.lower_union_narrow(scrutinee, variants, narrowed, subst, b)
+            }
+            // Struct -> interface (upcast). No-op rebind; same pointer shape.
+            (ResolvedType::Struct(_, _), ResolvedType::Interface(_, _)) => {
+                let op = self.lower_expr(e, subst, b);
+                let mty = self.lower_type(&target_ty, subst);
+                b.emit(AssignValue::Use(op), mty)
+            }
+            // Interface -> interface (parent / sibling) — also no-op.
+            (ResolvedType::Interface(_, _), ResolvedType::Interface(_, _)) => {
+                let op = self.lower_expr(e, subst, b);
+                let mty = self.lower_type(&target_ty, subst);
+                b.emit(AssignValue::Use(op), mty)
+            }
+            // Null literal -> nullable/union (the coerce_to helper handles
+            // both NullableRef and tagged-union construction).
+            (ResolvedType::Null, _) => {
+                let op = self.lower_expr(e, subst, b);
+                self.coerce_to(op, &src_ty, &target_ty, b)
+            }
+            _ => panic!("unsupported `as` {:?} -> {:?}", src_ty, target_ty),
+        }
+    }
+
+    fn lower_is(
+        &mut self,
+        e: &TypedExpr,
+        target: &ResolvedType,
+        subst: &Subst,
+        b: &mut FnBuilder,
+    ) -> Operand {
+        let src_ty = subst.apply(&e.ty);
+        let target_ty = subst.apply(target);
+        let scrutinee = self.lower_expr(e, subst, b);
+
+        // NullableRef path.
+        if let ResolvedType::Union(variants) = &src_ty {
+            if self.try_nullable_ref(variants).is_some() {
+                let op = if matches!(target_ty, ResolvedType::Null) {
+                    BinOp::Eq
+                } else {
+                    BinOp::Neq
+                };
+                return b.emit(
+                    AssignValue::Bin(op, scrutinee, Operand::Const(MirConst::Null)),
+                    MirType::Primitive(PrimitiveType::Bool),
+                );
+            }
+        }
+
+        // Tagged union path.
+        let mid = match &src_ty {
+            ResolvedType::Union(vs) => self.get_or_create_union(vs.clone()),
+            other => panic!("`is` scrutinee must be a union: got {:?}", other),
+        };
+        let target_mir = self.lower_type(&target_ty, subst);
+        let target_tag = self.tag_of_variant_mir(mid, &target_mir);
+
+        let tag_tmp = b.emit(
+            AssignValue::UnionTag(scrutinee),
+            MirType::Primitive(PrimitiveType::Uint16),
+        );
+        b.emit(
+            AssignValue::Bin(
+                BinOp::Eq,
+                tag_tmp,
+                Operand::Const(MirConst::Int(target_tag as i64, PrimitiveType::Uint16)),
+            ),
+            MirType::Primitive(PrimitiveType::Bool),
+        )
+    }
+
+    pub fn lower_union_narrow(
+        &mut self,
+        scrutinee: Operand,
+        variants: &[ResolvedType],
+        narrowed_ty: &ResolvedType,
+        subst: &Subst,
+        b: &mut FnBuilder,
+    ) -> Operand {
+        // NullableRef path: T | null narrowed to T or null.
+        if self.try_nullable_ref(variants).is_some() {
+            return self.emit_nullable_narrow(scrutinee, narrowed_ty, subst, b);
+        }
+        // Tagged path.
+        let mid = self.get_or_create_union(variants.to_vec());
+        let target_mir = self.lower_type(narrowed_ty, subst);
+        let target_tag = self.tag_of_variant_mir(mid, &target_mir);
+
+        let tag_tmp = b.emit(
+            AssignValue::UnionTag(scrutinee.clone()),
+            MirType::Primitive(PrimitiveType::Uint16),
+        );
+        let ok = b.emit(
+            AssignValue::Bin(
+                BinOp::Eq,
+                tag_tmp,
+                Operand::Const(MirConst::Int(target_tag as i64, PrimitiveType::Uint16)),
+            ),
+            MirType::Primitive(PrimitiveType::Bool),
+        );
+
+        let ok_bb = b.new_block();
+        let trap_bb = b.new_block();
+        let join_bb = b.new_block();
+        b.terminate(Terminator::CondBr(ok, ok_bb, trap_bb));
+
+        let result = b.new_temp(target_mir.clone());
+
+        b.switch_to(ok_bb);
+        b.push_stmt(Stmt::Assign(
+            result,
+            AssignValue::UnionPayload(scrutinee, mid),
+        ));
+        b.terminate(Terminator::Goto(join_bb));
+
+        b.switch_to(trap_bb);
+        b.terminate(Terminator::Trap(TrapReason::AsMismatch));
+
+        b.switch_to(join_bb);
+        Operand::Copy(result)
+    }
+
+    fn emit_nullable_narrow(
+        &mut self,
+        scrutinee: Operand,
+        narrowed_ty: &ResolvedType,
+        subst: &Subst,
+        b: &mut FnBuilder,
+    ) -> Operand {
+        let expect_null = matches!(narrowed_ty, ResolvedType::Null);
+        let cmp_op = if expect_null { BinOp::Eq } else { BinOp::Neq };
+        let cmp = b.emit(
+            AssignValue::Bin(cmp_op, scrutinee.clone(), Operand::Const(MirConst::Null)),
+            MirType::Primitive(PrimitiveType::Bool),
+        );
+
+        let ok_bb = b.new_block();
+        let trap_bb = b.new_block();
+        let join_bb = b.new_block();
+        b.terminate(Terminator::CondBr(cmp, ok_bb, trap_bb));
+
+        let target_mir = self.lower_type(narrowed_ty, subst);
+        let result = b.new_temp(target_mir);
+
+        b.switch_to(trap_bb);
+        b.terminate(Terminator::Trap(TrapReason::AsMismatch));
+
+        b.switch_to(ok_bb);
+        if expect_null {
+            b.push_stmt(Stmt::Assign(
+                result,
+                AssignValue::Use(Operand::Const(MirConst::Null)),
+            ));
+        } else {
+            b.push_stmt(Stmt::Assign(result, AssignValue::Use(scrutinee)));
+        }
+        b.terminate(Terminator::Goto(join_bb));
+
+        b.switch_to(join_bb);
+        Operand::Copy(result)
+    }
+
+    fn tag_of_variant_mir(&self, union_mid: MirTypeId, variant: &MirType) -> u16 {
+        match &self.mir.types[&union_mid] {
+            MirTypeDef::Union { variants, .. } => variants
+                .iter()
+                .find(|v| &v.ty == variant)
+                .map(|v| v.tag)
+                .unwrap_or_else(|| panic!("variant not in union: {:?}", variant)),
+            _ => unreachable!(),
         }
     }
 
@@ -369,31 +658,86 @@ impl Lower {
         None
     }
 
-    /// Phase 1 method resolution: inherent methods, plus universal-extend
-    /// entries whose target args are all type-params. Specialised extends
-    /// (`extend Foo<i32>`) require unification — deferred to Phase 2.
+    /// Resolve `OwnerStruct<owner_args>::method_name` to a concrete
+    /// `(FnId, type_args)` pair, where `type_args` is the binding for the
+    /// method's own `type_params` (caller still appends explicit method
+    /// type-arguments).
+    ///
+    /// Lookup order:
+    ///   1. Inherent methods (declared on the struct itself).
+    ///   2. Specialised extends with target_args that match `owner_args`
+    ///      exactly.
+    ///   3. Universal extends (`extend<T> Owner<T>`) — unify target_args
+    ///      against `owner_args` to bind the extend's type params.
     pub fn resolve_method(
         &self,
         owner: TypeId,
-        _owner_args: &[ResolvedType],
+        owner_args: &[ResolvedType],
         method_name: &str,
     ) -> FnId {
+        self.resolve_method_with_args(owner, owner_args, method_name).0
+    }
+
+    pub fn resolve_method_with_args(
+        &self,
+        owner: TypeId,
+        owner_args: &[ResolvedType],
+        method_name: &str,
+    ) -> (FnId, Vec<ResolvedType>) {
         let s = &self.hir.structs[&owner];
+
+        // 1. Inherent methods. Their type_params are method-level only.
         for fn_id in &s.methods {
             if self.hir.functions[fn_id].name == method_name {
-                return *fn_id;
+                return (*fn_id, vec![]);
             }
         }
-        for (target_args, fn_id) in &s.specialised_methods {
+
+        let specialised: Vec<(Vec<ResolvedType>, FnId)> = s.specialised_methods.clone();
+        // 2. Specialised extend matching owner_args literally.
+        for (target_args, fn_id) in &specialised {
+            if self.hir.functions[fn_id].name != method_name {
+                continue;
+            }
+            if target_args == owner_args {
+                return (*fn_id, vec![]);
+            }
+        }
+        // 3. Universal extend (each target_arg is a TypeParam).
+        for (target_args, fn_id) in &specialised {
             if self.hir.functions[fn_id].name != method_name {
                 continue;
             }
             let all_params = target_args
                 .iter()
-                .all(|a| matches!(a, ResolvedType::TypeParam(_)));
-            if all_params {
-                return *fn_id;
+                .all(|a: &ResolvedType| matches!(a, ResolvedType::TypeParam(_)));
+            if !all_params || target_args.len() != owner_args.len() {
+                continue;
             }
+            // Bind each extend type param to the concrete owner arg in
+            // the same position. Method's own type_params are exactly
+            // these extend params (in declaration order), so we can
+            // return owner_args directly.
+            let f = &self.hir.functions[fn_id];
+            let extend_param_to_arg: std::collections::HashMap<TypeParamId, ResolvedType> = target_args
+                .iter()
+                .zip(owner_args.iter())
+                .map(|(tp, a)| match tp {
+                    ResolvedType::TypeParam(id) => (*id, a.clone()),
+                    _ => unreachable!(),
+                })
+                .collect();
+            let method_args: Vec<ResolvedType> = f
+                .type_params
+                .iter()
+                .map(|p| {
+                    extend_param_to_arg
+                        .get(p)
+                        .cloned()
+                        .unwrap_or(ResolvedType::TypeParam(*p))
+                })
+                .collect();
+            return (*fn_id, method_args);
         }
         panic!("no method `{}` on `{}`", method_name, s.name);
     }
@@ -403,6 +747,26 @@ fn prim_of(ty: &ResolvedType) -> PrimitiveType {
     match ty {
         ResolvedType::Primitive(p) => p.clone(),
         _ => panic!("non-primitive type on a numeric literal"),
+    }
+}
+
+fn pick_wider_primitive(a: &PrimitiveType, b: &PrimitiveType) -> ResolvedType {
+    use PrimitiveType::*;
+    fn rank(p: &PrimitiveType) -> u32 {
+        match p {
+            Bool => 1,
+            Int8 | Uint8 => 8,
+            Int16 | Uint16 => 16,
+            Int32 | Uint32 | Char => 32,
+            Float32 => 33,
+            Int64 | Uint64 | String => 64,
+            Float64 => 65,
+        }
+    }
+    if rank(a) >= rank(b) {
+        ResolvedType::Primitive(a.clone())
+    } else {
+        ResolvedType::Primitive(b.clone())
     }
 }
 

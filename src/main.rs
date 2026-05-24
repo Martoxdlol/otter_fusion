@@ -135,7 +135,7 @@ fn run_run(file: &str) -> i32 {
     let mut compiled = match codegen::compile(&mir, jit) {
         Ok(c) => c,
         Err(e) => {
-            eprintln!("{file}: error: codegen: {e}");
+            eprintln!("{file}: error: codegen: {e:#?}");
             return 1;
         }
     };
@@ -368,8 +368,76 @@ fn make_jit_module() -> Result<JITModule, String> {
     let isa = isa_builder
         .finish(cranelift_codegen::settings::Flags::new(flags))
         .map_err(|e| e.to_string())?;
-    let builder = JITBuilder::with_isa(isa, default_libcall_names());
+    let mut builder = JITBuilder::with_isa(isa, default_libcall_names());
+    register_runtime_shims(&mut builder);
     Ok(JITModule::new(builder))
+}
+
+// Minimal runtime stubs so JIT smoke tests resolve __of_* symbols. Real
+// programs link a proper runtime; this is just enough to run examples.
+fn register_runtime_shims(builder: &mut JITBuilder) {
+    builder.symbol("__of_alloc", rt::of_alloc as *const u8);
+    builder.symbol("__of_vtable_lookup", rt::of_vtable_lookup as *const u8);
+    builder.symbol("__of_print", rt::of_print as *const u8);
+    builder.symbol("__of_println", rt::of_println as *const u8);
+    builder.symbol("__of_str_concat", rt::of_str_concat as *const u8);
+}
+
+mod rt {
+    use std::ffi::CStr;
+    use std::os::raw::{c_char, c_void};
+
+    pub unsafe extern "C" fn of_alloc(size: u64, _type_id: u64) -> *mut c_void {
+        let total = (size.max(16) + 16) as usize;
+        let layout = std::alloc::Layout::from_size_align(total, 8).unwrap();
+        unsafe {
+            let ptr = std::alloc::alloc_zeroed(layout);
+            // Skip a fake header (16 bytes) so callers see a "body" pointer.
+            ptr.add(16) as *mut c_void
+        }
+    }
+
+    pub unsafe extern "C" fn of_vtable_lookup(
+        _recv: *const c_void,
+        _iface_id: u64,
+        _slot: u64,
+    ) -> *const c_void {
+        // Unimplemented runtime: no real vtable resolution. Programs that
+        // hit a virtual call will crash; non-virtual code paths still run.
+        std::ptr::null()
+    }
+
+    pub unsafe extern "C" fn of_print(s: *const c_char) {
+        if s.is_null() {
+            return;
+        }
+        let cstr = unsafe { CStr::from_ptr(s) };
+        print!("{}", cstr.to_string_lossy());
+    }
+
+    pub unsafe extern "C" fn of_println(s: *const c_char) {
+        unsafe { of_print(s) };
+        println!();
+    }
+
+    pub unsafe extern "C" fn of_str_concat(
+        a: *const c_char,
+        b: *const c_char,
+    ) -> *const c_char {
+        let a = if a.is_null() {
+            String::new()
+        } else {
+            unsafe { CStr::from_ptr(a) }.to_string_lossy().into_owned()
+        };
+        let b = if b.is_null() {
+            String::new()
+        } else {
+            unsafe { CStr::from_ptr(b) }.to_string_lossy().into_owned()
+        };
+        let combined = format!("{}{}\0", a, b);
+        let boxed = combined.into_bytes().into_boxed_slice();
+        Box::leak(boxed).as_ptr() as *const c_char
+    }
 }
 
 fn build_mir(file: &str) -> Result<MirProgram, i32> {

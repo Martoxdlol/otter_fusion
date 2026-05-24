@@ -115,8 +115,18 @@ impl Lower {
         if from == to {
             return op;
         }
-        match to {
-            ResolvedType::Union(target_vs) => self.widen_to_union(op, from, target_vs, b),
+        match (from, to) {
+            // Primitive -> primitive: emit a Cast so the receiving slot
+            // gets a value of the right CLIF width. The validator marks
+            // these compatible (literal vs annotation) but leaves the
+            // HIR type as the literal's default; lowering bridges that.
+            (ResolvedType::Primitive(_), ResolvedType::Primitive(_)) => {
+                let mty = self.lower_concrete_type(to);
+                b.emit(AssignValue::Cast(op, mty.clone()), mty)
+            }
+            (_, ResolvedType::Union(target_vs)) => {
+                self.widen_to_union(op, from, target_vs, b)
+            }
             _ => op,
         }
     }
