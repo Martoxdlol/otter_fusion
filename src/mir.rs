@@ -93,13 +93,37 @@ pub enum MirTypeDef {
         /// But if they are primitives like (i8, f8) we can use smaller align
         layout: Layout,
     },
-    /// Don't care for now
+    /// Closure: heap-allocated environment plus a single MirFnId body.
+    /// The body receives the env pointer as its hidden first parameter.
     Closure {
-        /// It is like a struct, with access to variables of when it was created
         env_fields: Vec<MirField>,
         function: MirFnId,
         layout: Layout,
     },
+    /// Interface type. Has no instances of its own — a value of interface
+    /// type is always a pointer to a struct that implements it, plus an
+    /// out-of-band vtable lookup via `MirProgram.vtables`. Method calls
+    /// through this become `Callee::Virtual(recv, this_mir_id, slot)`.
+    Interface {
+        name: String,
+        /// Fields declared on the interface (used when reading through an
+        /// interface receiver). Each implementer may place these at any
+        /// offset; codegen needs a parallel field-offset table if you
+        /// actually allow field reads through interfaces.
+        fields: Vec<MirField>,
+        /// Method slot table — slot index matches `VTable.slots[i]`.
+        method_slots: Vec<InterfaceMethodSlot>,
+        /// Parent interfaces (post-mono). Used so that `(struct, parent)`
+        /// vtables get built when a struct implements a child interface.
+        extends: Vec<MirTypeId>,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub struct InterfaceMethodSlot {
+    pub name: String,
+    pub params: Vec<MirType>,
+    pub return_type: MirType,
 }
 
 impl MirTypeDef {

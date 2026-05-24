@@ -10,7 +10,7 @@ pub mod subst;
 pub mod unions;
 pub mod vtables;
 
-use crate::hir::{FnId, Hir, HirBlock, HirStatement, PrimitiveType, ResolvedType, TypeId, TypeParamId};
+use crate::hir::{FnId, Hir, HirBlock, ResolvedType, TypeId};
 use crate::lower::builder::FnBuilder;
 use crate::lower::layout::compute_struct_layout;
 use crate::lower::mangling::{name_function, name_struct};
@@ -109,8 +109,22 @@ impl Lower {
                     let f = self.lower_function(fn_id, type_args, mir_id);
                     self.mir.functions.insert(mir_id, f);
                 }
-                MonoTask::VTable { .. } => {
-                    // TODO: implement vtables
+                MonoTask::VTable {
+                    struct_mir,
+                    interface_mir,
+                    struct_hir,
+                    struct_args,
+                    iface_hir,
+                    iface_args,
+                } => {
+                    self.process_vtable_task(
+                        struct_mir,
+                        interface_mir,
+                        struct_hir,
+                        struct_args,
+                        iface_hir,
+                        iface_args,
+                    );
                 }
             }
         }
@@ -147,19 +161,71 @@ impl Lower {
     ) -> MirFunction {
         let f = self.hir.functions[&fn_id].clone();
 
-        // extern functions: imports (empty body) become forward-declared
-        // stubs; exports (with body) are Phase 4 — panic for now to surface
-        // them if they appear.
+        // extern function: import if body-less, export if body-bearing.
+        // Imports → forward-declared stubs (Abi::Extern, no blocks).
+        // Exports → fully lowered body, but Abi::Extern and no `self`.
         if f.is_extern {
-            if f.body.as_ref().map(|b| b.statements.is_empty() && b.returns.is_none()).unwrap_or(true) {
+            let body_present = f
+                .body
+                .as_ref()
+                .map(|b| !(b.statements.is_empty() && b.returns.is_none()))
+                .unwrap_or(false);
+            if !body_present {
                 return self.lower_extern_import(fn_id, type_args, mir_id);
             }
-            panic!("extern function with body (exported callback) — Phase 4");
+            return self.lower_extern_export(fn_id, type_args, mir_id);
         }
 
-        // f.type_params -> vec de params. Esos params pueden tener genéricos
-        // type_args -> vec de tipos concretos. No pueden tener genéricos.
-        let subst = Subst::new(f.type_params.clone(), type_args.clone());
+        // Build the substitution. Callers pass type_args =
+        //   [owner_type_args..., method_resolved_args..., explicit_args...].
+        // For methods we bind the owner's type params from the first
+        // segment, then the method's own from the rest.
+        let mut mappings: std::collections::HashMap<crate::hir::TypeParamId, ResolvedType> =
+            std::collections::HashMap::new();
+
+        let owner_arity = f
+            .owner
+            .map(|oid| self.hir.structs[&oid].type_params.len())
+            .unwrap_or(0);
+        if owner_arity > 0 {
+            let owner_params = self.hir.structs[&f.owner.unwrap()].type_params.clone();
+            for (tp, ta) in owner_params.iter().zip(type_args.iter()) {
+                mappings.insert(*tp, ta.clone());
+            }
+            // Universal extend: each `target_args[i]` is a TypeParam alias
+            // of the struct's i-th param. Bind those aliases to the same
+            // concrete type so body references through them resolve.
+            if let Some(owner_id) = f.owner {
+                let owner_struct = self.hir.structs[&owner_id].clone();
+                for (target_args, sm_id) in &owner_struct.specialised_methods {
+                    if *sm_id != fn_id {
+                        continue;
+                    }
+                    if target_args.len() != owner_arity {
+                        continue;
+                    }
+                    let all_tp = target_args
+                        .iter()
+                        .all(|a| matches!(a, ResolvedType::TypeParam(_)));
+                    if !all_tp {
+                        continue;
+                    }
+                    for (a, ta) in target_args.iter().zip(type_args.iter()) {
+                        if let ResolvedType::TypeParam(id) = a {
+                            mappings.insert(*id, ta.clone());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        // Method's own type params consume the rest of type_args.
+        let rest = type_args.iter().skip(owner_arity);
+        for (tp, ta) in f.type_params.iter().zip(rest) {
+            mappings.insert(*tp, ta.clone());
+        }
+
+        let subst = Subst { mappings };
 
         // Concrete return type for `Return`-statement coercion.
         let prev_ret = self.current_return_type.replace(subst.apply(&f.return_type));
@@ -248,13 +314,70 @@ impl Lower {
         let name = f.name.clone();
         let mut b = FnBuilder::new(mir_id, name, Abi::Extern, ret_ty);
         for p in &f.params {
-            let ty = self.lower_type(&p.ty, &subst);
+            let inner = self.lower_type(&p.ty, &subst);
+            let ty = if p.is_pointer {
+                MirType::Pointer(Box::new(inner))
+            } else {
+                inner
+            };
             let local = b.new_local(Some(p.name.clone()), ty);
             b.params.push(local);
         }
         let mut out = b.finish();
         out.blocks.clear();
         out
+    }
+
+    /// Body-bearing extern = exported callback. Same shape as an Otter
+    /// function except for `Abi::Extern`, no implicit `self`, no generics
+    /// (validator-enforced), and pointer-aware param typing.
+    fn lower_extern_export(
+        &mut self,
+        fn_id: FnId,
+        type_args: Vec<ResolvedType>,
+        mir_id: MirFnId,
+    ) -> MirFunction {
+        let f = self.hir.functions[&fn_id].clone();
+        let subst = Subst::new(f.type_params.clone(), type_args);
+
+        let prev_ret = self
+            .current_return_type
+            .replace(subst.apply(&f.return_type));
+        let ret_ty = self.lower_type(&f.return_type, &subst);
+
+        let mut b = FnBuilder::new(mir_id, f.name.clone(), Abi::Extern, ret_ty);
+        for p in &f.params {
+            let inner = self.lower_type(&p.ty, &subst);
+            let ty = if p.is_pointer {
+                MirType::Pointer(Box::new(inner))
+            } else {
+                inner
+            };
+            let local = b.new_local(Some(p.name.clone()), ty);
+            b.params.push(local);
+            b.bind(p.name.clone(), local);
+        }
+
+        let body = f
+            .body
+            .as_ref()
+            .expect("extern export must have a body — caller checked");
+        let trailing_src_ty = body.returns.as_ref().map(|e| subst.apply(&e.ty));
+        let trailing = self.lower_block(body, &subst, &mut b);
+
+        let ret_target = self.current_return_type.clone().expect("set above");
+        let term = match (trailing, trailing_src_ty) {
+            (Some(op), Some(src)) => {
+                let coerced = self.coerce_to(op, &src, &ret_target, &mut b);
+                Terminator::Return(Some(coerced))
+            }
+            (Some(op), None) => Terminator::Return(Some(op)),
+            (None, _) => Terminator::Return(None),
+        };
+        b.terminate_if_open(term);
+
+        self.current_return_type = prev_ret;
+        b.finish()
     }
 
     pub fn lower_block(
@@ -280,7 +403,6 @@ impl Lower {
     pub fn lower_concrete_type(&mut self, ty: &ResolvedType) -> MirType {
         match ty {
             ResolvedType::Primitive(p) => MirType::Primitive(p.clone()),
-            ResolvedType::Primitive(p) => MirType::Primitive(p.clone()),
 
             ResolvedType::Struct(hir_id, args) => {
                 let _is_extern = self.hir.structs[hir_id].is_extern;
@@ -290,9 +412,8 @@ impl Lower {
             }
 
             ResolvedType::Interface(hir_id, args) => {
-                todo!("interface lowering not implemented yet")
-                // let mid = self.get_or_create_interface(*hir_id, args.clone());
-                // MirType::ManagedRef(mid) // dispatched virtually at call sites
+                let mid = self.get_or_create_interface(*hir_id, args.clone());
+                MirType::ManagedRef(mid)
             }
 
             ResolvedType::Union(variants) => {
@@ -306,11 +427,12 @@ impl Lower {
             }
 
             ResolvedType::Function(args, ret) => {
-                // Default: assume closure (managed). FFI lowering (Phase 4)
-                // overrides this to FnPtr at extern boundaries.
-                // let mid = self.get_or_create_function_type(args, ret);
-                // MirType::Closure(mid)
-                todo!("function type lowering not implemented yet")
+                let arg_mirs: Vec<MirType> = args
+                    .iter()
+                    .map(|a| self.lower_concrete_type(a))
+                    .collect();
+                let ret_mir = self.lower_concrete_type(ret);
+                MirType::FnPtr(arg_mirs, Box::new(ret_mir))
             }
 
             ResolvedType::Null => MirType::Unit,
@@ -318,6 +440,95 @@ impl Lower {
             ResolvedType::TypeParam(id) => {
                 panic!("non-concrete TypeParam({:?}) reached lowering", id);
             }
+        }
+    }
+
+    pub fn get_or_create_interface(
+        &mut self,
+        hir_id: TypeId,
+        args: Vec<ResolvedType>,
+    ) -> MirTypeId {
+        let key = (hir_id, args);
+        if let Some(&mid) = self.mono_types.get(&key) {
+            return mid;
+        }
+        let mid = self.alloc_type_id();
+        self.mono_types.insert(key.clone(), mid);
+        self.mir.types.insert(
+            mid,
+            MirTypeDef::Interface {
+                name: String::new(),
+                fields: vec![],
+                method_slots: vec![],
+                extends: vec![],
+            },
+        );
+
+        let (hir_id, args) = key;
+        let def = self.build_interface_def(hir_id, &args);
+        self.mir.types.insert(mid, def);
+        mid
+    }
+
+    fn build_interface_def(&mut self, hir_id: TypeId, args: &[ResolvedType]) -> MirTypeDef {
+        let i = self.hir.interfaces[&hir_id].clone();
+        let subst = Subst::new(i.type_params.clone(), args.to_vec());
+
+        let fields: Vec<MirField> = i
+            .fields
+            .iter()
+            .map(|f| MirField {
+                name: f.name.clone(),
+                ty: self.lower_type(&f.ty, &subst),
+                offset: 0,
+            })
+            .collect();
+
+        let method_slots: Vec<InterfaceMethodSlot> = i
+            .methods
+            .iter()
+            .map(|fn_id| {
+                let f = &self.hir.functions[fn_id].clone();
+                let params = f
+                    .params
+                    .iter()
+                    .map(|p| self.lower_type(&p.ty, &subst))
+                    .collect();
+                let return_type = self.lower_type(&f.return_type, &subst);
+                InterfaceMethodSlot {
+                    name: f.name.clone(),
+                    params,
+                    return_type,
+                }
+            })
+            .collect();
+
+        let parents = i.extends.clone();
+        let mut extends: Vec<MirTypeId> = Vec::with_capacity(parents.len());
+        for (pid, pargs) in parents {
+            let pargs_concrete: Vec<ResolvedType> =
+                pargs.iter().map(|a| subst.apply(a)).collect();
+            extends.push(self.get_or_create_interface(pid, pargs_concrete));
+        }
+
+        let name = {
+            let module = &self.hir.modules[&i.module];
+            if args.is_empty() {
+                format!("{}::{}", module.name, i.name)
+            } else {
+                let inner: Vec<String> = args
+                    .iter()
+                    .map(|a| crate::lower::mangling::name_type(&self.hir, a, &[]))
+                    .collect();
+                format!("{}::{}<{}>", module.name, i.name, inner.join(","))
+            }
+        };
+
+        MirTypeDef::Interface {
+            name,
+            fields,
+            method_slots,
+            extends,
         }
     }
 
@@ -357,7 +568,14 @@ impl Lower {
         let field_types: Vec<MirType> = s
             .fields
             .iter()
-            .map(|f| self.lower_type(&f.ty, &subst))
+            .map(|f| {
+                let inner = self.lower_type(&f.ty, &subst);
+                if f.is_pointer && s.is_extern {
+                    MirType::Pointer(Box::new(inner))
+                } else {
+                    inner
+                }
+            })
             .collect();
 
         let (offsets, layout) = compute_struct_layout(&self.mir, &field_types);
@@ -383,11 +601,85 @@ impl Lower {
         // module + name + (args)
         let name = name_struct(&self.hir, &s, args);
 
-        MirTypeDef::Struct {
+        let def = MirTypeDef::Struct {
             name,
             fields,
             layout,
             kind,
+        };
+
+        // Enqueue vtable construction for every interface this struct
+        // implements. The struct itself is already cached in `mono_types`
+        // (placeholder inserted before build_struct_def runs).
+        let struct_mir = self.mono_types[&(hir_id, args.to_vec())];
+        let implements: Vec<(TypeId, Vec<ResolvedType>)> = s.implements.clone();
+        for (iface_id, iface_args) in implements {
+            let iface_concrete: Vec<ResolvedType> =
+                iface_args.iter().map(|a| subst.apply(a)).collect();
+            let iface_mir = self.get_or_create_interface(iface_id, iface_concrete.clone());
+            self.worklist.push_back(MonoTask::VTable {
+                struct_mir,
+                interface_mir: iface_mir,
+                struct_hir: hir_id,
+                struct_args: args.to_vec(),
+                iface_hir: iface_id,
+                iface_args: iface_concrete,
+            });
+        }
+
+        def
+    }
+
+    pub fn process_vtable_task(
+        &mut self,
+        struct_mir: MirTypeId,
+        interface_mir: MirTypeId,
+        struct_hir: TypeId,
+        struct_args: Vec<ResolvedType>,
+        iface_hir: TypeId,
+        iface_args: Vec<ResolvedType>,
+    ) {
+        if self.mir.vtables.contains_key(&(struct_mir, interface_mir)) {
+            return;
+        }
+        let iface = self.hir.interfaces[&iface_hir].clone();
+        let mut slots = Vec::with_capacity(iface.methods.len());
+        for iface_fn_id in &iface.methods {
+            let method_name = self.hir.functions[iface_fn_id].name.clone();
+            let (impl_fn_id, method_args) =
+                self.resolve_method_with_args(struct_hir, &struct_args, &method_name);
+            let mut all_args = struct_args.clone();
+            all_args.extend(method_args);
+            let mir_fn = self.mono_fn(impl_fn_id, all_args);
+            slots.push(mir_fn);
+        }
+        self.mir.vtables.insert(
+            (struct_mir, interface_mir),
+            VTable {
+                struct_ty: struct_mir,
+                interface_ty: interface_mir,
+                slots,
+            },
+        );
+
+        let iface_subst = Subst::new(iface.type_params.clone(), iface_args);
+        let parents: Vec<(TypeId, Vec<ResolvedType>)> = iface.extends.clone();
+        for (parent_id, parent_args) in parents {
+            let parent_concrete: Vec<ResolvedType> =
+                parent_args.iter().map(|a| iface_subst.apply(a)).collect();
+            let parent_mir =
+                self.get_or_create_interface(parent_id, parent_concrete.clone());
+            if self.mir.vtables.contains_key(&(struct_mir, parent_mir)) {
+                continue;
+            }
+            self.worklist.push_back(MonoTask::VTable {
+                struct_mir,
+                interface_mir: parent_mir,
+                struct_hir,
+                struct_args: struct_args.clone(),
+                iface_hir: parent_id,
+                iface_args: parent_concrete,
+            });
         }
     }
 
