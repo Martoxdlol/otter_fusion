@@ -1479,7 +1479,7 @@ impl Validator {
                 &generics,
                 &mut locals,
                 &func.return_type,
-                0,
+                0, None
             );
 
             self.hir.functions.get_mut(fn_id).unwrap().body = Some(block);
@@ -1521,12 +1521,13 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> HirBlock {
         locals.push(HashMap::new());
         let mut statements = Vec::new();
         for stmt in &block.statements {
             if let Some(s) =
-                self.check_statement(stmt, fn_label, module, generics, locals, return_type, loop_depth)
+                self.check_statement(stmt, fn_label, module, generics, locals, return_type, loop_depth, None)
             {
                 statements.push(s);
             }
@@ -1534,7 +1535,7 @@ impl Validator {
         let returns = block
             .returns
             .as_ref()
-            .map(|e| self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth));
+            .map(|e| self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, expected));
         locals.pop();
         HirBlock { statements, returns }
     }
@@ -1548,12 +1549,13 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> Option<HirStatement> {
         match stmt {
             ast::Statement::Assign(target, value) => {
                 // TODO: implement assignment validation
-                let typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth);
-                let typed_value = self.check_expr(value, fn_label, module, generics, locals, return_type, loop_depth);
+                let typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth, None);
+                let typed_value = self.check_expr(value, fn_label, module, generics, locals, return_type, loop_depth, None);
                 Some(HirStatement::Expr(typed_value))
             }
             ast::Statement::VarDecl(name, ty, init) => {
@@ -1567,28 +1569,17 @@ impl Validator {
                     self.resolve_type_expr(t, &ctx)
                 });
                 let mut init_typed = init.as_ref().map(|e| {
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_expr(
+                        e, fn_label, module, generics, locals, return_type, loop_depth, annotated.as_ref(),
+                    )
                 });
 
-                let final_ty = match (&annotated, init_typed.as_mut()) {
+                let final_ty = match (&annotated, init_typed.as_ref()) {
                     (Some(a), Some(typed)) => {
-                        if let ExprKind::Literal(HirLiteral::Float(_)) = typed.kind {
-                            if *a == ResolvedType::Primitive(PrimitiveType::Float32) {
-                                typed.ty = a.clone();
-                            }
-                        } else if let ExprKind::Literal(HirLiteral::Int(_)) = typed.kind {
-                            if matches!(a, ResolvedType::Primitive(
-                                PrimitiveType::Int8 | PrimitiveType::Int16 | PrimitiveType::Int32 | PrimitiveType::Int64 |
-                                PrimitiveType::Uint8 | PrimitiveType::Uint16 | PrimitiveType::Uint32 | PrimitiveType::Uint64
-                            )) {
-                                typed.ty = a.clone();
-                            }
-                        }
-
                         if !types_compatible(&typed.ty, a) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
-                                context: format!("var {}", name),
+                                context: format!("variable '{}'", name),
                                 expected: format_type(a),
                                 actual: format_type(&typed.ty),
                             });
@@ -1614,7 +1605,7 @@ impl Validator {
             }
             ast::Statement::Return(expr) => {
                 let typed = expr.as_ref().map(|e| {
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, Some(return_type))
                 });
                 let actual = typed
                     .as_ref()
@@ -1632,12 +1623,12 @@ impl Validator {
             }
             ast::Statement::Expr(e) => {
                 let typed =
-                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+                    self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, None);
                 Some(HirStatement::Expr(typed))
             }
             ast::Statement::While(cond, body) => {
                 let typed_cond =
-                    self.check_expr(cond, fn_label, module, generics, locals, return_type, loop_depth);
+                    self.check_expr(cond, fn_label, module, generics, locals, return_type, loop_depth, None);
                 if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
@@ -1653,14 +1644,13 @@ impl Validator {
                     generics,
                     locals,
                     return_type,
-                    loop_depth + 1,
+                    loop_depth + 1, None
                 );
                 Some(HirStatement::While(typed_cond, body_block))
             }
             ast::Statement::For(name, iter_expr, body) => {
                 let typed_iter = self.check_expr(
-                    iter_expr, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    iter_expr, fn_label, module, generics, locals, return_type, loop_depth, None);
                 // v1 limitation: element type isn't extracted from `Iterator<T>`
                 // (the prelude that would define it isn't injected yet).
                 let elem_ty = ResolvedType::Null;
@@ -1676,7 +1666,7 @@ impl Validator {
                     generics,
                     locals,
                     return_type,
-                    loop_depth + 1,
+                    loop_depth + 1, None
                 );
                 locals.pop();
                 Some(HirStatement::For(name.clone(), typed_iter, body_block))
@@ -1709,15 +1699,15 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         match expr {
             ast::Expr::SelfRef => self.check_variable("self", fn_label, module, locals),
-            ast::Expr::Literal(lit) => self.check_literal(lit, fn_label),
+            ast::Expr::Literal(lit) => self.check_literal(lit, fn_label, expected),
             ast::Expr::Variable(name) => self.check_variable(name, fn_label, module, locals),
             ast::Expr::If(cond, then_b, else_b) => {
                 let typed_cond = self.check_expr(
-                    cond, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    cond, fn_label, module, generics, locals, return_type, loop_depth, None);
                 if typed_cond.ty != ResolvedType::Primitive(PrimitiveType::Bool) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
@@ -1727,10 +1717,9 @@ impl Validator {
                     });
                 }
                 let then_block = self.check_block(
-                    then_b, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    then_b, fn_label, module, generics, locals, return_type, loop_depth, expected);
                 let else_block = else_b.as_ref().map(|b| {
-                    self.check_block(b, fn_label, module, generics, locals, return_type, loop_depth)
+                    self.check_block(b, fn_label, module, generics, locals, return_type, loop_depth, expected)
                 });
                 let ty = then_block
                     .returns
@@ -1747,13 +1736,12 @@ impl Validator {
                 }
             }
             ast::Expr::Call(callee, type_args, args) => self.check_call(
-                callee, type_args, args, fn_label, module, generics, locals, return_type, loop_depth,
-            ),
+                callee, type_args, args, fn_label, module, generics, locals, return_type, loop_depth, expected),
             ast::Expr::LiteralList(elems) => {
                 let typed_elems: Vec<TypedExpr> = elems
                     .iter()
                     .map(|e| {
-                        self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
+                        self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, None)
                     })
                     .collect();
                 // v1: no `List<T>` type yet (it lives in std). Element type is
@@ -1779,11 +1767,9 @@ impl Validator {
                     .iter()
                     .map(|(k, v)| {
                         let tk = self.check_expr(
-                            k, fn_label, module, generics, locals, return_type, loop_depth,
-                        );
+                            k, fn_label, module, generics, locals, return_type, loop_depth, None);
                         let tv = self.check_expr(
-                            v, fn_label, module, generics, locals, return_type, loop_depth,
-                        );
+                            v, fn_label, module, generics, locals, return_type, loop_depth, None);
                         (tk, tv)
                     })
                     .collect();
@@ -1793,12 +1779,10 @@ impl Validator {
                 }
             }
             ast::Expr::StructInit(ty_expr, fields) => self.check_struct_init(
-                ty_expr, fields, fn_label, module, generics, locals, return_type, loop_depth,
-            ),
+                ty_expr, fields, fn_label, module, generics, locals, return_type, loop_depth, None),
             ast::Expr::As(inner, ty) => {
                 let typed_inner = self.check_expr(
-                    inner, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    inner, fn_label, module, generics, locals, return_type, loop_depth, None);
                 let ctx = TypeResolveCtx {
                     module,
                     generics: generics.to_vec(),
@@ -1813,8 +1797,7 @@ impl Validator {
             }
             ast::Expr::Is(inner, ty) => {
                 let typed_inner = self.check_expr(
-                    inner, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    inner, fn_label, module, generics, locals, return_type, loop_depth, None);
                 let ctx = TypeResolveCtx {
                     module,
                     generics: generics.to_vec(),
@@ -1828,14 +1811,11 @@ impl Validator {
                 }
             }
             ast::Expr::Member(receiver, name) => self.check_member(
-                receiver, name, fn_label, module, generics, locals, return_type, loop_depth,
-            ),
+                receiver, name, fn_label, module, generics, locals, return_type, loop_depth, None),
             ast::Expr::BinaryOp(l, op, r) => self.check_binary(
-                l, op, r, fn_label, module, generics, locals, return_type, loop_depth,
-            ),
+                l, op, r, fn_label, module, generics, locals, return_type, loop_depth, None),
             ast::Expr::UnaryOp(op, e) => self.check_unary(
-                op, e, fn_label, module, generics, locals, return_type, loop_depth,
-            ),
+                op, e, fn_label, module, generics, locals, return_type, loop_depth, None),
             ast::Expr::FunctionLiteral(_, _, _, _) => {
                 // v1: function literals are accepted but bodies aren't
                 // type-checked yet (captures + nested scope handling deferred).
@@ -1846,8 +1826,7 @@ impl Validator {
             }
             ast::Expr::Block(b) => {
                 let block = self.check_block(
-                    b, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    b, fn_label, module, generics, locals, return_type, loop_depth, expected);
                 let ty = block
                     .returns
                     .as_ref()
@@ -1861,13 +1840,19 @@ impl Validator {
         }
     }
 
-    fn check_literal(&mut self, lit: &ast::Literal, fn_label: &str) -> TypedExpr {
+    fn check_literal(&mut self, lit: &ast::Literal, fn_label: &str, expected: Option<&ResolvedType>) -> TypedExpr {
         let (kind, ty) = match lit {
             ast::Literal::Int(s) => match s.parse::<i64>() {
-                Ok(v) => (
-                    HirLiteral::Int(v),
-                    ResolvedType::Primitive(PrimitiveType::Int64),
-                ),
+                Ok(v) => {
+                    let ty = match expected {
+                        Some(ResolvedType::Primitive(p)) if matches!(p,
+                            PrimitiveType::Int8 | PrimitiveType::Int16 | PrimitiveType::Int32 | PrimitiveType::Int64 |
+                            PrimitiveType::Uint8 | PrimitiveType::Uint16 | PrimitiveType::Uint32 | PrimitiveType::Uint64
+                        ) => ResolvedType::Primitive(p.clone()),
+                        _ => ResolvedType::Primitive(PrimitiveType::Int64),
+                    };
+                    (HirLiteral::Int(v), ty)
+                }
                 Err(_) => {
                     self.errors.push(ValidationError::LiteralOutOfRange {
                         function: fn_label.to_string(),
@@ -1880,10 +1865,13 @@ impl Validator {
                 }
             },
             ast::Literal::Float(s) => match s.parse::<f64>() {
-                Ok(v) => (
-                    HirLiteral::Float(v),
-                    ResolvedType::Primitive(PrimitiveType::Float64),
-                ),
+                Ok(v) => {
+                    let ty = match expected {
+                        Some(ResolvedType::Primitive(PrimitiveType::Float32)) => ResolvedType::Primitive(PrimitiveType::Float32),
+                        _ => ResolvedType::Primitive(PrimitiveType::Float64),
+                    };
+                    (HirLiteral::Float(v), ty)
+                }
                 Err(_) => {
                     self.errors.push(ValidationError::LiteralOutOfRange {
                         function: fn_label.to_string(),
@@ -1976,6 +1964,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         // Resolve any explicit type arguments up front.
         let ctx = TypeResolveCtx {
@@ -1987,13 +1976,6 @@ impl Validator {
         let resolved_type_args: Vec<ResolvedType> = type_args
             .iter()
             .map(|t| self.resolve_type_expr(t, &ctx))
-            .collect();
-
-        let typed_args: Vec<TypedExpr> = args
-            .iter()
-            .map(|a| {
-                self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth)
-            })
             .collect();
 
         // Special-case Variable(name) and Member(expr, name) callees so we can
@@ -2014,8 +1996,9 @@ impl Validator {
                                 function: fn_label.to_string(),
                                 context: name.clone(),
                             });
+                            let fallback_args = args.iter().map(|a| self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth, None)).collect();
                             return TypedExpr {
-                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
+                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, fallback_args),
                                 ty: ResolvedType::Null,
                             };
                         }
@@ -2062,16 +2045,16 @@ impl Validator {
                         kind: ExprKind::Variable(name.clone()),
                         ty: ResolvedType::Null,
                     };
-                    return TypedExpr {
-                        kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
-                        ty: ResolvedType::Null,
-                    };
+                    let fallback_args = args.iter().map(|a| self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth, None)).collect();
+                            return TypedExpr {
+                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, fallback_args),
+                                ty: ResolvedType::Null,
+                            };
                 }
             }
             ast::Expr::Member(receiver, member_name) => {
                 let typed_recv = self.check_expr(
-                    receiver, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    receiver, fn_label, module, generics, locals, return_type, loop_depth, None);
                 if let Some((fn_id, owner_subst)) =
                     self.find_method_for_call(&typed_recv.ty, member_name)
                 {
@@ -2116,16 +2099,16 @@ impl Validator {
                         kind: ExprKind::Member(Box::new(typed_recv), member_name.clone()),
                         ty: ResolvedType::Null,
                     };
-                    return TypedExpr {
-                        kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
-                        ty: ResolvedType::Null,
-                    };
+                    let fallback_args = args.iter().map(|a| self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth, None)).collect();
+                            return TypedExpr {
+                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, fallback_args),
+                                ty: ResolvedType::Null,
+                            };
                 }
             }
             other => {
                 let typed = self.check_expr(
-                    other, fn_label, module, generics, locals, return_type, loop_depth,
-                );
+                    other, fn_label, module, generics, locals, return_type, loop_depth, None);
                 let (params, ret) = match &typed.ty {
                     ResolvedType::Function(p, r) => (p.clone(), (**r).clone()),
                     _ => {
@@ -2133,15 +2116,22 @@ impl Validator {
                             function: fn_label.to_string(),
                             context: format_type(&typed.ty),
                         });
-                        return TypedExpr {
-                            kind: ExprKind::Call(Box::new(typed), resolved_type_args, typed_args),
-                            ty: ResolvedType::Null,
-                        };
+                        let fallback_args = args.iter().map(|a| self.check_expr(a, fn_label, module, generics, locals, return_type, loop_depth, None)).collect();
+                            return TypedExpr {
+                                kind: ExprKind::Call(Box::new(typed), resolved_type_args, fallback_args),
+                                ty: ResolvedType::Null,
+                            };
                     }
                 };
                 (typed, "<expr>".to_string(), HashMap::new(), params, ret)
             }
         };
+
+        let mut typed_args: Vec<TypedExpr> = Vec::with_capacity(args.len());
+        for (i, arg) in args.iter().enumerate() {
+            let expected_arg = params.get(i);
+            typed_args.push(self.check_expr(arg, fn_label, module, generics, locals, return_type, loop_depth, expected_arg));
+        }
 
         if typed_args.len() != params.len() {
             self.errors.push(ValidationError::CallArityMismatch {
@@ -2246,6 +2236,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let ctx = TypeResolveCtx {
             module,
@@ -2267,8 +2258,7 @@ impl Validator {
                         (
                             n.clone(),
                             self.check_expr(
-                                e, fn_label, module, generics, locals, return_type, loop_depth,
-                            ),
+                                e, fn_label, module, generics, locals, return_type, loop_depth, None),
                         )
                     })
                     .collect();
@@ -2289,8 +2279,12 @@ impl Validator {
         let mut typed_fields: Vec<(String, TypedExpr)> = Vec::new();
         let mut provided: HashSet<String> = HashSet::new();
         for (fname, fexpr) in fields {
+            let expected_field_ty = struct_def.fields.iter()
+                .find(|f| &f.name == fname)
+                .map(|f| substitute(&f.ty, &subst));
+
             let typed = self.check_expr(
-                fexpr, fn_label, module, generics, locals, return_type, loop_depth,
+                fexpr, fn_label, module, generics, locals, return_type, loop_depth, expected_field_ty.as_ref(),
             );
             if !provided.insert(fname.clone()) {
                 self.errors.push(ValidationError::ExtraFieldInit {
@@ -2350,10 +2344,10 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let typed_recv = self.check_expr(
-            receiver, fn_label, module, generics, locals, return_type, loop_depth,
-        );
+            receiver, fn_label, module, generics, locals, return_type, loop_depth, None);
         let recv_ty = typed_recv.ty.clone();
 
         if let ResolvedType::Struct(id, args) = &recv_ty {
@@ -2422,9 +2416,10 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
-        let lt = self.check_expr(l, fn_label, module, generics, locals, return_type, loop_depth);
-        let rt = self.check_expr(r, fn_label, module, generics, locals, return_type, loop_depth);
+        let lt = self.check_expr(l, fn_label, module, generics, locals, return_type, loop_depth, None);
+        let rt = self.check_expr(r, fn_label, module, generics, locals, return_type, loop_depth, Some(&lt.ty));
         let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
 
         let (hir_op, result_ty) = match op {
@@ -2500,8 +2495,9 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
+        expected: Option<&ResolvedType>,
     ) -> TypedExpr {
-        let typed = self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth);
+        let typed = self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, None);
         let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
         match op {
             ast::UnaryOperator::Neg => {
