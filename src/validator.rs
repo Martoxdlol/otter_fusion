@@ -683,7 +683,7 @@ impl Validator {
                                 name: decl.name.clone(),
                                 owner: None,
                                 has_self: false,
-                                is_extern: false,
+                                is_extern: decl.is_extern,
                                 type_params: Vec::new(),
                                 params: Vec::new(),
                                 return_type: ResolvedType::Null,

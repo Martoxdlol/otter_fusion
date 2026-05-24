@@ -189,7 +189,14 @@ fn run_compile(file: &str, output: Option<&str>) -> i32 {
             return 1;
         }
     };
-    let flags = cranelift_codegen::settings::Flags::new(cranelift_codegen::settings::builder());
+    // macOS arm64 (and modern Linux) refuse to link non-PIC code into
+    // executables. Default cranelift settings have is_pic=false; flip it.
+    let mut flag_builder = cranelift_codegen::settings::builder();
+    if let Err(e) = flag_builder.set("is_pic", "true") {
+        eprintln!("{file}: error: isa flag: {e}");
+        return 1;
+    }
+    let flags = cranelift_codegen::settings::Flags::new(flag_builder);
     let isa = match isa_builder.finish(flags) {
         Ok(i) => i,
         Err(e) => {
