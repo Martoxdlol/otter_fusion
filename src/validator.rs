@@ -2443,8 +2443,11 @@ impl Validator {
                 | ast::BinaryOperator::Ge
         );
         let needs_bool = matches!(op, ast::BinaryOperator::And | ast::BinaryOperator::Or);
+        let is_string_concat = matches!(op, ast::BinaryOperator::Add)
+            && lt.ty == ResolvedType::Primitive(PrimitiveType::String)
+            && rt.ty == ResolvedType::Primitive(PrimitiveType::String);
 
-        if needs_numeric && !is_numeric(&lt.ty) {
+        if needs_numeric && !is_numeric(&lt.ty) && !is_string_concat {
             self.errors.push(ValidationError::InvalidOperator {
                 function: fn_label.to_string(),
                 op: format!("{:?}", op),
