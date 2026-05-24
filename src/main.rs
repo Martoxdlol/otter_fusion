@@ -238,48 +238,93 @@ fn run_compile(file: &str, output: Option<&str>) -> i32 {
     0
 }
 
-fn build_hir(file: &str, short: bool) -> Result<Hir, i32> {
-    let source = read_source_file(file).map_err(|e| {
-        eprintln!("{file}:1:1: error: cannot read file: {e}");
-        1
-    })?;
-    
-    let sm = otter_fusion::source_map::SourceMap::new(file, &source);
 
-    let tokens = Lexer::new(&source).scan_all().map_err(|e| {
-        let (line, col) = e.span();
-        if short {
-            eprintln!("{file}:{line}:{col}: error: {e}");
-        } else {
-            print!("{}", sm.render_error(line, col, &format!("{e}")));
+fn load_modules_recursively(start_file: &str, short: bool) -> Result<Vec<Module>, i32> {
+    use std::collections::HashSet;
+    use std::path::{Path, PathBuf};
+
+    let mut modules = Vec::new();
+    let mut visited = HashSet::new();
+    // Do not attempt to load core module from disk
+    visited.insert("of:core".to_string());
+
+    let mut queue = vec![PathBuf::from(start_file)];
+
+    while let Some(path) = queue.pop() {
+        let module_name = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("main")
+            .to_string();
+
+        if visited.contains(&module_name) {
+            continue;
         }
-        1
-    })?;
-    let program = otter_fusion::parser::Parser::new(tokens)
-        .parse()
-        .map_err(|e| {
-            let (line, col) = e.span();
-            if short {
-                eprintln!("{file}:{line}:{col}: error: {e}");
-            } else {
-                print!("{}", sm.render_error(line, col, &format!("{e}")));
+        visited.insert(module_name.clone());
+
+        let source = match std::fs::read_to_string(&path) {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("{}:1:1: error: cannot read file: {}", path.display(), e);
+                return Err(1);
             }
-            1
-        })?;
-    let module_name = Path::new(file)
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .unwrap_or("main")
-        .to_string();
-    let module = Module {
-        name: module_name,
-        program,
-    };
-    
-    let modules = vec![
-        otter_fusion::get_core_module(),
-        module,
-    ];
+        };
+
+        let sm = otter_fusion::source_map::SourceMap::new(path.to_str().unwrap(), &source);
+
+        let tokens = match Lexer::new(&source).scan_all() {
+            Ok(t) => t,
+            Err(e) => {
+                let (line, col) = e.span();
+                if short {
+                    eprintln!("{}:{}:{}: error: {}", path.display(), line, col, e);
+                } else {
+                    print!("{}", sm.render_error(line, col, &format!("{e}")));
+                }
+                return Err(1);
+            }
+        };
+
+        let program = match otter_fusion::parser::Parser::new(tokens).parse() {
+            Ok(p) => p,
+            Err(e) => {
+                let (line, col) = e.span();
+                if short {
+                    eprintln!("{}:{}:{}: error: {}", path.display(), line, col, e);
+                } else {
+                    print!("{}", sm.render_error(line, col, &format!("{e}")));
+                }
+                return Err(1);
+            }
+        };
+
+        let dir = path.parent().unwrap_or_else(|| Path::new(""));
+        for item in &program.items {
+            if let otter_fusion::ast::ItemKind::Import(import_decl) = &item.kind {
+                let target = &import_decl.module;
+                if !visited.contains(target) {
+                    let next_file = dir.join(format!("{}.of", target));
+                    queue.push(next_file);
+                }
+            }
+        }
+
+        modules.push(Module {
+            name: module_name,
+            program,
+        });
+    }
+
+    Ok(modules)
+}
+
+fn build_hir(file: &str, short: bool) -> Result<Hir, i32> {
+    let mut modules = load_modules_recursively(file, short)?;
+    modules.insert(0, otter_fusion::get_core_module());
+
+    // Fallback source map for validator errors
+    let source = read_source_file(file).unwrap_or_default();
+    let sm = otter_fusion::source_map::SourceMap::new(file, &source);
 
     Validator::new(modules).validate().map_err(|errors| {
         use otter_fusion::validator::ValidationError;
