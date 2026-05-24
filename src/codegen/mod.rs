@@ -79,6 +79,56 @@ pub fn compile<M: Module>(mir: &MirProgram, mut module: M) -> Result<Compiled<M>
     })
 }
 
+/// Emit a C-ABI `main` trampoline that calls the program entry and returns
+/// its value as an i32 exit code (or 0 for Unit). Required for AOT-linked
+/// executables: the system linker resolves `_main` against this symbol.
+pub fn emit_c_main<M: Module>(
+    compiled: &mut Compiled<M>,
+    mir: &MirProgram,
+) -> Result<(), ModuleError> {
+    let entry_fid = compiled.function_ids[&mir.entry];
+    let entry_returns_unit = matches!(mir.functions[&mir.entry].return_type, MirType::Unit);
+
+    let call_conv = CallConv::triple_default(compiled.module.isa().triple());
+    let mut sig = Signature::new(call_conv);
+    sig.returns.push(AbiParam::new(types::I32));
+    let main_fid = compiled
+        .module
+        .declare_function("main", Linkage::Export, &sig)?;
+
+    let mut ctx = compiled.module.make_context();
+    ctx.func.signature = sig;
+    let mut fbctx = FunctionBuilderContext::new();
+    let mut b = FunctionBuilder::new(&mut ctx.func, &mut fbctx);
+    let block = b.create_block();
+    b.switch_to_block(block);
+    b.seal_block(block);
+
+    let entry_ref = compiled.module.declare_func_in_func(entry_fid, b.func);
+    let call = b.ins().call(entry_ref, &[]);
+    let exit_code = if entry_returns_unit {
+        b.ins().iconst(types::I32, 0)
+    } else {
+        let v = b.inst_results(call)[0];
+        let ty = b.func.dfg.value_type(v);
+        if ty == types::I32 {
+            v
+        } else if ty == types::I64 {
+            b.ins().ireduce(types::I32, v)
+        } else if ty.bits() < 32 {
+            b.ins().uextend(types::I32, v)
+        } else {
+            b.ins().iconst(types::I32, 0)
+        }
+    };
+    b.ins().return_(&[exit_code]);
+    b.finalize();
+
+    compiled.module.define_function(main_fid, &mut ctx)?;
+    compiled.module.clear_context(&mut ctx);
+    Ok(())
+}
+
 fn build_signature<M: Module>(module: &M, f: &mir::MirFunction) -> Signature {
     let call_conv = match f.abi {
         Abi::Otter => module.target_config().default_call_conv,

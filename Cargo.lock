@@ -563,8 +563,13 @@ dependencies = [
  "cranelift-native",
  "cranelift-object",
  "insta",
+ "otter_rt",
  "target-lexicon",
 ]
+
+[[package]]
+name = "otter_rt"
+version = "0.1.0"
 
 [[package]]
 name = "prettyplease"

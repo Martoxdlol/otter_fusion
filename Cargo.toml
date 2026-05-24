@@ -1,3 +1,6 @@
+[workspace]
+members = ["rt"]
+
 [package]
 name = "otter_fusion"
 version = "0.1.0"
@@ -12,6 +15,7 @@ cranelift-jit = "0.110"                         # JIT
 cranelift-object = "0.110"                      # AOT
 cranelift-native = "0.110"
 target-lexicon = "0.12"
+otter_rt = { path = "rt" }
 
 [dev-dependencies]
 insta = { version = "1.47.2", features = ["glob"] }
