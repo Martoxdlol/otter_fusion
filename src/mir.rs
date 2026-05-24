@@ -52,6 +52,12 @@ pub struct MirProgram {
     pub entry: MirFnId,
 }
 
+impl Default for MirProgram {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MirProgram {
     pub fn new() -> Self {
         Self {

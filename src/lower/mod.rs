@@ -711,22 +711,18 @@ impl Lower {
         // TypeId. These are used by the for-in desugar (Phase 3) and the
         // map iteration (also Phase 3).
         for (id, iface) in &self.hir.interfaces {
-            if iface.name == "Iterator" {
-                if let Some(m) = self.hir.modules.get(&iface.module) {
-                    if m.name == "of:core" {
+            if iface.name == "Iterator"
+                && let Some(m) = self.hir.modules.get(&iface.module)
+                    && m.name == "of:core" {
                         self.iterator_interface = Some(*id);
                     }
-                }
-            }
         }
         for (id, st) in &self.hir.structs {
-            if st.name == "Entry" {
-                if let Some(m) = self.hir.modules.get(&st.module) {
-                    if m.name == "of:core" {
+            if st.name == "Entry"
+                && let Some(m) = self.hir.modules.get(&st.module)
+                    && m.name == "of:core" {
                         self.entry_struct = Some(*id);
                     }
-                }
-            }
         }
     }
 }

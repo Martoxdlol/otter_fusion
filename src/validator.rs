@@ -1450,12 +1450,11 @@ impl Validator {
             };
 
             let mut locals: Vec<HashMap<String, ResolvedType>> = vec![HashMap::new()];
-            if func.has_self {
-                if let Some(owner) = func.owner {
+            if func.has_self
+                && let Some(owner) = func.owner {
                     let self_ty = self.self_type_for(owner);
                     locals[0].insert("self".to_string(), self_ty);
                 }
-            }
             for p in &func.params {
                 locals[0].insert(p.name.clone(), p.ty.clone());
             }
@@ -1549,12 +1548,12 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> Option<HirStatement> {
         match stmt {
             ast::Statement::Assign(target, value) => {
                 // TODO: implement assignment validation
-                let typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth, None);
+                let _typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth, None);
                 let typed_value = self.check_expr(value, fn_label, module, generics, locals, return_type, loop_depth, None);
                 Some(HirStatement::Expr(typed_value))
             }
@@ -1568,7 +1567,7 @@ impl Validator {
                     };
                     self.resolve_type_expr(t, &ctx)
                 });
-                let mut init_typed = init.as_ref().map(|e| {
+                let init_typed = init.as_ref().map(|e| {
                     self.check_expr(
                         e, fn_label, module, generics, locals, return_type, loop_depth, annotated.as_ref(),
                     )
@@ -1964,7 +1963,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         // Resolve any explicit type arguments up front.
         let ctx = TypeResolveCtx {
@@ -2236,7 +2235,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let ctx = TypeResolveCtx {
             module,
@@ -2344,7 +2343,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let typed_recv = self.check_expr(
             receiver, fn_label, module, generics, locals, return_type, loop_depth, None);
@@ -2416,7 +2415,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let lt = self.check_expr(l, fn_label, module, generics, locals, return_type, loop_depth, None);
         let rt = self.check_expr(r, fn_label, module, generics, locals, return_type, loop_depth, Some(&lt.ty));
@@ -2495,7 +2494,7 @@ impl Validator {
         locals: &mut Vec<HashMap<String, ResolvedType>>,
         return_type: &ResolvedType,
         loop_depth: u32,
-        expected: Option<&ResolvedType>,
+        _expected: Option<&ResolvedType>,
     ) -> TypedExpr {
         let typed = self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth, None);
         let bool_ty = ResolvedType::Primitive(PrimitiveType::Bool);
@@ -2836,11 +2835,10 @@ impl Validator {
         ctx: &TypeResolveCtx,
     ) -> ResolvedType {
         // 1. Local substitution (alias body inlining).
-        if args.is_empty() {
-            if let Some(ty) = ctx.local_subst.get(name) {
+        if args.is_empty()
+            && let Some(ty) = ctx.local_subst.get(name) {
                 return ty.clone();
             }
-        }
 
         // 2. Generic scopes, innermost first (decision: shadow on collision).
         for scope in ctx.generics.iter().rev() {
@@ -2899,9 +2897,9 @@ impl Validator {
 
                 // Reject extern structs as generic arguments.
                 for arg in &resolved_args {
-                    if let ResolvedType::Struct(arg_id, _) = arg {
-                        if let Some(s) = self.hir.structs.get(arg_id) {
-                            if s.is_extern {
+                    if let ResolvedType::Struct(arg_id, _) = arg
+                        && let Some(s) = self.hir.structs.get(arg_id)
+                            && s.is_extern {
                                 let module_name =
                                     self.hir.modules[&s.module].name.clone();
                                 self.errors.push(
@@ -2911,8 +2909,6 @@ impl Validator {
                                     },
                                 );
                             }
-                        }
-                    }
                 }
 
                 if self.hir.structs.contains_key(&id) {
@@ -2981,11 +2977,10 @@ impl Validator {
             return Some(entry.clone());
         }
         for source in &scope.globs {
-            if let Some(other) = self.module_scopes.get(source) {
-                if let Some(entry) = other.direct.get(name) {
+            if let Some(other) = self.module_scopes.get(source)
+                && let Some(entry) = other.direct.get(name) {
                     return Some(entry.clone());
                 }
-            }
         }
         None
     }
@@ -3063,11 +3058,10 @@ fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
     if actual == expected {
         return true;
     }
-    if let ResolvedType::Union(types) = expected {
-        if types.iter().any(|t| t == actual) {
+    if let ResolvedType::Union(types) = expected
+        && types.iter().any(|t| t == actual) {
             return true;
         }
-    }
     false
 }
 

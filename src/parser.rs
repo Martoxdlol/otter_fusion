@@ -1154,7 +1154,7 @@ impl Parser {
         let tok2 = self.peek().clone();
         self.back();
 
-        return tok2.token_type == TokenType::Colon;
+        tok2.token_type == TokenType::Colon
     }
 
     fn parse_map_literal(&mut self) -> Result<Expr, ParserError> {
@@ -1280,7 +1280,7 @@ impl Parser {
     }
 
     pub fn parse_optional_primitive(&self, name: &str) -> Option<PrimitiveType> {
-        return match name {
+        match name {
             "i8" => Some(PrimitiveType::Int8),
             "i16" => Some(PrimitiveType::Int16),
             "i32" => Some(PrimitiveType::Int32),
@@ -1297,7 +1297,7 @@ impl Parser {
             "null" => Some(PrimitiveType::Null),
             "void" => Some(PrimitiveType::Null),
             _ => return None,
-        };
+        }
     }
 }
 

@@ -379,6 +379,12 @@ pub struct TokenListBuilder {
     column: usize,
 }
 
+impl Default for TokenListBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TokenListBuilder {
     pub fn new() -> Self {
         Self {

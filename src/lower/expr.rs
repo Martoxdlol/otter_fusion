@@ -387,8 +387,8 @@ impl Lower {
         let scrutinee = self.lower_expr(e, subst, b);
 
         // NullableRef path.
-        if let ResolvedType::Union(variants) = &src_ty {
-            if self.try_nullable_ref(variants).is_some() {
+        if let ResolvedType::Union(variants) = &src_ty
+            && self.try_nullable_ref(variants).is_some() {
                 let op = if matches!(target_ty, ResolvedType::Null) {
                     BinOp::Eq
                 } else {
@@ -399,7 +399,6 @@ impl Lower {
                     MirType::Primitive(PrimitiveType::Bool),
                 );
             }
-        }
 
         // Tagged union path.
         let mid = match &src_ty {

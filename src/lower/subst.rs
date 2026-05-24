@@ -19,7 +19,7 @@ pub struct Subst {
 impl Subst {
     pub fn new(params: Vec<TypeParamId>, args: Vec<ResolvedType>) -> Self {
         Self {
-            mappings: params.into_iter().zip(args.into_iter()).collect(),
+            mappings: params.into_iter().zip(args).collect(),
         }
     }
 
