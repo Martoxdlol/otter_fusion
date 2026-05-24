@@ -1566,12 +1566,25 @@ impl Validator {
                     };
                     self.resolve_type_expr(t, &ctx)
                 });
-                let init_typed = init.as_ref().map(|e| {
+                let mut init_typed = init.as_ref().map(|e| {
                     self.check_expr(e, fn_label, module, generics, locals, return_type, loop_depth)
                 });
 
-                let final_ty = match (&annotated, &init_typed) {
+                let final_ty = match (&annotated, init_typed.as_mut()) {
                     (Some(a), Some(typed)) => {
+                        if let ExprKind::Literal(HirLiteral::Float(_)) = typed.kind {
+                            if *a == ResolvedType::Primitive(PrimitiveType::Float32) {
+                                typed.ty = a.clone();
+                            }
+                        } else if let ExprKind::Literal(HirLiteral::Int(_)) = typed.kind {
+                            if matches!(a, ResolvedType::Primitive(
+                                PrimitiveType::Int8 | PrimitiveType::Int16 | PrimitiveType::Int32 | PrimitiveType::Int64 |
+                                PrimitiveType::Uint8 | PrimitiveType::Uint16 | PrimitiveType::Uint32 | PrimitiveType::Uint64
+                            )) {
+                                typed.ty = a.clone();
+                            }
+                        }
+
                         if !types_compatible(&typed.ty, a) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
