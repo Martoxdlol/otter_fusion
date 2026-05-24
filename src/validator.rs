@@ -1698,13 +1698,7 @@ impl Validator {
         loop_depth: u32,
     ) -> TypedExpr {
         match expr {
-            ast::Expr::SelfRef => {
-                // TODO: resolve self type from owner context
-                TypedExpr {
-                    kind: ExprKind::Variable("self".to_string()),
-                    ty: ResolvedType::Null,
-                }
-            }
+            ast::Expr::SelfRef => self.check_variable("self", fn_label, module, locals),
             ast::Expr::Literal(lit) => self.check_literal(lit, fn_label),
             ast::Expr::Variable(name) => self.check_variable(name, fn_label, module, locals),
             ast::Expr::If(cond, then_b, else_b) => {
