@@ -203,6 +203,7 @@ struct FnCtx<'a> {
     /// Cached FuncRef in the current function for runtime helpers.
     alloc_ref: Option<ir::FuncRef>,
     vtable_lookup_ref: Option<ir::FuncRef>,
+    helpers: HashMap<&'static str, ir::FuncRef>,
 }
 
 fn lower_function<M: Module>(
@@ -270,6 +271,7 @@ fn lower_function<M: Module>(
         blocks,
         alloc_ref: None,
         vtable_lookup_ref: None,
+        helpers: HashMap::new(),
     };
 
     // Allocate a 16-byte heap block (via __of_alloc) for each non-parameter
@@ -420,6 +422,45 @@ fn lower_bin<M: Module>(
     let prim = operand_prim(mir_func, l);
     let lv = use_operand(module, b, func_ids, ctx, l);
     let rv = use_operand(module, b, func_ids, ctx, r);
+
+    // String ops route through the runtime; +, ==, != on raw pointers
+    // would compare addresses, not contents.
+    if matches!(prim, PrimitiveType::String) {
+        match op {
+            BinOp::Add => {
+                let helper = ensure_helper(
+                    module,
+                    b,
+                    ctx,
+                    "__of_str_concat",
+                    &[types::I64, types::I64],
+                    types::I64,
+                );
+                let call = b.ins().call(helper, &[lv, rv]);
+                return b.inst_results(call)[0];
+            }
+            BinOp::Eq | BinOp::Neq => {
+                let helper = ensure_helper(
+                    module,
+                    b,
+                    ctx,
+                    "__of_str_eq",
+                    &[types::I64, types::I64],
+                    types::I8,
+                );
+                let call = b.ins().call(helper, &[lv, rv]);
+                let eq = b.inst_results(call)[0];
+                return if matches!(op, BinOp::Eq) {
+                    eq
+                } else {
+                    let one = b.ins().iconst(types::I8, 1);
+                    b.ins().bxor(eq, one)
+                };
+            }
+            _ => {}
+        }
+    }
+
     let ins = b.ins();
     if is_float(&prim) {
         match op {
@@ -501,6 +542,27 @@ fn lower_cast<M: Module>(
         _ => unreachable!("Cast target must be primitive"),
     };
     let v = use_operand(module, b, func_ids, ctx, op);
+
+    // String/Char share the I64/I32 CLIF reps with integers; the generic
+    // numeric path below treats both ends as bag-of-bits, which is wrong for
+    // anything involving a real str pointer. Route those through the
+    // runtime, and reject the inverse direction (no parser in rt yet).
+    if matches!(dst, PrimitiveType::String) {
+        return cast_to_str(module, b, ctx, &src, v);
+    }
+    if matches!(src, PrimitiveType::String) {
+        panic!("cast from str to {dst:?} not supported");
+    }
+    if matches!(dst, PrimitiveType::Char) && matches!(src, PrimitiveType::Char) {
+        return v;
+    }
+    if matches!(src, PrimitiveType::Char) && !is_int_or_char(&dst) {
+        panic!("cast from char to {dst:?} not supported");
+    }
+    if matches!(dst, PrimitiveType::Char) && !is_int_or_char(&src) {
+        panic!("cast to char from {src:?} not supported");
+    }
+
     let src_ty = prim_clif(&src);
     let dst_ty = prim_clif(&dst);
 
@@ -545,6 +607,60 @@ fn lower_cast<M: Module>(
             }
         }
     }
+}
+
+fn is_int_or_char(p: &PrimitiveType) -> bool {
+    matches!(
+        p,
+        PrimitiveType::Int8
+            | PrimitiveType::Int16
+            | PrimitiveType::Int32
+            | PrimitiveType::Int64
+            | PrimitiveType::Uint8
+            | PrimitiveType::Uint16
+            | PrimitiveType::Uint32
+            | PrimitiveType::Uint64
+            | PrimitiveType::Char
+    )
+}
+
+fn cast_to_str<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    ctx: &mut FnCtx,
+    src: &PrimitiveType,
+    v: Value,
+) -> Value {
+    use PrimitiveType::*;
+    let (name, arg) = match src {
+        String => return v,
+        Int8 | Int16 | Int32 => {
+            let widened = b.ins().sextend(types::I64, v);
+            ("__of_i64_to_str", widened)
+        }
+        Int64 => ("__of_i64_to_str", v),
+        Uint8 | Uint16 | Uint32 => {
+            let widened = b.ins().uextend(types::I64, v);
+            ("__of_u64_to_str", widened)
+        }
+        Uint64 => ("__of_u64_to_str", v),
+        Float32 => {
+            let promoted = b.ins().fpromote(types::F64, v);
+            ("__of_f64_to_str", promoted)
+        }
+        Float64 => ("__of_f64_to_str", v),
+        Bool => ("__of_bool_to_str", v),
+        Char => ("__of_char_to_str", v),
+    };
+    let arg_ty = match src {
+        Float32 | Float64 => types::F64,
+        Bool => types::I8,
+        Char => types::I32,
+        _ => types::I64,
+    };
+    let helper = ensure_helper(module, b, ctx, name, &[arg_ty], types::I64);
+    let call = b.ins().call(helper, &[arg]);
+    b.inst_results(call)[0]
 }
 
 fn lower_call<M: Module>(
@@ -875,6 +991,30 @@ fn ensure_vtable_lookup<M: Module>(
         .expect("declare __of_vtable_lookup");
     let r = module.declare_func_in_func(fid, b.func);
     ctx.vtable_lookup_ref = Some(r);
+    r
+}
+
+fn ensure_helper<M: Module>(
+    module: &mut M,
+    b: &mut FunctionBuilder,
+    ctx: &mut FnCtx,
+    name: &'static str,
+    params: &[Type],
+    ret: Type,
+) -> ir::FuncRef {
+    if let Some(r) = ctx.helpers.get(name) {
+        return *r;
+    }
+    let mut sig = Signature::new(CallConv::triple_default(module.isa().triple()));
+    for p in params {
+        sig.params.push(AbiParam::new(*p));
+    }
+    sig.returns.push(AbiParam::new(ret));
+    let fid = module
+        .declare_function(name, Linkage::Import, &sig)
+        .unwrap_or_else(|_| panic!("declare {name}"));
+    let r = module.declare_func_in_func(fid, b.func);
+    ctx.helpers.insert(name, r);
     r
 }
 

@@ -52,52 +52,7 @@ pub unsafe extern "C" fn __of_str_concat(
     } else {
         unsafe { CStr::from_ptr(b) }.to_string_lossy().into_owned()
     };
-    leak_cstring(format!("{}{}", a, b))
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_str_eq(a: *const c_char, b: *const c_char) -> u8 {
-    if a == b {
-        return 1;
-    }
-    if a.is_null() || b.is_null() {
-        return 0;
-    }
-    let a = unsafe { CStr::from_ptr(a) };
-    let b = unsafe { CStr::from_ptr(b) };
-    if a.to_bytes() == b.to_bytes() { 1 } else { 0 }
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_i64_to_str(v: i64) -> *const c_char {
-    leak_cstring(v.to_string())
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_u64_to_str(v: u64) -> *const c_char {
-    leak_cstring(v.to_string())
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_f64_to_str(v: f64) -> *const c_char {
-    leak_cstring(v.to_string())
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_bool_to_str(v: u8) -> *const c_char {
-    leak_cstring(if v != 0 { "true" } else { "false" }.to_string())
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_char_to_str(codepoint: u32) -> *const c_char {
-    let s = char::from_u32(codepoint)
-        .map(|c| c.to_string())
-        .unwrap_or_default();
-    leak_cstring(s)
-}
-
-fn leak_cstring(mut s: String) -> *const c_char {
-    s.push('\0');
-    let boxed = s.into_bytes().into_boxed_slice();
+    let combined = format!("{}{}\0", a, b);
+    let boxed = combined.into_bytes().into_boxed_slice();
     Box::leak(boxed).as_ptr() as *const c_char
 }
