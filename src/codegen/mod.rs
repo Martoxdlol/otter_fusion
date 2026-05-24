@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments, clippy::result_large_err)]
+
 use std::collections::HashMap;
 
 use cranelift_codegen::{

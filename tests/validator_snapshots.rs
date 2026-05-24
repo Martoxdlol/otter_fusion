@@ -5,6 +5,7 @@ use otter_fusion::validator::Validator;
 /// Result of running the full compilation pipeline on a single file.
 /// Captures which phase failed so snapshots are transparent.
 #[derive(Debug)]
+#[allow(dead_code)]
 enum CompileResult {
     LexerError(String),
     ParserError(String),

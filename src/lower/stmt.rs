@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments)]
+
 use crate::{
     hir::{HirBlock, HirStatement, PrimitiveType, ResolvedType, TypedExpr},
     lower::{Lower, builder::FnBuilder, subst::Subst},

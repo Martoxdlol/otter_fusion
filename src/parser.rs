@@ -1296,7 +1296,7 @@ impl Parser {
             "bool" => Some(PrimitiveType::Bool),
             "null" => Some(PrimitiveType::Null),
             "void" => Some(PrimitiveType::Null),
-            _ => return None,
+            _ => None,
         }
     }
 }

@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_arguments)]
+
 use std::collections::{HashMap, HashSet};
 use std::fmt;
 
@@ -588,15 +590,17 @@ impl Validator {
                 None => continue,
             };
 
-            let mut scope = ModuleScope::default();
-            scope.globs = self.hir.modules[&module_id]
-                .imports
-                .iter()
-                .filter_map(|i| match i {
-                    HirImport::Glob(id) => Some(*id),
-                    HirImport::Named(_, _) => None,
-                })
-                .collect();
+            let mut scope = ModuleScope {
+                globs: self.hir.modules[&module_id]
+                    .imports
+                    .iter()
+                    .filter_map(|i| match i {
+                        HirImport::Glob(id) => Some(*id),
+                        HirImport::Named(_, _) => None,
+                    })
+                    .collect(),
+                ..Default::default()
+            };
 
             for item in &module.program.items {
                 match &item.kind {
@@ -3207,12 +3211,32 @@ fn signatures_match(
     expected_ret == provided_ret
 }
 
+fn resolve_primitive(p: &ast::PrimitiveType) -> ResolvedType {
+    match p {
+        ast::PrimitiveType::Int8 => ResolvedType::Primitive(PrimitiveType::Int8),
+        ast::PrimitiveType::Int16 => ResolvedType::Primitive(PrimitiveType::Int16),
+        ast::PrimitiveType::Int32 => ResolvedType::Primitive(PrimitiveType::Int32),
+        ast::PrimitiveType::Int64 => ResolvedType::Primitive(PrimitiveType::Int64),
+        ast::PrimitiveType::Uint8 => ResolvedType::Primitive(PrimitiveType::Uint8),
+        ast::PrimitiveType::Uint16 => ResolvedType::Primitive(PrimitiveType::Uint16),
+        ast::PrimitiveType::Uint32 => ResolvedType::Primitive(PrimitiveType::Uint32),
+        ast::PrimitiveType::Uint64 => ResolvedType::Primitive(PrimitiveType::Uint64),
+        ast::PrimitiveType::Float32 => ResolvedType::Primitive(PrimitiveType::Float32),
+        ast::PrimitiveType::Float64 => ResolvedType::Primitive(PrimitiveType::Float64),
+        ast::PrimitiveType::Bool => ResolvedType::Primitive(PrimitiveType::Bool),
+        ast::PrimitiveType::String => ResolvedType::Primitive(PrimitiveType::String),
+        ast::PrimitiveType::Char => ResolvedType::Primitive(PrimitiveType::Char),
+        ast::PrimitiveType::Null => ResolvedType::Null,
+    }
+}
+
 #[cfg(test)]
+#[allow(dead_code)]
 mod tests {
     use super::*;
     use crate::ast::{
-        BinaryOperator as AstBinOp, Block, Expr, ExtendDecl, FieldDecl, ImportDecl,
-        InterfaceDecl, Item, Literal, ParamDecl, Program, Statement, StructDecl,
+        Block, Expr, FieldDecl, ImportDecl, InterfaceDecl, Item, Literal, ParamDecl, Program,
+        Statement, StructDecl,
     };
 
     // ---- AST construction helpers ----
@@ -3551,23 +3575,4 @@ mod tests {
 
 
 
-}
-
-fn resolve_primitive(p: &ast::PrimitiveType) -> ResolvedType {
-    match p {
-        ast::PrimitiveType::Int8 => ResolvedType::Primitive(PrimitiveType::Int8),
-        ast::PrimitiveType::Int16 => ResolvedType::Primitive(PrimitiveType::Int16),
-        ast::PrimitiveType::Int32 => ResolvedType::Primitive(PrimitiveType::Int32),
-        ast::PrimitiveType::Int64 => ResolvedType::Primitive(PrimitiveType::Int64),
-        ast::PrimitiveType::Uint8 => ResolvedType::Primitive(PrimitiveType::Uint8),
-        ast::PrimitiveType::Uint16 => ResolvedType::Primitive(PrimitiveType::Uint16),
-        ast::PrimitiveType::Uint32 => ResolvedType::Primitive(PrimitiveType::Uint32),
-        ast::PrimitiveType::Uint64 => ResolvedType::Primitive(PrimitiveType::Uint64),
-        ast::PrimitiveType::Float32 => ResolvedType::Primitive(PrimitiveType::Float32),
-        ast::PrimitiveType::Float64 => ResolvedType::Primitive(PrimitiveType::Float64),
-        ast::PrimitiveType::Bool => ResolvedType::Primitive(PrimitiveType::Bool),
-        ast::PrimitiveType::String => ResolvedType::Primitive(PrimitiveType::String),
-        ast::PrimitiveType::Char => ResolvedType::Primitive(PrimitiveType::Char),
-        ast::PrimitiveType::Null => ResolvedType::Null,
-    }
 }
