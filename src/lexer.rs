@@ -286,7 +286,25 @@ impl Lexer {
                     continue;
                 }
                 '"' if !escaped => return Ok(self.token(TokenType::StringLit(value))),
-                _ => escaped = false,
+                _ => {
+                    if escaped {
+                        escaped = false;
+                        match c {
+                            'n' => value.push('\n'),
+                            't' => value.push('\t'),
+                            'r' => value.push('\r'),
+                            '\\' => value.push('\\'),
+                            '"' => value.push('"'),
+                            other => {
+                                return Err(LexerError::UnexpectedCharacter(
+                                    other,
+                                    self.line,
+                                    self.column,
+                                ));
+                            }
+                        }
+                    }
+                }
             }
 
             value.push(c);
@@ -373,5 +391,3 @@ impl Lexer {
         }
     }
 }
-
-
