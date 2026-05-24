@@ -1,161 +1,119 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/10_generics/generic_struct.of
+input_file: examples/spec/08_numeric_conversions/float_narrowing.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 7,
-        },
-        Token {
-            token_type: Identifier(
-                "Box",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: GT,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "content",
-            ),
-            position: 25,
-            line: 2,
-            column: 10,
-        },
-        Token {
-            token_type: Colon,
-            position: 26,
-            line: 2,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 28,
-            line: 2,
-            column: 13,
-        },
-        Token {
-            token_type: Comma,
-            position: 29,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: Function,
-            position: 41,
-            line: 4,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "get",
-            ),
-            position: 45,
-            line: 4,
-            column: 15,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 46,
-            line: 4,
-            column: 16,
-        },
-        Token {
-            token_type: SelfRef,
-            position: 50,
-            line: 4,
-            column: 20,
-        },
-        Token {
-            token_type: RightParen,
-            position: 51,
-            line: 4,
-            column: 21,
-        },
-        Token {
-            token_type: Colon,
-            position: 52,
-            line: 4,
-            column: 22,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 54,
-            line: 4,
-            column: 24,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 56,
-            line: 4,
-            column: 26,
-        },
-        Token {
-            token_type: SelfRef,
-            position: 65,
-            line: 5,
-            column: 9,
-        },
-        Token {
-            token_type: Dot,
-            position: 66,
-            line: 5,
-            column: 10,
-        },
-        Token {
-            token_type: Identifier(
-                "content",
-            ),
-            position: 73,
-            line: 5,
-            column: 17,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 77,
-            line: 6,
             column: 4,
         },
         Token {
-            token_type: RightBrace,
-            position: 79,
-            line: 7,
-            column: 2,
+            token_type: Identifier(
+                "high_precision",
+            ),
+            position: 18,
+            line: 1,
+            column: 19,
+        },
+        Token {
+            token_type: Colon,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Eq,
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Float(
+                "123.456",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Var,
+            position: 38,
+            line: 2,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "low_precision",
+            ),
+            position: 52,
+            line: 2,
+            column: 18,
+        },
+        Token {
+            token_type: Colon,
+            position: 53,
+            line: 2,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 57,
+            line: 2,
+            column: 23,
+        },
+        Token {
+            token_type: Eq,
+            position: 59,
+            line: 2,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "high_precision",
+            ),
+            position: 74,
+            line: 2,
+            column: 40,
+        },
+        Token {
+            token_type: As,
+            position: 77,
+            line: 2,
+            column: 43,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 81,
+            line: 2,
+            column: 47,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 82,
+            line: 2,
+            column: 48,
         },
     ],
 )

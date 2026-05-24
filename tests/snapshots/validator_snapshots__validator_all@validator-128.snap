@@ -1,10 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/validator/p1_duplicate_name_in_module_errors.of
 ---
 ValidationErrors(
     [
-        "bound on type parameter 'T' in test_module::Foo must be an interface",
+        "duplicate top-level name 'X' in module 'test_module'",
     ],
 )

@@ -1,11 +1,28 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_var_decl_type_init_mismatch_errors.of
+input_file: examples/validator/p5_unknown_member_errors.of
 ---
 Ok(
     Program {
         items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -14,23 +31,25 @@ Ok(
                         is_extern: false,
                         generics: [],
                         return_type: None,
-                        params: [],
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Named(
+                                    "S",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
                         body: Some(
                             Block {
                                 statements: [
-                                    VarDecl(
-                                        "x",
-                                        Some(
-                                            Primitive(
-                                                Int64,
+                                    Expr(
+                                        Member(
+                                            Variable(
+                                                "s",
                                             ),
-                                        ),
-                                        Some(
-                                            Literal(
-                                                String(
-                                                    "hi",
-                                                ),
-                                            ),
+                                            "x",
                                         ),
                                     ),
                                 ],
@@ -38,14 +57,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 2,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

@@ -5,21 +5,7 @@ input_file: examples/language/18_union_events_interface.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::describe'",
         "type mismatch in function 'test_module::main' (call to describe arg 0): expected 'struct#1 | struct#2 | struct#3', found 'null'",
-        "type mismatch in function 'test_module::main' (field height): expected 'int32', found 'int64'",
-        "type mismatch in function 'test_module::main' (field width): expected 'int32', found 'int64'",
-        "type mismatch in function 'test_module::main' (field x): expected 'int32', found 'int64'",
-        "type mismatch in function 'test_module::main' (field y): expected 'int32', found 'int64'",
         "module 'test_module' imports unknown module 'of:core'",
         "unknown type 'List' in module 'test_module'",
         "unknown variable 'print' in function 'test_module::main'",

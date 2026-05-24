@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/11_collections/list_literal.of
+input_file: examples/spec/08_numeric_conversions/int_narrowing.of
 ---
 Ok(
     [
@@ -13,269 +13,107 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "numbers",
+                "large_int",
             ),
-            position: 11,
+            position: 13,
             line: 1,
-            column: 12,
+            column: 14,
         },
         Token {
             token_type: Colon,
-            position: 12,
+            position: 14,
             line: 1,
-            column: 13,
+            column: 15,
         },
         Token {
             token_type: Identifier(
-                "List",
+                "i64",
             ),
-            position: 17,
-            line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: LT,
             position: 18,
             line: 1,
             column: 19,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: GT,
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
             token_type: Eq,
-            position: 24,
+            position: 20,
             line: 1,
-            column: 25,
+            column: 21,
         },
         Token {
-            token_type: LeftBracket,
+            token_type: Int(
+                "1000",
+            ),
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
             position: 26,
             line: 1,
             column: 27,
         },
         Token {
-            token_type: Int(
-                "1",
-            ),
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: Comma,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Int(
-                "2",
-            ),
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: Comma,
-            position: 31,
-            line: 1,
-            column: 32,
-        },
-        Token {
-            token_type: Int(
-                "3",
-            ),
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
-            token_type: Comma,
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: Int(
-                "4",
-            ),
-            position: 36,
-            line: 1,
-            column: 37,
-        },
-        Token {
-            token_type: Comma,
-            position: 37,
-            line: 1,
-            column: 38,
-        },
-        Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 39,
-            line: 1,
-            column: 40,
-        },
-        Token {
-            token_type: RightBracket,
-            position: 40,
-            line: 1,
-            column: 41,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 41,
-            line: 1,
-            column: 42,
-        },
-        Token {
             token_type: Var,
-            position: 45,
+            position: 30,
             line: 2,
             column: 4,
         },
         Token {
             token_type: Identifier(
-                "mixed",
+                "small_int",
             ),
-            position: 51,
+            position: 40,
             line: 2,
-            column: 10,
+            column: 14,
         },
         Token {
             token_type: Colon,
-            position: 52,
+            position: 41,
             line: 2,
-            column: 11,
+            column: 15,
         },
         Token {
             token_type: Identifier(
-                "List",
+                "i8",
             ),
-            position: 57,
+            position: 44,
             line: 2,
-            column: 16,
+            column: 18,
         },
         Token {
-            token_type: LT,
-            position: 58,
-            line: 2,
-            column: 17,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 61,
+            token_type: Eq,
+            position: 46,
             line: 2,
             column: 20,
         },
         Token {
-            token_type: Pipe,
-            position: 63,
-            line: 2,
-            column: 22,
-        },
-        Token {
             token_type: Identifier(
-                "str",
+                "large_int",
             ),
-            position: 67,
+            position: 56,
             line: 2,
-            column: 26,
+            column: 30,
         },
         Token {
-            token_type: GT,
-            position: 68,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: Eq,
-            position: 70,
-            line: 2,
-            column: 29,
-        },
-        Token {
-            token_type: LeftBracket,
-            position: 72,
-            line: 2,
-            column: 31,
-        },
-        Token {
-            token_type: Int(
-                "1",
-            ),
-            position: 73,
-            line: 2,
-            column: 32,
-        },
-        Token {
-            token_type: Comma,
-            position: 74,
+            token_type: As,
+            position: 59,
             line: 2,
             column: 33,
         },
         Token {
-            token_type: StringLit(
-                "two",
+            token_type: Identifier(
+                "i8",
             ),
-            position: 80,
+            position: 62,
             line: 2,
-            column: 39,
-        },
-        Token {
-            token_type: Comma,
-            position: 81,
-            line: 2,
-            column: 40,
-        },
-        Token {
-            token_type: Int(
-                "3",
-            ),
-            position: 83,
-            line: 2,
-            column: 42,
-        },
-        Token {
-            token_type: Comma,
-            position: 84,
-            line: 2,
-            column: 43,
-        },
-        Token {
-            token_type: StringLit(
-                "four",
-            ),
-            position: 91,
-            line: 2,
-            column: 50,
-        },
-        Token {
-            token_type: RightBracket,
-            position: 92,
-            line: 2,
-            column: 51,
+            column: 36,
         },
         Token {
             token_type: Semicolon,
-            position: 93,
+            position: 63,
             line: 2,
-            column: 52,
+            column: 37,
         },
     ],
 )

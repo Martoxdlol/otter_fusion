@@ -230,6 +230,7 @@ impl Lexer {
             "extern" => self.token(TokenType::Extern),
             "import" => self.token(TokenType::Import),
             "from" => self.token(TokenType::From),
+            "const" => self.token(TokenType::Const),
 
             _ => self.token(TokenType::Identifier(literal)),
         }
@@ -303,11 +304,11 @@ impl Lexer {
                                 ));
                             }
                         }
+                    } else {
+                        value.push(c);
                     }
                 }
             }
-
-            value.push(c);
         }
 
         // end of file

@@ -419,6 +419,22 @@ fn lower_bin<M: Module>(
     l: &Operand,
     r: &Operand,
 ) -> Value {
+    // Pointer-typed operands (NullableRef/ManagedRef/Struct refs) only
+    // support Eq/Neq, which lowers to raw pointer-width comparison.
+    // Comes up for `is null` / `as T` lowering on nullable unions.
+    let l_ty = operand_ty(mir_func, l);
+    let r_ty = operand_ty(mir_func, r);
+    if is_ref_ty(&l_ty) || is_ref_ty(&r_ty) {
+        let lv = use_operand(module, b, func_ids, ctx, l);
+        let rv = use_operand(module, b, func_ids, ctx, r);
+        let cc = match op {
+            BinOp::Eq => IntCC::Equal,
+            BinOp::Neq => IntCC::NotEqual,
+            other => panic!("unsupported binary op on reference type: {other:?}"),
+        };
+        return b.ins().icmp(cc, lv, rv);
+    }
+
     let prim = operand_prim(mir_func, l);
     let lv = use_operand(module, b, func_ids, ctx, l);
     let rv = use_operand(module, b, func_ids, ctx, r);
@@ -1036,6 +1052,13 @@ fn int_cc(signed: bool, c: Cmp) -> IntCC {
         (false, Cmp::Gt) => IntCC::UnsignedGreaterThan,
         (false, Cmp::Ge) => IntCC::UnsignedGreaterThanOrEqual,
     }
+}
+
+fn is_ref_ty(ty: &MirType) -> bool {
+    matches!(
+        ty,
+        MirType::ManagedRef(_) | MirType::NullableRef(_) | MirType::Closure(_)
+    )
 }
 
 fn operand_prim(mir_func: &mir::MirFunction, op: &Operand) -> PrimitiveType {

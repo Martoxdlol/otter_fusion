@@ -1,16 +1,15 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_implements_non_interface_errors.of
+input_file: examples/validator/p3_extend_on_interface_errors.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "A",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "I",
                         generics: [],
                         fields: [],
                         methods: [],
@@ -19,23 +18,39 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "B",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "A",
-                                [],
-                            ),
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "I",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "f",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 2,
+                                    col: 20,
+                                    len: 8,
+                                },
+                            },
                         ],
                     },
                 ),

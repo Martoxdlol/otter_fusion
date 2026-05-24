@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/validator/p1_duplicate_name_in_module_errors.of
 ---
 Ok(
     Program {
@@ -9,7 +9,7 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Bar",
+                        name: "X",
                         is_extern: false,
                         generics: [],
                         fields: [],
@@ -24,30 +24,31 @@ Ok(
                 },
             },
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
+                kind: Function(
+                    FunctionDecl {
+                        name: "X",
+                        has_self_param: false,
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [
-                                    Named(
-                                        "Bar",
-                                        [],
-                                    ),
-                                ],
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
                             },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

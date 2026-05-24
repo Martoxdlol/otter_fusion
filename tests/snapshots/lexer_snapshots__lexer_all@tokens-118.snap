@@ -1,143 +1,93 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/14_ffi/extern_function_export.of
+input_file: examples/spec/12_control_flow/for_loop.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
-            position: 6,
+            token_type: For,
+            position: 3,
             line: 1,
-            column: 7,
-        },
-        Token {
-            token_type: Function,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "on_tick",
-            ),
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: Colon,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Star,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "MyStruct",
-            ),
-            position: 36,
-            line: 1,
-            column: 37,
-        },
-        Token {
-            token_type: RightParen,
-            position: 37,
-            line: 1,
-            column: 38,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 39,
-            line: 1,
-            column: 40,
-        },
-        Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 43,
-            line: 2,
             column: 4,
         },
         Token {
-            token_type: Dot,
-            position: 44,
-            line: 2,
-            column: 5,
+            token_type: LeftParen,
+            position: 5,
+            line: 1,
+            column: 6,
         },
         Token {
             token_type: Identifier(
-                "counter",
+                "num",
             ),
-            position: 51,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: In,
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "numbers",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: RightParen,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 30,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 31,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "num",
+            ),
+            position: 34,
             line: 2,
             column: 12,
         },
         Token {
-            token_type: Eq,
-            position: 53,
+            token_type: RightParen,
+            position: 35,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 36,
             line: 2,
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 55,
-            line: 2,
-            column: 16,
-        },
-        Token {
-            token_type: Dot,
-            position: 56,
-            line: 2,
-            column: 17,
-        },
-        Token {
-            token_type: Identifier(
-                "counter",
-            ),
-            position: 63,
-            line: 2,
-            column: 24,
-        },
-        Token {
-            token_type: Plus,
-            position: 65,
-            line: 2,
-            column: 26,
-        },
-        Token {
-            token_type: Int(
-                "1",
-            ),
-            position: 67,
-            line: 2,
-            column: 28,
-        },
-        Token {
             token_type: RightBrace,
-            position: 69,
+            position: 38,
             line: 3,
             column: 2,
         },

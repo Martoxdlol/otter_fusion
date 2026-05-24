@@ -1,12 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/05_extensions/extend_specialized.of
+input_file: examples/spec/04_structs_interfaces/struct_instantiation.of
 ---
-ValidationErrors(
-    [
-        "invalid operator 'Mul' for operand of type 'null' in function 'test_module::Wrapper::double'",
-        "type mismatch in function 'test_module::Wrapper::double' (binary Mul): expected 'null', found 'int64'",
-        "unknown member 'value' on 'null' in function 'test_module::Wrapper::double'",
-    ],
+ParserError(
+    "unexpected token 'var'",
 )

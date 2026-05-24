@@ -1,42 +1,34 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_unknown_type_errors.of
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "foo",
-                        has_self_param: false,
-                        is_extern: false,
+                kind: Struct(
+                    StructDecl {
+                        name: "Cfg",
+                        is_extern: true,
                         generics: [],
-                        return_type: Some(
-                            Named(
-                                "Nope",
-                                [],
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
+                        fields: [
+                            FieldDecl {
+                                name: "p",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: true,
                             },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 14,
+                    len: 6,
                 },
             },
         ],

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_type_expr_named_with_type_args.of
+input_file: examples/parser/parse_type_alias_union.of
 ---
 Ok(
     Program {
@@ -9,13 +9,15 @@ Ok(
             Item {
                 kind: TypeAlias(
                     TypeAliasDecl {
-                        name: "X",
+                        name: "Result",
                         generics: [],
-                        ty: Named(
-                            "List",
+                        ty: Union(
                             [
                                 Primitive(
-                                    Int32,
+                                    Int64,
+                                ),
+                                Primitive(
+                                    String,
                                 ),
                             ],
                         ),

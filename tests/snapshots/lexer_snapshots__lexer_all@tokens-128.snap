@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/validator/p1_duplicate_name_in_module_errors.of
 ---
 Ok(
     [
@@ -13,83 +13,61 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Bar",
+                "X",
             ),
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: LeftBrace,
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: LeftBrace,
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
             token_type: RightBrace,
-            position: 13,
+            position: 11,
             line: 1,
-            column: 14,
+            column: 12,
         },
         Token {
-            token_type: Struct,
+            token_type: Function,
             position: 20,
             line: 2,
-            column: 7,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "Foo",
+                "X",
             ),
-            position: 24,
+            position: 22,
             line: 2,
             column: 11,
         },
         Token {
-            token_type: LT,
-            position: 25,
+            token_type: LeftParen,
+            position: 23,
             line: 2,
             column: 12,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 26,
+            token_type: RightParen,
+            position: 24,
             line: 2,
             column: 13,
         },
         Token {
-            token_type: Colon,
-            position: 27,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: Identifier(
-                "Bar",
-            ),
-            position: 31,
-            line: 2,
-            column: 18,
-        },
-        Token {
-            token_type: GT,
-            position: 32,
-            line: 2,
-            column: 19,
-        },
-        Token {
             token_type: LeftBrace,
-            position: 34,
+            position: 26,
             line: 2,
-            column: 21,
+            column: 15,
         },
         Token {
             token_type: RightBrace,
-            position: 35,
+            position: 27,
             line: 2,
-            column: 22,
+            column: 16,
         },
     ],
 )

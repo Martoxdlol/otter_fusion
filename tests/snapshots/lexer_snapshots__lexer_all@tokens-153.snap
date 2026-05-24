@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_break_outside_loop_errors.of
+input_file: examples/validator/p5_as_cast_changes_type.of
 ---
 Ok(
     [
@@ -38,22 +38,64 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Break,
+            token_type: LeftParen,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: As,
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: Semicolon,
-            position: 24,
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 27,
             line: 1,
-            column: 25,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Plus,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: Float(
+                "2.0",
+            ),
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 35,
+            line: 1,
+            column: 36,
         },
         Token {
             token_type: RightBrace,
-            position: 26,
+            position: 37,
             line: 1,
-            column: 27,
+            column: 38,
         },
     ],
 )

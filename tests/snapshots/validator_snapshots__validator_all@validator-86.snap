@@ -1,8 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/02_variables/var_from_if.of
+input_file: examples/spec/01_type_system/discriminated_unions.of
 ---
-ParserError(
-    "unexpected token 'var'",
-)
+Ok

@@ -1,189 +1,75 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p4_struct_implements_interface_ok.of
+input_file: examples/validator/p4_implements_non_interface_errors.of
 ---
 Ok(
     [
         Token {
-            token_type: Interface,
-            position: 9,
+            token_type: Struct,
+            position: 6,
             line: 1,
-            column: 10,
+            column: 7,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "A",
             ),
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: RightBrace,
             position: 11,
             line: 1,
             column: 12,
         },
         Token {
-            token_type: LeftBrace,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: Function,
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Identifier(
-                "f",
-            ),
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: RightParen,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: Colon,
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 36,
-            line: 1,
-            column: 37,
-        },
-        Token {
             token_type: Struct,
-            position: 43,
+            position: 18,
             line: 2,
             column: 7,
         },
         Token {
             token_type: Identifier(
-                "S",
+                "B",
             ),
-            position: 45,
+            position: 20,
             line: 2,
             column: 9,
         },
         Token {
             token_type: Colon,
-            position: 47,
+            position: 22,
             line: 2,
             column: 11,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "A",
             ),
-            position: 49,
+            position: 24,
             line: 2,
             column: 13,
         },
         Token {
             token_type: LeftBrace,
-            position: 51,
+            position: 26,
             line: 2,
             column: 15,
         },
         Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 53,
-            line: 2,
-            column: 17,
-        },
-        Token {
-            token_type: Colon,
-            position: 54,
-            line: 2,
-            column: 18,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 58,
-            line: 2,
-            column: 22,
-        },
-        Token {
-            token_type: Function,
-            position: 67,
-            line: 2,
-            column: 31,
-        },
-        Token {
-            token_type: Identifier(
-                "f",
-            ),
-            position: 69,
-            line: 2,
-            column: 33,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 70,
-            line: 2,
-            column: 34,
-        },
-        Token {
-            token_type: RightParen,
-            position: 71,
-            line: 2,
-            column: 35,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 73,
-            line: 2,
-            column: 37,
-        },
-        Token {
             token_type: RightBrace,
-            position: 74,
+            position: 27,
             line: 2,
-            column: 38,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 76,
-            line: 2,
-            column: 40,
+            column: 16,
         },
     ],
 )

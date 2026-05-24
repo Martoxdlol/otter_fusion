@@ -1,10 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_var_decl_type_init_mismatch_errors.of
+input_file: examples/validator/p5_unknown_member_errors.of
 ---
 ValidationErrors(
     [
-        "type mismatch in function 'test_module::test' (var x): expected 'int64', found 'string'",
+        "unknown member 'x' on 'struct#0' in function 'test_module::test'",
     ],
 )

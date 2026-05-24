@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_while_non_bool_cond_errors.of
+input_file: examples/validator/p5_var_decl_type_init_mismatch_errors.of
 ---
 Ok(
     [
@@ -38,48 +38,58 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: While,
+            token_type: Var,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: LeftParen,
-            position: 25,
+            token_type: Colon,
+            position: 24,
             line: 1,
-            column: 26,
+            column: 25,
         },
         Token {
-            token_type: Int(
-                "5",
+            token_type: Identifier(
+                "i64",
             ),
-            position: 26,
+            position: 28,
             line: 1,
-            column: 27,
+            column: 29,
         },
         Token {
-            token_type: RightParen,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: Eq,
             position: 30,
             line: 1,
             column: 31,
         },
         Token {
-            token_type: RightBrace,
-            position: 32,
+            token_type: StringLit(
+                "hi",
+            ),
+            position: 35,
             line: 1,
-            column: 33,
+            column: 36,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 36,
+            line: 1,
+            column: 37,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 38,
+            line: 1,
+            column: 39,
         },
     ],
 )

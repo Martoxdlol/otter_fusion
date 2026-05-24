@@ -1,47 +1,485 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p1_function_skeleton_inserted.of
+input_file: examples/spec/14_ffi/pin_unpin.of
 ---
 Ok(
     [
         Token {
-            token_type: Function,
-            position: 8,
+            token_type: Extern,
+            position: 6,
             line: 1,
-            column: 9,
+            column: 7,
         },
         Token {
-            token_type: Identifier(
-                "foo",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: LeftParen,
+            token_type: Struct,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: RightParen,
-            position: 14,
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 20,
             line: 1,
-            column: 15,
+            column: 21,
         },
         Token {
             token_type: LeftBrace,
-            position: 16,
+            position: 22,
             line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "data",
+            ),
+            position: 29,
+            line: 2,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 30,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Star,
+            position: 32,
+            line: 2,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "u8",
+            ),
+            position: 34,
+            line: 2,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 35,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 42,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 43,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 47,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 48,
+            line: 3,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 50,
+            line: 4,
+            column: 2,
+        },
+        Token {
+            token_type: Extern,
+            position: 58,
+            line: 6,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 67,
+            line: 6,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 74,
+            line: 6,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 75,
+            line: 6,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 79,
+            line: 6,
+            column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 80,
+            line: 6,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 84,
+            line: 6,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 85,
+            line: 6,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 86,
+            line: 6,
+            column: 35,
+        },
+        Token {
+            token_type: Star,
+            position: 88,
+            line: 6,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 94,
+            line: 6,
+            column: 43,
+        },
+        Token {
+            token_type: Pipe,
+            position: 96,
+            line: 6,
+            column: 45,
+        },
+        Token {
+            token_type: Null,
+            position: 101,
+            line: 6,
+            column: 50,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 102,
+            line: 6,
+            column: 51,
+        },
+        Token {
+            token_type: Extern,
+            position: 109,
+            line: 7,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 118,
+            line: 7,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "free",
+            ),
+            position: 123,
+            line: 7,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 124,
+            line: 7,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "buf",
+            ),
+            position: 127,
+            line: 7,
+            column: 25,
+        },
+        Token {
+            token_type: Colon,
+            position: 128,
+            line: 7,
+            column: 26,
+        },
+        Token {
+            token_type: Star,
+            position: 130,
+            line: 7,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 136,
+            line: 7,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 137,
+            line: 7,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 138,
+            line: 7,
+            column: 36,
+        },
+        Token {
+            token_type: Function,
+            position: 148,
+            line: 9,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "allocate",
+            ),
+            position: 157,
+            line: 9,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 158,
+            line: 9,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 162,
+            line: 9,
+            column: 23,
+        },
+        Token {
+            token_type: Colon,
+            position: 163,
+            line: 9,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "u64",
+            ),
+            position: 167,
+            line: 9,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 168,
+            line: 9,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 169,
+            line: 9,
+            column: 30,
+        },
+        Token {
+            token_type: Star,
+            position: 171,
+            line: 9,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 177,
+            line: 9,
+            column: 38,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 179,
+            line: 9,
+            column: 40,
+        },
+        Token {
+            token_type: Var,
+            position: 185,
+            line: 10,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 191,
+            line: 10,
+            column: 12,
+        },
+        Token {
+            token_type: Eq,
+            position: 193,
+            line: 10,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "malloc",
+            ),
+            position: 200,
+            line: 10,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 201,
+            line: 10,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 205,
+            line: 10,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 206,
+            line: 10,
+            column: 27,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 207,
+            line: 10,
+            column: 28,
+        },
+        Token {
+            token_type: If,
+            position: 212,
+            line: 11,
+            column: 5,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 214,
+            line: 11,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 219,
+            line: 11,
+            column: 12,
+        },
+        Token {
+            token_type: Is,
+            position: 222,
+            line: 11,
+            column: 15,
+        },
+        Token {
+            token_type: Null,
+            position: 227,
+            line: 11,
+            column: 20,
+        },
+        Token {
+            token_type: RightParen,
+            position: 228,
+            line: 11,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 230,
+            line: 11,
+            column: 23,
+        },
+        Token {
+            token_type: Return,
+            position: 241,
+            line: 12,
+            column: 11,
+        },
+        Token {
+            token_type: Null,
+            position: 246,
+            line: 12,
+            column: 16,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 247,
+            line: 12,
             column: 17,
         },
         Token {
             token_type: RightBrace,
-            position: 17,
-            line: 1,
+            position: 251,
+            line: 13,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "maybe",
+            ),
+            position: 259,
+            line: 14,
+            column: 8,
+        },
+        Token {
+            token_type: As,
+            position: 262,
+            line: 14,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 269,
+            line: 14,
             column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 271,
+            line: 15,
+            column: 2,
         },
     ],
 )

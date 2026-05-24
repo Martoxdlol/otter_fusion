@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_while_non_bool_cond_errors.of
+input_file: examples/validator/p5_var_decl_inferred_from_init.of
 ---
 Ok(
     Program {
@@ -18,16 +18,16 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    While(
-                                        Literal(
-                                            Int(
-                                                "5",
+                                    VarDecl(
+                                        "x",
+                                        None,
+                                        Some(
+                                            Literal(
+                                                Int(
+                                                    "5",
+                                                ),
                                             ),
                                         ),
-                                        Block {
-                                            statements: [],
-                                            returns: None,
-                                        },
                                     ),
                                 ],
                                 returns: None,

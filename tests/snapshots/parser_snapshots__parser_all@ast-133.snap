@@ -1,33 +1,51 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
+input_file: examples/validator/p2_bound_referencing_interface_ok.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Cfg",
-                        is_extern: true,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Show",
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "p",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: true,
-                            },
-                        ],
+                        fields: [],
                         methods: [],
                         implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 14,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Foo",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [
+                                    Named(
+                                        "Show",
+                                        [],
+                                    ),
+                                ],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 7,
                     len: 6,
                 },
             },

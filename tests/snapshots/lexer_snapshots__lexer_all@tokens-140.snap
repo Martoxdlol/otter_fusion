@@ -1,139 +1,95 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Type,
+            position: 4,
             line: 1,
-            column: 7,
+            column: 5,
         },
         Token {
             token_type: Identifier(
-                "Box",
+                "MyInt",
             ),
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: Eq,
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: GT,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: Identifier(
+                "i64",
+            ),
             position: 16,
             line: 1,
             column: 17,
         },
         Token {
-            token_type: Extend,
-            position: 23,
-            line: 2,
-            column: 7,
-        },
-        Token {
-            token_type: Identifier(
-                "Box",
-            ),
-            position: 27,
-            line: 2,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 28,
-            line: 2,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 31,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: GT,
-            position: 32,
-            line: 2,
-            column: 16,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 34,
-            line: 2,
+            token_type: Semicolon,
+            position: 17,
+            line: 1,
             column: 18,
         },
         Token {
             token_type: Function,
-            position: 43,
+            position: 26,
             line: 2,
-            column: 27,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "is_int",
+                "foo",
             ),
-            position: 50,
+            position: 30,
             line: 2,
-            column: 34,
+            column: 13,
         },
         Token {
             token_type: LeftParen,
-            position: 51,
+            position: 31,
             line: 2,
-            column: 35,
+            column: 14,
         },
         Token {
             token_type: RightParen,
-            position: 52,
+            position: 32,
             line: 2,
-            column: 36,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 33,
+            line: 2,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "MyInt",
+            ),
+            position: 39,
+            line: 2,
+            column: 22,
         },
         Token {
             token_type: LeftBrace,
-            position: 54,
+            position: 41,
             line: 2,
-            column: 38,
+            column: 24,
         },
         Token {
             token_type: RightBrace,
-            position: 55,
+            position: 42,
             line: 2,
-            column: 39,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 57,
-            line: 2,
-            column: 41,
+            column: 25,
         },
     ],
 )

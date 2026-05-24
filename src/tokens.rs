@@ -79,6 +79,7 @@ pub enum TokenType {
     Extern,    // extern
     Import,    // import
     From,      // from
+    Const,     // const
 
     EOF,
 }
@@ -291,6 +292,7 @@ impl fmt::Display for TokenType {
             TokenType::Extern => f.write_str("'extern'"),
             TokenType::Import => f.write_str("'import'"),
             TokenType::From => f.write_str("'from'"),
+            TokenType::Const => f.write_str("'const'"),
             TokenType::EOF => f.write_str("end of file"),
         }
     }
@@ -366,6 +368,7 @@ impl TokenType {
             TokenType::Extern => 6,
             TokenType::Import => 6,
             TokenType::From => 4,
+            TokenType::Const => 5,
 
             TokenType::EOF => 0,
         }

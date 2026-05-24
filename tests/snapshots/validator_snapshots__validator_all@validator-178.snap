@@ -1,15 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_while_non_bool_cond_errors.of
+input_file: examples/validator/p5_var_decl_type_init_mismatch_errors.of
 ---
-Err(
+ValidationErrors(
     [
-        TypeMismatch {
-            function: "test_module::test",
-            context: "while condition",
-            expected: "bool",
-            actual: "int64",
-        },
+        "type mismatch in function 'test_module::test' (variable 'x'): expected 'int64', found 'string'",
     ],
 )

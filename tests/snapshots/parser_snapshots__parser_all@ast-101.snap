@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/05_extensions/extend_with_interface.of
+input_file: examples/spec/05_extensions/extend_basic.of
 ---
 Ok(
     Program {
@@ -32,41 +32,6 @@ Ok(
                 },
             },
             Item {
-                kind: Interface(
-                    InterfaceDecl {
-                        name: "Movable",
-                        generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "move",
-                                has_self_param: true,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        String,
-                                    ),
-                                ),
-                                params: [],
-                                body: None,
-                                span: Span {
-                                    line: 6,
-                                    col: 11,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 5,
-                    col: 10,
-                    len: 9,
-                },
-            },
-            Item {
                 kind: Extend(
                     ExtendDecl {
                         target: Named(
@@ -74,21 +39,16 @@ Ok(
                             [],
                         ),
                         generic_params: [],
-                        implements: [
-                            Named(
-                                "Movable",
-                                [],
-                            ),
-                        ],
+                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "move",
+                                name: "is_fast",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
                                 return_type: Some(
                                     Primitive(
-                                        String,
+                                        Bool,
                                     ),
                                 ),
                                 params: [],
@@ -96,16 +56,23 @@ Ok(
                                     Block {
                                         statements: [],
                                         returns: Some(
-                                            Literal(
-                                                String(
-                                                    "The vehicle moves",
+                                            BinaryOp(
+                                                Member(
+                                                    SelfRef,
+                                                    "speed",
+                                                ),
+                                                Gt,
+                                                Literal(
+                                                    Int(
+                                                        "100",
+                                                    ),
                                                 ),
                                             ),
                                         ),
                                     },
                                 ),
                                 span: Span {
-                                    line: 10,
+                                    line: 6,
                                     col: 11,
                                     len: 8,
                                 },
@@ -114,7 +81,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 9,
+                    line: 5,
                     col: 7,
                     len: 6,
                 },

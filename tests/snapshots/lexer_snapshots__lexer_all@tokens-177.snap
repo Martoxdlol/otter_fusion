@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_var_decl_with_annotation_and_init.of
+input_file: examples/validator/p5_var_decl_no_type_no_init_errors.of
 ---
 Ok(
     [
@@ -52,44 +52,16 @@ Ok(
             column: 24,
         },
         Token {
-            token_type: Colon,
+            token_type: Semicolon,
             position: 24,
             line: 1,
             column: 25,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Eq,
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
             token_type: RightBrace,
-            position: 35,
+            position: 26,
             line: 1,
-            column: 36,
+            column: 27,
         },
     ],
 )

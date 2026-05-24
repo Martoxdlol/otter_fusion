@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_struct_init_missing_field_errors.of
+input_file: examples/validator/p5_self_member_access_in_method.of
 ---
 Ok(
     [
@@ -48,74 +48,74 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: RightBrace,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
             token_type: Function,
-            position: 28,
-            line: 2,
-            column: 9,
+            position: 26,
+            line: 1,
+            column: 27,
         },
         Token {
             token_type: Identifier(
-                "test",
+                "m",
             ),
-            position: 33,
-            line: 2,
-            column: 14,
+            position: 28,
+            line: 1,
+            column: 29,
         },
         Token {
             token_type: LeftParen,
-            position: 34,
-            line: 2,
-            column: 15,
+            position: 29,
+            line: 1,
+            column: 30,
         },
         Token {
             token_type: RightParen,
-            position: 35,
-            line: 2,
-            column: 16,
+            position: 30,
+            line: 1,
+            column: 31,
         },
         Token {
             token_type: LeftBrace,
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: SelfRef,
             position: 37,
-            line: 2,
-            column: 18,
+            line: 1,
+            column: 38,
+        },
+        Token {
+            token_type: Dot,
+            position: 38,
+            line: 1,
+            column: 39,
         },
         Token {
             token_type: Identifier(
-                "S",
+                "x",
             ),
             position: 39,
-            line: 2,
-            column: 20,
+            line: 1,
+            column: 40,
         },
         Token {
-            token_type: LeftBrace,
-            position: 41,
-            line: 2,
-            column: 22,
+            token_type: Semicolon,
+            position: 40,
+            line: 1,
+            column: 41,
         },
         Token {
             token_type: RightBrace,
             position: 42,
-            line: 2,
-            column: 23,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 43,
-            line: 2,
-            column: 24,
+            line: 1,
+            column: 43,
         },
         Token {
             token_type: RightBrace,
-            position: 45,
-            line: 2,
-            column: 26,
+            position: 44,
+            line: 1,
+            column: 45,
         },
     ],
 )

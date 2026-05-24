@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_struct_with_multiple_fields.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     Program {
@@ -11,23 +11,17 @@ Ok(
                     StructDecl {
                         name: "Point",
                         is_extern: false,
-                        generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Float64,
-                                ),
-                                is_pointer: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
                             },
-                            FieldDecl {
-                                name: "y",
-                                ty: Primitive(
-                                    Float64,
-                                ),
-                                is_pointer: false,
+                            GenericParam {
+                                name: "U",
+                                bounds: [],
                             },
                         ],
+                        fields: [],
                         methods: [],
                         implements: [],
                     },

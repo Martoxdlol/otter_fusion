@@ -5,17 +5,10 @@ input_file: examples/language/10_generics.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Mul' for operand of type 'null' in function 'test_module::Wrapper::double'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
+        "invalid operator 'Mul' for operand of type ''tp1' in function 'test_module::Wrapper::double'",
         "type 'test_module::Wrapper' is missing member 'name' required by interface 'test_module::Named'",
-        "type mismatch in function 'test_module::Wrapper::double' (binary Mul): expected 'null', found 'int64'",
-        "type mismatch in function 'test_module::main' (field value): expected 'int32', found 'int64'",
+        "type mismatch in function 'test_module::Wrapper::double' (binary Mul): expected ''tp1', found 'int64'",
         "module 'test_module' imports unknown module 'of:core'",
-        "unknown member 'value' on 'null' in function 'test_module::Wrapper::double'",
-        "unknown member 'value' on 'null' in function 'test_module::Wrapper::get'",
         "unknown member 'double' on 'struct#0<int32>' in function 'test_module::main'",
         "unknown variable 'print' in function 'test_module::main'",
         "unknown variable 'print' in function 'test_module::main'",

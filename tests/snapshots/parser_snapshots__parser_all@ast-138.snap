@@ -1,66 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p3_extend_adds_specialised_method.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
-Ok(
-    Program {
-        items: [
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Foo",
-                            [],
-                        ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "m",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 22,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
-                },
-            },
-        ],
-    },
+Err(
+    "unexpected token '*'",
 )

@@ -1,83 +1,138 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/06_type_logic/is_operator.of
+input_file: examples/spec/05_extensions/extend_generic_with_interface.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "process",
-                        has_self_param: false,
+                kind: Struct(
+                    StructDecl {
+                        name: "Wrapper",
                         is_extern: false,
-                        generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "input",
-                                ty: Union(
-                                    [
-                                        Primitive(
-                                            Int64,
-                                        ),
-                                        Primitive(
-                                            String,
-                                        ),
-                                    ],
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
                                 ),
                                 is_pointer: false,
                             },
                         ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: Some(
-                                    If(
-                                        Is(
-                                            Variable(
-                                                "input",
-                                            ),
-                                            Primitive(
-                                                Int64,
-                                            ),
-                                        ),
-                                        Block {
-                                            statements: [
-                                                VarDecl(
-                                                    "value",
-                                                    None,
-                                                    Some(
-                                                        As(
-                                                            Variable(
-                                                                "input",
-                                                            ),
-                                                            Primitive(
-                                                                Int64,
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ),
-                                            ],
-                                            returns: None,
-                                        },
-                                        None,
-                                    ),
-                                ),
-                            },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "name",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: None,
+                                span: Span {
+                                    line: 6,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 5,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Wrapper",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Named",
+                                [],
+                            ),
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "name",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Literal(
+                                                String(
+                                                    "Wrapper",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 10,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 9,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

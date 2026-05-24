@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     [
@@ -46,7 +46,7 @@ Ok(
             column: 20,
         },
         Token {
-            token_type: And,
+            token_type: EqEq,
             position: 22,
             line: 1,
             column: 23,

@@ -74,6 +74,47 @@ var value = {
 };
 ```
 
+## Constants (`const`)
+
+Top-level compile-time constants are declared with `const`. The compiler
+inlines each use site to the declared literal value, so referencing a
+constant has no runtime cost over hard-coding the value.
+
+```typescript
+const O_RDONLY: i32 = 0;
+const PI: f64 = 3.14159;
+const GREETING: str = "hello";
+const ENABLED: bool = true;
+const EOF: i32 = -1;
+```
+
+### Rules
+
+- A `const` lives at module top level only (not inside functions, structs,
+  interfaces, or extend blocks).
+- The right-hand side must be a **literal**: an integer, float, string,
+  character, boolean, or `null`. A leading `-` is allowed on numeric
+  literals. No identifiers, calls, operators, or expressions of any kind.
+- The declared type must be a primitive (`i8`…`i64`, `u8`…`u64`, `f32`,
+  `f64`, `bool`, `str`, `char`) or `null`. Struct, interface, list, map,
+  and function types are not allowed.
+- Integer literals are range-checked against the declared type; assigning
+  `300` to an `i8` is an error.
+- Constants are exported by name and can be `import`ed across modules:
+  ```typescript
+  import { O_RDONLY, GREETING } from "of_io";
+  ```
+- Constants cannot be reassigned, called like a function, or used in a
+  type position.
+
+### Why a separate construct instead of a `var`
+
+`var` introduces a runtime binding with mutability and scope semantics.
+`const` is purely a compile-time alias for a literal value — it never
+allocates, captures, or generates code on its own. Use `const` for
+syscall flags, configuration values, and other fixed literals that
+multiple call sites share.
+
 ## Functions
 
 Functions use the `function` keyword. The last expression in a function body is automatically returned. Use the `return` keyword for early exits.

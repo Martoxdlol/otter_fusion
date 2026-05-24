@@ -1,20 +1,32 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p2_bound_referencing_interface_ok.of
+input_file: examples/validator/p1_function_skeleton_inserted.of
 ---
 Ok(
     [
         Token {
-            token_type: Interface,
-            position: 9,
+            token_type: Function,
+            position: 8,
             line: 1,
-            column: 10,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "Show",
+                "foo",
             ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: RightParen,
             position: 14,
             line: 1,
             column: 15,
@@ -30,66 +42,6 @@ Ok(
             position: 17,
             line: 1,
             column: 18,
-        },
-        Token {
-            token_type: Struct,
-            position: 24,
-            line: 2,
-            column: 7,
-        },
-        Token {
-            token_type: Identifier(
-                "Foo",
-            ),
-            position: 28,
-            line: 2,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 29,
-            line: 2,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 30,
-            line: 2,
-            column: 13,
-        },
-        Token {
-            token_type: Colon,
-            position: 31,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: Identifier(
-                "Show",
-            ),
-            position: 36,
-            line: 2,
-            column: 19,
-        },
-        Token {
-            token_type: GT,
-            position: 37,
-            line: 2,
-            column: 20,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 39,
-            line: 2,
-            column: 22,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 40,
-            line: 2,
-            column: 23,
         },
     ],
 )

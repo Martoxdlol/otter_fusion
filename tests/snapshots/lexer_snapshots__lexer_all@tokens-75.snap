@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_multiple_fields.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     [
@@ -20,60 +20,50 @@ Ok(
             column: 13,
         },
         Token {
-            token_type: LeftBrace,
+            token_type: LT,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 16,
+            token_type: Comma,
+            position: 15,
             line: 1,
-            column: 17,
+            column: 16,
         },
         Token {
-            token_type: Colon,
+            token_type: Identifier(
+                "U",
+            ),
             position: 17,
             line: 1,
             column: 18,
         },
         Token {
-            token_type: Identifier(
-                "f64",
-            ),
-            position: 21,
+            token_type: GT,
+            position: 18,
             line: 1,
-            column: 22,
+            column: 19,
         },
         Token {
-            token_type: Identifier(
-                "y",
-            ),
-            position: 23,
+            token_type: LeftBrace,
+            position: 20,
             line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: Colon,
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "f64",
-            ),
-            position: 28,
-            line: 1,
-            column: 29,
+            column: 21,
         },
         Token {
             token_type: RightBrace,
-            position: 30,
+            position: 21,
             line: 1,
-            column: 31,
+            column: 22,
         },
     ],
 )

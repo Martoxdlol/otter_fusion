@@ -1,10 +1,14 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
+input_file: examples/parser/parse_expr_binary_precedence.of
 ---
 ValidationErrors(
     [
-        "unknown type 'Buffer' in module 'test_module'",
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::test'",
+        "invalid operator 'Mul' for operand of type 'null' in function 'test_module::test'",
+        "unknown variable 'x' in function 'test_module::test'",
+        "unknown variable 'y' in function 'test_module::test'",
+        "unknown variable 'z' in function 'test_module::test'",
     ],
 )

@@ -5,11 +5,6 @@ input_file: examples/language/12_error_unions.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::format'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::format'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::format'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::format'",
-        "type mismatch in function 'test_module::divide' (field code): expected 'int32', found 'int64'",
         "module 'test_module' imports unknown module 'of:core'",
         "unknown variable 'print' in function 'test_module::main'",
         "unknown variable 'print' in function 'test_module::main'",

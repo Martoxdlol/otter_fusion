@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_struct_implements_interface_ok.of
+input_file: examples/validator/p4_implements_non_interface_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "type 'test_module::B' implements clause references a non-interface",
+    ],
+)

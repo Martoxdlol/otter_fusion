@@ -1,41 +1,53 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_extern_struct.of
+input_file: examples/parser/parse_extern_function_pointer_params.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "MyCFunctionArgs",
+                kind: Function(
+                    FunctionDecl {
+                        name: "hashmap_set",
+                        has_self_param: false,
                         is_extern: true,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            FieldDecl {
-                                name: "b",
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "key",
                                 ty: Primitive(
                                     String,
                                 ),
                                 is_pointer: true,
                             },
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
                         ],
-                        methods: [],
-                        implements: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 16,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 14,
-                    len: 6,
+                    col: 16,
+                    len: 8,
                 },
             },
         ],

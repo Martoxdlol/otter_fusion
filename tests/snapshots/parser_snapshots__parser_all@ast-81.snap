@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_type_expr_primitive.of
+input_file: examples/parser/parse_type_alias_with_generics.of
 ---
 Ok(
     Program {
@@ -9,10 +9,23 @@ Ok(
             Item {
                 kind: TypeAlias(
                     TypeAliasDecl {
-                        name: "X",
-                        generics: [],
-                        ty: Primitive(
-                            Int32,
+                        name: "Option",
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        ty: Union(
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                                Primitive(
+                                    Null,
+                                ),
+                            ],
                         ),
                     },
                 ),

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_struct.of
+input_file: examples/parser/parse_extern_function_pointer_params.of
 ---
 Ok(
     [
@@ -12,80 +12,98 @@ Ok(
             column: 7,
         },
         Token {
-            token_type: Struct,
-            position: 13,
+            token_type: Function,
+            position: 15,
             line: 1,
-            column: 14,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "MyCFunctionArgs",
+                "hashmap_set",
             ),
-            position: 29,
+            position: 27,
             line: 1,
-            column: 30,
+            column: 28,
         },
         Token {
-            token_type: LeftBrace,
+            token_type: LeftParen,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "key",
+            ),
             position: 31,
             line: 1,
             column: 32,
         },
         Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 33,
+            token_type: Colon,
+            position: 32,
             line: 1,
-            column: 34,
+            column: 33,
         },
         Token {
-            token_type: Colon,
+            token_type: Star,
             position: 34,
             line: 1,
             column: 35,
         },
         Token {
             token_type: Identifier(
-                "i32",
+                "str",
             ),
+            position: 37,
+            line: 1,
+            column: 38,
+        },
+        Token {
+            token_type: Comma,
             position: 38,
             line: 1,
             column: 39,
         },
         Token {
             token_type: Identifier(
-                "b",
+                "value",
             ),
-            position: 40,
+            position: 44,
             line: 1,
-            column: 41,
+            column: 45,
         },
         Token {
             token_type: Colon,
-            position: 41,
+            position: 45,
             line: 1,
-            column: 42,
+            column: 46,
         },
         Token {
             token_type: Star,
-            position: 43,
+            position: 47,
             line: 1,
-            column: 44,
+            column: 48,
         },
         Token {
             token_type: Identifier(
-                "str",
+                "MyStruct",
             ),
-            position: 46,
+            position: 55,
             line: 1,
-            column: 47,
+            column: 56,
         },
         Token {
-            token_type: RightBrace,
-            position: 48,
+            token_type: RightParen,
+            position: 56,
             line: 1,
-            column: 49,
+            column: 57,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 57,
+            line: 1,
+            column: 58,
         },
     ],
 )

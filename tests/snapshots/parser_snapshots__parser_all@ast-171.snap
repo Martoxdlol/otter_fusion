@@ -1,11 +1,36 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_unknown_variable_errors.of
+input_file: examples/validator/p5_struct_init_and_member_access.of
 ---
 Ok(
     Program {
         items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -18,9 +43,34 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
+                                    VarDecl(
+                                        "s",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "S",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "x",
+                                                        Literal(
+                                                            Int(
+                                                                "5",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
                                     Expr(
-                                        Variable(
-                                            "oops",
+                                        Member(
+                                            Variable(
+                                                "s",
+                                            ),
+                                            "x",
                                         ),
                                     ),
                                 ],
@@ -28,14 +78,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 2,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_extern_function_with_body.of
+input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
 ---
 Ok(
     Program {
@@ -9,28 +9,30 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "on_tick",
+                        name: "malloc",
                         has_self_param: false,
                         is_extern: true,
                         generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "d",
-                                ty: Named(
-                                    "MyStruct",
+                        return_type: Some(
+                            Pointer(
+                                Named(
+                                    "Buffer",
                                     [],
                                 ),
-                                is_pointer: true,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "size",
+                                ty: Primitive(
+                                    Uint64,
+                                ),
+                                is_pointer: false,
                             },
                         ],
                         body: Some(
                             Block {
-                                statements: [
-                                    Return(
-                                        None,
-                                    ),
-                                ],
+                                statements: [],
                                 returns: None,
                             },
                         ),

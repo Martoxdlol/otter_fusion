@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     Program {
@@ -25,7 +25,7 @@ Ok(
                                                     "5",
                                                 ),
                                             ),
-                                            And,
+                                            Eq,
                                             Literal(
                                                 Int(
                                                     "5",

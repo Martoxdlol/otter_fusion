@@ -1,89 +1,101 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_type_alias.of
+input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
+            token_type: Extern,
+            position: 6,
             line: 1,
-            column: 5,
+            column: 7,
+        },
+        Token {
+            token_type: Function,
+            position: 15,
+            line: 1,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "Fun",
+                "malloc",
             ),
-            position: 8,
+            position: 22,
             line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: Eq,
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: Extern,
-            position: 17,
-            line: 1,
-            column: 18,
+            column: 23,
         },
         Token {
             token_type: LeftParen,
-            position: 19,
+            position: 23,
             line: 1,
-            column: 20,
+            column: 24,
         },
         Token {
             token_type: Identifier(
-                "x",
+                "size",
             ),
-            position: 20,
+            position: 27,
             line: 1,
-            column: 21,
+            column: 28,
         },
         Token {
             token_type: Colon,
-            position: 21,
+            position: 28,
             line: 1,
-            column: 22,
+            column: 29,
         },
         Token {
             token_type: Identifier(
-                "MyStruct",
+                "u64",
             ),
-            position: 30,
+            position: 32,
             line: 1,
-            column: 31,
+            column: 33,
         },
         Token {
             token_type: RightParen,
-            position: 31,
+            position: 33,
             line: 1,
-            column: 32,
+            column: 34,
         },
         Token {
-            token_type: FatArrow,
+            token_type: Colon,
             position: 34,
             line: 1,
             column: 35,
         },
         Token {
-            token_type: Identifier(
-                "bool",
-            ),
-            position: 39,
+            token_type: Star,
+            position: 36,
             line: 1,
-            column: 40,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: Pipe,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: Null,
+            position: 49,
+            line: 1,
+            column: 50,
         },
         Token {
             token_type: Semicolon,
-            position: 40,
+            position: 50,
             line: 1,
-            column: 41,
+            column: 51,
         },
     ],
 )

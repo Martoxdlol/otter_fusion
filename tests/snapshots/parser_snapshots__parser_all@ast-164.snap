@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_return_type_mismatch_errors.of
+input_file: examples/validator/p5_is_check_yields_bool.of
 ---
 Ok(
     Program {
@@ -13,21 +13,20 @@ Ok(
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
+                        return_type: None,
                         params: [],
                         body: Some(
                             Block {
                                 statements: [
-                                    Return(
-                                        Some(
+                                    Expr(
+                                        Is(
                                             Literal(
-                                                String(
-                                                    "hi",
+                                                Int(
+                                                    "5",
                                                 ),
+                                            ),
+                                            Primitive(
+                                                Int64,
                                             ),
                                         ),
                                     ),

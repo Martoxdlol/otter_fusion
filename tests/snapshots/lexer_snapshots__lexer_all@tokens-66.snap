@@ -1,77 +1,69 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_function_no_body.of
+input_file: examples/parser/parse_extern_function_simple.of
 ---
 Ok(
     [
         Token {
+            token_type: Extern,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
             token_type: Function,
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: Identifier(
-                "foo",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Colon,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
             token_type: Identifier(
-                "i32",
+                "print",
             ),
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: RightParen,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: Colon,
             position: 21,
             line: 1,
             column: 22,
         },
         Token {
-            token_type: Identifier(
-                "bool",
-            ),
-            position: 26,
+            token_type: LeftParen,
+            position: 22,
             line: 1,
-            column: 27,
+            column: 23,
         },
         Token {
-            token_type: Semicolon,
+            token_type: Identifier(
+                "value",
+            ),
             position: 27,
             line: 1,
             column: 28,
+        },
+        Token {
+            token_type: Colon,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 34,
+            line: 1,
+            column: 35,
         },
     ],
 )

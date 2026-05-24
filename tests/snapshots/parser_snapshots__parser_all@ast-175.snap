@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_var_decl_with_annotation_and_init.of
+input_file: examples/validator/p5_unknown_variable_errors.of
 ---
 Ok(
     Program {
@@ -18,19 +18,9 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    VarDecl(
-                                        "x",
-                                        Some(
-                                            Primitive(
-                                                Int64,
-                                            ),
-                                        ),
-                                        Some(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
-                                            ),
+                                    Expr(
+                                        Variable(
+                                            "oops",
                                         ),
                                     ),
                                 ],

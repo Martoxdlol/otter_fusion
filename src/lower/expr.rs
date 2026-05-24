@@ -540,7 +540,12 @@ impl Lower {
         let join_bb = b.new_block();
 
         let result_mir = self.lower_type(result_ty, subst);
-        let result = b.new_temp(result_mir);
+        let result = b.new_temp(result_mir.clone());
+        // Statement-position ifs (and ifs whose arms return null) have
+        // result type `Null` / MirType::Unit. Skip the result-merge
+        // assigns entirely — codegen drops Unit locals, so writing into
+        // one would reference an unbound operand and panic.
+        let stores_result = !matches!(result_mir, MirType::Unit);
 
         b.terminate(Terminator::CondBr(cond_op, then_bb, else_bb));
 
@@ -552,7 +557,9 @@ impl Lower {
         // After lowering the arm, current_block may have been split by nested
         // control flow. Touch only the still-open tail.
         if b.is_open() {
-            if let (Some(op), Some(src)) = (t_val, t_src_ty) {
+            if stores_result
+                && let (Some(op), Some(src)) = (t_val, t_src_ty)
+            {
                 let coerced = self.coerce_to(op, &src, &target_ty, b);
                 b.push_stmt(Stmt::Assign(result, AssignValue::Use(coerced)));
             }
@@ -564,7 +571,9 @@ impl Lower {
             let e_src_ty = eb.returns.as_ref().map(|e| subst.apply(&e.ty));
             let e_val = self.lower_block(eb, subst, b);
             if b.is_open() {
-                if let (Some(op), Some(src)) = (e_val, e_src_ty) {
+                if stores_result
+                    && let (Some(op), Some(src)) = (e_val, e_src_ty)
+                {
                     let coerced = self.coerce_to(op, &src, &target_ty, b);
                     b.push_stmt(Stmt::Assign(result, AssignValue::Use(coerced)));
                 }

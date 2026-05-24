@@ -7,8 +7,6 @@ ValidationErrors(
     [
         "invalid operator 'Add' for operand of type 'null' in function 'test_module::main'",
         "invalid operator 'Add' for operand of type 'null' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
         "invalid operator 'Gt' for operand of type 'null' in function 'test_module::main'",
         "type mismatch in function 'test_module::main' (binary Add): expected 'null', found 'string'",
         "type mismatch in function 'test_module::main' (binary Add): expected 'null', found 'string'",

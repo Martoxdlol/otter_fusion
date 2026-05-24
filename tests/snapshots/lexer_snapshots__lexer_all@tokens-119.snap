@@ -1,149 +1,171 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/14_ffi/extern_function_import.of
+input_file: examples/spec/12_control_flow/while_loop.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
-            position: 6,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 7,
+            column: 4,
         },
         Token {
-            token_type: Function,
-            position: 15,
+            token_type: Identifier(
+                "i",
+            ),
+            position: 5,
             line: 1,
-            column: 16,
+            column: 6,
+        },
+        Token {
+            token_type: Eq,
+            position: 7,
+            line: 1,
+            column: 8,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: While,
+            position: 16,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 18,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 19,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: LT,
+            position: 21,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 24,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: RightParen,
+            position: 25,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 27,
+            line: 2,
+            column: 17,
         },
         Token {
             token_type: Identifier(
                 "print",
             ),
-            position: 21,
-            line: 1,
-            column: 22,
+            position: 35,
+            line: 3,
+            column: 8,
         },
         Token {
             token_type: LeftParen,
-            position: 22,
-            line: 1,
-            column: 23,
+            position: 36,
+            line: 3,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "value",
+                "i",
             ),
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: Colon,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "str",
-            ),
-            position: 32,
-            line: 1,
-            column: 33,
+            position: 37,
+            line: 3,
+            column: 10,
         },
         Token {
             token_type: RightParen,
-            position: 33,
-            line: 1,
-            column: 34,
+            position: 38,
+            line: 3,
+            column: 11,
         },
         Token {
             token_type: Semicolon,
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: Extern,
-            position: 41,
-            line: 2,
-            column: 7,
-        },
-        Token {
-            token_type: Function,
-            position: 50,
-            line: 2,
-            column: 16,
+            position: 39,
+            line: 3,
+            column: 12,
         },
         Token {
             token_type: Identifier(
-                "malloc",
+                "i",
             ),
-            position: 57,
-            line: 2,
-            column: 23,
+            position: 43,
+            line: 4,
+            column: 4,
         },
         Token {
-            token_type: LeftParen,
-            position: 58,
-            line: 2,
-            column: 24,
+            token_type: Eq,
+            position: 45,
+            line: 4,
+            column: 6,
         },
         Token {
             token_type: Identifier(
-                "size",
+                "i",
             ),
-            position: 62,
-            line: 2,
-            column: 28,
+            position: 47,
+            line: 4,
+            column: 8,
         },
         Token {
-            token_type: Colon,
-            position: 63,
-            line: 2,
-            column: 29,
+            token_type: Plus,
+            position: 49,
+            line: 4,
+            column: 10,
         },
         Token {
-            token_type: Identifier(
-                "u64",
+            token_type: Int(
+                "1",
             ),
-            position: 67,
-            line: 2,
-            column: 33,
-        },
-        Token {
-            token_type: RightParen,
-            position: 68,
-            line: 2,
-            column: 34,
-        },
-        Token {
-            token_type: Colon,
-            position: 69,
-            line: 2,
-            column: 35,
-        },
-        Token {
-            token_type: Star,
-            position: 71,
-            line: 2,
-            column: 37,
-        },
-        Token {
-            token_type: Identifier(
-                "Buffer",
-            ),
-            position: 77,
-            line: 2,
-            column: 43,
+            position: 51,
+            line: 4,
+            column: 12,
         },
         Token {
             token_type: Semicolon,
-            position: 78,
-            line: 2,
-            column: 44,
+            position: 52,
+            line: 4,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 54,
+            line: 5,
+            column: 2,
         },
     ],
 )

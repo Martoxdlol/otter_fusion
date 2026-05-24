@@ -5,19 +5,6 @@ input_file: examples/language/17_union_ast.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::main'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::show'",
         "type mismatch in function 'test_module::show' (call to show arg 0): expected 'struct#0 | struct#1 | struct#2 | struct#3', found 'null'",
         "module 'test_module' imports unknown module 'of:core'",
         "unknown type 'List' in module 'test_module'",

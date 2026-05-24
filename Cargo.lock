@@ -568,6 +568,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "otter_io"
+version = "0.1.0"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "otter_rt"
 version = "0.1.0"
 

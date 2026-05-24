@@ -2,7 +2,7 @@ use std::fmt;
 
 use crate::{
     ast::{
-        BinaryOperator, Block, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
+        BinaryOperator, Block, ConstDecl, Expr, ExtendDecl, ExternParam, FieldDecl, FunctionDecl,
         GenericParam, ImportDecl, ImportSymbol, ImportSymbols, InterfaceDecl, Item, ItemKind,
         Literal, ParamDecl, PrimitiveType, Program, Statement, StructDecl, TypeAliasDecl,
         TypeExpr, UnaryOperator,
@@ -98,8 +98,65 @@ impl Parser {
                     _ => Err(self.unexpected_token_peek()),
                 }
             }
+            TokenType::Const => Ok(Item {
+                kind: ItemKind::Const(self.parse_const_decl()?),
+                span,
+            }),
             _ => Err(self.unexpected_token_peek()),
         }
+    }
+
+    /// Parses `const NAME: TYPE = LITERAL;`.
+    /// The RHS must be a literal (with optional leading `-` on numerics).
+    /// No expression constants — keeps validation trivial and ensures the
+    /// value is fully resolved before any callers reference it.
+    pub fn parse_const_decl(&mut self) -> Result<ConstDecl, ParserError> {
+        self.expect(TokenType::Const)?;
+        let name = self.expect_identifier()?;
+        self.expect(TokenType::Colon)?;
+        let ty = self.parse_type_expr()?;
+        self.expect(TokenType::Eq)?;
+        let value = self.parse_const_literal()?;
+        self.expect_end_of_statement()?;
+        Ok(ConstDecl { name, ty, value })
+    }
+
+    fn parse_const_literal(&mut self) -> Result<Literal, ParserError> {
+        let negate = self.expect_optional(TokenType::Minus);
+        let lit = match self.peek().token_type.clone() {
+            TokenType::Int(v) => {
+                self.advance();
+                let s = if negate { format!("-{}", v) } else { v };
+                Literal::Int(s)
+            }
+            TokenType::Float(v) => {
+                self.advance();
+                let s = if negate { format!("-{}", v) } else { v };
+                Literal::Float(s)
+            }
+            TokenType::StringLit(v) if !negate => {
+                self.advance();
+                Literal::String(v)
+            }
+            TokenType::CharLit(c) if !negate => {
+                self.advance();
+                Literal::Char(c)
+            }
+            TokenType::True if !negate => {
+                self.advance();
+                Literal::Bool(true)
+            }
+            TokenType::False if !negate => {
+                self.advance();
+                Literal::Bool(false)
+            }
+            TokenType::Null if !negate => {
+                self.advance();
+                Literal::Null
+            }
+            _ => return Err(self.unexpected_token_peek()),
+        };
+        Ok(lit)
     }
 
     /// Parses one of:

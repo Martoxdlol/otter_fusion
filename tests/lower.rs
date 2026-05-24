@@ -20,7 +20,10 @@ fn lower_source(src: &str) -> MirProgram {
         name: "test".to_string(),
         program,
     };
-    let hir = Validator::new(vec![module])
+    // Real compilation always prepends of:core (see src/main.rs); mirror
+    // that here so tests that `import` from it can validate.
+    let modules = vec![otter_fusion::get_core_module(), module];
+    let hir = Validator::new(modules)
         .validate()
         .unwrap_or_else(|errs| panic!("validate: {:?}", errs));
     Lower::new(hir).lower().expect("lower")

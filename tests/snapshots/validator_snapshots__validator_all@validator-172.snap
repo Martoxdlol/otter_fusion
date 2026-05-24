@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_var_decl_inferred_from_init.of
+input_file: examples/validator/p5_struct_init_extra_field_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown field 'y' when initializing 'S' in function 'test_module::test'",
+    ],
+)

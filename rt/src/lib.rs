@@ -101,3 +101,81 @@ fn leak_cstring(mut s: String) -> *const c_char {
     let boxed = s.into_bytes().into_boxed_slice();
     Box::leak(boxed).as_ptr() as *const c_char
 }
+
+// ---- Buffer (declared in of_core.of) ----
+//
+// `extern struct Buffer { data: *u8, size: u64 }`. The of-side lowering
+// treats `Buffer` as a managed reference, so every parameter / return at
+// the C ABI boundary is `*mut Buffer` — a pointer to a 16-byte struct
+// {data, size} that lives on the foreign heap.
+//
+// Lifetime: each `__of_buffer_alloc` pairs with a `__of_buffer_free`.
+// The GC never touches these buffers.
+
+#[repr(C)]
+pub struct Buffer {
+    pub data: *mut u8,
+    pub size: u64,
+}
+
+fn buffer_box(data: *mut u8, size: u64) -> *mut Buffer {
+    Box::into_raw(Box::new(Buffer { data, size }))
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_buffer_alloc(size: u64) -> *mut Buffer {
+    if size == 0 {
+        return buffer_box(std::ptr::null_mut(), 0);
+    }
+    let layout = match std::alloc::Layout::from_size_align(size as usize, 8) {
+        Ok(l) => l,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let data = unsafe { std::alloc::alloc_zeroed(layout) };
+    if data.is_null() {
+        return std::ptr::null_mut();
+    }
+    buffer_box(data, size)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_buffer_free(buf: *mut Buffer) {
+    if buf.is_null() {
+        return;
+    }
+    // Reclaim both the data region and the Buffer header.
+    let owned = unsafe { Box::from_raw(buf) };
+    if !owned.data.is_null() && owned.size > 0
+        && let Ok(layout) = std::alloc::Layout::from_size_align(owned.size as usize, 8)
+    {
+        unsafe { std::alloc::dealloc(owned.data, layout) };
+    }
+}
+
+/// Returns the byte at `i`. Out-of-range reads return 0; callers should
+/// range-check via `buf.size` before reading. The of-side declares this
+/// as `u8 | null` but the small-primitive nullable ABI isn't wired up in
+/// codegen yet, so a clamped getter is the pragmatic shape today.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_buffer_get(buf: *mut Buffer, i: u64) -> u8 {
+    if buf.is_null() {
+        return 0;
+    }
+    let buf = unsafe { &*buf };
+    if buf.data.is_null() || i >= buf.size {
+        return 0;
+    }
+    unsafe { *buf.data.add(i as usize) }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_buffer_set(buf: *mut Buffer, i: u64, v: u8) {
+    if buf.is_null() {
+        return;
+    }
+    let buf = unsafe { &*buf };
+    if buf.data.is_null() || i >= buf.size {
+        return;
+    }
+    unsafe { *buf.data.add(i as usize) = v };
+}

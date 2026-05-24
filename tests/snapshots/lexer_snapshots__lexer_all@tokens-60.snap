@@ -1,89 +1,49 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
+input_file: examples/parser/parse_extend_decl_unit.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
+            token_type: Extend,
             position: 6,
             line: 1,
             column: 7,
         },
         Token {
-            token_type: Function,
-            position: 15,
+            token_type: Identifier(
+                "Vehicle",
+            ),
+            position: 14,
             line: 1,
-            column: 16,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 16,
+            line: 1,
+            column: 17,
         },
         Token {
             token_type: Identifier(
-                "malloc",
+                "Movable",
             ),
-            position: 22,
+            position: 24,
             line: 1,
-            column: 23,
+            column: 25,
         },
         Token {
-            token_type: LeftParen,
-            position: 23,
+            token_type: LeftBrace,
+            position: 26,
             line: 1,
-            column: 24,
+            column: 27,
         },
         Token {
-            token_type: Identifier(
-                "size",
-            ),
+            token_type: RightBrace,
             position: 27,
             line: 1,
             column: 28,
-        },
-        Token {
-            token_type: Colon,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "u64",
-            ),
-            position: 32,
-            line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: RightParen,
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
-            token_type: Colon,
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: Star,
-            position: 36,
-            line: 1,
-            column: 37,
-        },
-        Token {
-            token_type: Identifier(
-                "Buffer",
-            ),
-            position: 42,
-            line: 1,
-            column: 43,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 43,
-            line: 1,
-            column: 44,
         },
     ],
 )

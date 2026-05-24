@@ -1,57 +1,57 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_type_alias_union.of
+input_file: examples/parser/parse_simple_struct.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
+            token_type: Struct,
+            position: 6,
             line: 1,
-            column: 5,
+            column: 7,
         },
         Token {
             token_type: Identifier(
-                "Result",
+                "Point",
             ),
-            position: 11,
+            position: 12,
             line: 1,
-            column: 12,
+            column: 13,
         },
         Token {
-            token_type: Eq,
-            position: 13,
+            token_type: LeftBrace,
+            position: 14,
             line: 1,
-            column: 14,
+            column: 15,
         },
         Token {
             token_type: Identifier(
-                "i64",
+                "x",
             ),
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Colon,
             position: 17,
             line: 1,
             column: 18,
         },
         Token {
-            token_type: Pipe,
-            position: 19,
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 21,
             line: 1,
-            column: 20,
+            column: 22,
         },
         Token {
-            token_type: Identifier(
-                "str",
-            ),
+            token_type: RightBrace,
             position: 23,
             line: 1,
             column: 24,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 24,
-            line: 1,
-            column: 25,
         },
     ],
 )

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_map_literal.of
+input_file: examples/parser/parse_function_no_body.of
 ---
 Ok(
     Program {
@@ -9,46 +9,27 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "test",
+                        name: "foo",
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        return_type: None,
-                        params: [],
+                        return_type: Some(
+                            Primitive(
+                                Bool,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
                         body: Some(
                             Block {
-                                statements: [
-                                    Expr(
-                                        LiteralMap(
-                                            [
-                                                (
-                                                    Literal(
-                                                        String(
-                                                            "a",
-                                                        ),
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "1",
-                                                        ),
-                                                    ),
-                                                ),
-                                                (
-                                                    Literal(
-                                                        String(
-                                                            "b",
-                                                        ),
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "2",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                ],
+                                statements: [],
                                 returns: None,
                             },
                         ),

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_simple_struct.of
+input_file: examples/parser/parse_implements_clause.of
 ---
 Ok(
     Program {
@@ -12,17 +12,18 @@ Ok(
                         name: "Point",
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        fields: [],
                         methods: [],
-                        implements: [],
+                        implements: [
+                            Named(
+                                "Movable",
+                                [],
+                            ),
+                            Named(
+                                "Drawable",
+                                [],
+                            ),
+                        ],
                     },
                 ),
                 span: Span {

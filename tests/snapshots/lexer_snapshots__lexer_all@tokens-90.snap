@@ -1,133 +1,121 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/03_functions/implicit_return.of
+input_file: examples/spec/02_variables/var_from_if.of
 ---
 Ok(
     [
         Token {
-            token_type: Function,
-            position: 8,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 9,
+            column: 4,
         },
         Token {
             token_type: Identifier(
-                "add",
+                "status",
             ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: LeftParen,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Colon,
+            token_type: If,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 19,
+            token_type: LeftParen,
+            position: 17,
             line: 1,
-            column: 20,
+            column: 18,
         },
         Token {
-            token_type: Comma,
+            token_type: Identifier(
+                "age",
+            ),
             position: 20,
             line: 1,
             column: 21,
         },
         Token {
-            token_type: Identifier(
-                "b",
-            ),
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Colon,
+            token_type: GtEq,
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: Identifier(
-                "i64",
+            token_type: Int(
+                "18",
             ),
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: RightParen,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Colon,
+            token_type: LeftBrace,
             position: 29,
             line: 1,
             column: 30,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 35,
-            line: 1,
-            column: 36,
-        },
-        Token {
-            token_type: Identifier(
-                "a",
+            token_type: StringLit(
+                "Adult",
             ),
             position: 39,
             line: 2,
-            column: 4,
-        },
-        Token {
-            token_type: Plus,
-            position: 41,
-            line: 2,
-            column: 6,
-        },
-        Token {
-            token_type: Identifier(
-                "b",
-            ),
-            position: 43,
-            line: 2,
-            column: 8,
+            column: 10,
         },
         Token {
             token_type: RightBrace,
-            position: 45,
+            position: 41,
             line: 3,
             column: 2,
+        },
+        Token {
+            token_type: Else,
+            position: 46,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 48,
+            line: 3,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "Minor",
+            ),
+            position: 58,
+            line: 4,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 60,
+            line: 5,
+            column: 2,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 61,
+            line: 5,
+            column: 3,
         },
     ],
 )

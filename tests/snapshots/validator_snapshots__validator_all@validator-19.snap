@@ -5,22 +5,8 @@ input_file: examples/language/19_union_result_with_errors.of
 ---
 ValidationErrors(
     [
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::NotFound::message'",
-        "invalid operator 'Add' for operand of type 'null' in function 'test_module::PermissionDenied::message'",
-        "invalid operator 'Add' for operand of type 'null' in function 'test_module::PermissionDenied::message'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Timeout::message'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::Timeout::message'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::display'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::display'",
-        "invalid operator 'Add' for operand of type 'string' in function 'test_module::display'",
-        "type mismatch in function 'test_module::NotFound::message' (binary Add): expected 'string', found 'null'",
-        "type mismatch in function 'test_module::PermissionDenied::message' (binary Add): expected 'null', found 'string'",
         "type mismatch in function 'test_module::main' (call to fetch arg 0): expected 'int64', found 'null'",
         "module 'test_module' imports unknown module 'of:core'",
-        "unknown member 'resource' on 'null' in function 'test_module::NotFound::message'",
-        "unknown member 'resource' on 'null' in function 'test_module::PermissionDenied::message'",
-        "unknown member 'user' on 'null' in function 'test_module::PermissionDenied::message'",
-        "unknown member 'millis' on 'null' in function 'test_module::Timeout::message'",
         "unknown type 'List' in module 'test_module'",
         "unknown variable 'print' in function 'test_module::main'",
     ],

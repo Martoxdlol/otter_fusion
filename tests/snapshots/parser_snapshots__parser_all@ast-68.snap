@@ -1,35 +1,50 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_implements_clause.of
+input_file: examples/parser/parse_extern_function_with_body.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Point",
-                        is_extern: false,
+                kind: Function(
+                    FunctionDecl {
+                        name: "on_tick",
+                        has_self_param: false,
+                        is_extern: true,
                         generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "Movable",
-                                [],
-                            ),
-                            Named(
-                                "Drawable",
-                                [],
-                            ),
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "d",
+                                ty: Named(
+                                    "MyStruct",
+                                    [],
+                                ),
+                                is_pointer: true,
+                            },
                         ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Return(
+                                        None,
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 16,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 16,
+                    len: 8,
                 },
             },
         ],

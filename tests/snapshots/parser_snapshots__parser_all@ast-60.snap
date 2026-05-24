@@ -1,52 +1,32 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
+input_file: examples/parser/parse_extend_decl_unit.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "malloc",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Pointer(
-                                Named(
-                                    "Buffer",
-                                    [],
-                                ),
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Vehicle",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [
+                            Named(
+                                "Movable",
+                                [],
                             ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "size",
-                                ty: Primitive(
-                                    Uint64,
-                                ),
-                                is_pointer: false,
-                            },
                         ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 16,
-                            len: 8,
-                        },
+                        methods: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 16,
-                    len: 8,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

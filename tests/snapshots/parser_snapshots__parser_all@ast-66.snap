@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_function_no_body.of
+input_file: examples/parser/parse_extern_function_simple.of
 ---
 Ok(
     Program {
@@ -9,20 +9,16 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "foo",
+                        name: "print",
                         has_self_param: false,
-                        is_extern: false,
+                        is_extern: true,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Bool,
-                            ),
-                        ),
+                        return_type: None,
                         params: [
                             ParamDecl {
-                                name: "x",
+                                name: "value",
                                 ty: Primitive(
-                                    Int32,
+                                    String,
                                 ),
                                 is_pointer: false,
                             },
@@ -35,14 +31,14 @@ Ok(
                         ),
                         span: Span {
                             line: 1,
-                            col: 9,
+                            col: 16,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
+                    col: 16,
                     len: 8,
                 },
             },
