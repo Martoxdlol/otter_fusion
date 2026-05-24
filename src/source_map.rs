@@ -1,9 +1,3 @@
-/// Central table that maps byte offsets to file/line/column information.
-/// Inspired by rustc's SourceMap and Clang's SourceManager.
-///
-/// The SourceMap is created once when the source file is loaded, and is
-/// consulted only when an error needs to be displayed. This means the
-/// happy path (no errors) pays zero cost.
 pub struct SourceMap {
     file_name: String,
     source: String,
@@ -16,8 +10,8 @@ pub struct SourceMap {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LocInfo {
     pub file: String,
-    pub line: usize,   // 1-indexed
-    pub col: usize,    // 1-indexed
+    pub line: usize, // 1-indexed
+    pub col: usize,  // 1-indexed
 }
 
 impl SourceMap {
@@ -156,6 +150,38 @@ impl SourceMap {
 
         out
     }
+
+    /// Searches for a specific keyword in the source code.
+    /// If found, returns its exact (line, col, len) coordinates.
+    /// If not found, falls back to the default coordinates.
+    pub fn find_keyword_span(
+        &self,
+        default_line: usize,
+        default_col: usize,
+        keyword: &str,
+    ) -> (usize, usize, usize) {
+        if keyword.is_empty() {
+            return (default_line, default_col, 1);
+        }
+
+        // We can optimize search within the scope of the reported function/block
+        // by looking up the keyword's position.
+        if let Some(byte_idx) = self.source.find(keyword) {
+            let mut line = 1;
+            for (idx, &start) in self.line_starts.iter().enumerate() {
+                if byte_idx >= start as usize {
+                    line = idx + 1;
+                } else {
+                    break;
+                }
+            }
+            let line_start = self.line_starts[line - 1] as usize;
+            let col = byte_idx - line_start + 1;
+            return (line, col, keyword.len());
+        }
+
+        (default_line, default_col, 1)
+    }
 }
 
 #[cfg(test)]
@@ -232,5 +258,21 @@ mod tests {
         let output = sm.render_error_span(2, 3, 5, "expected str, found i64");
         assert!(output.contains("error: expected str, found i64"));
         assert!(output.contains("^^"));
+    }
+
+    #[test]
+    fn locate_keyword_coordinates() {
+        let src = "function test() {\n  var height: f32 = 1.78;\n  print(height);\n}";
+        let sm = SourceMap::new("main.of", src);
+
+        let (line, col, len) = sm.find_keyword_span(1, 1, "height");
+        assert_eq!(line, 2);
+        assert_eq!(col, 7);
+        assert_eq!(len, 6);
+
+        let (line2, col2, len2) = sm.find_keyword_span(1, 1, "print");
+        assert_eq!(line2, 3);
+        assert_eq!(col2, 3);
+        assert_eq!(len2, 5);
     }
 }
