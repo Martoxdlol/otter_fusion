@@ -1,0 +1,282 @@
+// reactor.of — connection table + read/write helpers backing the event loop.
+//
+// One ConnState per accepted client, kept in a singly-linked list hung off
+// the Reactor. Each conn is in one of three phases:
+//
+//   READING — buffered request bytes accumulating; reactor is select()ing
+//             this fd for readability.
+//   WRITING — response bytes prebuilt; reactor is select()ing for writability.
+//   WAITING — long-poll in flight, parked in ChatState.waiters; this conn is
+//             in NEITHER fd_set until either a message arrives or the deadline
+//             passes, at which point it gets flipped back to WRITING.
+//
+// The reactor loop itself lives in slack.of so it can call into route()
+// without indirection (the language has no usable function-pointer/lambda
+// values yet).
+
+import { println, Buffer, __of_buffer_free } from "of:core";
+import {
+  TcpListener,
+  TcpStream,
+  IoError,
+  __of_buffer_from_str,
+  __of_close,
+  __of_read,
+  __of_write,
+  __of_errno,
+  fd_set_nonblocking,
+} from "of_io";
+import { Response, Request, parse_request_bytes } from "web_server";
+
+const PHASE_READING: i32 = 0;
+const PHASE_WRITING: i32 = 1;
+const PHASE_WAITING: i32 = 2;
+
+const READ_CAP: u64 = 8192;
+
+struct ConnState {
+  fd: i32,
+  phase: i32,
+  read_buf: Buffer,
+  read_len: i64,
+  write_buf: Buffer | null,
+  write_size: u64,
+  write_pos: u64,
+  next: ConnState | null,
+}
+
+extend ConnState {
+  // Stage a Response for writing. Frees any previous write_buf. Caller
+  // is responsible for transitioning phase (so dispatch can decide between
+  // "respond now" and "respond after wakeup").
+  function start_writing(self, resp: Response) {
+    var old = self.write_buf;
+    if (old is Buffer) {
+      __of_buffer_free(old as Buffer);
+    }
+    var buf_or = __of_buffer_from_str(resp.as_http());
+    if (buf_or is null) {
+      self.write_buf = null;
+      self.write_size = 0 as u64;
+      self.write_pos = 0 as u64;
+      return;
+    }
+    var b = buf_or as Buffer;
+    self.write_buf = b;
+    self.write_size = b.size;
+    self.write_pos = 0 as u64;
+    self.phase = PHASE_WRITING;
+  }
+
+  // Release fd + every Buffer the conn owns. Called once at connection
+  // teardown — the linked-list unlink is the caller's responsibility.
+  function free_all(self) {
+    __of_close(self.fd);
+    __of_buffer_free(self.read_buf);
+    var wb = self.write_buf;
+    if (wb is Buffer) {
+      __of_buffer_free(wb as Buffer);
+      self.write_buf = null;
+    }
+  }
+}
+
+// Try to make a ConnState for `fd`. Allocates the read buffer up-front; if
+// that fails we just close the fd and bail.
+function make_conn(fd: i32): ConnState | null {
+  var buf_or = Buffer.alloc(READ_CAP);
+  if (buf_or is null) {
+    __of_close(fd);
+    return null;
+  }
+  // Best-effort: surface errors at the call site by warning, the conn
+  // can still proceed if fcntl failed (very rare on local sockets).
+  var nb = fd_set_nonblocking(fd, true);
+  if (nb is IoError) {
+    println("set_nonblocking: " + (nb as IoError).message());
+  }
+  ConnState {
+    fd: fd,
+    phase: PHASE_READING,
+    read_buf: buf_or as Buffer,
+    read_len: 0 as i64,
+    write_buf: null,
+    write_size: 0 as u64,
+    write_pos: 0 as u64,
+    next: null,
+  }
+}
+
+struct Reactor {
+  listener: TcpListener,
+  head: ConnState | null,
+
+  function new(listener: TcpListener): Reactor {
+    Reactor { listener: listener, head: null }
+  }
+}
+
+extend Reactor {
+  function push_conn(self, c: ConnState) {
+    c.next = self.head;
+    self.head = c;
+  }
+
+  // Unlink the conn matching `fd` (if any) and run its teardown.
+  function close_fd(self, fd: i32) {
+    var prev: ConnState | null = null;
+    var p: ConnState | null = self.head;
+    while (p is ConnState) {
+      var c = p as ConnState;
+      if (c.fd == fd) {
+        if (prev is null) {
+          self.head = c.next;
+        } else {
+          var pv = prev as ConnState;
+          pv.next = c.next;
+        }
+        c.free_all();
+        return;
+      }
+      prev = p;
+      p = c.next;
+    }
+  }
+
+  // Move a parked WAITING conn back into write mode with the given response.
+  // Returns false if no conn with that fd was found (e.g. it was already torn
+  // down because the client disconnected).
+  function wake_fd(self, fd: i32, resp: Response): bool {
+    var p: ConnState | null = self.head;
+    while (p is ConnState) {
+      var c = p as ConnState;
+      if (c.fd == fd) {
+        c.start_writing(resp);
+        return true;
+      }
+      p = c.next;
+    }
+    false
+  }
+}
+
+// Read more bytes into c.read_buf at offset c.read_len. The kernel only
+// fills starting at byte 0 of the Buffer we hand it, so we splice via a
+// transient ReadResult and copy the tail in. Returns:
+//   > 0 — bytes appended
+//   0  — EOF
+//  -1  — would block (caller continues; no error)
+//  -2  — other I/O error (caller closes the conn)
+function read_more(c: ConnState): i64 {
+  var remaining = READ_CAP - (c.read_len as u64);
+  if (remaining == (0 as u64)) {
+    return (0 as i64) - (2 as i64);
+  }
+  var tmp_or = Buffer.alloc(remaining);
+  if (tmp_or is null) {
+    return (0 as i64) - (2 as i64);
+  }
+  var tmp = tmp_or as Buffer;
+  var n = __of_read(c.fd, tmp, remaining);
+  if (n < (0 as i64)) {
+    var err = __of_errno();
+    __of_buffer_free(tmp);
+    if (err == (35 as i32) || err == (11 as i32)) {
+      return (0 as i64) - (1 as i64);
+    }
+    return (0 as i64) - (2 as i64);
+  }
+  if (n == (0 as i64)) {
+    __of_buffer_free(tmp);
+    return 0 as i64;
+  }
+  var i: u64 = 0 as u64;
+  var nu = n as u64;
+  var base: u64 = c.read_len as u64;
+  while (i < nu) {
+    c.read_buf.set(base + i, tmp.get(i));
+    i = i + (1 as u64);
+  }
+  __of_buffer_free(tmp);
+  c.read_len = c.read_len + n;
+  n
+}
+
+// Try to parse what we've buffered so far as a full HTTP request. Returns
+// null if more bytes are needed (no blank line yet), an IoError if the
+// request line is malformed, or the Request itself.
+function try_parse(c: ConnState): Request | IoError | null {
+  if (c.read_len <= (0 as i64)) {
+    return null;
+  }
+  if (not_terminated(c.read_buf, c.read_len)) {
+    return null;
+  }
+  var parsed = parse_request_bytes(c.read_buf, c.read_len);
+  if (parsed is IoError) {
+    return parsed as IoError;
+  }
+  var req: Request | IoError | null = parsed as Request;
+  req
+}
+
+// Look for CRLFCRLF (or LFLF as a forgiving fallback). True until we see one.
+function not_terminated(buf: Buffer, len: i64): bool {
+  if (len < (4 as i64)) {
+    return true;
+  }
+  var n = len as u64;
+  var i: u64 = 0 as u64;
+  var stop = n - (3 as u64);
+  while (i < stop) {
+    if (buf.get(i) == (13 as u8)
+        && buf.get(i + (1 as u64)) == (10 as u8)
+        && buf.get(i + (2 as u64)) == (13 as u8)
+        && buf.get(i + (3 as u64)) == (10 as u8)) {
+      return false;
+    }
+    if (buf.get(i) == (10 as u8) && buf.get(i + (1 as u64)) == (10 as u8)) {
+      return false;
+    }
+    i = i + (1 as u64);
+  }
+  true
+}
+
+// Push whatever's left of write_buf to the socket. Returns true if the
+// write fully drained (caller should close the conn), false otherwise.
+function write_more(c: ConnState): bool {
+  if (c.write_buf is null) {
+    return true;
+  }
+  var buf = c.write_buf as Buffer;
+  if (c.write_pos >= c.write_size) {
+    return true;
+  }
+  var remaining = c.write_size - c.write_pos;
+  // The extern wants a base pointer + length; we don't have pointer arith
+  // exposed to of-land, so we splice via a temporary that starts at offset 0.
+  var tmp_or = Buffer.alloc(remaining);
+  if (tmp_or is null) {
+    return false;
+  }
+  var tmp = tmp_or as Buffer;
+  var i: u64 = 0 as u64;
+  while (i < remaining) {
+    tmp.set(i, buf.get(c.write_pos + i));
+    i = i + (1 as u64);
+  }
+  var n = __of_write(c.fd, tmp, remaining);
+  __of_buffer_free(tmp);
+  if (n <= (0 as i64)) {
+    var err = __of_errno();
+    if (err == (35 as i32) || err == (11 as i32)) {
+      return false;
+    }
+    // any other error → drop the conn
+    c.write_pos = c.write_size;
+    return true;
+  }
+  c.write_pos = c.write_pos + (n as u64);
+  c.write_pos >= c.write_size
+}

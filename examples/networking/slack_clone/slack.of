@@ -1,0 +1,313 @@
+// slack.of — entry point: wires the reactor, owns the chat state, and
+// dispatches incoming requests to the right handler.
+//
+// The event loop is in this file (not reactor.of) because dispatching to
+// route() would need a function-value seam — and the language doesn't have
+// a usable one yet. Co-locating keeps every call direct.
+
+import { println } from "of:core";
+import {
+  TcpListener,
+  IoError,
+  FdSet,
+  select,
+  now_ms,
+  __of_accept_simple,
+  __of_errno,
+} from "of_io";
+import { Request, Response, Server } from "web_server";
+
+import { ChatState, Channel, Waiter, Message } from "state";
+import { Query, parse_query, parse_form, path_only } from "url";
+import { page } from "views";
+import {
+  Reactor, ConnState, make_conn,
+  read_more, try_parse, write_more,
+  PHASE_READING, PHASE_WRITING, PHASE_WAITING,
+} from "reactor";
+
+const HOST: str = "127.0.0.1";
+const PORT: i32 = 8090;
+
+// Default long-poll deadline (ms). Clients may pass `wait=N` (seconds) up to
+// this cap; we mostly want browsers to recycle the connection before any
+// intermediate proxy times it out.
+const MAX_WAIT_MS: i64 = 30000;
+// Floor on the select() timeout. Even with no pending waiters we want to
+// re-check the connection list periodically so closed sockets get cleaned.
+const TICK_MS: i64 = 1000;
+
+// =============================================================================
+// Routing
+// =============================================================================
+//
+// Returns:
+//   Response — write it back, then close the conn.
+//   null     — handler suspended the conn (long-poll); reactor leaves it
+//              parked until either a wakeup or a deadline.
+
+function route(req: Request, c: ConnState, state: ChatState, reactor: Reactor): Response | null {
+  var base = path_only(req.path);
+
+  if (req.method == "GET" && base == "/") {
+    return Response.html(page());
+  }
+  if (req.method == "GET" && base == "/health") {
+    return Response.text("ok\n");
+  }
+  if (req.method == "GET" && base == "/channels") {
+    return Response.json(state.channels_json());
+  }
+  if (req.method == "POST" && base == "/channels") {
+    var f = parse_form(req.body);
+    if (f.channel == "") {
+      return Response.bad_request("channel required\n");
+    }
+    state.ensure_channel(f.channel);
+    return Response.with_status(201 as i32, "Created", "{}", "application/json");
+  }
+  if (req.method == "POST" && base == "/send") {
+    var f = parse_form(req.body);
+    if (f.channel == "" || f.user == "" || f.text == "") {
+      return Response.bad_request("channel/user/text required\n");
+    }
+    var ch = state.ensure_channel(f.channel);
+    ch.append(f.user, f.text);
+    drain_waiters(state, ch, reactor);
+    return Response.with_status(204 as i32, "No Content", "", "application/json");
+  }
+  if (req.method == "GET" && base == "/poll") {
+    var q = parse_query(req.path);
+    var ch_or = state.find_channel(q.channel);
+    if (ch_or is Channel) {
+      var ch = ch_or as Channel;
+      if (ch.next_id - (1 as i64) > q.since) {
+        return Response.json(ch.poll_json(q.since));
+      }
+    }
+    var wait_ms: i64 = q.wait * (1000 as i64);
+    if (wait_ms <= (0 as i64)) {
+      wait_ms = 25000 as i64;
+    }
+    if (wait_ms > MAX_WAIT_MS) {
+      wait_ms = MAX_WAIT_MS;
+    }
+    var deadline = now_ms() + wait_ms;
+    state.add_waiter(c.fd, q.channel, q.since, deadline);
+    c.phase = PHASE_WAITING;
+    return null;
+  }
+
+  Response.not_found()
+}
+
+// Wake every waiter on `ch` whose `since` is below the channel's high-water
+// mark. We hand each woken waiter its own JSON snapshot — there's no shared
+// "what's new" payload because each client may have a different since cursor.
+function drain_waiters(state: ChatState, ch: Channel, reactor: Reactor) {
+  var cursor = ch.next_id - (1 as i64);
+  while (true) {
+    var w_or = state.take_woken(ch.name, cursor);
+    if (w_or is null) {
+      return;
+    }
+    var w = w_or as Waiter;
+    var resp = Response.json(ch.poll_json(w.since));
+    reactor.wake_fd(w.fd, resp);
+  }
+}
+
+// Same pattern for the timeout side: send `{"messages":[],"next":since}` and
+// move the conn back to WRITING.
+function drain_expired(state: ChatState, reactor: Reactor) {
+  var now = now_ms();
+  while (true) {
+    var w_or = state.take_expired(now);
+    if (w_or is null) {
+      return;
+    }
+    var w = w_or as Waiter;
+    var body = "{\"messages\":[],\"next\":" + (w.since as str) + "}";
+    var resp = Response.json(body);
+    reactor.wake_fd(w.fd, resp);
+  }
+}
+
+// =============================================================================
+// Event loop
+// =============================================================================
+
+function tick(r: Reactor, state: ChatState) {
+  var rs = FdSet.new();
+  var ws = FdSet.new();
+  rs.add(r.listener.fd);
+  var max_fd = r.listener.fd;
+
+  var p: ConnState | null = r.head;
+  while (p is ConnState) {
+    var c = p as ConnState;
+    if (c.phase == PHASE_READING) {
+      rs.add(c.fd);
+    } else if (c.phase == PHASE_WRITING) {
+      ws.add(c.fd);
+    }
+    if (c.fd > max_fd) {
+      max_fd = c.fd;
+    }
+    p = c.next;
+  }
+
+  var timeout = compute_timeout(state);
+  var ready = select(max_fd + (1 as i32), rs, ws, null, timeout);
+  if (ready is IoError) {
+    println("select: " + (ready as IoError).message());
+    rs.free();
+    ws.free();
+    return;
+  }
+
+  if (rs.isset(r.listener.fd)) {
+    accept_one(r);
+  }
+
+  // Snapshot the list of fds we care about before mutating r.head, because
+  // dispatch() can move conns between phases or close them outright.
+  var to_close: List_i32 = List_i32 { head: null };
+  var q: ConnState | null = r.head;
+  while (q is ConnState) {
+    var c = q as ConnState;
+    var nxt = c.next;
+    if (c.phase == PHASE_READING && rs.isset(c.fd)) {
+      handle_readable(c, state, r, to_close);
+    } else if (c.phase == PHASE_WRITING && ws.isset(c.fd)) {
+      handle_writable(c, to_close);
+    }
+    q = nxt;
+  }
+
+  // Apply close decisions after iteration so the linked-list walk above
+  // stays simple.
+  var n: I32Node | null = to_close.head;
+  while (n is I32Node) {
+    var nn = n as I32Node;
+    state.drop_waiter_for_fd(nn.value);
+    r.close_fd(nn.value);
+    n = nn.next;
+  }
+
+  drain_expired(state, r);
+
+  rs.free();
+  ws.free();
+}
+
+function compute_timeout(state: ChatState): i64 {
+  var dl = state.earliest_deadline();
+  if (dl < (0 as i64)) {
+    return TICK_MS;
+  }
+  var rem = dl - now_ms();
+  if (rem < (10 as i64)) {
+    return 10 as i64;
+  }
+  if (rem > TICK_MS) {
+    return TICK_MS;
+  }
+  rem
+}
+
+function accept_one(r: Reactor) {
+  var cfd = __of_accept_simple(r.listener.fd);
+  if (cfd < (0 as i32)) {
+    // Spurious wakeup or EAGAIN — ignore.
+    return;
+  }
+  var c_or = make_conn(cfd);
+  if (c_or is null) {
+    println("make_conn: alloc failed");
+    return;
+  }
+  r.push_conn(c_or as ConnState);
+}
+
+function handle_readable(c: ConnState, state: ChatState, r: Reactor, close_list: List_i32) {
+  var n = read_more(c);
+  if (n == ((0 as i64) - (1 as i64))) {
+    return;
+  }
+  if (n <= (0 as i64)) {
+    list_push(close_list, c.fd);
+    return;
+  }
+  var parsed_or = try_parse(c);
+  if (parsed_or is null) {
+    return;
+  }
+  if (parsed_or is IoError) {
+    var resp = Response.bad_request("bad request\n");
+    c.start_writing(resp);
+    return;
+  }
+  var req = parsed_or as Request;
+  var maybe = route(req, c, state, r);
+  if (maybe is Response) {
+    c.start_writing(maybe as Response);
+  }
+  // null → suspended, conn already moved to PHASE_WAITING.
+}
+
+function handle_writable(c: ConnState, close_list: List_i32) {
+  var done = write_more(c);
+  if (done) {
+    list_push(close_list, c.fd);
+  }
+}
+
+// =============================================================================
+// Tiny fd list — we need one to defer close decisions out of the iter loop,
+// and the runtime has no List<T> wired up.
+// =============================================================================
+
+struct I32Node {
+  value: i32,
+  next: I32Node | null,
+}
+
+struct List_i32 {
+  head: I32Node | null,
+}
+
+function list_push(l: List_i32, v: i32) {
+  l.head = I32Node { value: v, next: l.head };
+}
+
+// =============================================================================
+// main
+// =============================================================================
+
+function main(): i64 {
+  var srv_or = Server.bind(HOST, PORT as u16);
+  if (srv_or is IoError) {
+    println("bind: " + (srv_or as IoError).message());
+    return 1;
+  }
+  var srv = srv_or as Server;
+  var nb = srv.listener.set_nonblocking(true);
+  if (nb is IoError) {
+    println("listener nonblocking: " + (nb as IoError).message());
+    srv.close();
+    return 1;
+  }
+  println("of-slack listening on http://" + HOST + ":" + (PORT as str));
+
+  var state = ChatState.new();
+  // Seed one channel so the UI has something to land on.
+  state.ensure_channel("general");
+
+  var reactor = Reactor.new(srv.listener);
+  while (true) {
+    tick(reactor, state);
+  }
+
+  0
+}

@@ -1,0 +1,412 @@
+import { Buffer } from "of:core";
+import { __of_buffer_alloc, __of_buffer_free } from "of:core";
+
+// of_io — thin wrappers over POSIX file, networking, and multiplexing
+// syscalls. Link against libotter_io.a.
+//
+// Calling convention:
+//   - `str` lowers to a null-terminated C string (`*const c_char`).
+//   - Raw byte regions (sockaddr, fd_set, timeval) ride on `Buffer`; pass
+//     `Buffer { data: null, size: 0 }` to mean "NULL syscall argument".
+//   - All syscalls return their raw libc result. -1 means error; call
+//     `__of_errno()` to read errno.
+//   - Buffers returned by the helpers (sockaddr_in/timeval/fdset_new) own
+//     foreign-heap memory. Free them with `Buffer.free()`.
+
+// ---- File operations ----
+
+extern function __of_open(path: str, flags: i32, mode: u32): i32;
+extern function __of_read(fd: i32, buf: Buffer, len: u64): i64;
+extern function __of_write(fd: i32, buf: Buffer, len: u64): i64;
+extern function __of_close(fd: i32): i32;
+extern function __of_lseek(fd: i32, offset: i64, whence: i32): i64;
+
+// ---- Networking ----
+
+extern function __of_socket(domain: i32, type_: i32, protocol: i32): i32;
+extern function __of_bind(fd: i32, addr: Buffer, len: u32): i32;
+extern function __of_listen(fd: i32, backlog: i32): i32;
+// `addr` is a sockaddr-sized buffer the kernel writes into. `addrlen` is
+// a 4-byte buffer: caller initializes it to the size of `addr`, kernel
+// overwrites with the actual length.
+extern function __of_accept(fd: i32, addr: Buffer, addrlen: Buffer): i32;
+extern function __of_connect(fd: i32, addr: Buffer, len: u32): i32;
+
+// ---- Multiplexing + non-blocking control ----
+
+// Any of the fd_set / timeout arguments may be `null` to pass NULL to
+// the kernel (meaning "don't watch this kind of event" / "block forever").
+extern function __of_select(nfds: i32, rfds: Buffer | null, wfds: Buffer | null, efds: Buffer | null, timeout: Buffer | null): i32;
+
+// Use `fcntl(fd, F_GETFL(), 0)` to read flags and `fcntl(fd, F_SETFL(), flags)`
+// to set them. To toggle non-blocking: `fcntl(fd, F_SETFL(), flags | O_NONBLOCK())`.
+extern function __of_fcntl(fd: i32, cmd: i32, arg: i64): i32;
+
+// ---- Last syscall error ----
+
+extern function __of_errno(): i32;
+
+// Milliseconds since a monotonic epoch. Never goes backwards; safe for deadlines.
+extern function __of_now_ms(): i64;
+
+function now_ms(): i64 {
+  __of_now_ms()
+}
+
+// ---- Helpers (build syscall byte arguments without exposing layouts) ----
+
+// IPv4 sockaddr_in (16 bytes). `ip_be` and `port_be` are network-byte-order.
+extern function __of_sockaddr_in(ip_be: u32, port_be: u16): Buffer;
+
+// struct timeval (sec + usec).
+extern function __of_timeval(sec: i64, usec: i64): Buffer;
+
+// fd_set sized for FD_SETSIZE; bits start cleared.
+extern function __of_fdset_new(): Buffer;
+extern function __of_fdset_zero(set: Buffer);
+extern function __of_fdset_set(set: Buffer, fd: i32);
+extern function __of_fdset_clr(set: Buffer, fd: i32);
+extern function __of_fdset_isset(set: Buffer, fd: i32): bool;
+
+// htons / htonl — needed to build a sockaddr_in.
+extern function __of_htons(host_short: u16): u16;
+extern function __of_htonl(host_long: u32): u32;
+
+// Bitwise OR helper — the language doesn't have `|` on integers, but
+// flag combinations need it (e.g. `O_CREAT | O_WRONLY`).
+extern function __of_or_i32(a: i32, b: i32): i32;
+
+// ---- POSIX-stable constants ----
+// These values are guaranteed by POSIX across Linux and macOS, so they
+// can live as compile-time consts.
+
+const O_RDONLY: i32 = 0;
+const O_WRONLY: i32 = 1;
+const O_RDWR: i32 = 2;
+
+const SEEK_SET: i32 = 0;
+const SEEK_CUR: i32 = 1;
+const SEEK_END: i32 = 2;
+
+const STDIN_FILENO: i32 = 0;
+const STDOUT_FILENO: i32 = 1;
+const STDERR_FILENO: i32 = 2;
+
+// ---- Platform-divergent constants ----
+// O_CREAT, O_NONBLOCK, AF_INET, etc. have different bit patterns on
+// Linux vs. macOS; expose them as 0-arg extern functions so Rust picks
+// the right libc value at compile time.
+
+extern function O_CREAT(): i32;
+extern function O_TRUNC(): i32;
+extern function O_APPEND(): i32;
+extern function O_NONBLOCK(): i32;
+
+extern function AF_INET(): i32;
+extern function AF_INET6(): i32;
+extern function AF_UNIX(): i32;
+extern function SOCK_STREAM(): i32;
+extern function SOCK_DGRAM(): i32;
+
+extern function F_GETFL(): i32;
+extern function F_SETFL(): i32;
+
+// Default file mode for created files (rw-r--r--). 0644 octal.
+const MODE_RW_R_R: u32 = 420;
+
+// =============================================================================
+// High-level facade
+//
+// Wraps the raw __of_* externs in friendlier types: IoError carries errno +
+// the failing op, TcpListener / TcpStream own a socket fd, FdSet wraps the
+// fd_set Buffer. No Drop in the language, so callers still pair every
+// successful construction with a `.close()` / `.free()`.
+// =============================================================================
+
+// Additional Rust-side helpers used only by the facade.
+extern function __of_and_not_i32(a: i32, b: i32): i32;
+extern function __of_buffer_from_str(s: str): Buffer | null;
+// Returns the empty string on bad inputs rather than null; small-primitive
+// nullables (str | null, u8 | null, ...) need a 16-byte tagged-union ABI
+// that codegen doesn't emit yet. See the runtime side for details.
+extern function __of_str_from_buffer(buf: Buffer, start: i64, len: i64): str;
+extern function __of_sockaddr_for_host(host: str, port: u16): Buffer | null;
+extern function __of_accept_simple(fd: i32): i32;
+extern function __of_set_reuseaddr(fd: i32, on: u8): i32;
+
+// POSIX-stable errno values used when the facade itself decides to fail
+// (allocation, address parsing). Real kernel errors come via __of_errno().
+const E_NOMEM: i32 = 12;
+const E_INVAL: i32 = 22;
+
+struct IoError {
+  errno: i32,
+  op: str,
+}
+
+extend IoError {
+  function message(self): str {
+    self.op + " failed (errno=" + (self.errno as str) + ")"
+  }
+}
+
+// ---- Free fd-based I/O ----
+//
+// Wrap raw __of_write / __of_read so callers don't reach for the extern
+// when talking to stdin/stdout (fd 0/1) — they get the same IoError shape
+// the rest of the facade uses.
+
+function write(fd: i32, buf: Buffer, len: u64): i64 | IoError {
+  var n = __of_write(fd, buf, len);
+  if (n < 0) {
+    return IoError { errno: __of_errno(), op: "write" };
+  }
+  n
+}
+
+// ---- TcpListener ----
+
+struct TcpListener {
+  fd: i32,
+
+  // Bind + listen on host:port. host is a dotted-quad IPv4 string.
+  function bind(host: str, port: u16, backlog: i32): TcpListener | IoError {
+    var fd = __of_socket(AF_INET(), SOCK_STREAM(), 0);
+    if (fd < 0) {
+      return IoError { errno: __of_errno(), op: "socket" };
+    }
+    // Best-effort SO_REUSEADDR — ignore failures (older platforms, custom
+    // sysctl). The previous-binding-still-in-TIME_WAIT case is by far the
+    // common cause of "bind: errno 48" during dev, and this clears it.
+    __of_set_reuseaddr(fd, 1 as u8);
+    var addr_maybe = __of_sockaddr_for_host(host, port);
+    if (addr_maybe is null) {
+      __of_close(fd);
+      return IoError { errno: E_INVAL, op: "parse_addr" };
+    }
+    var addr = addr_maybe as Buffer;
+    var rc = __of_bind(fd, addr, 16 as u32);
+    __of_buffer_free(addr);
+    if (rc < 0) {
+      var e = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e, op: "bind" };
+    }
+    if (__of_listen(fd, backlog) < 0) {
+      var e2 = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e2, op: "listen" };
+    }
+    TcpListener { fd: fd }
+  }
+}
+
+extend TcpListener {
+  function accept(self): TcpStream | IoError {
+    var cfd = __of_accept_simple(self.fd);
+    if (cfd < 0) {
+      return IoError { errno: __of_errno(), op: "accept" };
+    }
+    TcpStream { fd: cfd }
+  }
+
+  function set_nonblocking(self, on: bool): IoError | null {
+    fd_set_nonblocking(self.fd, on)
+  }
+
+  function close(self) {
+    __of_close(self.fd);
+  }
+}
+
+// ---- TcpStream ----
+
+struct TcpStream {
+  fd: i32,
+
+  function connect(host: str, port: u16): TcpStream | IoError {
+    var fd = __of_socket(AF_INET(), SOCK_STREAM(), 0);
+    if (fd < 0) {
+      return IoError { errno: __of_errno(), op: "socket" };
+    }
+    var addr_maybe = __of_sockaddr_for_host(host, port);
+    if (addr_maybe is null) {
+      __of_close(fd);
+      return IoError { errno: E_INVAL, op: "parse_addr" };
+    }
+    var addr = addr_maybe as Buffer;
+    var rc = __of_connect(fd, addr, 16 as u32);
+    __of_buffer_free(addr);
+    if (rc < 0) {
+      var e = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e, op: "connect" };
+    }
+    TcpStream { fd: fd }
+  }
+}
+
+extend TcpStream {
+  // Allocate a fresh Buffer of `max` bytes and fill it with up to `max`
+  // bytes from the socket. Caller frees ReadResult.buf via .free() when done.
+  function read(self, max: u64): ReadResult | IoError {
+    var buf_maybe = __of_buffer_alloc(max);
+    if (buf_maybe is null) {
+      return IoError { errno: E_NOMEM, op: "alloc" };
+    }
+    var buf = buf_maybe as Buffer;
+    var n = __of_read(self.fd, buf, max);
+    if (n < 0) {
+      var e = __of_errno();
+      __of_buffer_free(buf);
+      return IoError { errno: e, op: "read" };
+    }
+    ReadResult { buf: buf, len: n }
+  }
+
+  // Read into a caller-owned Buffer. Returns the byte count.
+  function read_into(self, buf: Buffer, max: u64): i64 | IoError {
+    var n = __of_read(self.fd, buf, max);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "read" };
+    }
+    n
+  }
+
+  function write(self, buf: Buffer, len: u64): i64 | IoError {
+    var n = __of_write(self.fd, buf, len);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "write" };
+    }
+    n
+  }
+
+  // Copy `s` into a transient Buffer, send it, free it.
+  function write_str(self, s: str): i64 | IoError {
+    var buf_maybe = __of_buffer_from_str(s);
+    if (buf_maybe is null) {
+      return IoError { errno: E_NOMEM, op: "alloc" };
+    }
+    var buf = buf_maybe as Buffer;
+    var n = __of_write(self.fd, buf, buf.size);
+    __of_buffer_free(buf);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "write" };
+    }
+    n
+  }
+
+  function set_nonblocking(self, on: bool): IoError | null {
+    fd_set_nonblocking(self.fd, on)
+  }
+
+  function close(self) {
+    __of_close(self.fd);
+  }
+}
+
+// Returned by TcpStream.read(). `len` is the actual bytes filled;
+// `buf.size` is the buffer's capacity (>= len). Caller calls .free().
+struct ReadResult {
+  buf: Buffer,
+  len: i64,
+}
+
+extend ReadResult {
+  function free(self) {
+    __of_buffer_free(self.buf);
+  }
+
+  // Copy the first `self.len` bytes out as a str. Returns an empty string
+  // when the read was empty or the runtime helper couldn't allocate; see
+  // __of_str_from_buffer for the rationale.
+  function as_str(self): str {
+    if (self.len <= (0 as i64)) {
+      return "";
+    }
+    __of_str_from_buffer(self.buf, 0 as i64, self.len)
+  }
+}
+
+// ---- FdSet ----
+
+struct FdSet {
+  buf: Buffer,
+
+  function new(): FdSet {
+    FdSet { buf: __of_fdset_new() }
+  }
+}
+
+extend FdSet {
+  function add(self, fd: i32) {
+    __of_fdset_set(self.buf, fd);
+  }
+  function remove(self, fd: i32) {
+    __of_fdset_clr(self.buf, fd);
+  }
+  function isset(self, fd: i32): bool {
+    __of_fdset_isset(self.buf, fd)
+  }
+  function clear(self) {
+    __of_fdset_zero(self.buf);
+  }
+  function free(self) {
+    __of_buffer_free(self.buf);
+  }
+}
+
+// ---- select ----
+//
+// timeout_ms < 0 → block forever (NULL timeval).
+// Any of r/w/e can be null → NULL pointer for that set.
+// Returned i32 is the count of ready fds; 0 means timeout.
+
+function select(nfds: i32, r: FdSet | null, w: FdSet | null, e: FdSet | null, timeout_ms: i64): i32 | IoError {
+  var rbuf = fdset_buf(r);
+  var wbuf = fdset_buf(w);
+  var ebuf = fdset_buf(e);
+  var tvbuf: Buffer | null = if (timeout_ms < 0) {
+    null
+  } else {
+    var sec = timeout_ms / 1000;
+    __of_timeval(sec, (timeout_ms - sec * 1000) * 1000)
+  };
+  var rc = __of_select(nfds, rbuf, wbuf, ebuf, tvbuf);
+  var err_after = __of_errno();
+  if (tvbuf is Buffer) {
+    __of_buffer_free(tvbuf as Buffer);
+  }
+  if (rc < 0) {
+    return IoError { errno: err_after, op: "select" };
+  }
+  rc
+}
+
+// Internal: unwrap FdSet | null to its inner Buffer | null for the raw
+// extern. Written with an intermediate `var` so the trailing implicit
+// return doesn't glue onto the preceding if-statement as a call.
+function fdset_buf(s: FdSet | null): Buffer | null {
+  if (s is null) {
+    return null;
+  }
+  var fs = s as FdSet;
+  fs.buf
+}
+
+// Internal: F_GETFL + F_SETFL with O_NONBLOCK toggled.
+function fd_set_nonblocking(fd: i32, on: bool): IoError | null {
+  var flags = __of_fcntl(fd, F_GETFL(), 0 as i64);
+  if (flags < 0) {
+    return IoError { errno: __of_errno(), op: "fcntl-getfl" };
+  }
+  var new_flags = if (on) {
+    __of_or_i32(flags, O_NONBLOCK())
+  } else {
+    __of_and_not_i32(flags, O_NONBLOCK())
+  };
+  if (__of_fcntl(fd, F_SETFL(), new_flags as i64) < 0) {
+    return IoError { errno: __of_errno(), op: "fcntl-setfl" };
+  }
+  null
+}

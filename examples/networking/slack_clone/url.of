@@ -1,0 +1,194 @@
+// url.of — query-string and form-body parsing via Buffer byte scan.
+//
+// The language has no `str.split` / `str.index_of` wired up, so we lower
+// each string to a Buffer (a foreign-heap byte view) and walk it byte by
+// byte, slicing out fields with `__of_str_from_buffer`. Output is a tiny
+// struct so routes don't have to think about parsing.
+
+import { Buffer, __of_buffer_free } from "of:core";
+import { __of_buffer_from_str, __of_str_from_buffer } from "of_io";
+
+const ASCII_QUESTION: u8 = 63;
+const ASCII_AMP: u8 = 38;
+const ASCII_EQ: u8 = 61;
+const ASCII_PLUS: u8 = 43;
+const ASCII_PERCENT: u8 = 37;
+
+// Parsed query — only the fields slack_clone uses. Empty string when absent.
+struct Query {
+  channel: str,
+  user: str,
+  text: str,
+  since: i64,
+  wait: i64,
+
+  function empty(): Query {
+    Query { channel: "", user: "", text: "", since: 0 as i64, wait: 0 as i64 }
+  }
+}
+
+// Strip the query off a path: "/poll?a=1&b=2" → "/poll".
+function path_only(p: str): str {
+  var buf_or = __of_buffer_from_str(p);
+  if (buf_or is null) {
+    return p;
+  }
+  var buf = buf_or as Buffer;
+  var qpos = scan_byte(buf, 0 as i64, buf.size as i64, ASCII_QUESTION);
+  var out: str = if (qpos < (0 as i64)) {
+    p
+  } else {
+    __of_str_from_buffer(buf, 0 as i64, qpos)
+  };
+  __of_buffer_free(buf);
+  out
+}
+
+// Parse a query string starting after `?`. Accepts `channel`, `user`, `text`,
+// `since`, `wait` — everything else is ignored.
+function parse_query(path_with_query: str): Query {
+  var q = Query.empty();
+  var buf_or = __of_buffer_from_str(path_with_query);
+  if (buf_or is null) {
+    return q;
+  }
+  var buf = buf_or as Buffer;
+  var len = buf.size as i64;
+  var qpos = scan_byte(buf, 0 as i64, len, ASCII_QUESTION);
+  if (qpos >= (0 as i64)) {
+    fill_pairs_from(buf, qpos + (1 as i64), len, q, false);
+  }
+  __of_buffer_free(buf);
+  q
+}
+
+// Same as parse_query but reads `key=value&...` directly out of a form body.
+function parse_form(body: str): Query {
+  var q = Query.empty();
+  var buf_or = __of_buffer_from_str(body);
+  if (buf_or is null) {
+    return q;
+  }
+  var buf = buf_or as Buffer;
+  fill_pairs_from(buf, 0 as i64, buf.size as i64, q, true);
+  __of_buffer_free(buf);
+  q
+}
+
+// Walk `key=value(&key=value)*` from `start..end`, populating fields on `q`.
+// `decode_plus` controls whether '+' decodes to space (form bodies do, paths
+// don't unless we want to be lenient — keeping it explicit per call site).
+function fill_pairs_from(buf: Buffer, start: i64, end: i64, q: Query, decode_plus: bool) {
+  var i = start;
+  while (i < end) {
+    var eq = scan_byte(buf, i, end, ASCII_EQ);
+    var amp = scan_byte(buf, i, end, ASCII_AMP);
+    var pair_end = if (amp < (0 as i64)) { end } else { amp };
+    if (eq < (0 as i64) || eq > pair_end) {
+      i = pair_end + (1 as i64);
+      continue;
+    }
+    var k = __of_str_from_buffer(buf, i, eq - i);
+    var v_raw = __of_str_from_buffer(buf, eq + (1 as i64), pair_end - eq - (1 as i64));
+    var v = url_decode(v_raw, decode_plus);
+    if (k == "channel") { q.channel = v; }
+    else if (k == "user") { q.user = v; }
+    else if (k == "text") { q.text = v; }
+    else if (k == "since") { q.since = parse_i64(v); }
+    else if (k == "wait") { q.wait = parse_i64(v); }
+    i = pair_end + (1 as i64);
+  }
+}
+
+// Decode percent-escapes and (optionally) '+' → space. Bad escapes pass through.
+function url_decode(s: str, plus_is_space: bool): str {
+  var src_or = __of_buffer_from_str(s);
+  if (src_or is null) {
+    return s;
+  }
+  var src = src_or as Buffer;
+  var n = src.size;
+  var dst_or = Buffer.alloc(n);
+  if (dst_or is null) {
+    __of_buffer_free(src);
+    return s;
+  }
+  var dst = dst_or as Buffer;
+  var i: u64 = 0 as u64;
+  var j: u64 = 0 as u64;
+  while (i < n) {
+    var b = src.get(i);
+    if (b == ASCII_PERCENT && (i + (2 as u64)) < n) {
+      var hi = hex_nibble(src.get(i + (1 as u64)));
+      var lo = hex_nibble(src.get(i + (2 as u64)));
+      if (hi >= 0 && lo >= 0) {
+        dst.set(j, ((hi * 16 + lo) as u8));
+        j = j + (1 as u64);
+        i = i + (3 as u64);
+        continue;
+      }
+    }
+    if (plus_is_space && b == ASCII_PLUS) {
+      dst.set(j, 32 as u8);
+    } else {
+      dst.set(j, b);
+    }
+    j = j + (1 as u64);
+    i = i + (1 as u64);
+  }
+  var out = __of_str_from_buffer(dst, 0 as i64, j as i64);
+  __of_buffer_free(dst);
+  __of_buffer_free(src);
+  out
+}
+
+// Hex digit to 0..15, or -1 for non-hex bytes.
+function hex_nibble(b: u8): i32 {
+  var r: i32 = (0 as i32) - (1 as i32);
+  if (b >= (48 as u8) && b <= (57 as u8))       { r = (b as i32) - (48 as i32); }
+  else if (b >= (97 as u8) && b <= (102 as u8)) { r = (b as i32) - (97 as i32) + (10 as i32); }
+  else if (b >= (65 as u8) && b <= (70 as u8))  { r = (b as i32) - (65 as i32) + (10 as i32); }
+  r
+}
+
+// Decimal i64 parser, stops at the first non-digit. Returns 0 on garbage.
+function parse_i64(s: str): i64 {
+  var buf_or = __of_buffer_from_str(s);
+  if (buf_or is null) {
+    return 0 as i64;
+  }
+  var buf = buf_or as Buffer;
+  var n = buf.size;
+  var i: u64 = 0 as u64;
+  var neg = false;
+  if (n > (0 as u64) && buf.get(0 as u64) == (45 as u8)) {
+    neg = true;
+    i = 1 as u64;
+  }
+  var v: i64 = 0 as i64;
+  while (i < n) {
+    var b = buf.get(i);
+    if (b < (48 as u8) || b > (57 as u8)) {
+      break;
+    }
+    v = v * (10 as i64) + ((b as i64) - (48 as i64));
+    i = i + (1 as u64);
+  }
+  __of_buffer_free(buf);
+  if (neg) { (0 as i64) - v } else { v }
+}
+
+// Offset of first byte equal to `target` in `start..end`, or -1.
+function scan_byte(buf: Buffer, start: i64, end: i64, target: u8): i64 {
+  var found: i64 = (0 as i64) - (1 as i64);
+  var i = start;
+  while (i < end) {
+    if (buf.get(i as u64) == target) {
+      found = i;
+      i = end;
+    } else {
+      i = i + (1 as i64);
+    }
+  }
+  found
+}

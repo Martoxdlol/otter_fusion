@@ -169,6 +169,17 @@ pub extern "C" fn __of_errno() -> c_int {
     std::io::Error::last_os_error().raw_os_error().unwrap_or(0)
 }
 
+// ---- Monotonic clock ----
+//
+// Milliseconds since an unspecified epoch. Suitable for relative deadlines
+// (long-poll timeout, retry backoff). Never goes backwards.
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_now_ms() -> i64 {
+    let mut ts: libc::timespec = unsafe { std::mem::zeroed() };
+    unsafe { libc::clock_gettime(libc::CLOCK_MONOTONIC, &mut ts) };
+    (ts.tv_sec as i64) * 1000 + (ts.tv_nsec as i64) / 1_000_000
+}
+
 // ---- Byte-region builders ----
 
 #[unsafe(no_mangle)]

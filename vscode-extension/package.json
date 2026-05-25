@@ -4,16 +4,25 @@
   "description": "Syntax highlighting and validation for Otter Fusion (.of) files",
   "version": "0.0.1",
   "publisher": "otter-fusion",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Programming Languages", "Linters"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
   "main": "./out/extension.js",
-  "activationEvents": ["onLanguage:otter-fusion"],
   "contributes": {
     "languages": [
       {
         "id": "otter-fusion",
-        "aliases": ["Otter Fusion", "otter-fusion"],
-        "extensions": [".of"],
+        "aliases": [
+          "Otter Fusion",
+          "otter-fusion"
+        ],
+        "extensions": [
+          ".of"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -37,7 +46,8 @@
   },
   "scripts": {
     "compile": "tsc -p .",
-    "watch": "tsc -p . -w"
+    "watch": "tsc -p . -w",
+    "package": "tsc -p . && npx @vscode/vsce package --out otter-fusion.vsix"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

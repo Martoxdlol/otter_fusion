@@ -1,0 +1,322 @@
+// of_web — a minimal HTTP/1.1 web server library.
+//
+// Style: explicit accept loop. The user owns the loop, calls
+// `server.accept()` per connection, asks the connection for the parsed
+// request, builds a Response, and writes it back. No closures, no
+// middleware stacks — those need language features (lambdas, lists of
+// function values, virtual dispatch) that aren't ready yet.
+//
+//   var srv = (Server.bind("127.0.0.1", 8080 as u16) as Server);
+//   while (true) {
+//     var conn = srv.accept() as Connection;
+//     var req = conn.read_request() as Request;
+//     var resp = if (req.path == "/") {
+//       Response.text("hello\n")
+//     } else {
+//       Response.not_found()
+//     };
+//     conn.write_response(resp);
+//     conn.close();
+//   }
+//
+// HTTP scope: serves one response per connection (Connection: close),
+// parses the request line (method, path, protocol) and the body that
+// follows the first blank line. Headers are not parsed individually —
+// `Request.raw` keeps the original text for callers that need them.
+
+import { println, Buffer } from "of:core";
+import {
+  TcpListener,
+  TcpStream,
+  ReadResult,
+  IoError,
+  __of_str_from_buffer,
+} from "of_io";
+
+// =============================================================================
+// Status codes — top-level consts so handlers can write
+// `Response.with_status(STATUS_OK, ...)` instead of magic numbers.
+// =============================================================================
+
+const STATUS_OK: i32 = 200;
+const STATUS_CREATED: i32 = 201;
+const STATUS_NO_CONTENT: i32 = 204;
+const STATUS_BAD_REQUEST: i32 = 400;
+const STATUS_NOT_FOUND: i32 = 404;
+const STATUS_METHOD_NOT_ALLOWED: i32 = 405;
+const STATUS_INTERNAL_ERROR: i32 = 500;
+
+// Errno-ish codes used by the parser to surface failures through the
+// same IoError shape as the underlying TCP layer.
+const E_INVAL: i32 = 22;
+
+const MAX_REQUEST_BYTES: u64 = 8192;
+const HTTP_SPACE: u8 = 32;
+const HTTP_CR: u8 = 13;
+const HTTP_LF: u8 = 10;
+
+// =============================================================================
+// Request — produced by Connection.read_request().
+//
+// `raw` keeps the original request text so callers that need headers can
+// scan it themselves (the parser only splits the request line + body).
+// =============================================================================
+
+struct Request {
+  method: str,
+  path: str,
+  protocol: str,
+  body: str,
+  raw: str,
+}
+
+// =============================================================================
+// Response — built by handlers, written by Connection.write_response().
+// =============================================================================
+
+struct Response {
+  status: i32,
+  status_text: str,
+  content_type: str,
+  body: str,
+
+  // 200 OK with explicit content type.
+  function ok(body: str, content_type: str): Response {
+    Response {
+      status: STATUS_OK,
+      status_text: "OK",
+      content_type: content_type,
+      body: body,
+    }
+  }
+  // 200 OK, text/plain.
+  function text(body: str): Response {
+    Response {
+      status: STATUS_OK,
+      status_text: "OK",
+      content_type: "text/plain; charset=utf-8",
+      body: body,
+    }
+  }
+  // 200 OK, text/html.
+  function html(body: str): Response {
+    Response {
+      status: STATUS_OK,
+      status_text: "OK",
+      content_type: "text/html; charset=utf-8",
+      body: body,
+    }
+  }
+  // 200 OK, application/json. The body must already be JSON-encoded.
+  function json(body: str): Response {
+    Response {
+      status: STATUS_OK,
+      status_text: "OK",
+      content_type: "application/json",
+      body: body,
+    }
+  }
+  function not_found(): Response {
+    Response {
+      status: STATUS_NOT_FOUND,
+      status_text: "Not Found",
+      content_type: "text/plain; charset=utf-8",
+      body: "Not Found\n",
+    }
+  }
+  function bad_request(body: str): Response {
+    Response {
+      status: STATUS_BAD_REQUEST,
+      status_text: "Bad Request",
+      content_type: "text/plain; charset=utf-8",
+      body: body,
+    }
+  }
+  function method_not_allowed(): Response {
+    Response {
+      status: STATUS_METHOD_NOT_ALLOWED,
+      status_text: "Method Not Allowed",
+      content_type: "text/plain; charset=utf-8",
+      body: "Method Not Allowed\n",
+    }
+  }
+  function internal_error(body: str): Response {
+    Response {
+      status: STATUS_INTERNAL_ERROR,
+      status_text: "Internal Server Error",
+      content_type: "text/plain; charset=utf-8",
+      body: body,
+    }
+  }
+  // Escape hatch for any status code the convenience helpers don't cover.
+  function with_status(status: i32, status_text: str, body: str, content_type: str): Response {
+    Response {
+      status: status,
+      status_text: status_text,
+      content_type: content_type,
+      body: body,
+    }
+  }
+}
+
+extend Response {
+  // Serialize into the bytes the server writes on the wire.
+  // Content-Length is omitted on purpose: the language has no string-length
+  // helper wired up yet, so we lean on `Connection: close` for framing.
+  function as_http(self): str {
+    "HTTP/1.1 " + (self.status as str) + " " + self.status_text + "\r\n"
+      + "Content-Type: " + self.content_type + "\r\n"
+      + "Connection: close\r\n"
+      + "\r\n"
+      + self.body
+  }
+}
+
+// =============================================================================
+// Server — owns the TcpListener.
+// =============================================================================
+
+struct Server {
+  listener: TcpListener,
+
+  function bind(host: str, port: u16): Server | IoError {
+    var listener_or_err = TcpListener.bind(host, port, 16);
+    if (listener_or_err is IoError) {
+      return listener_or_err as IoError;
+    }
+    Server { listener: listener_or_err as TcpListener }
+  }
+}
+
+extend Server {
+  function accept(self): Connection | IoError {
+    var stream_or_err = self.listener.accept();
+    if (stream_or_err is IoError) {
+      return stream_or_err as IoError;
+    }
+    Connection { stream: stream_or_err as TcpStream }
+  }
+
+  function close(self) {
+    self.listener.close();
+  }
+}
+
+// =============================================================================
+// Connection — owns one accepted TcpStream.
+// =============================================================================
+
+struct Connection {
+  stream: TcpStream,
+}
+
+extend Connection {
+  function read_request(self): Request | IoError {
+    var read_res = self.stream.read(MAX_REQUEST_BYTES);
+    if (read_res is IoError) {
+      return read_res as IoError;
+    }
+    var r = read_res as ReadResult;
+    var parsed = parse_request_bytes(r.buf, r.len);
+    r.free();
+    parsed
+  }
+
+  function write_response(self, resp: Response): IoError | null {
+    var w = self.stream.write_str(resp.as_http());
+    if (w is IoError) {
+      return w as IoError;
+    }
+    null
+  }
+
+  function close(self) {
+    self.stream.close();
+  }
+}
+
+// =============================================================================
+// Request parser — scans the buffer byte-by-byte. Returns IoError with
+// E_INVAL if the request line is malformed.
+//
+// All substrings come out via __of_str_from_buffer, so each Request owns
+// freshly-allocated `str` storage and is safe to use after the source
+// Buffer is freed.
+// =============================================================================
+
+function parse_request_bytes(buf: Buffer, len: i64): Request | IoError {
+  // -- request line: METHOD SP PATH SP PROTOCOL CRLF --
+  var method_end = scan_for(buf, len, 0 as i64, HTTP_SPACE);
+  if (method_end < (0 as i64)) {
+    return IoError { errno: E_INVAL, op: "parse-method" };
+  }
+
+  var path_start = method_end + (1 as i64);
+  var path_end = scan_for(buf, len, path_start, HTTP_SPACE);
+  if (path_end < (0 as i64)) {
+    return IoError { errno: E_INVAL, op: "parse-path" };
+  }
+
+  var proto_start = path_end + (1 as i64);
+  var proto_end = scan_for(buf, len, proto_start, HTTP_CR);
+  if (proto_end < (0 as i64)) {
+    proto_end = len;
+  }
+
+  // -- body: starts after the first blank line (CRLFCRLF) --
+  var blank = scan_blank_line(buf, len, proto_end as i64);
+
+  var method_str = __of_str_from_buffer(buf, 0 as i64, method_end);
+  var path_str = __of_str_from_buffer(buf, path_start, path_end - path_start);
+  var proto_str = __of_str_from_buffer(buf, proto_start, proto_end - proto_start);
+  var raw_str = __of_str_from_buffer(buf, 0 as i64, len);
+
+  var body_str: str = if (blank >= (0 as i64) && blank < len) {
+    __of_str_from_buffer(buf, blank, len - blank)
+  } else {
+    ""
+  };
+
+  Request {
+    method: method_str,
+    path: path_str,
+    protocol: proto_str,
+    body: body_str,
+    raw: raw_str,
+  }
+}
+
+// Return the offset of the first byte at-or-after `start` that equals
+// `target`, or -1 if not found within `len`.
+function scan_for(buf: Buffer, len: i64, start: i64, target: u8): i64 {
+  var i = start;
+  while (i < len) {
+    if (buf.get(i as u64) == target) {
+      return i;
+    }
+    i = i + (1 as i64);
+  }
+  -1 as i64
+}
+
+// Find the byte offset where the body starts (right after the first
+// CRLFCRLF or LFLF). Returns -1 if no blank line was seen.
+function scan_blank_line(buf: Buffer, len: i64, start: i64): i64 {
+  var i = start;
+  while (i + (3 as i64) < len) {
+    if (buf.get(i as u64) == HTTP_CR
+        && buf.get((i + (1 as i64)) as u64) == HTTP_LF
+        && buf.get((i + (2 as i64)) as u64) == HTTP_CR
+        && buf.get((i + (3 as i64)) as u64) == HTTP_LF) {
+      return i + (4 as i64);
+    }
+    i = i + (1 as i64);
+  }
+  -1 as i64
+}
+
+// Re-export of_io's println so example apps can `import { println } from "web_server"`
+// without also reaching into of:core just for logging.
+function log(msg: str) {
+  println(msg);
+}

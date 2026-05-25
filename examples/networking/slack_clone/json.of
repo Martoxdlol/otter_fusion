@@ -1,0 +1,65 @@
+// json.of — string escaping + small builders. We don't have a full JSON
+// emitter because we never need to round-trip arbitrary values; routes
+// know the shape they want and assemble it directly from strings and
+// integers. The one thing we DO need is correct string escaping so an
+// in-message `"` doesn't break the wire format.
+
+import { Buffer, __of_buffer_free } from "of:core";
+import { __of_buffer_from_str, __of_str_from_buffer } from "of_io";
+
+const ASCII_QUOTE: u8 = 34;
+const ASCII_BACKSLASH: u8 = 92;
+const ASCII_NEWLINE: u8 = 10;
+const ASCII_CR: u8 = 13;
+const ASCII_TAB: u8 = 9;
+
+// Wrap `s` in double quotes with JSON-safe escapes. Bytes < 0x20 that aren't
+// \n/\r/\t turn into spaces — we don't run unicode escape sequences because
+// chat input never legitimately carries control bytes.
+function json_str(s: str): str {
+  var src_or = __of_buffer_from_str(s);
+  if (src_or is null) {
+    return "\"\"";
+  }
+  var src = src_or as Buffer;
+  var n = src.size;
+  // Worst-case expansion is 2x (every byte → `\X`) plus the two quotes.
+  var dst_or = Buffer.alloc(n * (2 as u64) + (2 as u64));
+  if (dst_or is null) {
+    __of_buffer_free(src);
+    return "\"\"";
+  }
+  var dst = dst_or as Buffer;
+  var j: u64 = 0 as u64;
+  dst.set(j, ASCII_QUOTE); j = j + (1 as u64);
+  var i: u64 = 0 as u64;
+  while (i < n) {
+    var b = src.get(i);
+    if (b == ASCII_QUOTE) {
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+      dst.set(j, ASCII_QUOTE);     j = j + (1 as u64);
+    } else if (b == ASCII_BACKSLASH) {
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+    } else if (b == ASCII_NEWLINE) {
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+      dst.set(j, (110 as u8));     j = j + (1 as u64);
+    } else if (b == ASCII_CR) {
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+      dst.set(j, (114 as u8));     j = j + (1 as u64);
+    } else if (b == ASCII_TAB) {
+      dst.set(j, ASCII_BACKSLASH); j = j + (1 as u64);
+      dst.set(j, (116 as u8));     j = j + (1 as u64);
+    } else if (b < (32 as u8)) {
+      dst.set(j, (32 as u8)); j = j + (1 as u64);
+    } else {
+      dst.set(j, b); j = j + (1 as u64);
+    }
+    i = i + (1 as u64);
+  }
+  dst.set(j, ASCII_QUOTE); j = j + (1 as u64);
+  var out = __of_str_from_buffer(dst, 0 as i64, j as i64);
+  __of_buffer_free(dst);
+  __of_buffer_free(src);
+  out
+}

@@ -1,13 +1,17 @@
 import * as vscode from "vscode";
-import { execFile } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import * as path from "node:path";
 
 const LANGUAGE_ID = "otter-fusion";
 
 let diagnostics: vscode.DiagnosticCollection;
+let loginPath: string | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
   diagnostics = vscode.languages.createDiagnosticCollection(LANGUAGE_ID);
   context.subscriptions.push(diagnostics);
+
+  loginPath = loadLoginShellPath();
 
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument(validate),
@@ -22,18 +26,49 @@ export function deactivate(): void {
   diagnostics?.dispose();
 }
 
+// Login zsh sources .zprofile; capture its PATH for execFile lookup.
+function loadLoginShellPath(): string | undefined {
+  try {
+    const out = execFileSync("zsh", ["-lc", 'printf %s "$PATH"'], {
+      timeout: 5_000,
+      encoding: "utf8",
+    });
+    return out.trim() || process.env.PATH;
+  } catch {
+    return process.env.PATH;
+  }
+}
+
+function resolveBinary(doc: vscode.TextDocument): string {
+  const configured = vscode.workspace
+    .getConfiguration("otterFusion")
+    .get<string>("binaryPath", "otter_fusion");
+
+  if (path.isAbsolute(configured)) return configured;
+
+  const looksRelative =
+    configured.includes("/") || configured.includes(path.sep);
+  if (looksRelative) {
+    const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
+    if (folder) return path.resolve(folder.uri.fsPath, configured);
+  }
+
+  return configured;
+}
+
 function validate(doc: vscode.TextDocument): void {
   if (doc.languageId !== LANGUAGE_ID) return;
   if (doc.uri.scheme !== "file") return;
 
-  const bin = vscode.workspace
-    .getConfiguration("otterFusion")
-    .get<string>("binaryPath", "otter_fusion");
+  const bin = resolveBinary(doc);
 
   execFile(
     bin,
     ["validate", doc.fileName, "--short"],
-    { timeout: 10_000 },
+    {
+      timeout: 10_000,
+      env: { ...process.env, PATH: loginPath ?? process.env.PATH },
+    },
     (err, stdout, stderr) => {
       if (err && (err as NodeJS.ErrnoException).code === "ENOENT") {
         vscode.window.showErrorMessage(
