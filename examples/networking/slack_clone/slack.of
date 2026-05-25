@@ -24,7 +24,7 @@ import {
   PHASE_READING, PHASE_WRITING, PHASE_WAITING,
 } from "reactor";
 
-const HOST: str = "127.0.0.1";
+const HOST: str = "0.0.0.0";
 const PORT: i32 = 8090;
 
 // Default long-poll deadline (ms). Clients may pass `wait=N` (seconds) up to
