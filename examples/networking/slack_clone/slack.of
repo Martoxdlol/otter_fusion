@@ -13,7 +13,7 @@ import {
   now_ms,
   __of_accept_simple,
 } from "of_io";
-import { Request, Response, Server } from "web_server";
+import { Request, Response, Server, log_request, log_response } from "web_server";
 
 import { ChatState, Channel, Waiter } from "state";
 import { parse_query, parse_form, path_only } from "url";
@@ -111,6 +111,7 @@ function drain_waiters(state: ChatState, ch: Channel, reactor: Reactor) {
     }
     var w = w_or as Waiter;
     var resp = Response.json(ch.poll_json(w.since));
+    log_response(resp);
     reactor.wake_fd(w.fd, resp);
   }
 }
@@ -127,6 +128,7 @@ function drain_expired(state: ChatState, reactor: Reactor) {
     var w = w_or as Waiter;
     var body = "{\"messages\":[],\"next\":" + (w.since as str) + "}";
     var resp = Response.json(body);
+    log_response(resp);
     reactor.wake_fd(w.fd, resp);
   }
 }
@@ -234,8 +236,10 @@ function handle_readable(c: ConnState, state: ChatState, r: Reactor, close_list:
     return;
   }
   var req = parsed_or as Request;
+  log_request(req);
   var maybe = route(req, c, state, r);
   if (maybe is Response) {
+    log_response(maybe as Response);
     c.start_writing(maybe as Response);
   }
   // null → suspended, conn already moved to PHASE_WAITING.

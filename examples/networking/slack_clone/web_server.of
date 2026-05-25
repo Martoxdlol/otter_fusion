@@ -30,6 +30,7 @@ import {
   TcpStream,
   ReadResult,
   IoError,
+  now_ms,
   __of_str_from_buffer,
 } from "of_io";
 
@@ -214,17 +215,25 @@ extend Connection {
   function read_request(self): Request | IoError {
     var read_res = self.stream.read(MAX_REQUEST_BYTES);
     if (read_res is IoError) {
+      log_io_error("read", read_res as IoError);
       return read_res as IoError;
     }
     var r = read_res as ReadResult;
     var parsed = parse_request_bytes(r.buf, r.len);
     r.free();
+    if (parsed is Request) {
+      log_request(parsed as Request);
+    } else {
+      log_io_error("parse", parsed as IoError);
+    }
     parsed
   }
 
   function write_response(self, resp: Response): IoError | null {
+    log_response(resp);
     var w = self.stream.write_str(resp.as_http());
     if (w is IoError) {
+      log_io_error("write", w as IoError);
       return w as IoError;
     }
     null
@@ -319,4 +328,24 @@ function scan_blank_line(buf: Buffer, len: i64, start: i64): i64 {
 // without also reaching into of:core just for logging.
 function log(msg: str) {
   println(msg);
+}
+
+// Access log helpers. now_ms() is a monotonic timestamp; the same value
+// on req + resp lets a reader correlate the two lines.
+function log_request(req: Request) {
+  log("[" + (now_ms() as str) + "] --> " + req.method + " " + req.path + " " + req.protocol);
+  if (req.body != "") {
+    log("    body: " + req.body);
+  }
+}
+
+function log_response(resp: Response) {
+  log("[" + (now_ms() as str) + "] <-- " + (resp.status as str) + " " + resp.status_text + " " + resp.content_type);
+  if (resp.body != "") {
+    log("    body: " + resp.body);
+  }
+}
+
+function log_io_error(op: str, err: IoError) {
+  log("[" + (now_ms() as str) + "] !! " + op + ": " + err.message());
 }
