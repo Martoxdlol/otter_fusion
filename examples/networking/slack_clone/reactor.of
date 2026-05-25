@@ -209,13 +209,14 @@ function read_more(c: ConnState): i64 {
 }
 
 // Try to parse what we've buffered so far as a full HTTP request. Returns
-// null if more bytes are needed (no blank line yet), an IoError if the
-// request line is malformed, or the Request itself.
+// null while more bytes are still needed (headers not finished, or body
+// still arriving), an IoError if the request line is malformed, or the
+// Request itself.
 function try_parse(c: ConnState): Request | IoError | null {
   if (c.read_len <= (0 as i64)) {
     return null;
   }
-  if (not_terminated(c.read_buf, c.read_len)) {
+  if (request_incomplete(c.read_buf, c.read_len)) {
     return null;
   }
   var parsed = parse_request_bytes(c.read_buf, c.read_len);
@@ -226,27 +227,163 @@ function try_parse(c: ConnState): Request | IoError | null {
   req
 }
 
-// Look for CRLFCRLF (or LFLF as a forgiving fallback). True until we see one.
-function not_terminated(buf: Buffer, len: i64): bool {
-  if (len < (4 as i64)) {
+// True until we have headers (CRLFCRLF / LFLF) AND Content-Length bytes
+// after them. Without this check, a proxy that flushes headers and body
+// in separate writes (common on TLS-terminating front ends) makes us
+// parse a request before its body has arrived. Content-Length defaults
+// to 0; capped at READ_CAP so a runaway claim can't wedge the conn.
+function request_incomplete(buf: Buffer, len: i64): bool {
+  var headers_end = find_headers_end(buf, len);
+  if (headers_end < (0 as i64)) {
     return true;
   }
+  var content_len = parse_content_length(buf, headers_end);
+  if (content_len < (0 as i64)) {
+    content_len = 0 as i64;
+  }
+  var needed = headers_end + content_len;
+  if (needed > (READ_CAP as i64)) {
+    return false;
+  }
+  len < needed
+}
+
+// Offset of the byte AFTER the blank line that terminates the headers,
+// or -1 if no blank line is buffered yet.
+function find_headers_end(buf: Buffer, len: i64): i64 {
   var n = len as u64;
   var i: u64 = 0 as u64;
-  var stop = n - (3 as u64);
-  while (i < stop) {
-    if (buf.get(i) == (13 as u8)
+  while (i < n) {
+    var b = buf.get(i);
+    if (b == (13 as u8) && i + (3 as u64) < n
         && buf.get(i + (1 as u64)) == (10 as u8)
         && buf.get(i + (2 as u64)) == (13 as u8)
         && buf.get(i + (3 as u64)) == (10 as u8)) {
-      return false;
+      return (i + (4 as u64)) as i64;
     }
-    if (buf.get(i) == (10 as u8) && buf.get(i + (1 as u64)) == (10 as u8)) {
-      return false;
+    if (b == (10 as u8) && i + (1 as u64) < n && buf.get(i + (1 as u64)) == (10 as u8)) {
+      return (i + (2 as u64)) as i64;
     }
     i = i + (1 as u64);
   }
-  true
+  (0 as i64) - (1 as i64)
+}
+
+// Walk the header block, returning the first Content-Length value
+// (case-insensitive), or 0 if absent.
+function parse_content_length(buf: Buffer, end: i64): i64 {
+  var tgt_or = __of_buffer_from_str("content-length");
+  if (tgt_or is null) {
+    return 0 as i64;
+  }
+  var tgt = tgt_or as Buffer;
+  var result: i64 = 0 as i64;
+  var i = end_of_line(buf, 0 as i64, end);
+  while (i < end) {
+    var line_start = i;
+    var line_end = end_of_line(buf, i, end);
+    if (line_end <= line_start) {
+      i = end;
+    } else {
+      var colon = scan_in_range(buf, line_start, line_end, 58 as u8);
+      if (colon > line_start && header_name_matches(buf, line_start, colon, tgt)) {
+        result = parse_decimal_after(buf, colon + (1 as i64), line_end);
+        i = end;
+      } else {
+        i = line_end;
+      }
+    }
+  }
+  __of_buffer_free(tgt);
+  result
+}
+
+// Offset just past the next \r\n (or bare \n), or `end` if neither is found.
+function end_of_line(buf: Buffer, start: i64, end: i64): i64 {
+  var i = start;
+  var found: i64 = end;
+  while (i < end) {
+    var b = buf.get(i as u64);
+    if (b == (10 as u8)) {
+      found = i + (1 as i64);
+      i = end;
+    } else if (b == (13 as u8) && (i + (1 as i64)) < end && buf.get((i + (1 as i64)) as u64) == (10 as u8)) {
+      found = i + (2 as i64);
+      i = end;
+    } else {
+      i = i + (1 as i64);
+    }
+  }
+  found
+}
+
+function scan_in_range(buf: Buffer, start: i64, end: i64, target: u8): i64 {
+  var found: i64 = (0 as i64) - (1 as i64);
+  var i = start;
+  while (i < end) {
+    if (buf.get(i as u64) == target) {
+      found = i;
+      i = end;
+    } else {
+      i = i + (1 as i64);
+    }
+  }
+  found
+}
+
+// Case-insensitive ASCII compare of buf[start..end) against `tgt`.
+function header_name_matches(buf: Buffer, start: i64, end: i64, tgt: Buffer): bool {
+  var name_len = end - start;
+  if ((tgt.size as i64) != name_len) {
+    return false;
+  }
+  var ok = true;
+  var i: i64 = 0 as i64;
+  while (i < name_len) {
+    var b = ascii_lower(buf.get((start + i) as u64));
+    if (b != tgt.get(i as u64)) {
+      ok = false;
+      i = name_len;
+    } else {
+      i = i + (1 as i64);
+    }
+  }
+  ok
+}
+
+function ascii_lower(b: u8): u8 {
+  if (b >= (65 as u8) && b <= (90 as u8)) {
+    b + (32 as u8)
+  } else {
+    b
+  }
+}
+
+// Skip ASCII spaces/tabs, then parse a non-negative decimal up to the
+// first non-digit. Returns 0 if no digit is seen.
+function parse_decimal_after(buf: Buffer, start: i64, end: i64): i64 {
+  var i = start;
+  var skipping = true;
+  while (skipping && i < end) {
+    var b = buf.get(i as u64);
+    if (b == (32 as u8) || b == (9 as u8)) {
+      i = i + (1 as i64);
+    } else {
+      skipping = false;
+    }
+  }
+  var v: i64 = 0 as i64;
+  var parsing = true;
+  while (parsing && i < end) {
+    var b = buf.get(i as u64);
+    if (b >= (48 as u8) && b <= (57 as u8)) {
+      v = v * (10 as i64) + ((b as i64) - (48 as i64));
+      i = i + (1 as i64);
+    } else {
+      parsing = false;
+    }
+  }
+  v
 }
 
 // Push whatever's left of write_buf to the socket. Returns true if the
