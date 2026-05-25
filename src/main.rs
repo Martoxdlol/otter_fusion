@@ -161,10 +161,21 @@ fn run_run(file: &str, lib_paths: &[String]) -> i32 {
             return 1;
         }
     };
+    let init_fid = match codegen::emit_vtable_init(&mut compiled, &mir) {
+        Ok(fid) => fid,
+        Err(e) => {
+            eprintln!("{file}: error: emit vtable init: {e}");
+            return 1;
+        }
+    };
     if let Err(e) = compiled.module.finalize_definitions() {
         eprintln!("{file}: error: finalize: {e}");
         return 1;
     }
+
+    let init_ptr = compiled.module.get_finalized_function(init_fid);
+    let init: extern "C" fn() = unsafe { std::mem::transmute(init_ptr) };
+    init();
 
     let func_id = compiled.function_ids[&mir.entry];
     let code_ptr = compiled.module.get_finalized_function(func_id);
@@ -519,6 +530,11 @@ fn make_jit_module(libs: Vec<libloading::Library>) -> Result<JITModule, String> 
 fn register_runtime_shims(builder: &mut JITBuilder) {
     builder.symbol("__of_alloc", otter_rt::__of_alloc as *const u8);
     builder.symbol("__of_vtable_lookup", otter_rt::__of_vtable_lookup as *const u8);
+    builder.symbol(
+        "__of_vtable_register",
+        otter_rt::__of_vtable_register as *const u8,
+    );
+    builder.symbol("__of_vtable_clear", otter_rt::__of_vtable_clear as *const u8);
     builder.symbol("__of_print", otter_rt::__of_print as *const u8);
     builder.symbol("__of_println", otter_rt::__of_println as *const u8);
     builder.symbol("__of_str_concat", otter_rt::__of_str_concat as *const u8);

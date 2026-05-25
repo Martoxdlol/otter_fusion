@@ -82,10 +82,12 @@ pub fn compile<M: Module>(mir: &MirProgram, mut module: M) -> Result<Compiled<M>
 /// Emit a C-ABI `main` trampoline that calls the program entry and returns
 /// its value as an i32 exit code (or 0 for Unit). Required for AOT-linked
 /// executables: the system linker resolves `_main` against this symbol.
+/// Calls `__of_vtable_init` first so virtual dispatch works.
 pub fn emit_c_main<M: Module>(
     compiled: &mut Compiled<M>,
     mir: &MirProgram,
 ) -> Result<(), ModuleError> {
+    let init_fid = emit_vtable_init(compiled, mir)?;
     let entry_fid = compiled.function_ids[&mir.entry];
     let entry_returns_unit = matches!(mir.functions[&mir.entry].return_type, MirType::Unit);
 
@@ -103,6 +105,9 @@ pub fn emit_c_main<M: Module>(
     let block = b.create_block();
     b.switch_to_block(block);
     b.seal_block(block);
+
+    let init_ref = compiled.module.declare_func_in_func(init_fid, b.func);
+    b.ins().call(init_ref, &[]);
 
     let entry_ref = compiled.module.declare_func_in_func(entry_fid, b.func);
     let call = b.ins().call(entry_ref, &[]);
@@ -127,6 +132,74 @@ pub fn emit_c_main<M: Module>(
     compiled.module.define_function(main_fid, &mut ctx)?;
     compiled.module.clear_context(&mut ctx);
     Ok(())
+}
+
+/// Emit `__of_vtable_init`: clears the runtime registry, then registers
+/// every `(struct_id, iface_id, slot) → fn_ptr` triple in `mir.vtables`.
+/// Returns the FuncId so the caller can wire it into `main`. Exposed
+/// publicly so the JIT harness can invoke it before the program entry.
+pub fn emit_vtable_init<M: Module>(
+    compiled: &mut Compiled<M>,
+    mir: &MirProgram,
+) -> Result<FuncId, ModuleError> {
+    let call_conv = CallConv::triple_default(compiled.module.isa().triple());
+
+    let init_sig = Signature::new(call_conv.clone());
+    let init_fid = compiled
+        .module
+        .declare_function("__of_vtable_init", Linkage::Export, &init_sig)?;
+
+    let clear_sig = Signature::new(call_conv.clone());
+    let clear_fid =
+        compiled
+            .module
+            .declare_function("__of_vtable_clear", Linkage::Import, &clear_sig)?;
+
+    let mut register_sig = Signature::new(call_conv);
+    register_sig.params.push(AbiParam::new(types::I64)); // struct id
+    register_sig.params.push(AbiParam::new(types::I64)); // iface id
+    register_sig.params.push(AbiParam::new(types::I64)); // slot
+    register_sig.params.push(AbiParam::new(types::I64)); // fn ptr
+    let register_fid =
+        compiled
+            .module
+            .declare_function("__of_vtable_register", Linkage::Import, &register_sig)?;
+
+    let mut ctx = compiled.module.make_context();
+    ctx.func.signature = init_sig;
+    let mut fbctx = FunctionBuilderContext::new();
+    let mut b = FunctionBuilder::new(&mut ctx.func, &mut fbctx);
+    let block = b.create_block();
+    b.switch_to_block(block);
+    b.seal_block(block);
+
+    let clear_ref = compiled.module.declare_func_in_func(clear_fid, b.func);
+    b.ins().call(clear_ref, &[]);
+
+    let register_ref = compiled.module.declare_func_in_func(register_fid, b.func);
+
+    // Sorted iteration so the emitted object is deterministic (good for
+    // snapshot tests and reproducible AOT builds).
+    let mut entries: Vec<_> = mir.vtables.iter().collect();
+    entries.sort_by_key(|((s, i), _)| (s.0, i.0));
+    for ((struct_mir, iface_mir), vt) in entries {
+        for (slot_idx, fn_mir) in vt.slots.iter().enumerate() {
+            let fn_fid = compiled.function_ids[fn_mir];
+            let fn_ref = compiled.module.declare_func_in_func(fn_fid, b.func);
+            let fn_addr = b.ins().func_addr(types::I64, fn_ref);
+            let s_v = b.ins().iconst(types::I64, struct_mir.0 as i64);
+            let i_v = b.ins().iconst(types::I64, iface_mir.0 as i64);
+            let slot_v = b.ins().iconst(types::I64, slot_idx as i64);
+            b.ins().call(register_ref, &[s_v, i_v, slot_v, fn_addr]);
+        }
+    }
+
+    b.ins().return_(&[]);
+    b.finalize();
+
+    compiled.module.define_function(init_fid, &mut ctx)?;
+    compiled.module.clear_context(&mut ctx);
+    Ok(init_fid)
 }
 
 fn build_signature<M: Module>(module: &M, f: &mir::MirFunction) -> Signature {

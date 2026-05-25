@@ -1850,7 +1850,7 @@ impl Validator {
                             value, fn_label, module, generics, locals, return_type, loop_depth,
                             Some(&target_ty),
                         );
-                        if !types_compatible(&typed_value.ty, &target_ty) {
+                        if !types_compatible_in(&typed_value.ty, &target_ty, Some(&self.hir)) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
                                 context: format!("assignment to '{}'", name),
@@ -1910,7 +1910,7 @@ impl Validator {
                             value, fn_label, module, generics, locals, return_type, loop_depth,
                             Some(&field_ty),
                         );
-                        if !types_compatible(&typed_value.ty, &field_ty) {
+                        if !types_compatible_in(&typed_value.ty, &field_ty, Some(&self.hir)) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
                                 context: format!("assignment to field '{}'", field),
@@ -1952,7 +1952,7 @@ impl Validator {
 
                 let final_ty = match (&annotated, init_typed.as_ref()) {
                     (Some(a), Some(typed)) => {
-                        if !types_compatible(&typed.ty, a) {
+                        if !types_compatible_in(&typed.ty, a, Some(&self.hir)) {
                             self.errors.push(ValidationError::TypeMismatch {
                                 function: fn_label.to_string(),
                                 context: format!("variable '{}'", name),
@@ -1987,7 +1987,7 @@ impl Validator {
                     .as_ref()
                     .map(|t| t.ty.clone())
                     .unwrap_or(ResolvedType::Null);
-                if !types_compatible(&actual, return_type) {
+                if !types_compatible_in(&actual, return_type, Some(&self.hir)) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
                         context: "return".to_string(),
@@ -2666,7 +2666,7 @@ impl Validator {
             });
         } else {
             for (i, (arg, expected)) in typed_args.iter().zip(params.iter()).enumerate() {
-                if !types_compatible(&arg.ty, expected) {
+                if !types_compatible_in(&arg.ty, expected, Some(&self.hir)) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
                         context: format!("call to {} arg {}", callee_label, i),
@@ -2718,7 +2718,7 @@ impl Validator {
             });
         } else {
             for (i, (arg, expected)) in typed_args.iter().zip(params.iter()).enumerate() {
-                if !types_compatible(&arg.ty, expected) {
+                if !types_compatible_in(&arg.ty, expected, Some(&self.hir)) {
                     self.errors.push(ValidationError::TypeMismatch {
                         function: fn_label.to_string(),
                         context: format!("call to {} arg {}", callee_label, i),
@@ -2831,6 +2831,17 @@ impl Validator {
                     return Some((*fn_id, subst));
                 }
             }
+            // Walk parent interfaces. Each parent's type args are written
+            // in terms of the child's type params, so push the child's
+            // subst through before recursing.
+            for (parent_id, parent_args) in &i.extends {
+                let concrete_args: Vec<ResolvedType> =
+                    parent_args.iter().map(|a| substitute(a, &subst)).collect();
+                let parent_ty = ResolvedType::Interface(*parent_id, concrete_args);
+                if let Some(found) = self.find_method_for_call(&parent_ty, name) {
+                    return Some(found);
+                }
+            }
         }
         None
     }
@@ -2912,7 +2923,7 @@ impl Validator {
             match struct_def.fields.iter().find(|f| &f.name == fname) {
                 Some(field) => {
                     let expected = substitute(&field.ty, &subst);
-                    if !types_compatible(&typed.ty, &expected) {
+                    if !types_compatible_in(&typed.ty, &expected, Some(&self.hir)) {
                         self.errors.push(ValidationError::TypeMismatch {
                             function: fn_label.to_string(),
                             context: format!("field {}", fname),
@@ -3678,7 +3689,14 @@ fn is_managed_ref_type(ty: &ResolvedType, hir: &Hir) -> bool {
 // don't have the offset-(-1) type-id header that virtual dispatch needs,
 // so passing an extern value through an interface slot would break at
 // the first method call.
-fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
+/// Whether `actual` can flow into a slot typed `expected`. With `Some(hir)`,
+/// struct→interface and interface→supertrait upcasts are honoured by walking
+/// the implements / extends chains.
+fn types_compatible_in(
+    actual: &ResolvedType,
+    expected: &ResolvedType,
+    hir: Option<&Hir>,
+) -> bool {
     if actual == expected {
         return true;
     }
@@ -3692,7 +3710,55 @@ fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
             return true;
         }
     }
+    if let (Some(hir), ResolvedType::Interface(iface_id, iface_args)) = (hir, expected) {
+        return implements_interface(hir, actual, *iface_id, iface_args);
+    }
     false
+}
+
+/// True if `actual` can flow into a parameter of interface `(iface_id, iface_args)`.
+/// Handles structs whose declared implements list contains the interface, plus
+/// transitive interface inheritance via `extends`. Args are matched structurally;
+/// generic interfaces only coerce when their concrete arg lists agree.
+fn implements_interface(
+    hir: &Hir,
+    actual: &ResolvedType,
+    iface_id: TypeId,
+    iface_args: &[ResolvedType],
+) -> bool {
+    match actual {
+        ResolvedType::Struct(sid, _) => {
+            let Some(s) = hir.structs.get(sid) else {
+                return false;
+            };
+            s.implements
+                .iter()
+                .any(|(id, args)| interface_matches(hir, *id, args, iface_id, iface_args))
+        }
+        ResolvedType::Interface(actual_iface_id, actual_args) => {
+            interface_matches(hir, *actual_iface_id, actual_args, iface_id, iface_args)
+        }
+        _ => false,
+    }
+}
+
+fn interface_matches(
+    hir: &Hir,
+    iface_id: TypeId,
+    iface_args: &[ResolvedType],
+    target_id: TypeId,
+    target_args: &[ResolvedType],
+) -> bool {
+    if iface_id == target_id && iface_args == target_args {
+        return true;
+    }
+    let Some(iface) = hir.interfaces.get(&iface_id) else {
+        return false;
+    };
+    iface
+        .extends
+        .iter()
+        .any(|(parent_id, parent_args)| interface_matches(hir, *parent_id, parent_args, target_id, target_args))
 }
 
 // Combine the types of an if-expression's two branches into a single type.

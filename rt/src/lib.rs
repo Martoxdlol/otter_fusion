@@ -1,25 +1,72 @@
+use std::collections::HashMap;
 use std::ffi::CStr;
 use std::os::raw::{c_char, c_void};
+use std::sync::Mutex;
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn __of_alloc(size: u64, _type_id: u64) -> *mut c_void {
+pub unsafe extern "C" fn __of_alloc(size: u64, type_id: u64) -> *mut c_void {
     let total = (size.max(16) + 16) as usize;
     let layout = std::alloc::Layout::from_size_align(total, 8).unwrap();
     unsafe {
         let ptr = std::alloc::alloc_zeroed(layout);
-        // Skip a fake header (16 bytes) so callers see a "body" pointer.
+        // Header is [gc_meta:8 | type_id:8]; user pointer skips both.
+        // type_id sits at user_ptr - 8 (gc_meta at user_ptr - 16, zeroed).
+        let header = ptr as *mut u64;
+        header.add(1).write(type_id);
         ptr.add(16) as *mut c_void
     }
 }
 
+// (struct_id, iface_id, slot) → function pointer. Registered at program
+// start by `__of_vtable_init` (codegen-emitted), read on each virtual
+// dispatch. Globally shared — JIT tests must clear it before re-init
+// (handled by `__of_vtable_clear`).
+type VTableKey = (u64, u64, u64);
+static VTABLE_REGISTRY: Mutex<Option<HashMap<VTableKey, usize>>> = Mutex::new(None);
+
+fn with_registry<R>(f: impl FnOnce(&mut HashMap<VTableKey, usize>) -> R) -> R {
+    let mut guard = VTABLE_REGISTRY.lock().unwrap();
+    let map = guard.get_or_insert_with(HashMap::new);
+    f(map)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_vtable_register(
+    struct_id: u64,
+    iface_id: u64,
+    slot: u64,
+    fn_ptr: *const c_void,
+) {
+    with_registry(|m| {
+        m.insert((struct_id, iface_id, slot), fn_ptr as usize);
+    });
+}
+
+/// Wipes every registered vtable entry. Codegen emits a call to this at
+/// the top of `__of_vtable_init`, so re-running the init (JIT tests, hot
+/// reload) starts from a clean slate.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_vtable_clear() {
+    with_registry(|m| m.clear());
+}
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_vtable_lookup(
-    _recv: *const c_void,
-    _iface_id: u64,
-    _slot: u64,
+    recv: *const c_void,
+    iface_id: u64,
+    slot: u64,
 ) -> *const c_void {
-    // No real vtable resolution yet; virtual calls crash, non-virtual paths run.
-    std::ptr::null()
+    if recv.is_null() {
+        return std::ptr::null();
+    }
+    // type_id lives at recv - 8 (see __of_alloc layout).
+    let type_id = unsafe { (recv as *const u64).offset(-1).read() };
+    with_registry(|m| {
+        m.get(&(type_id, iface_id, slot))
+            .copied()
+            .map(|p| p as *const c_void)
+            .unwrap_or(std::ptr::null())
+    })
 }
 
 #[unsafe(no_mangle)]
