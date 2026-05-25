@@ -1,10 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p1_duplicate_name_in_module_errors.of
+input_file: examples/spec/14_ffi/pinning_example.of
 ---
-ValidationErrors(
-    [
-        "duplicate top-level name 'X' in module 'test_module'",
-    ],
+ParserError(
+    "unexpected token '*'",
 )

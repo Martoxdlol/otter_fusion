@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/02_variables/var_with_type.of
+input_file: examples/spec/02_variables/var_from_if.of
 ---
 Ok(
     [
@@ -13,127 +13,109 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "name",
+                "status",
             ),
-            position: 8,
+            position: 10,
             line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: Colon,
-            position: 9,
-            line: 1,
-            column: 10,
-        },
-        Token {
-            token_type: Identifier(
-                "str",
-            ),
-            position: 13,
-            line: 1,
-            column: 14,
+            column: 11,
         },
         Token {
             token_type: Eq,
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: If,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
-            token_type: StringLit(
-                "John Doe",
+            token_type: LeftParen,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "age",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: GtEq,
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Int(
+                "18",
             ),
             position: 26,
             line: 1,
             column: 27,
         },
         Token {
-            token_type: Semicolon,
+            token_type: RightParen,
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: Var,
-            position: 31,
-            line: 2,
-            column: 4,
+            token_type: LeftBrace,
+            position: 29,
+            line: 1,
+            column: 30,
         },
         Token {
-            token_type: Identifier(
-                "age",
+            token_type: StringLit(
+                "Adult",
             ),
-            position: 35,
-            line: 2,
-            column: 8,
-        },
-        Token {
-            token_type: Eq,
-            position: 37,
+            position: 39,
             line: 2,
             column: 10,
         },
         Token {
-            token_type: Int(
-                "30",
-            ),
-            position: 40,
-            line: 2,
-            column: 13,
-        },
-        Token {
-            token_type: Semicolon,
+            token_type: RightBrace,
             position: 41,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: Var,
-            position: 45,
             line: 3,
-            column: 4,
+            column: 2,
         },
         Token {
-            token_type: Identifier(
-                "price",
+            token_type: Else,
+            position: 46,
+            line: 3,
+            column: 7,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 48,
+            line: 3,
+            column: 9,
+        },
+        Token {
+            token_type: StringLit(
+                "Minor",
             ),
-            position: 51,
-            line: 3,
+            position: 58,
+            line: 4,
             column: 10,
         },
         Token {
-            token_type: Colon,
-            position: 52,
-            line: 3,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "f32",
-            ),
-            position: 56,
-            line: 3,
-            column: 15,
-        },
-        Token {
-            token_type: Eq,
-            position: 58,
-            line: 3,
-            column: 17,
-        },
-        Token {
-            token_type: Float(
-                "19.99",
-            ),
-            position: 64,
-            line: 3,
-            column: 23,
+            token_type: RightBrace,
+            position: 60,
+            line: 5,
+            column: 2,
         },
         Token {
             token_type: Semicolon,
-            position: 65,
-            line: 3,
-            column: 24,
+            position: 61,
+            line: 5,
+            column: 3,
         },
     ],
 )

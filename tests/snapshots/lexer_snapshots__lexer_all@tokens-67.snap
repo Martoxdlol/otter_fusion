@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_simple.of
+input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
 ---
 Ok(
     [
@@ -19,21 +19,21 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "print",
+                "malloc",
             ),
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: LeftParen,
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
+            token_type: LeftParen,
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
             token_type: Identifier(
-                "value",
+                "size",
             ),
             position: 27,
             line: 1,
@@ -47,7 +47,7 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "str",
+                "u64",
             ),
             position: 32,
             line: 1,
@@ -60,10 +60,30 @@ Ok(
             column: 34,
         },
         Token {
-            token_type: Semicolon,
+            token_type: Colon,
             position: 34,
             line: 1,
             column: 35,
+        },
+        Token {
+            token_type: Star,
+            position: 36,
+            line: 1,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "Buffer",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 43,
+            line: 1,
+            column: 44,
         },
     ],
 )

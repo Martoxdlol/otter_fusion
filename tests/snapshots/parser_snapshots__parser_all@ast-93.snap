@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/02_variables/var_with_type.of
+input_file: examples/spec/02_variables/var_from_if.of
 ---
 Err(
     "unexpected token 'var'",

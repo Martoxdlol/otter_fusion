@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_extern_function_pointer_params.of
+input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
 ---
 Ok(
     Program {
@@ -9,26 +9,32 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "hashmap_set",
+                        name: "malloc",
                         has_self_param: false,
                         is_extern: true,
                         generics: [],
-                        return_type: None,
+                        return_type: Some(
+                            Union(
+                                [
+                                    Pointer(
+                                        Named(
+                                            "Buffer",
+                                            [],
+                                        ),
+                                    ),
+                                    Primitive(
+                                        Null,
+                                    ),
+                                ],
+                            ),
+                        ),
                         params: [
                             ParamDecl {
-                                name: "key",
+                                name: "size",
                                 ty: Primitive(
-                                    String,
+                                    Uint64,
                                 ),
-                                is_pointer: true,
-                            },
-                            ParamDecl {
-                                name: "value",
-                                ty: Named(
-                                    "MyStruct",
-                                    [],
-                                ),
-                                is_pointer: true,
+                                is_pointer: false,
                             },
                         ],
                         body: Some(

@@ -1,7 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/spec/09_null_handling/nullable_return.of
+input_file: examples/spec/08_numeric_conversions/float_narrowing.of
 ---
 ParserError(
     "unexpected token 'var'",

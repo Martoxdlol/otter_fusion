@@ -1,221 +1,171 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/14_ffi/extern_fn_type.of
+input_file: examples/spec/12_control_flow/while_loop.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 5,
+            column: 4,
         },
         Token {
             token_type: Identifier(
-                "Fun",
+                "i",
             ),
-            position: 8,
+            position: 5,
             line: 1,
-            column: 9,
+            column: 6,
         },
         Token {
             token_type: Eq,
+            position: 7,
+            line: 1,
+            column: 8,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Semicolon,
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: Extern,
-            position: 17,
-            line: 1,
-            column: 18,
+            token_type: While,
+            position: 16,
+            line: 2,
+            column: 6,
         },
         Token {
             token_type: LeftParen,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: Colon,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: Identifier(
-                "MyStruct",
-            ),
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: RightParen,
-            position: 31,
-            line: 1,
-            column: 32,
-        },
-        Token {
-            token_type: FatArrow,
-            position: 34,
-            line: 1,
-            column: 35,
-        },
-        Token {
-            token_type: Identifier(
-                "bool",
-            ),
-            position: 39,
-            line: 1,
-            column: 40,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 40,
-            line: 1,
-            column: 41,
-        },
-        Token {
-            token_type: Type,
-            position: 45,
+            position: 18,
             line: 2,
-            column: 5,
+            column: 8,
         },
         Token {
             token_type: Identifier(
-                "Callback",
+                "i",
             ),
-            position: 54,
+            position: 19,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: LT,
+            position: 21,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 24,
             line: 2,
             column: 14,
         },
         Token {
-            token_type: Eq,
-            position: 56,
+            token_type: RightParen,
+            position: 25,
             line: 2,
-            column: 16,
+            column: 15,
         },
         Token {
-            token_type: Extern,
-            position: 63,
+            token_type: LeftBrace,
+            position: 27,
             line: 2,
-            column: 23,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 35,
+            line: 3,
+            column: 8,
         },
         Token {
             token_type: LeftParen,
-            position: 65,
-            line: 2,
-            column: 25,
+            position: 36,
+            line: 3,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "data",
+                "i",
             ),
-            position: 69,
-            line: 2,
-            column: 29,
-        },
-        Token {
-            token_type: Colon,
-            position: 70,
-            line: 2,
-            column: 30,
-        },
-        Token {
-            token_type: Star,
-            position: 72,
-            line: 2,
-            column: 32,
-        },
-        Token {
-            token_type: Identifier(
-                "MyStruct",
-            ),
-            position: 80,
-            line: 2,
-            column: 40,
-        },
-        Token {
-            token_type: Comma,
-            position: 81,
-            line: 2,
-            column: 41,
-        },
-        Token {
-            token_type: Identifier(
-                "size",
-            ),
-            position: 86,
-            line: 2,
-            column: 46,
-        },
-        Token {
-            token_type: Colon,
-            position: 87,
-            line: 2,
-            column: 47,
-        },
-        Token {
-            token_type: Identifier(
-                "u64",
-            ),
-            position: 91,
-            line: 2,
-            column: 51,
+            position: 37,
+            line: 3,
+            column: 10,
         },
         Token {
             token_type: RightParen,
-            position: 92,
-            line: 2,
-            column: 52,
-        },
-        Token {
-            token_type: FatArrow,
-            position: 95,
-            line: 2,
-            column: 55,
-        },
-        Token {
-            token_type: Star,
-            position: 97,
-            line: 2,
-            column: 57,
-        },
-        Token {
-            token_type: Identifier(
-                "Buffer",
-            ),
-            position: 103,
-            line: 2,
-            column: 63,
-        },
-        Token {
-            token_type: Pipe,
-            position: 105,
-            line: 2,
-            column: 65,
-        },
-        Token {
-            token_type: Null,
-            position: 110,
-            line: 2,
-            column: 70,
+            position: 38,
+            line: 3,
+            column: 11,
         },
         Token {
             token_type: Semicolon,
-            position: 111,
-            line: 2,
-            column: 71,
+            position: 39,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 43,
+            line: 4,
+            column: 4,
+        },
+        Token {
+            token_type: Eq,
+            position: 45,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 47,
+            line: 4,
+            column: 8,
+        },
+        Token {
+            token_type: Plus,
+            position: 49,
+            line: 4,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 51,
+            line: 4,
+            column: 12,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 52,
+            line: 4,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 54,
+            line: 5,
+            column: 2,
         },
     ],
 )

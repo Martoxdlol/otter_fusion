@@ -1,0 +1,60 @@
+// Looped TCP echo server on 127.0.0.1:8082. Handles many sequential
+// clients; each connection echoes until the client closes the socket.
+// Demonstrates: per-connection read loop, EOF detection on read(==0),
+// outer accept loop. Run until SIGINT.
+//
+//   /tmp/04_looping_echo_server &
+//   echo "hi" | nc -w 1 127.0.0.1 8082
+//   echo "again" | nc -w 1 127.0.0.1 8082
+//   kill %1
+
+import { println } from "of:core";
+import { TcpListener, TcpStream, ReadResult, IoError } from "of_io";
+
+// Echo a single client's traffic until they close or an error fires.
+function handle_client(client: TcpStream) {
+  while (true) {
+    var read_res = client.read(1024 as u64);
+    if (read_res is IoError) {
+      println("  read: " + (read_res as IoError).message());
+      break;
+    }
+    var r = read_res as ReadResult;
+    if (r.len == (0 as i64)) {
+      r.free();
+      break;
+    }
+    var w = client.write(r.buf, r.len as u64);
+    r.free();
+    if (w is IoError) {
+      println("  write: " + (w as IoError).message());
+      break;
+    }
+  }
+}
+
+function main(): i64 {
+  var listener_or_err = TcpListener.bind("127.0.0.1", 8082 as u16, 8);
+  if (listener_or_err is IoError) {
+    println("bind: " + (listener_or_err as IoError).message());
+    return 1;
+  }
+  var listener = listener_or_err as TcpListener;
+  println("looped echo server on 127.0.0.1:8082");
+
+  while (true) {
+    var accept_res = listener.accept();
+    if (accept_res is IoError) {
+      println("accept: " + (accept_res as IoError).message());
+      listener.close();
+      return 1;
+    }
+    var client = accept_res as TcpStream;
+    println("client connected fd=" + (client.fd as str));
+    handle_client(client);
+    client.close();
+    println("client disconnected");
+  }
+
+  0
+}

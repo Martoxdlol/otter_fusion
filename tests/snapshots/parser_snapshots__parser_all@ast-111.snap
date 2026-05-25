@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/11_collections/list_literal.of
+input_file: examples/spec/07_error_management/error_checking.of
 ---
 Err(
     "unexpected token 'var'",

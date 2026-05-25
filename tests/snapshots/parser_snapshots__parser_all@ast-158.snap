@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_break_outside_loop_errors.of
+input_file: examples/validator/p5_binary_op_arithmetic_on_non_numeric_errors.of
 ---
 Ok(
     Program {
@@ -18,7 +18,21 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    Break,
+                                    Expr(
+                                        BinaryOp(
+                                            Literal(
+                                                Int(
+                                                    "5",
+                                                ),
+                                            ),
+                                            Add,
+                                            Literal(
+                                                String(
+                                                    "hello",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
                                 ],
                                 returns: None,
                             },

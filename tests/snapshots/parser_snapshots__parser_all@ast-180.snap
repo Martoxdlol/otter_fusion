@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_var_decl_with_annotation_and_init.of
+input_file: examples/validator/p5_var_decl_no_type_no_init_errors.of
 ---
 Ok(
     Program {
@@ -20,18 +20,8 @@ Ok(
                                 statements: [
                                     VarDecl(
                                         "x",
-                                        Some(
-                                            Primitive(
-                                                Int64,
-                                            ),
-                                        ),
-                                        Some(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
-                                            ),
-                                        ),
+                                        None,
+                                        None,
                                     ),
                                 ],
                                 returns: None,

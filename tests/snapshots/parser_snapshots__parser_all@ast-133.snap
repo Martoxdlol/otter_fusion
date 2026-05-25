@@ -1,16 +1,15 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/validator/p1_interface_skeleton_inserted.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Bar",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Show",
                         generics: [],
                         fields: [],
                         methods: [],
@@ -19,35 +18,8 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [
-                                    Named(
-                                        "Bar",
-                                        [],
-                                    ),
-                                ],
-                            },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

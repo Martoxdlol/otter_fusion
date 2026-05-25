@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
+input_file: examples/parser/parse_extern_function_generic_pointer.of
 ---
 Ok(
     Program {
@@ -9,25 +9,31 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "malloc",
+                        name: "hashmap_set",
                         has_self_param: false,
                         is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Pointer(
-                                Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                            ),
-                        ),
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        return_type: None,
                         params: [
                             ParamDecl {
-                                name: "size",
+                                name: "key",
                                 ty: Primitive(
-                                    Uint64,
+                                    String,
                                 ),
-                                is_pointer: false,
+                                is_pointer: true,
+                            },
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: true,
                             },
                         ],
                         body: Some(

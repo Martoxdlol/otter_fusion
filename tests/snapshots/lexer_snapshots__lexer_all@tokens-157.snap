@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_binary_op_type_mismatch_errors.of
+input_file: examples/validator/p5_binary_op_arithmetic_ok.of
 ---
 Ok(
     [
@@ -52,24 +52,24 @@ Ok(
             column: 22,
         },
         Token {
-            token_type: Float(
-                "5.0",
+            token_type: Int(
+                "5",
             ),
-            position: 25,
+            position: 23,
             line: 1,
-            column: 26,
+            column: 24,
         },
         Token {
             token_type: Semicolon,
-            position: 26,
+            position: 24,
             line: 1,
-            column: 27,
+            column: 25,
         },
         Token {
             token_type: RightBrace,
-            position: 28,
+            position: 26,
             line: 1,
-            column: 29,
+            column: 27,
         },
     ],
 )

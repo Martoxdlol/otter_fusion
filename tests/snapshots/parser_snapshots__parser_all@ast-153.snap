@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_universal_extend_satisfies_interface.of
+input_file: examples/validator/p4_missing_interface_method_errors.of
 ---
 Ok(
     Program {
@@ -47,12 +47,7 @@ Ok(
                     StructDecl {
                         name: "S",
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                        generics: [],
                         fields: [],
                         methods: [],
                         implements: [
@@ -65,49 +60,6 @@ Ok(
                 ),
                 span: Span {
                     line: 2,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "S",
-                            [
-                                Named(
-                                    "T",
-                                    [],
-                                ),
-                            ],
-                        ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "f",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 3,
-                                    col: 23,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                    },
-                ),
-                span: Span {
-                    line: 3,
                     col: 7,
                     len: 6,
                 },

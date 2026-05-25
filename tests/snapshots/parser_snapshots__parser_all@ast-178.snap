@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_var_decl_no_type_no_init_errors.of
+input_file: examples/validator/p5_unknown_variable_errors.of
 ---
 Ok(
     Program {
@@ -18,10 +18,10 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    VarDecl(
-                                        "x",
-                                        None,
-                                        None,
+                                    Expr(
+                                        Variable(
+                                            "oops",
+                                        ),
                                     ),
                                 ],
                                 returns: None,

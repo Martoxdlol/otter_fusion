@@ -1,6 +1,12 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_function_signature_resolved.of
+input_file: examples/spec/14_ffi/pointer_syntax.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'MyStruct' in module 'test_module'",
+    ],
+)

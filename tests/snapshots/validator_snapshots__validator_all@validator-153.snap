@@ -1,10 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_universal_extend_satisfies_interface.of
+input_file: examples/validator/p4_missing_interface_method_errors.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'T' in module 'test_module'",
-    ],
-)
+Ok

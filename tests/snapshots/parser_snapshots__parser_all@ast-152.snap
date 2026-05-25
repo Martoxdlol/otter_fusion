@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_struct_implements_interface_ok.of
+input_file: examples/validator/p4_interface_method_signature_mismatch_errors.of
 ---
 Ok(
     Program {
@@ -11,15 +11,7 @@ Ok(
                     InterfaceDecl {
                         name: "I",
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        fields: [],
                         methods: [
                             FunctionDecl {
                                 name: "f",
@@ -27,7 +19,15 @@ Ok(
                                 is_extern: false,
                                 generics: [],
                                 return_type: None,
-                                params: [],
+                                params: [
+                                    ParamDecl {
+                                        name: "a",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
                                 body: Some(
                                     Block {
                                         statements: [],
@@ -56,15 +56,7 @@ Ok(
                         name: "S",
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        fields: [],
                         methods: [
                             FunctionDecl {
                                 name: "f",
@@ -81,7 +73,7 @@ Ok(
                                 ),
                                 span: Span {
                                     line: 2,
-                                    col: 31,
+                                    col: 24,
                                     len: 8,
                                 },
                             },

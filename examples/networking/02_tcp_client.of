@@ -1,77 +1,35 @@
 // TCP client that connects to 127.0.0.1:8080, sends "ping\n", reads the
-// reply, and prints it. Pairs with 01_tcp_echo_server.of (start the
-// server first).
+// reply, and prints it. Pairs with 01_tcp_echo_server.of (start it first).
 
-import { println, Buffer } from "of:core";
-import { __of_buffer_alloc, __of_buffer_free, __of_buffer_set } from "of:core";
-import {
-  __of_socket, __of_connect, __of_close,
-  __of_read, __of_write, __of_errno,
-  __of_sockaddr_in, __of_htons, __of_htonl,
-  AF_INET, SOCK_STREAM,
-} from "of_io";
-
-function errno_str(): str {
-  "errno=" + (__of_errno() as str)
-}
+import { println } from "of:core";
+import { TcpStream, ReadResult, IoError, write } from "of_io";
 
 function main(): i64 {
-  var sock = __of_socket(AF_INET(), SOCK_STREAM(), 0);
-  if (sock < 0) {
-    println("socket() failed " + errno_str());
+  var connect_res = TcpStream.connect("127.0.0.1", 8080 as u16);
+  if (connect_res is IoError) {
+    println("connect: " + (connect_res as IoError).message());
     return 1;
   }
-
-  var ip_be = __of_htonl(2130706433 as u32);  // 127.0.0.1
-  var port_be = __of_htons(8080 as u16);
-  var addr = __of_sockaddr_in(ip_be, port_be);
-
-  if (__of_connect(sock, addr, 16 as u32) < 0) {
-    println("connect() failed " + errno_str());
-    __of_close(sock);
-    __of_buffer_free(addr);
-    return 1;
-  }
+  var sock = connect_res as TcpStream;
   println("connected to 127.0.0.1:8080");
 
-  // Build a 5-byte "ping\n" payload by hand.
-  var msg_maybe = __of_buffer_alloc(5);
-  if (msg_maybe is null) {
-    println("alloc failed");
-    return 1;
-  }
-  var msg = msg_maybe as Buffer;
-  __of_buffer_set(msg, 0 as u64, 112 as u8);  // 'p'
-  __of_buffer_set(msg, 1 as u64, 105 as u8);  // 'i'
-  __of_buffer_set(msg, 2 as u64, 110 as u8);  // 'n'
-  __of_buffer_set(msg, 3 as u64, 103 as u8);  // 'g'
-  __of_buffer_set(msg, 4 as u64, 10 as u8);   // '\n'
-
-  var sent = __of_write(sock, msg, 5 as u64);
-  if (sent < 0) {
-    println("write() failed " + errno_str());
+  var sent = sock.write_str("ping\n");
+  if (sent is IoError) {
+    println("write: " + (sent as IoError).message());
   } else {
-    println("sent " + (sent as str) + " bytes");
+    println("sent " + ((sent as i64) as str) + " bytes");
   }
 
-  var reply_maybe = __of_buffer_alloc(256);
-  if (reply_maybe is null) {
-    println("alloc failed");
-    return 1;
-  }
-  var reply = reply_maybe as Buffer;
-  var n = __of_read(sock, reply, 256);
-  if (n > 0) {
-    println("received " + (n as str) + " bytes:");
-    // Print byte-by-byte through write to stdout (fd 1).
-    __of_write(1, reply, n as u64);
+  var read_res = sock.read(256 as u64);
+  if (read_res is IoError) {
+    println("read: " + (read_res as IoError).message());
   } else {
-    println("read returned " + (n as str));
+    var r = read_res as ReadResult;
+    println("received " + (r.len as str) + " bytes:");
+    write(1, r.buf, r.len as u64);
+    r.free();
   }
 
-  __of_close(sock);
-  __of_buffer_free(addr);
-  __of_buffer_free(msg);
-  __of_buffer_free(reply);
+  sock.close();
   0
 }

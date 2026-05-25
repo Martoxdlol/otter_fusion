@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_is_check_yields_bool.of
+input_file: examples/validator/p5_continue_inside_while_ok.of
 ---
 Ok(
     Program {
@@ -18,17 +18,18 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    Expr(
-                                        Is(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
-                                            ),
-                                            Primitive(
-                                                Int64,
+                                    While(
+                                        Literal(
+                                            Bool(
+                                                true,
                                             ),
                                         ),
+                                        Block {
+                                            statements: [
+                                                Continue,
+                                            ],
+                                            returns: None,
+                                        },
                                     ),
                                 ],
                                 returns: None,

@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
 ---
 Ok

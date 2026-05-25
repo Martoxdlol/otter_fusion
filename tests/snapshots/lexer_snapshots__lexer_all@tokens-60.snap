@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_expr_binary_precedence.of
+input_file: examples/parser/parse_expr_binary_left_associative.of
 ---
 Ok(
     [
@@ -60,7 +60,7 @@ Ok(
             column: 24,
         },
         Token {
-            token_type: Star,
+            token_type: Plus,
             position: 25,
             line: 1,
             column: 26,

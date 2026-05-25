@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/05_extensions/extend_specialized.of
+input_file: examples/spec/05_extensions/extend_generic.of
 ---
 Ok(
     [
@@ -86,100 +86,120 @@ Ok(
             column: 7,
         },
         Token {
+            token_type: LT,
+            position: 42,
+            line: 5,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 43,
+            line: 5,
+            column: 9,
+        },
+        Token {
+            token_type: GT,
+            position: 44,
+            line: 5,
+            column: 10,
+        },
+        Token {
             token_type: Identifier(
                 "Wrapper",
             ),
-            position: 49,
+            position: 52,
             line: 5,
-            column: 15,
+            column: 18,
         },
         Token {
             token_type: LT,
-            position: 50,
-            line: 5,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "i32",
-            ),
             position: 53,
             line: 5,
             column: 19,
         },
         Token {
-            token_type: GT,
+            token_type: Identifier(
+                "T",
+            ),
             position: 54,
             line: 5,
             column: 20,
         },
         Token {
-            token_type: LeftBrace,
-            position: 56,
+            token_type: GT,
+            position: 55,
             line: 5,
-            column: 22,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 57,
+            line: 5,
+            column: 23,
         },
         Token {
             token_type: Function,
-            position: 67,
+            position: 68,
             line: 6,
             column: 11,
         },
         Token {
             token_type: Identifier(
-                "double",
+                "get",
             ),
-            position: 74,
+            position: 72,
             line: 6,
-            column: 18,
+            column: 15,
         },
         Token {
             token_type: LeftParen,
-            position: 75,
+            position: 73,
             line: 6,
-            column: 19,
+            column: 16,
         },
         Token {
             token_type: SelfRef,
-            position: 79,
+            position: 77,
             line: 6,
-            column: 23,
+            column: 20,
         },
         Token {
             token_type: RightParen,
-            position: 80,
+            position: 78,
+            line: 6,
+            column: 21,
+        },
+        Token {
+            token_type: Colon,
+            position: 79,
+            line: 6,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 81,
             line: 6,
             column: 24,
         },
         Token {
-            token_type: Colon,
-            position: 81,
-            line: 6,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "i32",
-            ),
-            position: 85,
-            line: 6,
-            column: 29,
-        },
-        Token {
             token_type: LeftBrace,
-            position: 87,
+            position: 83,
             line: 6,
-            column: 31,
+            column: 26,
         },
         Token {
             token_type: SelfRef,
-            position: 96,
+            position: 92,
             line: 7,
             column: 9,
         },
         Token {
             token_type: Dot,
-            position: 97,
+            position: 93,
             line: 7,
             column: 10,
         },
@@ -187,33 +207,19 @@ Ok(
             token_type: Identifier(
                 "value",
             ),
-            position: 102,
+            position: 98,
             line: 7,
             column: 15,
         },
         Token {
-            token_type: Star,
-            position: 104,
-            line: 7,
-            column: 17,
-        },
-        Token {
-            token_type: Int(
-                "2",
-            ),
-            position: 106,
-            line: 7,
-            column: 19,
-        },
-        Token {
             token_type: RightBrace,
-            position: 110,
+            position: 102,
             line: 8,
             column: 4,
         },
         Token {
             token_type: RightBrace,
-            position: 112,
+            position: 104,
             line: 9,
             column: 2,
         },

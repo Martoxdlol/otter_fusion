@@ -1,75 +1,79 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_type_alias_with_generics.of
+input_file: examples/parser/parse_struct_with_multiple_fields.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
+            token_type: Struct,
+            position: 6,
             line: 1,
-            column: 5,
+            column: 7,
         },
         Token {
             token_type: Identifier(
-                "Option",
+                "Point",
             ),
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: LT,
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: GT,
+            token_type: LeftBrace,
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Eq,
+            token_type: Identifier(
+                "x",
+            ),
             position: 16,
             line: 1,
             column: 17,
         },
         Token {
+            token_type: Colon,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
             token_type: Identifier(
-                "T",
+                "f64",
             ),
-            position: 18,
+            position: 21,
             line: 1,
-            column: 19,
+            column: 22,
         },
         Token {
-            token_type: Pipe,
-            position: 20,
+            token_type: Identifier(
+                "y",
+            ),
+            position: 23,
             line: 1,
-            column: 21,
+            column: 24,
         },
         Token {
-            token_type: Null,
-            position: 25,
+            token_type: Colon,
+            position: 24,
             line: 1,
-            column: 26,
+            column: 25,
         },
         Token {
-            token_type: Semicolon,
-            position: 26,
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 28,
             line: 1,
-            column: 27,
+            column: 29,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 30,
+            line: 1,
+            column: 31,
         },
     ],
 )

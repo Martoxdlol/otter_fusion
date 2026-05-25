@@ -218,6 +218,66 @@ pub extern "C" fn __of_or_i32(a: c_int, b: c_int) -> c_int {
     a | b
 }
 
+// a & !b. Pairs with __of_or_i32 — needed to clear flag bits.
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_and_not_i32(a: c_int, b: c_int) -> c_int {
+    a & !b
+}
+
+// ---- High-level helpers used by the of-side facade ----
+
+// Copy a null-terminated C string into a fresh foreign-heap Buffer
+// (excluding the terminator). Returns NULL on null input.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_buffer_from_str(s: *const c_char) -> *mut Buffer {
+    if s.is_null() {
+        return std::ptr::null_mut();
+    }
+    let bytes = unsafe { std::ffi::CStr::from_ptr(s) }.to_bytes().to_vec();
+    buffer_from_vec(bytes)
+}
+
+// Parse a dotted-quad IPv4 string and build a sockaddr_in for (host, port).
+// `port` is host-byte-order. Returns NULL on parse failure or null input.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_sockaddr_for_host(
+    host: *const c_char,
+    port: u16,
+) -> *mut Buffer {
+    if host.is_null() {
+        return std::ptr::null_mut();
+    }
+    let s = match unsafe { std::ffi::CStr::from_ptr(host) }.to_str() {
+        Ok(s) => s,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let addr: std::net::Ipv4Addr = match s.parse() {
+        Ok(a) => a,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    // octets() is in network order. Reading those bytes as a native u32
+    // produces a value whose memory representation matches network byte
+    // order — i.e. the right value for sockaddr_in.s_addr.
+    let ip_be = u32::from_ne_bytes(addr.octets());
+    __of_sockaddr_in(ip_be, port.to_be())
+}
+
+// accept() without exposing the peer sockaddr. Allocates a transient
+// sockaddr_in + socklen_t on the stack so the facade doesn't have to
+// thread two Buffers through.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_accept_simple(fd: c_int) -> c_int {
+    let mut addr: libc::sockaddr_in = unsafe { std::mem::zeroed() };
+    let mut len: libc::socklen_t = std::mem::size_of::<libc::sockaddr_in>() as libc::socklen_t;
+    unsafe {
+        libc::accept(
+            fd,
+            &mut addr as *mut _ as *mut libc::sockaddr,
+            &mut len,
+        )
+    }
+}
+
 // ---- Platform-resolved flag constants ----
 
 #[unsafe(no_mangle)]

@@ -1,47 +1,11 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_call_arg_type_mismatch_errors.of
+input_file: examples/validator/p5_binary_op_type_mismatch_errors.of
 ---
 Ok(
     Program {
         items: [
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "f",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 9,
-                    len: 8,
-                },
-            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -55,18 +19,18 @@ Ok(
                             Block {
                                 statements: [
                                     Expr(
-                                        Call(
-                                            Variable(
-                                                "f",
-                                            ),
-                                            [],
-                                            [
-                                                Literal(
-                                                    String(
-                                                        "hola",
-                                                    ),
+                                        BinaryOp(
+                                            Literal(
+                                                Int(
+                                                    "5",
                                                 ),
-                                            ],
+                                            ),
+                                            Add,
+                                            Literal(
+                                                Float(
+                                                    "5.0",
+                                                ),
+                                            ),
                                         ),
                                     ),
                                 ],
@@ -74,14 +38,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 2,
+                            line: 1,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 2,
+                    line: 1,
                     col: 9,
                     len: 8,
                 },

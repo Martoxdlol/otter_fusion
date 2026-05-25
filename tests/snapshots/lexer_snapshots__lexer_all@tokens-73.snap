@@ -1,63 +1,77 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_implements_clause.of
+input_file: examples/parser/parse_function_no_body.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Function,
+            position: 8,
             line: 1,
-            column: 7,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "Point",
+                "foo",
             ),
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: Colon,
+            token_type: LeftParen,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Identifier(
-                "Movable",
-            ),
-            position: 22,
+            token_type: Colon,
+            position: 15,
             line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Plus,
-            position: 24,
-            line: 1,
-            column: 25,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "Drawable",
+                "i32",
             ),
-            position: 33,
+            position: 19,
             line: 1,
-            column: 34,
+            column: 20,
         },
         Token {
-            token_type: LeftBrace,
-            position: 35,
+            token_type: RightParen,
+            position: 20,
             line: 1,
-            column: 36,
+            column: 21,
         },
         Token {
-            token_type: RightBrace,
-            position: 36,
+            token_type: Colon,
+            position: 21,
             line: 1,
-            column: 37,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 27,
+            line: 1,
+            column: 28,
         },
     ],
 )

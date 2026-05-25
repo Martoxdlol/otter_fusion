@@ -1,10 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_implements_non_interface_errors.of
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
 ---
 ValidationErrors(
     [
-        "type 'test_module::B' implements clause references a non-interface",
+        "unknown type 'U' in module 'test_module'",
     ],
 )

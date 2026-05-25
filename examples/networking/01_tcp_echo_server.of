@@ -1,94 +1,42 @@
 // Single-connection TCP echo server on 127.0.0.1:8080.
-//
-// Accepts ONE client, echoes a single buffer back, closes the connection,
-// and exits. Pair with 02_tcp_client.of in another terminal.
+// Accepts ONE client through the of_io facade, echoes a single buffer,
+// closes, and exits. Pair with 02_tcp_client.of in another terminal.
 
-import { println, Buffer } from "of:core";
-import { __of_buffer_alloc, __of_buffer_free } from "of:core";
-import {
-  __of_socket, __of_bind, __of_listen, __of_accept, __of_close,
-  __of_read, __of_write, __of_errno,
-  __of_sockaddr_in, __of_htons, __of_htonl,
-  AF_INET, SOCK_STREAM,
-} from "of_io";
-
-function errno_str(): str {
-  "errno=" + (__of_errno() as str)
-}
+import { println } from "of:core";
+import { TcpListener, TcpStream, ReadResult, IoError } from "of_io";
 
 function main(): i64 {
-  // 1. Create the listening socket.
-  var server = __of_socket(AF_INET(), SOCK_STREAM(), 0);
-  if (server < 0) {
-    println("socket() failed " + errno_str());
+  var listener_or_err = TcpListener.bind("127.0.0.1", 8080 as u16, 1);
+  if (listener_or_err is IoError) {
+    println("bind: " + (listener_or_err as IoError).message());
     return 1;
   }
-
-  // 2. Bind to 127.0.0.1:8080. sockaddr_in is 16 bytes.
-  // IP is 127<<24 | 1 = 0x7F000001 in host order; htonl flips to network order.
-  var ip_be = __of_htonl(2130706433 as u32);
-  var port_be = __of_htons(8080 as u16);
-  var addr = __of_sockaddr_in(ip_be, port_be);
-  if (__of_bind(server, addr, 16 as u32) < 0) {
-    println("bind() failed " + errno_str());
-    __of_close(server);
-    __of_buffer_free(addr);
-    return 1;
-  }
-
-  // 3. Listen with a backlog of 1.
-  if (__of_listen(server, 1) < 0) {
-    println("listen() failed " + errno_str());
-    __of_close(server);
-    __of_buffer_free(addr);
-    return 1;
-  }
-
+  var listener = listener_or_err as TcpListener;
   println("listening on 127.0.0.1:8080");
 
-  // 4. Accept one client.
-  var client_addr = __of_sockaddr_in(0 as u32, 0 as u16);
-  var client_addrlen_maybe = __of_buffer_alloc(4);
-  if (client_addrlen_maybe is null) {
-    println("alloc failed");
+  var accept_res = listener.accept();
+  if (accept_res is IoError) {
+    println("accept: " + (accept_res as IoError).message());
+    listener.close();
     return 1;
   }
-  var client_addrlen = client_addrlen_maybe as Buffer;
-  // accept() writes the actual sockaddr length into the addrlen buffer;
-  // we don't bother initializing it for this minimal example.
-  var client = __of_accept(server, client_addr, client_addrlen);
-  if (client < 0) {
-    println("accept() failed " + errno_str());
-    __of_close(server);
-    __of_buffer_free(addr);
-    __of_buffer_free(client_addr);
-    __of_buffer_free(client_addrlen);
-    return 1;
-  }
+  var client = accept_res as TcpStream;
   println("client connected");
 
-  // 5. Read one buffer, write it back.
-  var buf_maybe = __of_buffer_alloc(1024);
-  if (buf_maybe is null) {
-    println("alloc failed");
-    return 1;
-  }
-  var buf = buf_maybe as Buffer;
-
-  var n = __of_read(client, buf, 1024);
-  if (n > 0) {
-    println("read " + (n as str) + " bytes; echoing");
-    __of_write(client, buf, n as u64);
+  var read_res = client.read(1024 as u64);
+  if (read_res is IoError) {
+    println("read: " + (read_res as IoError).message());
   } else {
-    println("read returned " + (n as str) + " " + errno_str());
+    var r = read_res as ReadResult;
+    println("read " + (r.len as str) + " bytes; echoing");
+    var w = client.write(r.buf, r.len as u64);
+    if (w is IoError) {
+      println("write: " + (w as IoError).message());
+    }
+    r.free();
   }
 
-  // 6. Tear down.
-  __of_close(client);
-  __of_close(server);
-  __of_buffer_free(buf);
-  __of_buffer_free(addr);
-  __of_buffer_free(client_addr);
-  __of_buffer_free(client_addrlen);
+  client.close();
+  listener.close();
   0
 }

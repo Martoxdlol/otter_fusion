@@ -1,0 +1,43 @@
+// Connects to 127.0.0.1:8082, sends three messages over the same socket
+// (without reconnecting), prints each reply, then closes.
+// Pair with 04_looping_echo_server.of.
+
+import { println, print } from "of:core";
+import { TcpStream, ReadResult, IoError, write } from "of_io";
+
+function send_and_recv(sock: TcpStream, msg: str) {
+  var sent = sock.write_str(msg);
+  if (sent is IoError) {
+    println("  write: " + (sent as IoError).message());
+    return;
+  }
+  println("sent " + ((sent as i64) as str) + " bytes: " + msg);
+
+  var read_res = sock.read(256 as u64);
+  if (read_res is IoError) {
+    println("  read: " + (read_res as IoError).message());
+    return;
+  }
+  var r = read_res as ReadResult;
+  print("got " + (r.len as str) + " bytes: ");
+  write(1, r.buf, r.len as u64);
+  r.free();
+}
+
+function main(): i64 {
+  var connect_res = TcpStream.connect("127.0.0.1", 8082 as u16);
+  if (connect_res is IoError) {
+    println("connect: " + (connect_res as IoError).message());
+    return 1;
+  }
+  var sock = connect_res as TcpStream;
+  println("connected to 127.0.0.1:8082");
+
+  send_and_recv(sock, "hello\n");
+  send_and_recv(sock, "world\n");
+  send_and_recv(sock, "goodbye\n");
+
+  sock.close();
+  println("done");
+  0
+}

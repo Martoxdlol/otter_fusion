@@ -1,10 +1,656 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_empty_program.of
+input_file: examples/networking/05_multi_message_client.of
 ---
 Ok(
     Program {
-        items: [],
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "println",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 5,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of_io",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "TcpStream",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "ReadResult",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "IoError",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "write",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 6,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "send_and_recv",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "sock",
+                                ty: Named(
+                                    "TcpStream",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "msg",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "sent",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "sock",
+                                                    ),
+                                                    "write_str",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "msg",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "sent",
+                                                ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "  write: ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "sent",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        None,
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            Literal(
+                                                                String(
+                                                                    "sent ",
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            As(
+                                                                As(
+                                                                    Variable(
+                                                                        "sent",
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int64,
+                                                                    ),
+                                                                ),
+                                                                Primitive(
+                                                                    String,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                " bytes: ",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Variable(
+                                                        "msg",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "read_res",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "sock",
+                                                    ),
+                                                    "read",
+                                                ),
+                                                [],
+                                                [
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "256",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint64,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "read_res",
+                                                ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "  read: ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "read_res",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        None,
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "r",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "read_res",
+                                                ),
+                                                Named(
+                                                    "ReadResult",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        Literal(
+                                                            String(
+                                                                "got ",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Member(
+                                                                Variable(
+                                                                    "r",
+                                                                ),
+                                                                "len",
+                                                            ),
+                                                            Primitive(
+                                                                String,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Literal(
+                                                        String(
+                                                            " bytes: ",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "write",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    Int(
+                                                        "1",
+                                                    ),
+                                                ),
+                                                Member(
+                                                    Variable(
+                                                        "r",
+                                                    ),
+                                                    "buf",
+                                                ),
+                                                As(
+                                                    Member(
+                                                        Variable(
+                                                            "r",
+                                                        ),
+                                                        "len",
+                                                    ),
+                                                    Primitive(
+                                                        Uint64,
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "r",
+                                                ),
+                                                "free",
+                                            ),
+                                            [],
+                                            [],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 8,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "connect_res",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "TcpStream",
+                                                    ),
+                                                    "connect",
+                                                ),
+                                                [],
+                                                [
+                                                    Literal(
+                                                        String(
+                                                            "127.0.0.1",
+                                                        ),
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "8082",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint16,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "connect_res",
+                                                ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "connect: ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "connect_res",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "sock",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "connect_res",
+                                                ),
+                                                Named(
+                                                    "TcpStream",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "connected to 127.0.0.1:8082",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "send_and_recv",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "sock",
+                                                ),
+                                                Literal(
+                                                    String(
+                                                        "hello\n",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "send_and_recv",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "sock",
+                                                ),
+                                                Literal(
+                                                    String(
+                                                        "world\n",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "send_and_recv",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "sock",
+                                                ),
+                                                Literal(
+                                                    String(
+                                                        "goodbye\n",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "sock",
+                                                ),
+                                                "close",
+                                            ),
+                                            [],
+                                            [],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "done",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 27,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 27,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
     },
 )

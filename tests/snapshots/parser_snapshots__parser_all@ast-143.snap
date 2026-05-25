@@ -1,64 +1,58 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p3_extend_adds_specialised_method.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
-                        is_extern: false,
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "MyInt",
                         generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                        ty: Primitive(
+                            Int64,
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 5,
+                    len: 4,
                 },
             },
             Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Foo",
-                            [],
+                kind: Function(
+                    FunctionDecl {
+                        name: "foo",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "MyInt",
+                                [],
+                            ),
                         ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "m",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 22,
-                                    len: 8,
-                                },
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
                             },
-                        ],
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

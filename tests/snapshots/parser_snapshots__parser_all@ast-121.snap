@@ -1,8 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/13_iterators/iterator_interface.of
+input_file: examples/spec/12_control_flow/for_loop.of
 ---
 Err(
-    "unexpected token '('",
+    "unexpected token 'for'",
 )

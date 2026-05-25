@@ -1,11 +1,36 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_unknown_variable_errors.of
+input_file: examples/validator/p5_struct_init_missing_field_errors.of
 ---
 Ok(
     Program {
         items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -19,8 +44,12 @@ Ok(
                             Block {
                                 statements: [
                                     Expr(
-                                        Variable(
-                                            "oops",
+                                        StructInit(
+                                            Named(
+                                                "S",
+                                                [],
+                                            ),
+                                            [],
                                         ),
                                     ),
                                 ],
@@ -28,14 +57,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 2,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

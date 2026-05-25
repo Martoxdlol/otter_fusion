@@ -1,6 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_type_alias_inlined_in_signature.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
-Ok
+ParserError(
+    "unexpected token '*'",
+)

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p4_implements_non_interface_errors.of
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
 ---
 Ok(
     Program {
@@ -9,9 +9,14 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "A",
+                        name: "Box",
                         is_extern: false,
-                        generics: [],
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         fields: [],
                         methods: [],
                         implements: [],
@@ -24,18 +29,39 @@ Ok(
                 },
             },
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "B",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "A",
-                                [],
-                            ),
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Box",
+                            [
+                                Named(
+                                    "U",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "peek",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 2,
+                                    col: 25,
+                                    len: 8,
+                                },
+                            },
                         ],
                     },
                 ),

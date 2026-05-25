@@ -1,16 +1,15 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/04_structs_interfaces/struct_basic.of
+input_file: examples/spec/04_structs_interfaces/interface_basic.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Person",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
                         generics: [],
                         fields: [
                             FieldDecl {
@@ -20,59 +19,15 @@ Ok(
                                 ),
                                 is_pointer: false,
                             },
-                            FieldDecl {
-                                name: "age",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
                         ],
-                        methods: [
-                            FunctionDecl {
-                                name: "greet",
-                                has_self_param: true,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        String,
-                                    ),
-                                ),
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: Some(
-                                            BinaryOp(
-                                                Literal(
-                                                    String(
-                                                        "Hello, ",
-                                                    ),
-                                                ),
-                                                Add,
-                                                Member(
-                                                    SelfRef,
-                                                    "name",
-                                                ),
-                                            ),
-                                        ),
-                                    },
-                                ),
-                                span: Span {
-                                    line: 5,
-                                    col: 11,
-                                    len: 8,
-                                },
-                            },
-                        ],
+                        methods: [],
                         implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

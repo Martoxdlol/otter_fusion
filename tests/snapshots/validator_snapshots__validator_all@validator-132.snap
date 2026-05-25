@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p1_struct_skeleton_inserted.of
+input_file: examples/validator/p1_function_skeleton_inserted.of
 ---
 Ok

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p4_implements_non_interface_errors.of
+input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
 ---
 Ok(
     [
@@ -13,63 +13,127 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "A",
+                "Box",
             ),
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: LeftBrace,
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: RightBrace,
+            token_type: LT,
             position: 11,
             line: 1,
             column: 12,
         },
         Token {
-            token_type: Struct,
-            position: 18,
+            token_type: Identifier(
+                "T",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: GT,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Extend,
+            position: 23,
             line: 2,
             column: 7,
         },
         Token {
             token_type: Identifier(
-                "B",
+                "Box",
             ),
-            position: 20,
-            line: 2,
-            column: 9,
-        },
-        Token {
-            token_type: Colon,
-            position: 22,
+            position: 27,
             line: 2,
             column: 11,
         },
         Token {
+            token_type: LT,
+            position: 28,
+            line: 2,
+            column: 12,
+        },
+        Token {
             token_type: Identifier(
-                "A",
+                "U",
             ),
-            position: 24,
+            position: 29,
             line: 2,
             column: 13,
         },
         Token {
-            token_type: LeftBrace,
-            position: 26,
+            token_type: GT,
+            position: 30,
             line: 2,
-            column: 15,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 32,
+            line: 2,
+            column: 16,
+        },
+        Token {
+            token_type: Function,
+            position: 41,
+            line: 2,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "peek",
+            ),
+            position: 46,
+            line: 2,
+            column: 30,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 47,
+            line: 2,
+            column: 31,
+        },
+        Token {
+            token_type: RightParen,
+            position: 48,
+            line: 2,
+            column: 32,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 50,
+            line: 2,
+            column: 34,
         },
         Token {
             token_type: RightBrace,
-            position: 27,
+            position: 51,
             line: 2,
-            column: 16,
+            column: 35,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 53,
+            line: 2,
+            column: 37,
         },
     ],
 )

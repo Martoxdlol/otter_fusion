@@ -1,37 +1,41 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_function_no_params.of
+input_file: examples/parser/parse_extern_struct.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "noop",
-                        has_self_param: false,
-                        is_extern: false,
+                kind: Struct(
+                    StructDecl {
+                        name: "MyCFunctionArgs",
+                        is_extern: true,
                         generics: [],
-                        return_type: None,
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
+                        fields: [
+                            FieldDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
                             },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                            FieldDecl {
+                                name: "b",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 14,
+                    len: 6,
                 },
             },
         ],

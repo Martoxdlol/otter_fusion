@@ -181,6 +181,10 @@ pub struct HirCapture {
 pub enum ExprKind {
     Literal(HirLiteral),
     Variable(String),
+    /// Resolved reference to a static method (no `self`). Produced by the
+    /// validator for `TypeName.method` callees so lowering can skip the
+    /// receiver-lookup machinery and call the FnId directly.
+    Static(FnId, TypeId, Vec<ResolvedType>),
     If(Box<TypedExpr>, Box<HirBlock>, Option<Box<HirBlock>>),
     Call(Box<TypedExpr>, Vec<ResolvedType>, Vec<TypedExpr>), // callee, type args, args
     LiteralMap(Vec<(TypedExpr, TypedExpr)>),

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_generics.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     [
@@ -13,65 +13,57 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Box",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
+                "Point",
             ),
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: GT,
+            token_type: LT,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: LeftBrace,
+            token_type: Identifier(
+                "T",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Comma,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
             token_type: Identifier(
-                "value",
+                "U",
             ),
-            position: 21,
+            position: 17,
             line: 1,
-            column: 22,
+            column: 18,
         },
         Token {
-            token_type: Colon,
-            position: 22,
+            token_type: GT,
+            position: 18,
             line: 1,
-            column: 23,
+            column: 19,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 24,
+            token_type: LeftBrace,
+            position: 20,
             line: 1,
-            column: 25,
+            column: 21,
         },
         Token {
             token_type: RightBrace,
-            position: 26,
+            position: 21,
             line: 1,
-            column: 27,
+            column: 22,
         },
     ],
 )

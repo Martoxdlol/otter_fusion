@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_if_expression_typechecks.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     [
@@ -38,80 +38,38 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: If,
-            position: 20,
+            token_type: Int(
+                "5",
+            ),
+            position: 19,
             line: 1,
-            column: 21,
+            column: 20,
         },
         Token {
-            token_type: LeftParen,
+            token_type: EqEq,
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
-            token_type: True,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: RightParen,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
             token_type: Int(
                 "5",
             ),
-            position: 31,
+            position: 24,
             line: 1,
-            column: 32,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 25,
+            line: 1,
+            column: 26,
         },
         Token {
             token_type: RightBrace,
-            position: 33,
+            position: 27,
             line: 1,
-            column: 34,
-        },
-        Token {
-            token_type: Else,
-            position: 38,
-            line: 1,
-            column: 39,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 40,
-            line: 1,
-            column: 41,
-        },
-        Token {
-            token_type: Int(
-                "6",
-            ),
-            position: 42,
-            line: 1,
-            column: 43,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 44,
-            line: 1,
-            column: 45,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 46,
-            line: 1,
-            column: 47,
+            column: 28,
         },
     ],
 )

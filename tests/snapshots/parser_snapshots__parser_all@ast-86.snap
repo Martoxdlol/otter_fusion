@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_type_expr_primitive.of
+input_file: examples/parser/parse_type_expr_function_type.of
 ---
 Ok(
     Program {
@@ -11,8 +11,18 @@ Ok(
                     TypeAliasDecl {
                         name: "X",
                         generics: [],
-                        ty: Primitive(
-                            Int32,
+                        ty: Function(
+                            [
+                                Primitive(
+                                    Int32,
+                                ),
+                                Primitive(
+                                    String,
+                                ),
+                            ],
+                            Primitive(
+                                Bool,
+                            ),
                         ),
                     },
                 ),

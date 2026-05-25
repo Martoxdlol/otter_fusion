@@ -1,58 +1,103 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_as_cast_changes_type.of
+input_file: examples/validator/p4_struct_implements_interface_ok.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "test",
-                        has_self_param: false,
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "I",
                         generics: [],
-                        return_type: None,
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [
-                                    Expr(
-                                        BinaryOp(
-                                            As(
-                                                Literal(
-                                                    Int(
-                                                        "5",
-                                                    ),
-                                                ),
-                                                Primitive(
-                                                    Float64,
-                                                ),
-                                            ),
-                                            Add,
-                                            Literal(
-                                                Float(
-                                                    "2.0",
-                                                ),
-                                            ),
-                                        ),
-                                    ),
-                                ],
-                                returns: None,
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
                             },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "f",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 1,
+                                    col: 23,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "f",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 2,
+                                    col: 31,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "I",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p3_extend_adds_specialised_method.of
 ---
 Ok(
     [
@@ -13,127 +13,87 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Box",
+                "Foo",
             ),
             position: 10,
             line: 1,
             column: 11,
         },
         Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: LeftBrace,
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: GT,
+            token_type: RightBrace,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: LeftBrace,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 16,
-            line: 1,
-            column: 17,
-        },
-        Token {
             token_type: Extend,
-            position: 23,
+            position: 20,
             line: 2,
             column: 7,
         },
         Token {
             token_type: Identifier(
-                "Box",
+                "Foo",
             ),
-            position: 27,
+            position: 24,
             line: 2,
             column: 11,
         },
         Token {
-            token_type: LT,
-            position: 28,
-            line: 2,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 31,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: GT,
-            position: 32,
-            line: 2,
-            column: 16,
-        },
-        Token {
             token_type: LeftBrace,
-            position: 34,
+            position: 26,
             line: 2,
-            column: 18,
+            column: 13,
         },
         Token {
             token_type: Function,
-            position: 43,
+            position: 35,
             line: 2,
-            column: 27,
+            column: 22,
         },
         Token {
             token_type: Identifier(
-                "is_int",
+                "m",
             ),
-            position: 50,
+            position: 37,
             line: 2,
-            column: 34,
+            column: 24,
         },
         Token {
             token_type: LeftParen,
-            position: 51,
+            position: 38,
             line: 2,
-            column: 35,
+            column: 25,
         },
         Token {
             token_type: RightParen,
-            position: 52,
+            position: 39,
             line: 2,
-            column: 36,
+            column: 26,
         },
         Token {
             token_type: LeftBrace,
-            position: 54,
+            position: 41,
             line: 2,
-            column: 38,
+            column: 28,
         },
         Token {
             token_type: RightBrace,
-            position: 55,
+            position: 42,
             line: 2,
-            column: 39,
+            column: 29,
         },
         Token {
             token_type: RightBrace,
-            position: 57,
+            position: 44,
             line: 2,
-            column: 41,
+            column: 31,
         },
     ],
 )

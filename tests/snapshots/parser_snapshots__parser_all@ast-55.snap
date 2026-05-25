@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/networking/of_io.of
+input_file: examples/networking/04_looping_echo_server.of
 ---
 Ok(
     Program {
@@ -13,7 +13,7 @@ Ok(
                         symbols: Named(
                             [
                                 ImportSymbol {
-                                    name: "Buffer",
+                                    name: "println",
                                     alias: None,
                                 },
                             ],
@@ -21,7 +21,39 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 11,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of_io",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "TcpListener",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "TcpStream",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "ReadResult",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "IoError",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 12,
                     col: 7,
                     len: 6,
                 },
@@ -29,1673 +61,642 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "__of_open",
+                        name: "handle_client",
                         has_self_param: false,
-                        is_extern: true,
+                        is_extern: false,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
+                        return_type: None,
                         params: [
                             ParamDecl {
-                                name: "path",
-                                ty: Primitive(
-                                    String,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "flags",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "mode",
-                                ty: Primitive(
-                                    Uint32,
+                                name: "client",
+                                ty: Named(
+                                    "TcpStream",
+                                    [],
                                 ),
                                 is_pointer: false,
                             },
                         ],
                         body: Some(
                             Block {
-                                statements: [],
+                                statements: [
+                                    While(
+                                        Literal(
+                                            Bool(
+                                                true,
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "read_res",
+                                                    None,
+                                                    Some(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "client",
+                                                                ),
+                                                                "read",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                As(
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1024",
+                                                                        ),
+                                                                    ),
+                                                                    Primitive(
+                                                                        Uint64,
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "read_res",
+                                                            ),
+                                                            Named(
+                                                                "IoError",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Expr(
+                                                                    Call(
+                                                                        Variable(
+                                                                            "println",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            BinaryOp(
+                                                                                Literal(
+                                                                                    String(
+                                                                                        "  read: ",
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                Call(
+                                                                                    Member(
+                                                                                        As(
+                                                                                            Variable(
+                                                                                                "read_res",
+                                                                                            ),
+                                                                                            Named(
+                                                                                                "IoError",
+                                                                                                [],
+                                                                                            ),
+                                                                                        ),
+                                                                                        "message",
+                                                                                    ),
+                                                                                    [],
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Break,
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                VarDecl(
+                                                    "r",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "read_res",
+                                                            ),
+                                                            Named(
+                                                                "ReadResult",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            Member(
+                                                                Variable(
+                                                                    "r",
+                                                                ),
+                                                                "len",
+                                                            ),
+                                                            Eq,
+                                                            As(
+                                                                Literal(
+                                                                    Int(
+                                                                        "0",
+                                                                    ),
+                                                                ),
+                                                                Primitive(
+                                                                    Int64,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Expr(
+                                                                    Call(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            "free",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Break,
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                VarDecl(
+                                                    "w",
+                                                    None,
+                                                    Some(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "client",
+                                                                ),
+                                                                "write",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Member(
+                                                                    Variable(
+                                                                        "r",
+                                                                    ),
+                                                                    "buf",
+                                                                ),
+                                                                As(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "r",
+                                                                        ),
+                                                                        "len",
+                                                                    ),
+                                                                    Primitive(
+                                                                        Uint64,
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Member(
+                                                            Variable(
+                                                                "r",
+                                                            ),
+                                                            "free",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: Some(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "w",
+                                                        ),
+                                                        Named(
+                                                            "IoError",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Expr(
+                                                                Call(
+                                                                    Variable(
+                                                                        "println",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        BinaryOp(
+                                                                            Literal(
+                                                                                String(
+                                                                                    "  write: ",
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            Call(
+                                                                                Member(
+                                                                                    As(
+                                                                                        Variable(
+                                                                                            "w",
+                                                                                        ),
+                                                                                        Named(
+                                                                                            "IoError",
+                                                                                            [],
+                                                                                        ),
+                                                                                    ),
+                                                                                    "message",
+                                                                                ),
+                                                                                [],
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                            Break,
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                        },
+                                    ),
+                                ],
                                 returns: None,
                             },
                         ),
                         span: Span {
-                            line: 17,
-                            col: 16,
+                            line: 15,
+                            col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 17,
-                    col: 16,
+                    line: 15,
+                    col: 9,
                     len: 8,
                 },
             },
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "__of_read",
+                        name: "main",
                         has_self_param: false,
-                        is_extern: true,
+                        is_extern: false,
                         generics: [],
                         return_type: Some(
                             Primitive(
                                 Int64,
                             ),
                         ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "buf",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "len",
-                                ty: Primitive(
-                                    Uint64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        params: [],
                         body: Some(
                             Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 18,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 18,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_write",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "buf",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "len",
-                                ty: Primitive(
-                                    Uint64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 19,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 19,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_close",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 20,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 20,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_lseek",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "offset",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "whence",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 21,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 21,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_socket",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "domain",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "type_",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "protocol",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 25,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 25,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_bind",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "addr",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "len",
-                                ty: Primitive(
-                                    Uint32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 26,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 26,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_listen",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "backlog",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 27,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 27,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_accept",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "addr",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "addrlen",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 31,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 31,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_connect",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "addr",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "len",
-                                ty: Primitive(
-                                    Uint32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 32,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 32,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_select",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "nfds",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "rfds",
-                                ty: Union(
-                                    [
-                                        Named(
-                                            "Buffer",
+                                statements: [
+                                    VarDecl(
+                                        "listener_or_err",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "TcpListener",
+                                                    ),
+                                                    "bind",
+                                                ),
+                                                [],
+                                                [
+                                                    Literal(
+                                                        String(
+                                                            "127.0.0.1",
+                                                        ),
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "8082",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint16,
+                                                        ),
+                                                    ),
+                                                    Literal(
+                                                        Int(
+                                                            "8",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "listener_or_err",
+                                                ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "println",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "bind: ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Call(
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "listener_or_err",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "listener",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "listener_or_err",
+                                                ),
+                                                Named(
+                                                    "TcpListener",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
                                             [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "looped echo server on 127.0.0.1:8082",
+                                                    ),
+                                                ),
+                                            ],
                                         ),
-                                        Primitive(
-                                            Null,
+                                    ),
+                                    While(
+                                        Literal(
+                                            Bool(
+                                                true,
+                                            ),
                                         ),
-                                    ],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "wfds",
-                                ty: Union(
-                                    [
-                                        Named(
-                                            "Buffer",
-                                            [],
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "accept_res",
+                                                    None,
+                                                    Some(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "listener",
+                                                                ),
+                                                                "accept",
+                                                            ),
+                                                            [],
+                                                            [],
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    If(
+                                                        Is(
+                                                            Variable(
+                                                                "accept_res",
+                                                            ),
+                                                            Named(
+                                                                "IoError",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Expr(
+                                                                    Call(
+                                                                        Variable(
+                                                                            "println",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            BinaryOp(
+                                                                                Literal(
+                                                                                    String(
+                                                                                        "accept: ",
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                Call(
+                                                                                    Member(
+                                                                                        As(
+                                                                                            Variable(
+                                                                                                "accept_res",
+                                                                                            ),
+                                                                                            Named(
+                                                                                                "IoError",
+                                                                                                [],
+                                                                                            ),
+                                                                                        ),
+                                                                                        "message",
+                                                                                    ),
+                                                                                    [],
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Expr(
+                                                                    Call(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "listener",
+                                                                            ),
+                                                                            "close",
+                                                                        ),
+                                                                        [],
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Return(
+                                                                    Some(
+                                                                        Literal(
+                                                                            Int(
+                                                                                "1",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                VarDecl(
+                                                    "client",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "accept_res",
+                                                            ),
+                                                            Named(
+                                                                "TcpStream",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "println",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "client connected fd=",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "client",
+                                                                        ),
+                                                                        "fd",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "handle_client",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Variable(
+                                                                "client",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Member(
+                                                            Variable(
+                                                                "client",
+                                                            ),
+                                                            "close",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "println",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Literal(
+                                                                String(
+                                                                    "client disconnected",
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
                                         ),
-                                        Primitive(
-                                            Null,
-                                        ),
-                                    ],
+                                    ),
                                 ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "efds",
-                                ty: Union(
-                                    [
-                                        Named(
-                                            "Buffer",
-                                            [],
-                                        ),
-                                        Primitive(
-                                            Null,
-                                        ),
-                                    ],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "timeout",
-                                ty: Union(
-                                    [
-                                        Named(
-                                            "Buffer",
-                                            [],
-                                        ),
-                                        Primitive(
-                                            Null,
-                                        ),
-                                    ],
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
                             },
                         ),
                         span: Span {
-                            line: 38,
-                            col: 16,
+                            line: 36,
+                            col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 38,
-                    col: 16,
+                    line: 36,
+                    col: 9,
                     len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fcntl",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "cmd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "arg",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 42,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 42,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_errno",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 46,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 46,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_sockaddr_in",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "Buffer",
-                                [],
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "ip_be",
-                                ty: Primitive(
-                                    Uint32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "port_be",
-                                ty: Primitive(
-                                    Uint16,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 51,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 51,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_timeval",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "Buffer",
-                                [],
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "sec",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "usec",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 54,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 54,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fdset_new",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "Buffer",
-                                [],
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 57,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 57,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fdset_zero",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "set",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 58,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 58,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fdset_set",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "set",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 59,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 59,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fdset_clr",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "set",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 60,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 60,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_fdset_isset",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Bool,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "set",
-                                ty: Named(
-                                    "Buffer",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "fd",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 61,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 61,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_htons",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Uint16,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "host_short",
-                                ty: Primitive(
-                                    Uint16,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 64,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 64,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_htonl",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Uint32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "host_long",
-                                ty: Primitive(
-                                    Uint32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 65,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 65,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "__of_or_i32",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "b",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 69,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 69,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "O_RDONLY",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "0",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 75,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "O_WRONLY",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "1",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 76,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "O_RDWR",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "2",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 77,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "SEEK_SET",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "0",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 79,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "SEEK_CUR",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "1",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 80,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "SEEK_END",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "2",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 81,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "STDIN_FILENO",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "0",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 83,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "STDOUT_FILENO",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "1",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 84,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "STDERR_FILENO",
-                        ty: Primitive(
-                            Int32,
-                        ),
-                        value: Int(
-                            "2",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 85,
-                    col: 6,
-                    len: 5,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "O_CREAT",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 92,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 92,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "O_TRUNC",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 93,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 93,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "O_APPEND",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 94,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 94,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "O_NONBLOCK",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 95,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 95,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "AF_INET",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 97,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 97,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "AF_INET6",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 98,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 98,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "AF_UNIX",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 99,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 99,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "SOCK_STREAM",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 100,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 100,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "SOCK_DGRAM",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 101,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 101,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "F_GETFL",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 103,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 103,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "F_SETFL",
-                        has_self_param: false,
-                        is_extern: true,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int32,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 104,
-                            col: 16,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 104,
-                    col: 16,
-                    len: 8,
-                },
-            },
-            Item {
-                kind: Const(
-                    ConstDecl {
-                        name: "MODE_RW_R_R",
-                        ty: Primitive(
-                            Uint32,
-                        ),
-                        value: Int(
-                            "420",
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 107,
-                    col: 6,
-                    len: 5,
                 },
             },
         ],

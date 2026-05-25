@@ -1,42 +1,40 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_unknown_type_errors.of
+input_file: examples/validator/p2_struct_generics_minted_and_field_resolved.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "foo",
-                        has_self_param: false,
+                kind: Struct(
+                    StructDecl {
+                        name: "Box",
                         is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "Nope",
-                                [],
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
                             },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                        ],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

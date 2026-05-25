@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_optional_generic_params.of
+input_file: examples/parser/parse_extern_function_with_body.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'MyStruct' in module 'test_module'",
+    ],
+)

@@ -1,46 +1,60 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p2_method_minted_with_owner.of
+input_file: examples/validator/p2_function_signature_resolved.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
+                kind: Function(
+                    FunctionDecl {
+                        name: "add",
+                        has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "m",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Int64,
                                 ),
-                                span: Span {
-                                    line: 1,
-                                    col: 20,
-                                    len: 8,
-                                },
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "b",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
                             },
                         ],
-                        implements: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    Variable(
+                                        "a",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

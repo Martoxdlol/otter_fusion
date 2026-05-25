@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_struct_init_and_member_access.of
+input_file: examples/validator/p5_is_check_yields_bool.of
 ---
 Ok

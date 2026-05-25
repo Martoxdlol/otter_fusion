@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_method_call_via_member.of
+input_file: examples/validator/p5_call_arity_mismatch_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "call to 'f' in function 'test_module::test' expects 1 argument(s), got 0",
+    ],
+)

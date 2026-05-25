@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_extern_function_generic_pointer.of
+input_file: examples/parser/parse_extend_decl_unit.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'Vehicle' in module 'test_module'",
+    ],
+)

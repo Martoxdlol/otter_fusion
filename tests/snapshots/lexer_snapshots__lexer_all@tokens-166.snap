@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_if_expression_typechecks.of
 ---
 Ok(
     [
@@ -38,38 +38,80 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 19,
+            token_type: If,
+            position: 20,
             line: 1,
-            column: 20,
+            column: 21,
         },
         Token {
-            token_type: And,
+            token_type: LeftParen,
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 24,
+            token_type: True,
+            position: 26,
             line: 1,
-            column: 25,
+            column: 27,
         },
         Token {
-            token_type: Semicolon,
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: RightParen,
             position: 27,
             line: 1,
             column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
+            position: 31,
+            line: 1,
+            column: 32,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Else,
+            position: 38,
+            line: 1,
+            column: 39,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 40,
+            line: 1,
+            column: 41,
+        },
+        Token {
+            token_type: Int(
+                "6",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 46,
+            line: 1,
+            column: 47,
         },
     ],
 )

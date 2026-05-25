@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/05_extensions/extend_with_interface.of
+input_file: examples/spec/05_extensions/extend_generic_with_interface.of
 ---
 Ok(
     Program {
@@ -9,14 +9,20 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Vehicle",
+                        name: "Wrapper",
                         is_extern: false,
-                        generics: [],
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         fields: [
                             FieldDecl {
-                                name: "speed",
-                                ty: Primitive(
-                                    Int32,
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
                                 ),
                                 is_pointer: false,
                             },
@@ -34,12 +40,12 @@ Ok(
             Item {
                 kind: Interface(
                     InterfaceDecl {
-                        name: "Movable",
+                        name: "Named",
                         generics: [],
                         fields: [],
                         methods: [
                             FunctionDecl {
-                                name: "move",
+                                name: "name",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
@@ -70,19 +76,29 @@ Ok(
                 kind: Extend(
                     ExtendDecl {
                         target: Named(
-                            "Vehicle",
-                            [],
+                            "Wrapper",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
                         ),
-                        generic_params: [],
+                        generic_params: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         implements: [
                             Named(
-                                "Movable",
+                                "Named",
                                 [],
                             ),
                         ],
                         methods: [
                             FunctionDecl {
-                                name: "move",
+                                name: "name",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
@@ -98,7 +114,7 @@ Ok(
                                         returns: Some(
                                             Literal(
                                                 String(
-                                                    "The vehicle moves",
+                                                    "Wrapper",
                                                 ),
                                             ),
                                         ),

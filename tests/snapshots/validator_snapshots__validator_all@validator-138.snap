@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
+input_file: examples/validator/p2_generic_arity_mismatch_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "type 'Wrapper' in module 'test_module' expects 1 generic argument(s), got 2",
+    ],
+)

@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p5_is_check_yields_bool.of
+input_file: examples/validator/p5_continue_inside_while_ok.of
 ---
 Ok(
     [
@@ -38,38 +38,58 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 19,
+            token_type: While,
+            position: 23,
             line: 1,
-            column: 20,
+            column: 24,
         },
         Token {
-            token_type: Is,
-            position: 22,
+            token_type: LeftParen,
+            position: 25,
             line: 1,
-            column: 23,
+            column: 26,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: True,
             position: 29,
             line: 1,
             column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+        Token {
+            token_type: Continue,
+            position: 41,
+            line: 1,
+            column: 42,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 46,
+            line: 1,
+            column: 47,
         },
     ],
 )

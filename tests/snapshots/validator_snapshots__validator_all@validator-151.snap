@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_struct_implements_interface_ok.of
+input_file: examples/validator/p4_interface_field_required_on_struct.of
 ---
-Ok
+ValidationErrors(
+    [
+        "type 'test_module::S' is missing member 'x' required by interface 'test_module::I'",
+    ],
+)

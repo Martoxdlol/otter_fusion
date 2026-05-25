@@ -1,35 +1,33 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_optional_generic_params.of
+input_file: examples/parser/parse_interface_decl_unit.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Point",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                            GenericParam {
-                                name: "U",
-                                bounds: [],
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
                             },
                         ],
-                        fields: [],
                         methods: [],
                         implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

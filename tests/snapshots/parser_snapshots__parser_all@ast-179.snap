@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_var_decl_type_init_mismatch_errors.of
+input_file: examples/validator/p5_var_decl_inferred_from_init.of
 ---
 Ok(
     Program {
@@ -20,15 +20,11 @@ Ok(
                                 statements: [
                                     VarDecl(
                                         "x",
-                                        Some(
-                                            Primitive(
-                                                Int64,
-                                            ),
-                                        ),
+                                        None,
                                         Some(
                                             Literal(
-                                                String(
-                                                    "hi",
+                                                Int(
+                                                    "5",
                                                 ),
                                             ),
                                         ),

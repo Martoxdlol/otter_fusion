@@ -1,95 +1,50 @@
-// Non-blocking server on 127.0.0.1:8081 that uses select() with a 2-second
+// Non-blocking server on 127.0.0.1:8081 using select() with a 2-second
 // timeout. If no client connects in time it prints "timeout" and exits;
 // otherwise it accepts the connection and exits.
 //
-// Demonstrates: O_NONBLOCK via fcntl, fd_set construction, select() with
-// a timeval timeout, and post-select FD_ISSET check.
+// Demonstrates: TcpListener.set_nonblocking(true), FdSet construction,
+// and the select() free function with millisecond timeout.
 
-import { println, Buffer } from "of:core";
-import { __of_buffer_alloc, __of_buffer_free } from "of:core";
-import {
-  __of_socket, __of_bind, __of_listen, __of_accept, __of_close,
-  __of_fcntl, __of_errno,
-  __of_select, __of_sockaddr_in, __of_htons, __of_htonl,
-  __of_timeval,
-  __of_fdset_new, __of_fdset_zero, __of_fdset_set, __of_fdset_isset,
-  AF_INET, SOCK_STREAM, F_SETFL, O_NONBLOCK,
-} from "of_io";
-
-function errno_str(): str {
-  "errno=" + (__of_errno() as str)
-}
+import { println } from "of:core";
+import { TcpListener, TcpStream, FdSet, IoError, select } from "of_io";
 
 function main(): i64 {
-  var server = __of_socket(AF_INET(), SOCK_STREAM(), 0);
-  if (server < 0) {
-    println("socket() failed " + errno_str());
+  var listener_or_err = TcpListener.bind("127.0.0.1", 8081 as u16, 1);
+  if (listener_or_err is IoError) {
+    println("bind: " + (listener_or_err as IoError).message());
     return 1;
   }
+  var listener = listener_or_err as TcpListener;
 
-  // Mark non-blocking. F_SETFL with O_NONBLOCK is fine on a fresh socket.
-  if (__of_fcntl(server, F_SETFL(), O_NONBLOCK() as i64) < 0) {
-    println("fcntl() failed " + errno_str());
-    __of_close(server);
-    return 1;
-  }
-
-  var ip_be = __of_htonl(2130706433 as u32);  // 127.0.0.1
-  var port_be = __of_htons(8081 as u16);
-  var addr = __of_sockaddr_in(ip_be, port_be);
-
-  if (__of_bind(server, addr, 16 as u32) < 0) {
-    println("bind() failed " + errno_str());
-    __of_close(server);
-    __of_buffer_free(addr);
-    return 1;
-  }
-
-  if (__of_listen(server, 1) < 0) {
-    println("listen() failed " + errno_str());
-    __of_close(server);
-    __of_buffer_free(addr);
+  var nb = listener.set_nonblocking(true);
+  if (nb is IoError) {
+    println("set_nonblocking: " + (nb as IoError).message());
+    listener.close();
     return 1;
   }
 
   println("waiting up to 2s for a connection on 127.0.0.1:8081");
 
-  // Build read fd_set with just the server fd.
-  var rfds = __of_fdset_new();
-  __of_fdset_zero(rfds);
-  __of_fdset_set(rfds, server);
+  var rs = FdSet.new();
+  rs.add(listener.fd);
 
-  // 2-second timeout.
-  var timeout = __of_timeval(2 as i64, 0 as i64);
-
-  // null for the write/except fd_sets: don't watch those events.
-  var ready = __of_select(server + 1, rfds, null, null, timeout);
-  if (ready < 0) {
-    println("select() failed " + errno_str());
-  } else if (ready == 0) {
+  var ready = select(listener.fd + 1, rs, null, null, 2000 as i64);
+  if (ready is IoError) {
+    println("select: " + (ready as IoError).message());
+  } else if ((ready as i32) == 0) {
     println("timeout, no client connected");
-  } else if (__of_fdset_isset(rfds, server)) {
-    var caddr = __of_sockaddr_in(0 as u32, 0 as u16);
-    var clen_maybe = __of_buffer_alloc(4);
-    if (clen_maybe is null) {
-      println("alloc failed");
+  } else if (rs.isset(listener.fd)) {
+    var accept_res = listener.accept();
+    if (accept_res is IoError) {
+      println("accept: " + (accept_res as IoError).message());
     } else {
-      var clen = clen_maybe as Buffer;
-      var c = __of_accept(server, caddr, clen);
-      if (c < 0) {
-        println("accept() failed " + errno_str());
-      } else {
-        println("accepted client fd=" + (c as str));
-        __of_close(c);
-      }
-      __of_buffer_free(caddr);
-      __of_buffer_free(clen);
+      var client = accept_res as TcpStream;
+      println("accepted client fd=" + (client.fd as str));
+      client.close();
     }
   }
 
-  __of_close(server);
-  __of_buffer_free(addr);
-  __of_buffer_free(rfds);
-  __of_buffer_free(timeout);
+  rs.free();
+  listener.close();
   0
 }

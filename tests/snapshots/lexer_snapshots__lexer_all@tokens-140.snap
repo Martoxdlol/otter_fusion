@@ -1,53 +1,39 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p2_struct_generics_minted_and_field_resolved.of
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
+            token_type: Extern,
             position: 6,
             line: 1,
             column: 7,
         },
         Token {
-            token_type: Identifier(
-                "Box",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: GT,
+            token_type: Struct,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: LeftBrace,
-            position: 15,
+            token_type: Identifier(
+                "Cfg",
+            ),
+            position: 17,
             line: 1,
-            column: 16,
+            column: 18,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 19,
+            line: 1,
+            column: 20,
         },
         Token {
             token_type: Identifier(
-                "value",
+                "p",
             ),
             position: 21,
             line: 1,
@@ -60,18 +46,24 @@ Ok(
             column: 23,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: Star,
             position: 24,
             line: 1,
             column: 25,
         },
         Token {
-            token_type: RightBrace,
-            position: 26,
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 27,
             line: 1,
-            column: 27,
+            column: 28,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 29,
+            line: 1,
+            column: 30,
         },
     ],
 )

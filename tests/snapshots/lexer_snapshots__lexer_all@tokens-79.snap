@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_method.of
+input_file: examples/parser/parse_simple_struct.of
 ---
 Ok(
     [
@@ -13,69 +13,45 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Foo",
+                "Point",
             ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LeftBrace,
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: Function,
-            position: 21,
+            token_type: LeftBrace,
+            position: 14,
             line: 1,
-            column: 22,
+            column: 15,
         },
         Token {
             token_type: Identifier(
-                "bar",
+                "x",
             ),
-            position: 25,
+            position: 16,
             line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: RightParen,
-            position: 27,
-            line: 1,
-            column: 28,
+            column: 17,
         },
         Token {
             token_type: Colon,
-            position: 28,
+            position: 17,
             line: 1,
-            column: 29,
+            column: 18,
         },
         Token {
             token_type: Identifier(
                 "i32",
             ),
-            position: 32,
+            position: 21,
             line: 1,
-            column: 33,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 33,
-            line: 1,
-            column: 34,
+            column: 22,
         },
         Token {
             token_type: RightBrace,
-            position: 35,
+            position: 23,
             line: 1,
-            column: 36,
+            column: 24,
         },
     ],
 )

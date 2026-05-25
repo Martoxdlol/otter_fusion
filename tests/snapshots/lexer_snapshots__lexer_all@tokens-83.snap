@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_type_decl_unit.of
+input_file: examples/parser/parse_type_alias_union.of
 ---
 Ok(
     [
@@ -13,31 +13,45 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Age",
+                "Result",
             ),
-            position: 8,
+            position: 11,
             line: 1,
-            column: 9,
+            column: 12,
         },
         Token {
             token_type: Eq,
-            position: 10,
+            position: 13,
             line: 1,
-            column: 11,
+            column: 14,
         },
         Token {
             token_type: Identifier(
-                "i32",
+                "i64",
             ),
-            position: 14,
+            position: 17,
             line: 1,
-            column: 15,
+            column: 18,
+        },
+        Token {
+            token_type: Pipe,
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 23,
+            line: 1,
+            column: 24,
         },
         Token {
             token_type: Semicolon,
-            position: 15,
+            position: 24,
             line: 1,
-            column: 16,
+            column: 25,
         },
     ],
 )

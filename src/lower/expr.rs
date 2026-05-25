@@ -23,6 +23,11 @@ impl Lower {
             }
             ExprKind::StructInit(id, ta, fs) => self.lower_struct_init(*id, ta, fs, subst, b),
             ExprKind::Member(recv, field) => self.lower_member(recv, field, &expr.ty, subst, b),
+            // Static method reference outside of a call position would be
+            // a first-class function value; not supported yet.
+            ExprKind::Static(_, _, _) => {
+                panic!("static method reference outside of call position")
+            }
             ExprKind::As(e, target) => self.lower_as(e, target, &expr.ty, subst, b),
             ExprKind::Is(e, target) => self.lower_is(e, target, subst, b),
             ExprKind::If(c, t, e) => self.lower_if(c, t, e.as_deref(), &expr.ty, subst, b),
@@ -166,7 +171,8 @@ impl Lower {
             &callee.kind,
             ExprKind::Member(recv, _) if matches!(subst.apply(&recv.ty), ResolvedType::Struct(_, _))
         );
-        let is_static = static_callee_var.is_some() || is_member_struct;
+        let is_known_static = matches!(&callee.kind, ExprKind::Static(..));
+        let is_static = static_callee_var.is_some() || is_member_struct || is_known_static;
         if !is_static && matches!(callee_ty, ResolvedType::Function(_, _)) {
             let callee_op = self.lower_expr(callee, subst, b);
             let arg_ops: Vec<Operand> = args
@@ -185,6 +191,11 @@ impl Lower {
                     .lookup_free_function(name)
                     .unwrap_or_else(|| panic!("unknown function `{}`", name));
                 (fn_id, None, vec![], vec![])
+            }
+            ExprKind::Static(fn_id, _owner_id, owner_args) => {
+                let owner_args: Vec<ResolvedType> =
+                    owner_args.iter().map(|t| subst.apply(t)).collect();
+                (*fn_id, None, owner_args, vec![])
             }
             ExprKind::Member(recv, method) => {
                 let recv_ty = subst.apply(&recv.ty);

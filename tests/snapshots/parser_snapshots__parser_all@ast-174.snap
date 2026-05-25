@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_struct_init_missing_field_errors.of
+input_file: examples/validator/p5_struct_init_and_member_access.of
 ---
 Ok(
     Program {
@@ -43,13 +43,34 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    Expr(
-                                        StructInit(
-                                            Named(
-                                                "S",
-                                                [],
+                                    VarDecl(
+                                        "s",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "S",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "x",
+                                                        Literal(
+                                                            Int(
+                                                                "5",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
                                             ),
-                                            [],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Member(
+                                            Variable(
+                                                "s",
+                                            ),
+                                            "x",
                                         ),
                                     ),
                                 ],

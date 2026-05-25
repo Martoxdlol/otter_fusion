@@ -16,10 +16,6 @@ Ok(
                                     name: "println",
                                     alias: None,
                                 },
-                                ImportSymbol {
-                                    name: "Buffer",
-                                    alias: None,
-                                },
                             ],
                         ),
                     },
@@ -33,15 +29,27 @@ Ok(
             Item {
                 kind: Import(
                     ImportDecl {
-                        module: "of:core",
+                        module: "of_io",
                         symbols: Named(
                             [
                                 ImportSymbol {
-                                    name: "__of_buffer_alloc",
+                                    name: "TcpListener",
                                     alias: None,
                                 },
                                 ImportSymbol {
-                                    name: "__of_buffer_free",
+                                    name: "TcpStream",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "FdSet",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "IoError",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "select",
                                     alias: None,
                                 },
                             ],
@@ -52,155 +60,6 @@ Ok(
                     line: 9,
                     col: 7,
                     len: 6,
-                },
-            },
-            Item {
-                kind: Import(
-                    ImportDecl {
-                        module: "of_io",
-                        symbols: Named(
-                            [
-                                ImportSymbol {
-                                    name: "__of_socket",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_bind",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_listen",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_accept",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_close",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_fcntl",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_errno",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_select",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_sockaddr_in",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_htons",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_htonl",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_timeval",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_fdset_new",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_fdset_zero",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_fdset_set",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_fdset_isset",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "AF_INET",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "SOCK_STREAM",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "F_SETFL",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "O_NONBLOCK",
-                                    alias: None,
-                                },
-                            ],
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 10,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "errno_str",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                String,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: Some(
-                                    BinaryOp(
-                                        Literal(
-                                            String(
-                                                "errno=",
-                                            ),
-                                        ),
-                                        Add,
-                                        As(
-                                            Call(
-                                                Variable(
-                                                    "__of_errno",
-                                                ),
-                                                [],
-                                                [],
-                                            ),
-                                            Primitive(
-                                                String,
-                                            ),
-                                        ),
-                                    ),
-                                ),
-                            },
-                        ),
-                        span: Span {
-                            line: 19,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 19,
-                    col: 9,
-                    len: 8,
                 },
             },
             Item {
@@ -220,222 +79,23 @@ Ok(
                             Block {
                                 statements: [
                                     VarDecl(
-                                        "server",
+                                        "listener_or_err",
                                         None,
                                         Some(
                                             Call(
-                                                Variable(
-                                                    "__of_socket",
-                                                ),
-                                                [],
-                                                [
-                                                    Call(
-                                                        Variable(
-                                                            "AF_INET",
-                                                        ),
-                                                        [],
-                                                        [],
-                                                    ),
-                                                    Call(
-                                                        Variable(
-                                                            "SOCK_STREAM",
-                                                        ),
-                                                        [],
-                                                        [],
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "0",
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    Expr(
-                                        If(
-                                            BinaryOp(
-                                                Variable(
-                                                    "server",
-                                                ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
-                                                ),
-                                            ),
-                                            Block {
-                                                statements: [
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "println",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                BinaryOp(
-                                                                    Literal(
-                                                                        String(
-                                                                            "socket() failed ",
-                                                                        ),
-                                                                    ),
-                                                                    Add,
-                                                                    Call(
-                                                                        Variable(
-                                                                            "errno_str",
-                                                                        ),
-                                                                        [],
-                                                                        [],
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Return(
-                                                        Some(
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                                returns: None,
-                                            },
-                                            None,
-                                        ),
-                                    ),
-                                    Expr(
-                                        If(
-                                            BinaryOp(
-                                                Call(
+                                                Member(
                                                     Variable(
-                                                        "__of_fcntl",
+                                                        "TcpListener",
                                                     ),
-                                                    [],
-                                                    [
-                                                        Variable(
-                                                            "server",
-                                                        ),
-                                                        Call(
-                                                            Variable(
-                                                                "F_SETFL",
-                                                            ),
-                                                            [],
-                                                            [],
-                                                        ),
-                                                        As(
-                                                            Call(
-                                                                Variable(
-                                                                    "O_NONBLOCK",
-                                                                ),
-                                                                [],
-                                                                [],
-                                                            ),
-                                                            Primitive(
-                                                                Int64,
-                                                            ),
-                                                        ),
-                                                    ],
-                                                ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
-                                                ),
-                                            ),
-                                            Block {
-                                                statements: [
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "println",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                BinaryOp(
-                                                                    Literal(
-                                                                        String(
-                                                                            "fcntl() failed ",
-                                                                        ),
-                                                                    ),
-                                                                    Add,
-                                                                    Call(
-                                                                        Variable(
-                                                                            "errno_str",
-                                                                        ),
-                                                                        [],
-                                                                        [],
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_close",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Variable(
-                                                                    "server",
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Return(
-                                                        Some(
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                                returns: None,
-                                            },
-                                            None,
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "ip_be",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_htonl",
+                                                    "bind",
                                                 ),
                                                 [],
                                                 [
-                                                    As(
-                                                        Literal(
-                                                            Int(
-                                                                "2130706433",
-                                                            ),
-                                                        ),
-                                                        Primitive(
-                                                            Uint32,
+                                                    Literal(
+                                                        String(
+                                                            "127.0.0.1",
                                                         ),
                                                     ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "port_be",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_htons",
-                                                ),
-                                                [],
-                                                [
                                                     As(
                                                         Literal(
                                                             Int(
@@ -446,25 +106,10 @@ Ok(
                                                             Uint16,
                                                         ),
                                                     ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "addr",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_sockaddr_in",
-                                                ),
-                                                [],
-                                                [
-                                                    Variable(
-                                                        "ip_be",
-                                                    ),
-                                                    Variable(
-                                                        "port_be",
+                                                    Literal(
+                                                        Int(
+                                                            "1",
+                                                        ),
                                                     ),
                                                 ],
                                             ),
@@ -472,36 +117,13 @@ Ok(
                                     ),
                                     Expr(
                                         If(
-                                            BinaryOp(
-                                                Call(
-                                                    Variable(
-                                                        "__of_bind",
-                                                    ),
-                                                    [],
-                                                    [
-                                                        Variable(
-                                                            "server",
-                                                        ),
-                                                        Variable(
-                                                            "addr",
-                                                        ),
-                                                        As(
-                                                            Literal(
-                                                                Int(
-                                                                    "16",
-                                                                ),
-                                                            ),
-                                                            Primitive(
-                                                                Uint32,
-                                                            ),
-                                                        ),
-                                                    ],
+                                            Is(
+                                                Variable(
+                                                    "listener_or_err",
                                                 ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
                                                 ),
                                             ),
                                             Block {
@@ -516,43 +138,26 @@ Ok(
                                                                 BinaryOp(
                                                                     Literal(
                                                                         String(
-                                                                            "bind() failed ",
+                                                                            "bind: ",
                                                                         ),
                                                                     ),
                                                                     Add,
                                                                     Call(
-                                                                        Variable(
-                                                                            "errno_str",
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "listener_or_err",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
                                                                         [],
                                                                         [],
                                                                     ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_close",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Variable(
-                                                                    "server",
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_buffer_free",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Variable(
-                                                                    "addr",
                                                                 ),
                                                             ],
                                                         ),
@@ -572,30 +177,52 @@ Ok(
                                             None,
                                         ),
                                     ),
+                                    VarDecl(
+                                        "listener",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "listener_or_err",
+                                                ),
+                                                Named(
+                                                    "TcpListener",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "nb",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "listener",
+                                                    ),
+                                                    "set_nonblocking",
+                                                ),
+                                                [],
+                                                [
+                                                    Literal(
+                                                        Bool(
+                                                            true,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
                                     Expr(
                                         If(
-                                            BinaryOp(
-                                                Call(
-                                                    Variable(
-                                                        "__of_listen",
-                                                    ),
-                                                    [],
-                                                    [
-                                                        Variable(
-                                                            "server",
-                                                        ),
-                                                        Literal(
-                                                            Int(
-                                                                "1",
-                                                            ),
-                                                        ),
-                                                    ],
+                                            Is(
+                                                Variable(
+                                                    "nb",
                                                 ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
                                                 ),
                                             ),
                                             Block {
@@ -610,13 +237,22 @@ Ok(
                                                                 BinaryOp(
                                                                     Literal(
                                                                         String(
-                                                                            "listen() failed ",
+                                                                            "set_nonblocking: ",
                                                                         ),
                                                                     ),
                                                                     Add,
                                                                     Call(
-                                                                        Variable(
-                                                                            "errno_str",
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "nb",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
                                                                         [],
                                                                         [],
@@ -627,28 +263,14 @@ Ok(
                                                     ),
                                                     Expr(
                                                         Call(
-                                                            Variable(
-                                                                "__of_close",
+                                                            Member(
+                                                                Variable(
+                                                                    "listener",
+                                                                ),
+                                                                "close",
                                                             ),
                                                             [],
-                                                            [
-                                                                Variable(
-                                                                    "server",
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_buffer_free",
-                                                            ),
                                                             [],
-                                                            [
-                                                                Variable(
-                                                                    "addr",
-                                                                ),
-                                                            ],
                                                         ),
                                                     ),
                                                     Return(
@@ -682,12 +304,15 @@ Ok(
                                         ),
                                     ),
                                     VarDecl(
-                                        "rfds",
+                                        "rs",
                                         None,
                                         Some(
                                             Call(
-                                                Variable(
-                                                    "__of_fdset_new",
+                                                Member(
+                                                    Variable(
+                                                        "FdSet",
+                                                    ),
+                                                    "new",
                                                 ),
                                                 [],
                                                 [],
@@ -696,65 +321,21 @@ Ok(
                                     ),
                                     Expr(
                                         Call(
-                                            Variable(
-                                                "__of_fdset_zero",
+                                            Member(
+                                                Variable(
+                                                    "rs",
+                                                ),
+                                                "add",
                                             ),
                                             [],
                                             [
-                                                Variable(
-                                                    "rfds",
+                                                Member(
+                                                    Variable(
+                                                        "listener",
+                                                    ),
+                                                    "fd",
                                                 ),
                                             ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_fdset_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "rfds",
-                                                ),
-                                                Variable(
-                                                    "server",
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "timeout",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_timeval",
-                                                ),
-                                                [],
-                                                [
-                                                    As(
-                                                        Literal(
-                                                            Int(
-                                                                "2",
-                                                            ),
-                                                        ),
-                                                        Primitive(
-                                                            Int64,
-                                                        ),
-                                                    ),
-                                                    As(
-                                                        Literal(
-                                                            Int(
-                                                                "0",
-                                                            ),
-                                                        ),
-                                                        Primitive(
-                                                            Int64,
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
                                         ),
                                     ),
                                     VarDecl(
@@ -763,13 +344,16 @@ Ok(
                                         Some(
                                             Call(
                                                 Variable(
-                                                    "__of_select",
+                                                    "select",
                                                 ),
                                                 [],
                                                 [
                                                     BinaryOp(
-                                                        Variable(
-                                                            "server",
+                                                        Member(
+                                                            Variable(
+                                                                "listener",
+                                                            ),
+                                                            "fd",
                                                         ),
                                                         Add,
                                                         Literal(
@@ -779,7 +363,7 @@ Ok(
                                                         ),
                                                     ),
                                                     Variable(
-                                                        "rfds",
+                                                        "rs",
                                                     ),
                                                     Literal(
                                                         Null,
@@ -787,8 +371,15 @@ Ok(
                                                     Literal(
                                                         Null,
                                                     ),
-                                                    Variable(
-                                                        "timeout",
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "2000",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
                                                     ),
                                                 ],
                                             ),
@@ -796,15 +387,13 @@ Ok(
                                     ),
                                     Expr(
                                         If(
-                                            BinaryOp(
+                                            Is(
                                                 Variable(
                                                     "ready",
                                                 ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
                                                 ),
                                             ),
                                             Block {
@@ -819,13 +408,22 @@ Ok(
                                                                 BinaryOp(
                                                                     Literal(
                                                                         String(
-                                                                            "select() failed ",
+                                                                            "select: ",
                                                                         ),
                                                                     ),
                                                                     Add,
                                                                     Call(
-                                                                        Variable(
-                                                                            "errno_str",
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "ready",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
                                                                         [],
                                                                         [],
@@ -843,8 +441,13 @@ Ok(
                                                     returns: Some(
                                                         If(
                                                             BinaryOp(
-                                                                Variable(
-                                                                    "ready",
+                                                                As(
+                                                                    Variable(
+                                                                        "ready",
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int32,
+                                                                    ),
                                                                 ),
                                                                 Eq,
                                                                 Literal(
@@ -879,71 +482,37 @@ Ok(
                                                                     returns: Some(
                                                                         If(
                                                                             Call(
-                                                                                Variable(
-                                                                                    "__of_fdset_isset",
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "rs",
+                                                                                    ),
+                                                                                    "isset",
                                                                                 ),
                                                                                 [],
                                                                                 [
-                                                                                    Variable(
-                                                                                        "rfds",
-                                                                                    ),
-                                                                                    Variable(
-                                                                                        "server",
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "listener",
+                                                                                        ),
+                                                                                        "fd",
                                                                                     ),
                                                                                 ],
                                                                             ),
                                                                             Block {
                                                                                 statements: [
                                                                                     VarDecl(
-                                                                                        "caddr",
+                                                                                        "accept_res",
                                                                                         None,
                                                                                         Some(
                                                                                             Call(
-                                                                                                Variable(
-                                                                                                    "__of_sockaddr_in",
+                                                                                                Member(
+                                                                                                    Variable(
+                                                                                                        "listener",
+                                                                                                    ),
+                                                                                                    "accept",
                                                                                                 ),
                                                                                                 [],
-                                                                                                [
-                                                                                                    As(
-                                                                                                        Literal(
-                                                                                                            Int(
-                                                                                                                "0",
-                                                                                                            ),
-                                                                                                        ),
-                                                                                                        Primitive(
-                                                                                                            Uint32,
-                                                                                                        ),
-                                                                                                    ),
-                                                                                                    As(
-                                                                                                        Literal(
-                                                                                                            Int(
-                                                                                                                "0",
-                                                                                                            ),
-                                                                                                        ),
-                                                                                                        Primitive(
-                                                                                                            Uint16,
-                                                                                                        ),
-                                                                                                    ),
-                                                                                                ],
-                                                                                            ),
-                                                                                        ),
-                                                                                    ),
-                                                                                    VarDecl(
-                                                                                        "clen_maybe",
-                                                                                        None,
-                                                                                        Some(
-                                                                                            Call(
-                                                                                                Variable(
-                                                                                                    "__of_buffer_alloc",
-                                                                                                ),
                                                                                                 [],
-                                                                                                [
-                                                                                                    Literal(
-                                                                                                        Int(
-                                                                                                            "4",
-                                                                                                        ),
-                                                                                                    ),
-                                                                                                ],
                                                                                             ),
                                                                                         ),
                                                                                     ),
@@ -952,10 +521,11 @@ Ok(
                                                                                     If(
                                                                                         Is(
                                                                                             Variable(
-                                                                                                "clen_maybe",
+                                                                                                "accept_res",
                                                                                             ),
-                                                                                            Primitive(
-                                                                                                Null,
+                                                                                            Named(
+                                                                                                "IoError",
+                                                                                                [],
                                                                                             ),
                                                                                         ),
                                                                                         Block {
@@ -967,9 +537,28 @@ Ok(
                                                                                                         ),
                                                                                                         [],
                                                                                                         [
-                                                                                                            Literal(
-                                                                                                                String(
-                                                                                                                    "alloc failed",
+                                                                                                            BinaryOp(
+                                                                                                                Literal(
+                                                                                                                    String(
+                                                                                                                        "accept: ",
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                                Add,
+                                                                                                                Call(
+                                                                                                                    Member(
+                                                                                                                        As(
+                                                                                                                            Variable(
+                                                                                                                                "accept_res",
+                                                                                                                            ),
+                                                                                                                            Named(
+                                                                                                                                "IoError",
+                                                                                                                                [],
+                                                                                                                            ),
+                                                                                                                        ),
+                                                                                                                        "message",
+                                                                                                                    ),
+                                                                                                                    [],
+                                                                                                                    [],
                                                                                                                 ),
                                                                                                             ),
                                                                                                         ],
@@ -982,158 +571,59 @@ Ok(
                                                                                             Block {
                                                                                                 statements: [
                                                                                                     VarDecl(
-                                                                                                        "clen",
+                                                                                                        "client",
                                                                                                         None,
                                                                                                         Some(
                                                                                                             As(
                                                                                                                 Variable(
-                                                                                                                    "clen_maybe",
+                                                                                                                    "accept_res",
                                                                                                                 ),
                                                                                                                 Named(
-                                                                                                                    "Buffer",
+                                                                                                                    "TcpStream",
                                                                                                                     [],
                                                                                                                 ),
                                                                                                             ),
                                                                                                         ),
                                                                                                     ),
-                                                                                                    VarDecl(
-                                                                                                        "c",
-                                                                                                        None,
-                                                                                                        Some(
-                                                                                                            Call(
-                                                                                                                Variable(
-                                                                                                                    "__of_accept",
-                                                                                                                ),
-                                                                                                                [],
-                                                                                                                [
-                                                                                                                    Variable(
-                                                                                                                        "server",
-                                                                                                                    ),
-                                                                                                                    Variable(
-                                                                                                                        "caddr",
-                                                                                                                    ),
-                                                                                                                    Variable(
-                                                                                                                        "clen",
-                                                                                                                    ),
-                                                                                                                ],
-                                                                                                            ),
-                                                                                                        ),
-                                                                                                    ),
                                                                                                     Expr(
-                                                                                                        If(
-                                                                                                            BinaryOp(
-                                                                                                                Variable(
-                                                                                                                    "c",
-                                                                                                                ),
-                                                                                                                Lt,
-                                                                                                                Literal(
-                                                                                                                    Int(
-                                                                                                                        "0",
-                                                                                                                    ),
-                                                                                                                ),
+                                                                                                        Call(
+                                                                                                            Variable(
+                                                                                                                "println",
                                                                                                             ),
-                                                                                                            Block {
-                                                                                                                statements: [
-                                                                                                                    Expr(
-                                                                                                                        Call(
+                                                                                                            [],
+                                                                                                            [
+                                                                                                                BinaryOp(
+                                                                                                                    Literal(
+                                                                                                                        String(
+                                                                                                                            "accepted client fd=",
+                                                                                                                        ),
+                                                                                                                    ),
+                                                                                                                    Add,
+                                                                                                                    As(
+                                                                                                                        Member(
                                                                                                                             Variable(
-                                                                                                                                "println",
+                                                                                                                                "client",
                                                                                                                             ),
-                                                                                                                            [],
-                                                                                                                            [
-                                                                                                                                BinaryOp(
-                                                                                                                                    Literal(
-                                                                                                                                        String(
-                                                                                                                                            "accept() failed ",
-                                                                                                                                        ),
-                                                                                                                                    ),
-                                                                                                                                    Add,
-                                                                                                                                    Call(
-                                                                                                                                        Variable(
-                                                                                                                                            "errno_str",
-                                                                                                                                        ),
-                                                                                                                                        [],
-                                                                                                                                        [],
-                                                                                                                                    ),
-                                                                                                                                ),
-                                                                                                                            ],
+                                                                                                                            "fd",
+                                                                                                                        ),
+                                                                                                                        Primitive(
+                                                                                                                            String,
                                                                                                                         ),
                                                                                                                     ),
-                                                                                                                ],
-                                                                                                                returns: None,
-                                                                                                            },
-                                                                                                            Some(
-                                                                                                                Block {
-                                                                                                                    statements: [
-                                                                                                                        Expr(
-                                                                                                                            Call(
-                                                                                                                                Variable(
-                                                                                                                                    "println",
-                                                                                                                                ),
-                                                                                                                                [],
-                                                                                                                                [
-                                                                                                                                    BinaryOp(
-                                                                                                                                        Literal(
-                                                                                                                                            String(
-                                                                                                                                                "accepted client fd=",
-                                                                                                                                            ),
-                                                                                                                                        ),
-                                                                                                                                        Add,
-                                                                                                                                        As(
-                                                                                                                                            Variable(
-                                                                                                                                                "c",
-                                                                                                                                            ),
-                                                                                                                                            Primitive(
-                                                                                                                                                String,
-                                                                                                                                            ),
-                                                                                                                                        ),
-                                                                                                                                    ),
-                                                                                                                                ],
-                                                                                                                            ),
-                                                                                                                        ),
-                                                                                                                        Expr(
-                                                                                                                            Call(
-                                                                                                                                Variable(
-                                                                                                                                    "__of_close",
-                                                                                                                                ),
-                                                                                                                                [],
-                                                                                                                                [
-                                                                                                                                    Variable(
-                                                                                                                                        "c",
-                                                                                                                                    ),
-                                                                                                                                ],
-                                                                                                                            ),
-                                                                                                                        ),
-                                                                                                                    ],
-                                                                                                                    returns: None,
-                                                                                                                },
-                                                                                                            ),
-                                                                                                        ),
-                                                                                                    ),
-                                                                                                    Expr(
-                                                                                                        Call(
-                                                                                                            Variable(
-                                                                                                                "__of_buffer_free",
-                                                                                                            ),
-                                                                                                            [],
-                                                                                                            [
-                                                                                                                Variable(
-                                                                                                                    "caddr",
                                                                                                                 ),
                                                                                                             ],
                                                                                                         ),
                                                                                                     ),
                                                                                                     Expr(
                                                                                                         Call(
-                                                                                                            Variable(
-                                                                                                                "__of_buffer_free",
+                                                                                                            Member(
+                                                                                                                Variable(
+                                                                                                                    "client",
+                                                                                                                ),
+                                                                                                                "close",
                                                                                                             ),
                                                                                                             [],
-                                                                                                            [
-                                                                                                                Variable(
-                                                                                                                    "clen",
-                                                                                                                ),
-                                                                                                            ],
+                                                                                                            [],
                                                                                                         ),
                                                                                                     ),
                                                                                                 ],
@@ -1156,54 +646,26 @@ Ok(
                                     ),
                                     Expr(
                                         Call(
-                                            Variable(
-                                                "__of_close",
+                                            Member(
+                                                Variable(
+                                                    "rs",
+                                                ),
+                                                "free",
                                             ),
                                             [],
-                                            [
-                                                Variable(
-                                                    "server",
-                                                ),
-                                            ],
+                                            [],
                                         ),
                                     ),
                                     Expr(
                                         Call(
-                                            Variable(
-                                                "__of_buffer_free",
+                                            Member(
+                                                Variable(
+                                                    "listener",
+                                                ),
+                                                "close",
                                             ),
                                             [],
-                                            [
-                                                Variable(
-                                                    "addr",
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_free",
-                                            ),
                                             [],
-                                            [
-                                                Variable(
-                                                    "rfds",
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_free",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "timeout",
-                                                ),
-                                            ],
                                         ),
                                     ),
                                 ],
@@ -1217,14 +679,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 23,
+                            line: 11,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 23,
+                    line: 11,
                     col: 9,
                     len: 8,
                 },

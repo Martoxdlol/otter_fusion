@@ -1,6 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_binary_op_arithmetic_ok.of
+input_file: examples/validator/p4_universal_extend_satisfies_interface.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'T' in module 'test_module'",
+    ],
+)

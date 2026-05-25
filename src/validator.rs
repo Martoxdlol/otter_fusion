@@ -2000,11 +2000,26 @@ impl Validator {
                 let else_block = else_b.as_ref().map(|b| {
                     self.check_block(b, fn_label, module, generics, locals, return_type, loop_depth, expected)
                 });
-                let ty = then_block
+                // The if-expression's type is the union of both branch types
+                // (de-duplicated and flattened). When the branches agree
+                // that collapses to a single type. Branches with no trailing
+                // expression contribute `Null`. Picking only the then-type
+                // would silently drop the else-arm in lowering and the
+                // codegen would then read an unallocated local.
+                let then_ty = then_block
                     .returns
                     .as_ref()
                     .map(|t| t.ty.clone())
                     .unwrap_or(ResolvedType::Null);
+                let else_ty = match &else_block {
+                    Some(eb) => eb
+                        .returns
+                        .as_ref()
+                        .map(|t| t.ty.clone())
+                        .unwrap_or(ResolvedType::Null),
+                    None => ResolvedType::Null,
+                };
+                let ty = unify_branch_types(then_ty, else_ty);
                 TypedExpr {
                     kind: ExprKind::If(
                         Box::new(typed_cond),
@@ -2385,6 +2400,68 @@ impl Validator {
                 }
             }
             ast::Expr::Member(receiver, member_name) => {
+                // Static method dispatch: receiver is a bare type name
+                // (`FdSet.new()`, `Buffer.alloc(n)`), the type resolves to a
+                // struct, and the struct has a no-self method with that name.
+                // Yields an ExprKind::Static so lowering hits the FnId
+                // directly without trying to evaluate the type as a value.
+                let static_resolution = if let ast::Expr::Variable(recv_name) = &**receiver
+                    && !locals.iter().any(|s| s.contains_key(recv_name))
+                    && let Some(ScopeEntry::Type(type_id)) =
+                        self.lookup_in_scope(module, recv_name)
+                {
+                    self.find_static_method(
+                        type_id,
+                        member_name,
+                        &resolved_type_args,
+                        fn_label,
+                    )
+                    .map(|(fn_id, subst)| (fn_id, subst, type_id, recv_name.clone()))
+                } else {
+                    None
+                };
+
+                if let Some((fn_id, subst, type_id, recv_name)) = static_resolution {
+                    let func = self.hir.functions[&fn_id].clone();
+                    let params: Vec<ResolvedType> = func
+                        .params
+                        .iter()
+                        .map(|p| substitute(&p.ty, &subst))
+                        .collect();
+                    let ret = substitute(&func.return_type, &subst);
+                    let st = &self.hir.structs[&type_id];
+                    let owner_args: Vec<ResolvedType> = st
+                        .type_params
+                        .iter()
+                        .map(|tp| {
+                            subst
+                                .get(tp)
+                                .cloned()
+                                .unwrap_or(ResolvedType::TypeParam(*tp))
+                        })
+                        .collect();
+                    let typed = TypedExpr {
+                        kind: ExprKind::Static(fn_id, type_id, owner_args),
+                        ty: ResolvedType::Function(params.clone(), Box::new(ret.clone())),
+                    };
+                    let label = format!("{}.{}", recv_name, member_name);
+                    return self.finish_call_with(
+                        typed,
+                        label,
+                        subst,
+                        params,
+                        ret,
+                        resolved_type_args,
+                        args,
+                        fn_label,
+                        module,
+                        generics,
+                        locals,
+                        return_type,
+                        loop_depth,
+                    );
+                }
+
                 let typed_recv = self.check_expr(
                     receiver, fn_label, module, generics, locals, return_type, loop_depth, None);
                 if let Some((fn_id, owner_subst)) =
@@ -2489,6 +2566,97 @@ impl Validator {
             kind: ExprKind::Call(Box::new(callee_typed), resolved_type_args, typed_args),
             ty: ret,
         }
+    }
+
+    // Tail of check_call. Extracted so the static-dispatch branch can reuse
+    // arg checking + final-call construction without duplicating the body.
+    #[allow(clippy::too_many_arguments)]
+    fn finish_call_with(
+        &mut self,
+        callee_typed: TypedExpr,
+        callee_label: String,
+        _fn_subst: HashMap<TypeParamId, ResolvedType>,
+        params: Vec<ResolvedType>,
+        ret: ResolvedType,
+        resolved_type_args: Vec<ResolvedType>,
+        args: &[ast::Expr],
+        fn_label: &str,
+        module: ModuleId,
+        generics: &[Vec<(String, TypeParamId)>],
+        locals: &mut Vec<HashMap<String, ResolvedType>>,
+        return_type: &ResolvedType,
+        loop_depth: u32,
+    ) -> TypedExpr {
+        let mut typed_args: Vec<TypedExpr> = Vec::with_capacity(args.len());
+        for (i, arg) in args.iter().enumerate() {
+            let expected_arg = params.get(i);
+            typed_args.push(self.check_expr(
+                arg, fn_label, module, generics, locals, return_type, loop_depth, expected_arg,
+            ));
+        }
+        if typed_args.len() != params.len() {
+            self.errors.push(ValidationError::CallArityMismatch {
+                function: fn_label.to_string(),
+                callee: callee_label.clone(),
+                expected: params.len(),
+                actual: typed_args.len(),
+            });
+        } else {
+            for (i, (arg, expected)) in typed_args.iter().zip(params.iter()).enumerate() {
+                if !types_compatible(&arg.ty, expected) {
+                    self.errors.push(ValidationError::TypeMismatch {
+                        function: fn_label.to_string(),
+                        context: format!("call to {} arg {}", callee_label, i),
+                        expected: format_type(expected),
+                        actual: format_type(&arg.ty),
+                    });
+                }
+            }
+        }
+        TypedExpr {
+            kind: ExprKind::Call(Box::new(callee_typed), resolved_type_args, typed_args),
+            ty: ret,
+        }
+    }
+
+    // Locate a no-self method named `name` on `type_id`. Returns the
+    // method's FnId plus the owner-type-param → concrete substitution
+    // (empty for non-generic structs; for generics the explicit
+    // resolved_type_args bind the owner's params).
+    fn find_static_method(
+        &mut self,
+        type_id: TypeId,
+        name: &str,
+        resolved_type_args: &[ResolvedType],
+        fn_label: &str,
+    ) -> Option<(FnId, HashMap<TypeParamId, ResolvedType>)> {
+        let s = self.hir.structs.get(&type_id)?;
+        let candidate = s.methods.iter().copied().find(|fid| {
+            self.hir
+                .functions
+                .get(fid)
+                .map(|f| f.name == name && !f.has_self)
+                .unwrap_or(false)
+        });
+        let fn_id = candidate?;
+        let mut subst: HashMap<TypeParamId, ResolvedType> = HashMap::new();
+        // For a generic struct, the user supplies the owner's type params
+        // as the call-site type arguments (e.g. `List.new<i32>()`).
+        if !s.type_params.is_empty() {
+            if resolved_type_args.len() != s.type_params.len() {
+                self.errors.push(ValidationError::CallArityMismatch {
+                    function: fn_label.to_string(),
+                    callee: format!("{}.{} (owner type args)", s.name, name),
+                    expected: s.type_params.len(),
+                    actual: resolved_type_args.len(),
+                });
+            } else {
+                for (tp, ta) in s.type_params.iter().zip(resolved_type_args.iter()) {
+                    subst.insert(*tp, ta.clone());
+                }
+            }
+        }
+        Some((fn_id, subst))
     }
 
     fn lookup_local(&self, name: &str, locals: &[HashMap<String, ResolvedType>]) -> ResolvedType {
@@ -3399,11 +3567,48 @@ fn types_compatible(actual: &ResolvedType, expected: &ResolvedType) -> bool {
     if actual == expected {
         return true;
     }
-    if let ResolvedType::Union(types) = expected
-        && types.iter().any(|t| t == actual) {
+    if let ResolvedType::Union(expected_vs) = expected {
+        // Union-to-union: same variant set in any order is fine.
+        if let ResolvedType::Union(actual_vs) = actual {
+            return actual_vs.iter().all(|t| expected_vs.contains(t))
+                && expected_vs.iter().all(|t| actual_vs.contains(t));
+        }
+        if expected_vs.iter().any(|t| t == actual) {
             return true;
         }
+    }
     false
+}
+
+// Combine the types of an if-expression's two branches into a single type.
+// Identical branches collapse; differing branches form a flat de-duplicated
+// union so the if-expression's result has a type that fits both arms.
+fn unify_branch_types(a: ResolvedType, b: ResolvedType) -> ResolvedType {
+    if a == b {
+        return a;
+    }
+    let mut variants: Vec<ResolvedType> = Vec::new();
+    let push = |t: ResolvedType, out: &mut Vec<ResolvedType>| match t {
+        ResolvedType::Union(inner) => {
+            for v in inner {
+                if !out.contains(&v) {
+                    out.push(v);
+                }
+            }
+        }
+        other => {
+            if !out.contains(&other) {
+                out.push(other);
+            }
+        }
+    };
+    push(a, &mut variants);
+    push(b, &mut variants);
+    if variants.len() == 1 {
+        variants.into_iter().next().unwrap()
+    } else {
+        ResolvedType::Union(variants)
+    }
 }
 
 fn is_numeric(ty: &ResolvedType) -> bool {

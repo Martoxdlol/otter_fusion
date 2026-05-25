@@ -17,7 +17,21 @@ pub fn name_struct(hir: &Hir, s: &HirStruct, args: &[ResolvedType]) -> String {
 pub fn name_function(hir: &Hir, fn_id: crate::hir::FnId, args: &[ResolvedType]) -> String {
     let f = &hir.functions[&fn_id];
     let module = &hir.modules[&f.module];
-    format!("{}::{}{}", module.name, f.name, format_type_args(hir, args))
+    // Methods need the owner struct in the symbol so e.g. `TcpListener.close`
+    // and `TcpStream.close` don't collide at link time.
+    match f.owner {
+        Some(owner_id) => {
+            let owner = &hir.structs[&owner_id];
+            format!(
+                "{}::{}::{}{}",
+                module.name,
+                owner.name,
+                f.name,
+                format_type_args(hir, args),
+            )
+        }
+        None => format!("{}::{}{}", module.name, f.name, format_type_args(hir, args)),
+    }
 }
 
 pub fn name_interface(hir: &Hir, ty: &ResolvedType, args: &[ResolvedType]) -> String {

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/parser/parse_struct_with_generics.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     Program {
@@ -9,24 +9,19 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Box",
+                        name: "Point",
                         is_extern: false,
                         generics: [
                             GenericParam {
                                 name: "T",
                                 bounds: [],
                             },
-                        ],
-                        fields: [
-                            FieldDecl {
-                                name: "value",
-                                ty: Named(
-                                    "T",
-                                    [],
-                                ),
-                                is_pointer: false,
+                            GenericParam {
+                                name: "U",
+                                bounds: [],
                             },
                         ],
+                        fields: [],
                         methods: [],
                         implements: [],
                     },

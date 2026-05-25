@@ -1,6 +1,6 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p4_default_method_does_not_require_struct_impl.of
+input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
 ---
 Ok

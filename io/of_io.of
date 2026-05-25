@@ -1,4 +1,5 @@
 import { Buffer } from "of:core";
+import { __of_buffer_alloc, __of_buffer_free } from "of:core";
 
 // of_io — thin wrappers over POSIX file, networking, and multiplexing
 // syscalls. Link against libotter_io.a.
@@ -105,3 +106,281 @@ extern function F_SETFL(): i32;
 
 // Default file mode for created files (rw-r--r--). 0644 octal.
 const MODE_RW_R_R: u32 = 420;
+
+// =============================================================================
+// High-level facade
+//
+// Wraps the raw __of_* externs in friendlier types: IoError carries errno +
+// the failing op, TcpListener / TcpStream own a socket fd, FdSet wraps the
+// fd_set Buffer. No Drop in the language, so callers still pair every
+// successful construction with a `.close()` / `.free()`.
+// =============================================================================
+
+// Additional Rust-side helpers used only by the facade.
+extern function __of_and_not_i32(a: i32, b: i32): i32;
+extern function __of_buffer_from_str(s: str): Buffer | null;
+extern function __of_sockaddr_for_host(host: str, port: u16): Buffer | null;
+extern function __of_accept_simple(fd: i32): i32;
+
+// POSIX-stable errno values used when the facade itself decides to fail
+// (allocation, address parsing). Real kernel errors come via __of_errno().
+const E_NOMEM: i32 = 12;
+const E_INVAL: i32 = 22;
+
+struct IoError {
+  errno: i32,
+  op: str,
+}
+
+extend IoError {
+  function message(self): str {
+    self.op + " failed (errno=" + (self.errno as str) + ")"
+  }
+}
+
+// ---- Free fd-based I/O ----
+//
+// Wrap raw __of_write / __of_read so callers don't reach for the extern
+// when talking to stdin/stdout (fd 0/1) — they get the same IoError shape
+// the rest of the facade uses.
+
+function write(fd: i32, buf: Buffer, len: u64): i64 | IoError {
+  var n = __of_write(fd, buf, len);
+  if (n < 0) {
+    return IoError { errno: __of_errno(), op: "write" };
+  }
+  n
+}
+
+// ---- TcpListener ----
+
+struct TcpListener {
+  fd: i32,
+
+  // Bind + listen on host:port. host is a dotted-quad IPv4 string.
+  function bind(host: str, port: u16, backlog: i32): TcpListener | IoError {
+    var fd = __of_socket(AF_INET(), SOCK_STREAM(), 0);
+    if (fd < 0) {
+      return IoError { errno: __of_errno(), op: "socket" };
+    }
+    var addr_maybe = __of_sockaddr_for_host(host, port);
+    if (addr_maybe is null) {
+      __of_close(fd);
+      return IoError { errno: E_INVAL, op: "parse_addr" };
+    }
+    var addr = addr_maybe as Buffer;
+    var rc = __of_bind(fd, addr, 16 as u32);
+    __of_buffer_free(addr);
+    if (rc < 0) {
+      var e = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e, op: "bind" };
+    }
+    if (__of_listen(fd, backlog) < 0) {
+      var e2 = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e2, op: "listen" };
+    }
+    TcpListener { fd: fd }
+  }
+}
+
+extend TcpListener {
+  function accept(self): TcpStream | IoError {
+    var cfd = __of_accept_simple(self.fd);
+    if (cfd < 0) {
+      return IoError { errno: __of_errno(), op: "accept" };
+    }
+    TcpStream { fd: cfd }
+  }
+
+  function set_nonblocking(self, on: bool): IoError | null {
+    fd_set_nonblocking(self.fd, on)
+  }
+
+  function close(self) {
+    __of_close(self.fd);
+  }
+}
+
+// ---- TcpStream ----
+
+struct TcpStream {
+  fd: i32,
+
+  function connect(host: str, port: u16): TcpStream | IoError {
+    var fd = __of_socket(AF_INET(), SOCK_STREAM(), 0);
+    if (fd < 0) {
+      return IoError { errno: __of_errno(), op: "socket" };
+    }
+    var addr_maybe = __of_sockaddr_for_host(host, port);
+    if (addr_maybe is null) {
+      __of_close(fd);
+      return IoError { errno: E_INVAL, op: "parse_addr" };
+    }
+    var addr = addr_maybe as Buffer;
+    var rc = __of_connect(fd, addr, 16 as u32);
+    __of_buffer_free(addr);
+    if (rc < 0) {
+      var e = __of_errno();
+      __of_close(fd);
+      return IoError { errno: e, op: "connect" };
+    }
+    TcpStream { fd: fd }
+  }
+}
+
+extend TcpStream {
+  // Allocate a fresh Buffer of `max` bytes and fill it with up to `max`
+  // bytes from the socket. Caller frees ReadResult.buf via .free() when done.
+  function read(self, max: u64): ReadResult | IoError {
+    var buf_maybe = __of_buffer_alloc(max);
+    if (buf_maybe is null) {
+      return IoError { errno: E_NOMEM, op: "alloc" };
+    }
+    var buf = buf_maybe as Buffer;
+    var n = __of_read(self.fd, buf, max);
+    if (n < 0) {
+      var e = __of_errno();
+      __of_buffer_free(buf);
+      return IoError { errno: e, op: "read" };
+    }
+    ReadResult { buf: buf, len: n }
+  }
+
+  // Read into a caller-owned Buffer. Returns the byte count.
+  function read_into(self, buf: Buffer, max: u64): i64 | IoError {
+    var n = __of_read(self.fd, buf, max);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "read" };
+    }
+    n
+  }
+
+  function write(self, buf: Buffer, len: u64): i64 | IoError {
+    var n = __of_write(self.fd, buf, len);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "write" };
+    }
+    n
+  }
+
+  // Copy `s` into a transient Buffer, send it, free it.
+  function write_str(self, s: str): i64 | IoError {
+    var buf_maybe = __of_buffer_from_str(s);
+    if (buf_maybe is null) {
+      return IoError { errno: E_NOMEM, op: "alloc" };
+    }
+    var buf = buf_maybe as Buffer;
+    var n = __of_write(self.fd, buf, buf.size);
+    __of_buffer_free(buf);
+    if (n < 0) {
+      return IoError { errno: __of_errno(), op: "write" };
+    }
+    n
+  }
+
+  function set_nonblocking(self, on: bool): IoError | null {
+    fd_set_nonblocking(self.fd, on)
+  }
+
+  function close(self) {
+    __of_close(self.fd);
+  }
+}
+
+// Returned by TcpStream.read(). `len` is the actual bytes filled;
+// `buf.size` is the buffer's capacity (>= len). Caller calls .free().
+struct ReadResult {
+  buf: Buffer,
+  len: i64,
+}
+
+extend ReadResult {
+  function free(self) {
+    __of_buffer_free(self.buf);
+  }
+}
+
+// ---- FdSet ----
+
+struct FdSet {
+  buf: Buffer,
+
+  function new(): FdSet {
+    FdSet { buf: __of_fdset_new() }
+  }
+}
+
+extend FdSet {
+  function add(self, fd: i32) {
+    __of_fdset_set(self.buf, fd);
+  }
+  function remove(self, fd: i32) {
+    __of_fdset_clr(self.buf, fd);
+  }
+  function isset(self, fd: i32): bool {
+    __of_fdset_isset(self.buf, fd)
+  }
+  function clear(self) {
+    __of_fdset_zero(self.buf);
+  }
+  function free(self) {
+    __of_buffer_free(self.buf);
+  }
+}
+
+// ---- select ----
+//
+// timeout_ms < 0 → block forever (NULL timeval).
+// Any of r/w/e can be null → NULL pointer for that set.
+// Returned i32 is the count of ready fds; 0 means timeout.
+
+function select(nfds: i32, r: FdSet | null, w: FdSet | null, e: FdSet | null, timeout_ms: i64): i32 | IoError {
+  var rbuf = fdset_buf(r);
+  var wbuf = fdset_buf(w);
+  var ebuf = fdset_buf(e);
+  var tvbuf: Buffer | null = if (timeout_ms < 0) {
+    null
+  } else {
+    var sec = timeout_ms / 1000;
+    __of_timeval(sec, (timeout_ms - sec * 1000) * 1000)
+  };
+  var rc = __of_select(nfds, rbuf, wbuf, ebuf, tvbuf);
+  var err_after = __of_errno();
+  if (tvbuf is Buffer) {
+    __of_buffer_free(tvbuf as Buffer);
+  }
+  if (rc < 0) {
+    return IoError { errno: err_after, op: "select" };
+  }
+  rc
+}
+
+// Internal: unwrap FdSet | null to its inner Buffer | null for the raw
+// extern. Written with an intermediate `var` so the trailing implicit
+// return doesn't glue onto the preceding if-statement as a call.
+function fdset_buf(s: FdSet | null): Buffer | null {
+  if (s is null) {
+    return null;
+  }
+  var fs = s as FdSet;
+  fs.buf
+}
+
+// Internal: F_GETFL + F_SETFL with O_NONBLOCK toggled.
+function fd_set_nonblocking(fd: i32, on: bool): IoError | null {
+  var flags = __of_fcntl(fd, F_GETFL(), 0 as i64);
+  if (flags < 0) {
+    return IoError { errno: __of_errno(), op: "fcntl-getfl" };
+  }
+  var new_flags = if (on) {
+    __of_or_i32(flags, O_NONBLOCK())
+  } else {
+    __of_and_not_i32(flags, O_NONBLOCK())
+  };
+  if (__of_fcntl(fd, F_SETFL(), new_flags as i64) < 0) {
+    return IoError { errno: __of_errno(), op: "fcntl-setfl" };
+  }
+  null
+}

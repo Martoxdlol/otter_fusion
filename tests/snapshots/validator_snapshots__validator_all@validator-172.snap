@@ -1,6 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p5_struct_init_and_member_access.of
+input_file: examples/validator/p5_self_member_access_in_method.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown member 'x' on 'null' in function 'test_module::S::m'",
+        "unknown variable 'self' in function 'test_module::S::m'",
+    ],
+)

@@ -1,10 +1,10 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_unknown_type_errors.of
 ---
 ValidationErrors(
     [
-        "invalid extend target in module 'test_module'",
+        "unknown type 'Nope' in module 'test_module'",
     ],
 )

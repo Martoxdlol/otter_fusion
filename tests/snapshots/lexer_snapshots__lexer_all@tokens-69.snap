@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_extern_function_with_body.of
+input_file: examples/parser/parse_extern_function_simple.of
 ---
 Ok(
     [
@@ -19,75 +19,51 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "on_tick",
+                "print",
             ),
-            position: 23,
+            position: 21,
             line: 1,
-            column: 24,
+            column: 22,
         },
         Token {
             token_type: LeftParen,
-            position: 24,
+            position: 22,
             line: 1,
-            column: 25,
+            column: 23,
         },
         Token {
             token_type: Identifier(
-                "d",
+                "value",
             ),
-            position: 25,
+            position: 27,
             line: 1,
-            column: 26,
+            column: 28,
         },
         Token {
             token_type: Colon,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Star,
             position: 28,
             line: 1,
             column: 29,
         },
         Token {
             token_type: Identifier(
-                "MyStruct",
+                "str",
             ),
-            position: 36,
+            position: 32,
             line: 1,
-            column: 37,
+            column: 33,
         },
         Token {
             token_type: RightParen,
-            position: 37,
+            position: 33,
             line: 1,
-            column: 38,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 39,
-            line: 1,
-            column: 40,
-        },
-        Token {
-            token_type: Return,
-            position: 46,
-            line: 1,
-            column: 47,
+            column: 34,
         },
         Token {
             token_type: Semicolon,
-            position: 47,
+            position: 34,
             line: 1,
-            column: 48,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 49,
-            line: 1,
-            column: 50,
+            column: 35,
         },
     ],
 )

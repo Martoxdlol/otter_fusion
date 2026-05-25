@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/spec/04_structs_interfaces/struct_implements.of
+input_file: examples/spec/04_structs_interfaces/interface_extends.of
 ---
 Ok(
     Program {
@@ -31,30 +31,14 @@ Ok(
                 },
             },
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Person",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Printable",
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "name",
-                                ty: Primitive(
-                                    String,
-                                ),
-                                is_pointer: false,
-                            },
-                            FieldDecl {
-                                name: "age",
-                                ty: Primitive(
-                                    Int32,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        fields: [],
                         methods: [
                             FunctionDecl {
-                                name: "greet",
+                                name: "to_string",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
@@ -64,27 +48,9 @@ Ok(
                                     ),
                                 ),
                                 params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: Some(
-                                            BinaryOp(
-                                                Literal(
-                                                    String(
-                                                        "Hello, ",
-                                                    ),
-                                                ),
-                                                Add,
-                                                Member(
-                                                    SelfRef,
-                                                    "name",
-                                                ),
-                                            ),
-                                        ),
-                                    },
-                                ),
+                                body: None,
                                 span: Span {
-                                    line: 9,
+                                    line: 6,
                                     col: 11,
                                     len: 8,
                                 },
@@ -100,8 +66,8 @@ Ok(
                 ),
                 span: Span {
                     line: 5,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p3_extend_adds_specialised_method.of
 ---
 Ok(
     Program {
@@ -9,14 +9,9 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Box",
+                        name: "Foo",
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                        generics: [],
                         fields: [],
                         methods: [],
                         implements: [],
@@ -32,18 +27,14 @@ Ok(
                 kind: Extend(
                     ExtendDecl {
                         target: Named(
-                            "Box",
-                            [
-                                Primitive(
-                                    Int64,
-                                ),
-                            ],
+                            "Foo",
+                            [],
                         ),
                         generic_params: [],
                         implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "is_int",
+                                name: "m",
                                 has_self_param: false,
                                 is_extern: false,
                                 generics: [],
@@ -57,7 +48,7 @@ Ok(
                                 ),
                                 span: Span {
                                     line: 2,
-                                    col: 27,
+                                    col: 22,
                                     len: 8,
                                 },
                             },

@@ -16,44 +16,12 @@ Ok(
                                     name: "println",
                                     alias: None,
                                 },
-                                ImportSymbol {
-                                    name: "Buffer",
-                                    alias: None,
-                                },
                             ],
                         ),
                     },
                 ),
                 span: Span {
-                    line: 5,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Import(
-                    ImportDecl {
-                        module: "of:core",
-                        symbols: Named(
-                            [
-                                ImportSymbol {
-                                    name: "__of_buffer_alloc",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_buffer_free",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_buffer_set",
-                                    alias: None,
-                                },
-                            ],
-                        ),
-                    },
-                ),
-                span: Span {
-                    line: 6,
+                    line: 4,
                     col: 7,
                     len: 6,
                 },
@@ -65,47 +33,19 @@ Ok(
                         symbols: Named(
                             [
                                 ImportSymbol {
-                                    name: "__of_socket",
+                                    name: "TcpStream",
                                     alias: None,
                                 },
                                 ImportSymbol {
-                                    name: "__of_connect",
+                                    name: "ReadResult",
                                     alias: None,
                                 },
                                 ImportSymbol {
-                                    name: "__of_close",
+                                    name: "IoError",
                                     alias: None,
                                 },
                                 ImportSymbol {
-                                    name: "__of_read",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_write",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_errno",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_sockaddr_in",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_htons",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "__of_htonl",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "AF_INET",
-                                    alias: None,
-                                },
-                                ImportSymbol {
-                                    name: "SOCK_STREAM",
+                                    name: "write",
                                     alias: None,
                                 },
                             ],
@@ -113,62 +53,9 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 7,
+                    line: 5,
                     col: 7,
                     len: 6,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "errno_str",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Primitive(
-                                String,
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: Some(
-                                    BinaryOp(
-                                        Literal(
-                                            String(
-                                                "errno=",
-                                            ),
-                                        ),
-                                        Add,
-                                        As(
-                                            Call(
-                                                Variable(
-                                                    "__of_errno",
-                                                ),
-                                                [],
-                                                [],
-                                            ),
-                                            Primitive(
-                                                String,
-                                            ),
-                                        ),
-                                    ),
-                                ),
-                            },
-                        ),
-                        span: Span {
-                            line: 14,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 14,
-                    col: 9,
-                    len: 8,
                 },
             },
             Item {
@@ -188,127 +75,23 @@ Ok(
                             Block {
                                 statements: [
                                     VarDecl(
-                                        "sock",
+                                        "connect_res",
                                         None,
                                         Some(
                                             Call(
-                                                Variable(
-                                                    "__of_socket",
+                                                Member(
+                                                    Variable(
+                                                        "TcpStream",
+                                                    ),
+                                                    "connect",
                                                 ),
                                                 [],
                                                 [
-                                                    Call(
-                                                        Variable(
-                                                            "AF_INET",
-                                                        ),
-                                                        [],
-                                                        [],
-                                                    ),
-                                                    Call(
-                                                        Variable(
-                                                            "SOCK_STREAM",
-                                                        ),
-                                                        [],
-                                                        [],
-                                                    ),
                                                     Literal(
-                                                        Int(
-                                                            "0",
+                                                        String(
+                                                            "127.0.0.1",
                                                         ),
                                                     ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    Expr(
-                                        If(
-                                            BinaryOp(
-                                                Variable(
-                                                    "sock",
-                                                ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
-                                                ),
-                                            ),
-                                            Block {
-                                                statements: [
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "println",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                BinaryOp(
-                                                                    Literal(
-                                                                        String(
-                                                                            "socket() failed ",
-                                                                        ),
-                                                                    ),
-                                                                    Add,
-                                                                    Call(
-                                                                        Variable(
-                                                                            "errno_str",
-                                                                        ),
-                                                                        [],
-                                                                        [],
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Return(
-                                                        Some(
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                                returns: None,
-                                            },
-                                            None,
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "ip_be",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_htonl",
-                                                ),
-                                                [],
-                                                [
-                                                    As(
-                                                        Literal(
-                                                            Int(
-                                                                "2130706433",
-                                                            ),
-                                                        ),
-                                                        Primitive(
-                                                            Uint32,
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "port_be",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_htons",
-                                                ),
-                                                [],
-                                                [
                                                     As(
                                                         Literal(
                                                             Int(
@@ -323,58 +106,15 @@ Ok(
                                             ),
                                         ),
                                     ),
-                                    VarDecl(
-                                        "addr",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_sockaddr_in",
-                                                ),
-                                                [],
-                                                [
-                                                    Variable(
-                                                        "ip_be",
-                                                    ),
-                                                    Variable(
-                                                        "port_be",
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
                                     Expr(
                                         If(
-                                            BinaryOp(
-                                                Call(
-                                                    Variable(
-                                                        "__of_connect",
-                                                    ),
-                                                    [],
-                                                    [
-                                                        Variable(
-                                                            "sock",
-                                                        ),
-                                                        Variable(
-                                                            "addr",
-                                                        ),
-                                                        As(
-                                                            Literal(
-                                                                Int(
-                                                                    "16",
-                                                                ),
-                                                            ),
-                                                            Primitive(
-                                                                Uint32,
-                                                            ),
-                                                        ),
-                                                    ],
+                                            Is(
+                                                Variable(
+                                                    "connect_res",
                                                 ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
                                                 ),
                                             ),
                                             Block {
@@ -389,43 +129,26 @@ Ok(
                                                                 BinaryOp(
                                                                     Literal(
                                                                         String(
-                                                                            "connect() failed ",
+                                                                            "connect: ",
                                                                         ),
                                                                     ),
                                                                     Add,
                                                                     Call(
-                                                                        Variable(
-                                                                            "errno_str",
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "connect_res",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
                                                                         [],
                                                                         [],
                                                                     ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_close",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Variable(
-                                                                    "sock",
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_buffer_free",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Variable(
-                                                                    "addr",
                                                                 ),
                                                             ],
                                                         ),
@@ -443,6 +166,21 @@ Ok(
                                                 returns: None,
                                             },
                                             None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "sock",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "connect_res",
+                                                ),
+                                                Named(
+                                                    "TcpStream",
+                                                    [],
+                                                ),
+                                            ),
                                         ),
                                     ),
                                     Expr(
@@ -461,18 +199,21 @@ Ok(
                                         ),
                                     ),
                                     VarDecl(
-                                        "msg_maybe",
+                                        "sent",
                                         None,
                                         Some(
                                             Call(
-                                                Variable(
-                                                    "__of_buffer_alloc",
+                                                Member(
+                                                    Variable(
+                                                        "sock",
+                                                    ),
+                                                    "write_str",
                                                 ),
                                                 [],
                                                 [
                                                     Literal(
-                                                        Int(
-                                                            "5",
+                                                        String(
+                                                            "ping\n",
                                                         ),
                                                     ),
                                                 ],
@@ -483,265 +224,11 @@ Ok(
                                         If(
                                             Is(
                                                 Variable(
-                                                    "msg_maybe",
-                                                ),
-                                                Primitive(
-                                                    Null,
-                                                ),
-                                            ),
-                                            Block {
-                                                statements: [
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "println",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Literal(
-                                                                    String(
-                                                                        "alloc failed",
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Return(
-                                                        Some(
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                                returns: None,
-                                            },
-                                            None,
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "msg",
-                                        None,
-                                        Some(
-                                            As(
-                                                Variable(
-                                                    "msg_maybe",
-                                                ),
-                                                Named(
-                                                    "Buffer",
-                                                    [],
-                                                ),
-                                            ),
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "0",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint64,
-                                                    ),
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "112",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint8,
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "1",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint64,
-                                                    ),
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "105",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint8,
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "2",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint64,
-                                                    ),
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "110",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint8,
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "3",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint64,
-                                                    ),
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "103",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint8,
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_set",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "4",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint64,
-                                                    ),
-                                                ),
-                                                As(
-                                                    Literal(
-                                                        Int(
-                                                            "10",
-                                                        ),
-                                                    ),
-                                                    Primitive(
-                                                        Uint8,
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "sent",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_write",
-                                                ),
-                                                [],
-                                                [
-                                                    Variable(
-                                                        "sock",
-                                                    ),
-                                                    Variable(
-                                                        "msg",
-                                                    ),
-                                                    As(
-                                                        Literal(
-                                                            Int(
-                                                                "5",
-                                                            ),
-                                                        ),
-                                                        Primitive(
-                                                            Uint64,
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    Expr(
-                                        If(
-                                            BinaryOp(
-                                                Variable(
                                                     "sent",
                                                 ),
-                                                Lt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
+                                                Named(
+                                                    "IoError",
+                                                    [],
                                                 ),
                                             ),
                                             Block {
@@ -756,13 +243,22 @@ Ok(
                                                                 BinaryOp(
                                                                     Literal(
                                                                         String(
-                                                                            "write() failed ",
+                                                                            "write: ",
                                                                         ),
                                                                     ),
                                                                     Add,
                                                                     Call(
-                                                                        Variable(
-                                                                            "errno_str",
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "sent",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
                                                                         [],
                                                                         [],
@@ -793,8 +289,13 @@ Ok(
                                                                             ),
                                                                             Add,
                                                                             As(
-                                                                                Variable(
-                                                                                    "sent",
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "sent",
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        Int64,
+                                                                                    ),
                                                                                 ),
                                                                                 Primitive(
                                                                                     String,
@@ -818,18 +319,26 @@ Ok(
                                         ),
                                     ),
                                     VarDecl(
-                                        "reply_maybe",
+                                        "read_res",
                                         None,
                                         Some(
                                             Call(
-                                                Variable(
-                                                    "__of_buffer_alloc",
+                                                Member(
+                                                    Variable(
+                                                        "sock",
+                                                    ),
+                                                    "read",
                                                 ),
                                                 [],
                                                 [
-                                                    Literal(
-                                                        Int(
-                                                            "256",
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "256",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Uint64,
                                                         ),
                                                     ),
                                                 ],
@@ -840,95 +349,11 @@ Ok(
                                         If(
                                             Is(
                                                 Variable(
-                                                    "reply_maybe",
-                                                ),
-                                                Primitive(
-                                                    Null,
-                                                ),
-                                            ),
-                                            Block {
-                                                statements: [
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "println",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Literal(
-                                                                    String(
-                                                                        "alloc failed",
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Return(
-                                                        Some(
-                                                            Literal(
-                                                                Int(
-                                                                    "1",
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                ],
-                                                returns: None,
-                                            },
-                                            None,
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "reply",
-                                        None,
-                                        Some(
-                                            As(
-                                                Variable(
-                                                    "reply_maybe",
+                                                    "read_res",
                                                 ),
                                                 Named(
-                                                    "Buffer",
+                                                    "IoError",
                                                     [],
-                                                ),
-                                            ),
-                                        ),
-                                    ),
-                                    VarDecl(
-                                        "n",
-                                        None,
-                                        Some(
-                                            Call(
-                                                Variable(
-                                                    "__of_read",
-                                                ),
-                                                [],
-                                                [
-                                                    Variable(
-                                                        "sock",
-                                                    ),
-                                                    Variable(
-                                                        "reply",
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "256",
-                                                        ),
-                                                    ),
-                                                ],
-                                            ),
-                                        ),
-                                    ),
-                                    Expr(
-                                        If(
-                                            BinaryOp(
-                                                Variable(
-                                                    "n",
-                                                ),
-                                                Gt,
-                                                Literal(
-                                                    Int(
-                                                        "0",
-                                                    ),
                                                 ),
                                             ),
                                             Block {
@@ -941,53 +366,27 @@ Ok(
                                                             [],
                                                             [
                                                                 BinaryOp(
-                                                                    BinaryOp(
-                                                                        Literal(
-                                                                            String(
-                                                                                "received ",
-                                                                            ),
-                                                                        ),
-                                                                        Add,
-                                                                        As(
-                                                                            Variable(
-                                                                                "n",
-                                                                            ),
-                                                                            Primitive(
-                                                                                String,
-                                                                            ),
+                                                                    Literal(
+                                                                        String(
+                                                                            "read: ",
                                                                         ),
                                                                     ),
                                                                     Add,
-                                                                    Literal(
-                                                                        String(
-                                                                            " bytes:",
+                                                                    Call(
+                                                                        Member(
+                                                                            As(
+                                                                                Variable(
+                                                                                    "read_res",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                            "message",
                                                                         ),
-                                                                    ),
-                                                                ),
-                                                            ],
-                                                        ),
-                                                    ),
-                                                    Expr(
-                                                        Call(
-                                                            Variable(
-                                                                "__of_write",
-                                                            ),
-                                                            [],
-                                                            [
-                                                                Literal(
-                                                                    Int(
-                                                                        "1",
-                                                                    ),
-                                                                ),
-                                                                Variable(
-                                                                    "reply",
-                                                                ),
-                                                                As(
-                                                                    Variable(
-                                                                        "n",
-                                                                    ),
-                                                                    Primitive(
-                                                                        Uint64,
+                                                                        [],
+                                                                        [],
                                                                     ),
                                                                 ),
                                                             ],
@@ -999,6 +398,21 @@ Ok(
                                             Some(
                                                 Block {
                                                     statements: [
+                                                        VarDecl(
+                                                            "r",
+                                                            None,
+                                                            Some(
+                                                                As(
+                                                                    Variable(
+                                                                        "read_res",
+                                                                    ),
+                                                                    Named(
+                                                                        "ReadResult",
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
                                                         Expr(
                                                             Call(
                                                                 Variable(
@@ -1007,22 +421,77 @@ Ok(
                                                                 [],
                                                                 [
                                                                     BinaryOp(
-                                                                        Literal(
-                                                                            String(
-                                                                                "read returned ",
+                                                                        BinaryOp(
+                                                                            Literal(
+                                                                                String(
+                                                                                    "received ",
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            As(
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "r",
+                                                                                    ),
+                                                                                    "len",
+                                                                                ),
+                                                                                Primitive(
+                                                                                    String,
+                                                                                ),
                                                                             ),
                                                                         ),
                                                                         Add,
-                                                                        As(
-                                                                            Variable(
-                                                                                "n",
-                                                                            ),
-                                                                            Primitive(
-                                                                                String,
+                                                                        Literal(
+                                                                            String(
+                                                                                " bytes:",
                                                                             ),
                                                                         ),
                                                                     ),
                                                                 ],
+                                                            ),
+                                                        ),
+                                                        Expr(
+                                                            Call(
+                                                                Variable(
+                                                                    "write",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                    Member(
+                                                                        Variable(
+                                                                            "r",
+                                                                        ),
+                                                                        "buf",
+                                                                    ),
+                                                                    As(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "r",
+                                                                            ),
+                                                                            "len",
+                                                                        ),
+                                                                        Primitive(
+                                                                            Uint64,
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                        Expr(
+                                                            Call(
+                                                                Member(
+                                                                    Variable(
+                                                                        "r",
+                                                                    ),
+                                                                    "free",
+                                                                ),
+                                                                [],
+                                                                [],
                                                             ),
                                                         ),
                                                     ],
@@ -1033,54 +502,14 @@ Ok(
                                     ),
                                     Expr(
                                         Call(
-                                            Variable(
-                                                "__of_close",
-                                            ),
-                                            [],
-                                            [
+                                            Member(
                                                 Variable(
                                                     "sock",
                                                 ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_free",
+                                                "close",
                                             ),
                                             [],
-                                            [
-                                                Variable(
-                                                    "addr",
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_free",
-                                            ),
                                             [],
-                                            [
-                                                Variable(
-                                                    "msg",
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    Expr(
-                                        Call(
-                                            Variable(
-                                                "__of_buffer_free",
-                                            ),
-                                            [],
-                                            [
-                                                Variable(
-                                                    "reply",
-                                                ),
-                                            ],
                                         ),
                                     ),
                                 ],
@@ -1094,14 +523,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 18,
+                            line: 7,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 18,
+                    line: 7,
                     col: 9,
                     len: 8,
                 },

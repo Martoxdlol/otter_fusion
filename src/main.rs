@@ -24,11 +24,27 @@ enum Commands {
         #[arg(long)]
         short: bool,
     },
-    Run { file: String },
+    Run {
+        file: String,
+        // Shared libraries (.dylib / .so) to dlopen and resolve symbols from.
+        // Static archives (.a) cannot be loaded at runtime — use `build`.
+        #[arg(short = 'l', long = "lib")]
+        libs: Vec<String>,
+    },
     Compile {
         file: String,
         #[arg(short, long)]
         output: Option<String>,
+    },
+    Build {
+        file: String,
+        // Output binary path. Defaults to the source file's stem (no extension).
+        #[arg(short, long)]
+        output: Option<String>,
+        // Extra libraries to link (passed verbatim to cc). Accepts .a, .so, .dylib,
+        // or any other path/flag cc understands.
+        #[arg(short = 'l', long = "lib")]
+        libs: Vec<String>,
     },
 }
 #[derive(Parser)]
@@ -50,8 +66,9 @@ fn main() -> Result<(), std::io::Error> {
         Commands::Scan { file } => run_scan(file),
         Commands::Parse { file } => run_parse(file),
         Commands::Validate { file, short } => run_validate(file, *short),
-        Commands::Run { file } => run_run(file),
+        Commands::Run { file, libs } => run_run(file, libs),
         Commands::Compile { file, output } => run_compile(file, output.as_deref()),
+        Commands::Build { file, output, libs } => run_build(file, output.as_deref(), libs),
     };
     std::process::exit(code);
 }
@@ -112,7 +129,7 @@ fn run_validate(file: &str, short: bool) -> i32 {
     }
 }
 
-fn run_run(file: &str) -> i32 {
+fn run_run(file: &str, lib_paths: &[String]) -> i32 {
     let mir = match build_mir(file) {
         Ok(m) => m,
         Err(code) => return code,
@@ -124,7 +141,12 @@ fn run_run(file: &str) -> i32 {
         return 1;
     }
 
-    let jit = match make_jit_module() {
+    let libs = match load_dynamic_libs(lib_paths) {
+        Ok(l) => l,
+        Err(code) => return code,
+    };
+
+    let jit = match make_jit_module(libs) {
         Ok(m) => m,
         Err(e) => {
             eprintln!("{file}: error: failed to build JIT: {e}");
@@ -177,76 +199,168 @@ fn run_run(file: &str) -> i32 {
 }
 
 fn run_compile(file: &str, output: Option<&str>) -> i32 {
-    let mir = match build_mir(file) {
-        Ok(m) => m,
-        Err(code) => return code,
-    };
+    let out_path = output
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(file).with_extension("o"));
+    if let Err(code) = emit_object(file, &out_path) {
+        return code;
+    }
+    println!("{}", out_path.display());
+    0
+}
 
-    let isa_builder = match cranelift_native::builder() {
-        Ok(b) => b,
-        Err(msg) => {
-            eprintln!("{file}: error: host machine not supported: {msg}");
-            return 1;
-        }
-    };
+fn emit_object(file: &str, out_path: &Path) -> Result<(), i32> {
+    let mir = build_mir(file)?;
+
+    let isa_builder = cranelift_native::builder().map_err(|msg| {
+        eprintln!("{file}: error: host machine not supported: {msg}");
+        1
+    })?;
     // macOS arm64 (and modern Linux) refuse to link non-PIC code into
     // executables. Default cranelift settings have is_pic=false; flip it.
     let mut flag_builder = cranelift_codegen::settings::builder();
-    if let Err(e) = flag_builder.set("is_pic", "true") {
+    flag_builder.set("is_pic", "true").map_err(|e| {
         eprintln!("{file}: error: isa flag: {e}");
-        return 1;
-    }
+        1
+    })?;
     let flags = cranelift_codegen::settings::Flags::new(flag_builder);
-    let isa = match isa_builder.finish(flags) {
-        Ok(i) => i,
-        Err(e) => {
-            eprintln!("{file}: error: isa: {e}");
-            return 1;
-        }
-    };
+    let isa = isa_builder.finish(flags).map_err(|e| {
+        eprintln!("{file}: error: isa: {e}");
+        1
+    })?;
     let obj_name = Path::new(file)
         .file_stem()
         .and_then(|s| s.to_str())
         .unwrap_or("main")
         .to_string();
-    let builder = match ObjectBuilder::new(isa, obj_name.clone(), default_libcall_names()) {
-        Ok(b) => b,
-        Err(e) => {
-            eprintln!("{file}: error: object builder: {e}");
-            return 1;
-        }
-    };
+    let builder = ObjectBuilder::new(isa, obj_name, default_libcall_names()).map_err(|e| {
+        eprintln!("{file}: error: object builder: {e}");
+        1
+    })?;
     let object_module = ObjectModule::new(builder);
 
-    let mut compiled = match codegen::compile(&mir, object_module) {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("{file}: error: codegen: {e}");
-            return 1;
-        }
-    };
-    if let Err(e) = codegen::emit_c_main(&mut compiled, &mir) {
+    let mut compiled = codegen::compile(&mir, object_module).map_err(|e| {
+        eprintln!("{file}: error: codegen: {e}");
+        1
+    })?;
+    codegen::emit_c_main(&mut compiled, &mir).map_err(|e| {
         eprintln!("{file}: error: emit main: {e}");
-        return 1;
-    }
+        1
+    })?;
     let product = compiled.module.finish();
-    let bytes = match product.emit() {
-        Ok(b) => b,
+    let bytes = product.emit().map_err(|e| {
+        eprintln!("{file}: error: emit object: {e}");
+        1
+    })?;
+
+    std::fs::write(out_path, &bytes).map_err(|e| {
+        eprintln!("{}: error: write object: {e}", out_path.display());
+        1
+    })?;
+    Ok(())
+}
+
+fn run_build(file: &str, output: Option<&str>, libs: &[String]) -> i32 {
+    let rt_lib = match find_otter_rt() {
+        Ok(p) => p,
         Err(e) => {
-            eprintln!("{file}: error: emit object: {e}");
+            eprintln!("{file}: error: {e}");
             return 1;
         }
     };
 
-    let out_path = output
+    let stem = Path::new(file)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("main")
+        .to_string();
+    let bin_path = output
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from(file).with_extension("o"));
-    if let Err(e) = std::fs::write(&out_path, &bytes) {
-        eprintln!("{}: error: write object: {e}", out_path.display());
-        return 1;
+        .unwrap_or_else(|| PathBuf::from(&stem));
+
+    let tmp_obj =
+        std::env::temp_dir().join(format!("otter_fusion.{}.{stem}.o", std::process::id()));
+    if let Err(code) = emit_object(file, &tmp_obj) {
+        return code;
     }
-    println!("{}", out_path.display());
-    0
+
+    let mut cmd = std::process::Command::new("cc");
+    cmd.arg(&tmp_obj).arg(&rt_lib);
+    for lib in libs {
+        cmd.arg(lib);
+    }
+    if cfg!(target_os = "linux") {
+        cmd.args(["-lpthread", "-ldl", "-lm"]);
+    }
+    cmd.arg("-o").arg(&bin_path);
+
+    let status = cmd.status();
+    let _ = std::fs::remove_file(&tmp_obj);
+
+    match status {
+        Ok(s) if s.success() => {
+            println!("{}", bin_path.display());
+            0
+        }
+        Ok(s) => {
+            eprintln!("{file}: error: cc exited with {s}");
+            1
+        }
+        Err(e) => {
+            eprintln!("{file}: error: cannot invoke cc: {e}");
+            1
+        }
+    }
+}
+
+// libotter_rt.a lookup order: $OTTER_RT_LIB, then the otter_fusion exe's
+// directory (where `cargo build` drops the staticlib).
+fn find_otter_rt() -> Result<PathBuf, String> {
+    if let Ok(p) = std::env::var("OTTER_RT_LIB") {
+        let path = PathBuf::from(&p);
+        if path.exists() {
+            return Ok(path);
+        }
+        return Err(format!("OTTER_RT_LIB does not exist: {p}"));
+    }
+    let exe = std::env::current_exe().map_err(|e| format!("cannot find current exe: {e}"))?;
+    let dir = exe
+        .parent()
+        .ok_or_else(|| "current exe has no parent directory".to_string())?;
+    let candidate = dir.join("libotter_rt.a");
+    if candidate.exists() {
+        return Ok(candidate);
+    }
+    Err(format!(
+        "cannot find libotter_rt.a (looked in {}); set OTTER_RT_LIB to override",
+        candidate.display()
+    ))
+}
+
+fn load_dynamic_libs(paths: &[String]) -> Result<Vec<libloading::Library>, i32> {
+    let mut loaded = Vec::with_capacity(paths.len());
+    for p in paths {
+        let path = Path::new(p);
+        let ext = path
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        if ext == "a" {
+            eprintln!(
+                "error: `run` does not accept static archives (.a): {p}; pass a .dylib/.so or use `build` for static linking"
+            );
+            return Err(1);
+        }
+        match unsafe { libloading::Library::new(path) } {
+            Ok(lib) => loaded.push(lib),
+            Err(e) => {
+                eprintln!("error: cannot load {}: {e}", path.display());
+                return Err(1);
+            }
+        }
+    }
+    Ok(loaded)
 }
 
 
@@ -371,7 +485,7 @@ fn build_hir(file: &str, short: bool) -> Result<Hir, i32> {
 
 // cranelift-jit 0.110 hardcodes `is_pic=true` in JITBuilder::new, which makes
 // its PLT writer panic on non-x86_64. Build the ISA ourselves with is_pic off.
-fn make_jit_module() -> Result<JITModule, String> {
+fn make_jit_module(libs: Vec<libloading::Library>) -> Result<JITModule, String> {
     let mut flags = cranelift_codegen::settings::builder();
     flags.set("use_colocated_libcalls", "false").map_err(|e| e.to_string())?;
     flags.set("is_pic", "false").map_err(|e| e.to_string())?;
@@ -381,6 +495,22 @@ fn make_jit_module() -> Result<JITModule, String> {
         .map_err(|e| e.to_string())?;
     let mut builder = JITBuilder::with_isa(isa, default_libcall_names());
     register_runtime_shims(&mut builder);
+    if !libs.is_empty() {
+        // Leak the libs: they must outlive the JIT module that resolves
+        // symbols against them.
+        let libs: &'static [libloading::Library] = Box::leak(libs.into_boxed_slice());
+        builder.symbol_lookup_fn(Box::new(move |name: &str| {
+            let cname = std::ffi::CString::new(name).ok()?;
+            for lib in libs {
+                unsafe {
+                    if let Ok(sym) = lib.get::<*const u8>(cname.as_bytes_with_nul()) {
+                        return Some(*sym);
+                    }
+                }
+            }
+            None
+        }));
+    }
     Ok(JITModule::new(builder))
 }
 

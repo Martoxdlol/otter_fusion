@@ -1,133 +1,139 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/spec/03_functions/implicit_return.of
+input_file: examples/spec/02_variables/var_with_type.of
 ---
 Ok(
     [
         Token {
-            token_type: Function,
+            token_type: Var,
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
             position: 8,
             line: 1,
             column: 9,
         },
         Token {
-            token_type: Identifier(
-                "add",
-            ),
-            position: 12,
+            token_type: Colon,
+            position: 9,
             line: 1,
-            column: 13,
+            column: 10,
         },
         Token {
-            token_type: LeftParen,
+            token_type: Identifier(
+                "str",
+            ),
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Colon,
+            token_type: Eq,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
-            token_type: Identifier(
-                "i64",
+            token_type: StringLit(
+                "John Doe",
             ),
-            position: 19,
+            position: 26,
             line: 1,
-            column: 20,
+            column: 27,
         },
         Token {
-            token_type: Comma,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: Identifier(
-                "b",
-            ),
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Colon,
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
+            token_type: Semicolon,
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: RightParen,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Colon,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 33,
-            line: 1,
-            column: 34,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 35,
-            line: 1,
-            column: 36,
-        },
-        Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 39,
+            token_type: Var,
+            position: 31,
             line: 2,
             column: 4,
         },
         Token {
-            token_type: Plus,
-            position: 41,
-            line: 2,
-            column: 6,
-        },
-        Token {
             token_type: Identifier(
-                "b",
+                "age",
             ),
-            position: 43,
+            position: 35,
             line: 2,
             column: 8,
         },
         Token {
-            token_type: RightBrace,
+            token_type: Eq,
+            position: 37,
+            line: 2,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "30",
+            ),
+            position: 40,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 41,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: Var,
             position: 45,
             line: 3,
-            column: 2,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "price",
+            ),
+            position: 51,
+            line: 3,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 52,
+            line: 3,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 56,
+            line: 3,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 58,
+            line: 3,
+            column: 17,
+        },
+        Token {
+            token_type: Float(
+                "19.99",
+            ),
+            position: 64,
+            line: 3,
+            column: 23,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 65,
+            line: 3,
+            column: 24,
         },
     ],
 )

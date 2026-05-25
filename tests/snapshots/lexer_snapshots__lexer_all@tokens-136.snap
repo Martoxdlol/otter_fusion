@@ -1,141 +1,95 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/validator/p2_generic_arity_mismatch_errors.of
+input_file: examples/validator/p2_bound_referencing_interface_ok.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Interface,
+            position: 9,
             line: 1,
-            column: 7,
+            column: 10,
         },
         Token {
             token_type: Identifier(
-                "Wrapper",
+                "Show",
             ),
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: LT,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: LeftBrace,
             position: 16,
             line: 1,
             column: 17,
         },
         Token {
-            token_type: GT,
+            token_type: RightBrace,
             position: 17,
             line: 1,
             column: 18,
         },
         Token {
-            token_type: LeftBrace,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: Function,
-            position: 29,
+            token_type: Struct,
+            position: 24,
             line: 2,
-            column: 9,
+            column: 7,
         },
         Token {
             token_type: Identifier(
-                "u",
+                "Foo",
             ),
-            position: 31,
+            position: 28,
             line: 2,
             column: 11,
         },
         Token {
-            token_type: LeftParen,
-            position: 32,
+            token_type: LT,
+            position: 29,
             line: 2,
             column: 12,
         },
         Token {
-            token_type: RightParen,
-            position: 33,
+            token_type: Identifier(
+                "T",
+            ),
+            position: 30,
             line: 2,
             column: 13,
         },
         Token {
             token_type: Colon,
-            position: 34,
+            position: 31,
             line: 2,
             column: 14,
         },
         Token {
             token_type: Identifier(
-                "Wrapper",
+                "Show",
             ),
-            position: 42,
+            position: 36,
+            line: 2,
+            column: 19,
+        },
+        Token {
+            token_type: GT,
+            position: 37,
+            line: 2,
+            column: 20,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 39,
             line: 2,
             column: 22,
         },
         Token {
-            token_type: LT,
-            position: 43,
+            token_type: RightBrace,
+            position: 40,
             line: 2,
             column: 23,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 46,
-            line: 2,
-            column: 26,
-        },
-        Token {
-            token_type: Comma,
-            position: 47,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 51,
-            line: 2,
-            column: 31,
-        },
-        Token {
-            token_type: GT,
-            position: 52,
-            line: 2,
-            column: 32,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 54,
-            line: 2,
-            column: 34,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 55,
-            line: 2,
-            column: 35,
         },
     ],
 )

@@ -1,7 +1,7 @@
 ---
 source: tests/parser_snapshots.rs
 expression: ast
-input_file: examples/validator/p5_unknown_member_errors.of
+input_file: examples/validator/p5_struct_init_extra_field_errors.of
 ---
 Ok(
     Program {
@@ -12,7 +12,15 @@ Ok(
                         name: "S",
                         is_extern: false,
                         generics: [],
-                        fields: [],
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
                         methods: [],
                         implements: [],
                     },
@@ -31,25 +39,34 @@ Ok(
                         is_extern: false,
                         generics: [],
                         return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "s",
-                                ty: Named(
-                                    "S",
-                                    [],
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        params: [],
                         body: Some(
                             Block {
                                 statements: [
                                     Expr(
-                                        Member(
-                                            Variable(
-                                                "s",
+                                        StructInit(
+                                            Named(
+                                                "S",
+                                                [],
                                             ),
-                                            "x",
+                                            [
+                                                (
+                                                    "x",
+                                                    Literal(
+                                                        Int(
+                                                            "5",
+                                                        ),
+                                                    ),
+                                                ),
+                                                (
+                                                    "y",
+                                                    Literal(
+                                                        Int(
+                                                            "6",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
                                         ),
                                     ),
                                 ],

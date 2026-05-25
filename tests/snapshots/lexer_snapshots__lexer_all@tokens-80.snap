@@ -1,7 +1,7 @@
 ---
 source: tests/lexer_snapshots.rs
 expression: tokens
-input_file: examples/parser/parse_struct_with_multiple_fields.of
+input_file: examples/parser/parse_struct_with_generics.of
 ---
 Ok(
     [
@@ -13,67 +13,65 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Point",
+                "Box",
+            ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: LT,
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
             ),
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
+            token_type: GT,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
             token_type: LeftBrace,
-            position: 14,
+            position: 15,
             line: 1,
-            column: 15,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "x",
-            ),
-            position: 16,
-            line: 1,
-            column: 17,
-        },
-        Token {
-            token_type: Colon,
-            position: 17,
-            line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: Identifier(
-                "f64",
+                "value",
             ),
             position: 21,
             line: 1,
             column: 22,
         },
         Token {
-            token_type: Identifier(
-                "y",
-            ),
-            position: 23,
+            token_type: Colon,
+            position: 22,
             line: 1,
-            column: 24,
+            column: 23,
         },
         Token {
-            token_type: Colon,
+            token_type: Identifier(
+                "T",
+            ),
             position: 24,
             line: 1,
             column: 25,
         },
         Token {
-            token_type: Identifier(
-                "f64",
-            ),
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
             token_type: RightBrace,
-            position: 30,
+            position: 26,
             line: 1,
-            column: 31,
+            column: 27,
         },
     ],
 )

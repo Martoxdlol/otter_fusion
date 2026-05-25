@@ -1,14 +1,8 @@
 ---
 source: tests/validator_snapshots.rs
 expression: result
-input_file: examples/parser/parse_expr_binary_mixed.of
+input_file: examples/parser/parse_error_unexpected_token_at_item.of
 ---
-ValidationErrors(
-    [
-        "invalid operator 'Add' for operand of type 'null' in function 'test_module::test'",
-        "invalid operator 'Div' for operand of type 'null' in function 'test_module::test'",
-        "unknown variable 'x' in function 'test_module::test'",
-        "unknown variable 'y' in function 'test_module::test'",
-        "unknown variable 'z' in function 'test_module::test'",
-    ],
+ParserError(
+    "unexpected token integer '42'",
 )
