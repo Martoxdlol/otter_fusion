@@ -1,8 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/02_variables/var_with_type.of
+input_file: examples/spec/01_type_system/union_error_pattern.of
 ---
-ParserError(
-    "unexpected token 'var'",
-)
+Ok

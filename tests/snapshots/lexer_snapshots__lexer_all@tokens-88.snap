@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/parser/parse_type_expr_primitive.of
+input_file: examples/parser/parse_type_decl_unit.of
 ---
 Ok(
     [
@@ -13,31 +14,31 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "X",
+                "Age",
             ),
-            position: 6,
-            line: 1,
-            column: 7,
-        },
-        Token {
-            token_type: Eq,
             position: 8,
             line: 1,
             column: 9,
         },
         Token {
+            token_type: Eq,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
             token_type: Identifier(
                 "i32",
             ),
-            position: 12,
+            position: 14,
             line: 1,
-            column: 13,
+            column: 15,
         },
         Token {
             token_type: Semicolon,
-            position: 13,
+            position: 15,
             line: 1,
-            column: 14,
+            column: 16,
         },
     ],
 )

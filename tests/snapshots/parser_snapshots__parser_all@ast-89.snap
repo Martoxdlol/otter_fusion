@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/spec/01_type_system/discriminated_unions.of
+input_file: examples/parser/parse_type_expr_function_type.of
 ---
 Ok(
     Program {
@@ -9,20 +10,20 @@ Ok(
             Item {
                 kind: TypeAlias(
                     TypeAliasDecl {
-                        name: "Result",
+                        name: "X",
                         generics: [],
-                        ty: Union(
+                        ty: Function(
                             [
                                 Primitive(
-                                    Int64,
+                                    Int32,
                                 ),
                                 Primitive(
                                     String,
                                 ),
-                                Primitive(
-                                    Null,
-                                ),
                             ],
+                            Primitive(
+                                Bool,
+                            ),
                         ),
                     },
                 ),

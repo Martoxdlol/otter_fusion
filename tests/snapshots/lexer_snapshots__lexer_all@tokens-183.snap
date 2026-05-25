@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_while_non_bool_cond_errors.of
+input_file: examples/validator/p5_var_decl_no_type_no_init_errors.of
 ---
 Ok(
     [
@@ -38,48 +39,30 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: While,
+            token_type: Var,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
             position: 23,
             line: 1,
             column: 24,
         },
         Token {
-            token_type: LeftParen,
-            position: 25,
+            token_type: Semicolon,
+            position: 24,
             line: 1,
-            column: 26,
+            column: 25,
         },
         Token {
-            token_type: Int(
-                "5",
-            ),
+            token_type: RightBrace,
             position: 26,
             line: 1,
             column: 27,
-        },
-        Token {
-            token_type: RightParen,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 32,
-            line: 1,
-            column: 33,
         },
     ],
 )

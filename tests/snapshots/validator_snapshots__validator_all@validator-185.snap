@@ -1,0 +1,7 @@
+---
+source: tests/validator_snapshots.rs
+assertion_line: 51
+expression: result
+input_file: examples/validator/p5_var_decl_with_annotation_and_init.of
+---
+Ok

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_extern_function_pointer_params.of
+input_file: examples/parser/parse_extern_function_generic_pointer.of
 ---
 Ok(
     Program {
@@ -12,7 +13,12 @@ Ok(
                         name: "hashmap_set",
                         has_self_param: false,
                         is_extern: true,
-                        generics: [],
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         return_type: None,
                         params: [
                             ParamDecl {
@@ -25,7 +31,7 @@ Ok(
                             ParamDecl {
                                 name: "value",
                                 ty: Named(
-                                    "MyStruct",
+                                    "T",
                                     [],
                                 ),
                                 is_pointer: true,

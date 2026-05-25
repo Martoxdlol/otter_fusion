@@ -1,111 +1,120 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/spec/10_generics/generic_function.of
+input_file: examples/spec/08_numeric_conversions/float_narrowing.of
 ---
 Ok(
     [
         Token {
-            token_type: Function,
-            position: 8,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 9,
+            column: 4,
         },
         Token {
             token_type: Identifier(
-                "identity",
+                "high_precision",
             ),
-            position: 17,
-            line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: LT,
             position: 18,
             line: 1,
             column: 19,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: Colon,
             position: 19,
             line: 1,
             column: 20,
         },
         Token {
-            token_type: GT,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
             token_type: Identifier(
-                "value",
+                "f64",
             ),
-            position: 26,
+            position: 23,
             line: 1,
-            column: 27,
+            column: 24,
         },
         Token {
-            token_type: Colon,
-            position: 27,
+            token_type: Eq,
+            position: 25,
             line: 1,
-            column: 28,
+            column: 26,
         },
         Token {
-            token_type: Identifier(
-                "T",
-            ),
-            position: 29,
-            line: 1,
-            column: 30,
-        },
-        Token {
-            token_type: RightParen,
-            position: 30,
-            line: 1,
-            column: 31,
-        },
-        Token {
-            token_type: Colon,
-            position: 31,
-            line: 1,
-            column: 32,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
+            token_type: Float(
+                "123.456",
             ),
             position: 33,
             line: 1,
             column: 34,
         },
         Token {
-            token_type: LeftBrace,
-            position: 35,
+            token_type: Semicolon,
+            position: 34,
             line: 1,
-            column: 36,
+            column: 35,
+        },
+        Token {
+            token_type: Var,
+            position: 38,
+            line: 2,
+            column: 4,
         },
         Token {
             token_type: Identifier(
-                "value",
+                "low_precision",
             ),
-            position: 43,
+            position: 52,
             line: 2,
-            column: 8,
+            column: 18,
         },
         Token {
-            token_type: RightBrace,
-            position: 45,
-            line: 3,
-            column: 2,
+            token_type: Colon,
+            position: 53,
+            line: 2,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 57,
+            line: 2,
+            column: 23,
+        },
+        Token {
+            token_type: Eq,
+            position: 59,
+            line: 2,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "high_precision",
+            ),
+            position: 74,
+            line: 2,
+            column: 40,
+        },
+        Token {
+            token_type: As,
+            position: 77,
+            line: 2,
+            column: 43,
+        },
+        Token {
+            token_type: Identifier(
+                "f32",
+            ),
+            position: 81,
+            line: 2,
+            column: 47,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 82,
+            line: 2,
+            column: 48,
         },
     ],
 )

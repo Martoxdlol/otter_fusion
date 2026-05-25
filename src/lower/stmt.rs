@@ -47,6 +47,39 @@ impl Lower {
                 let _ = self.lower_expr(e, subst, b);
             }
 
+            HirStatement::AssignVar(name, target_ty, value) => {
+                let local = b
+                    .lookup(name)
+                    .unwrap_or_else(|| panic!("assignment to unbound variable `{}`", name));
+                let raw = self.lower_expr(value, subst, b);
+                let op = self.coerce_to_subst(raw, &value.ty, target_ty, subst, b);
+                b.push_stmt(Stmt::Assign(local, AssignValue::Use(op)));
+            }
+
+            HirStatement::AssignField(recv, field, value) => {
+                let recv_op = self.lower_expr(recv, subst, b);
+                let recv_ty = subst.apply(&recv.ty);
+                let recv_mir = self.lower_type(&recv.ty, subst);
+                let recv_local = match recv_op {
+                    Operand::Copy(l) | Operand::Move(l) => l,
+                    Operand::Const(_) => {
+                        let tmp = b.new_temp(recv_mir);
+                        b.push_stmt(Stmt::Assign(tmp, AssignValue::Use(recv_op)));
+                        tmp
+                    }
+                };
+                let (offset, field_mir_ty, field_resolved_ty) =
+                    self.resolve_field_layout(&recv_ty, field, subst);
+                let raw = self.lower_expr(value, subst, b);
+                let value_op = self.coerce_to_subst(raw, &value.ty, &field_resolved_ty, subst, b);
+                b.push_stmt(Stmt::StoreField {
+                    recv: recv_local,
+                    offset,
+                    field_ty: field_mir_ty,
+                    value: value_op,
+                });
+            }
+
             HirStatement::While(cond, body) => {
                 self.lower_while(cond, body, subst, b);
             }

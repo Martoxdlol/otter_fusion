@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_struct_with_method.of
+input_file: examples/parser/parse_optional_generic_params.of
 ---
 Ok(
     Program {
@@ -9,35 +10,20 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Foo",
+                        name: "Point",
                         is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "bar",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        Int32,
-                                    ),
-                                ),
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 1,
-                                    col: 22,
-                                    len: 8,
-                                },
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                            GenericParam {
+                                name: "U",
+                                bounds: [],
                             },
                         ],
+                        fields: [],
+                        methods: [],
                         implements: [],
                     },
                 ),

@@ -253,6 +253,15 @@ pub struct MirBlock {
 #[derive(Debug, Clone)]
 pub enum Stmt {
     Assign(LocalId, AssignValue),
+    /// Store `value` into `recv`'s field at the given byte offset. `field_ty`
+    /// describes the field's MIR type so the backend can emit the right
+    /// store width and write-barrier treatment.
+    StoreField {
+        recv: LocalId,
+        offset: u32,
+        field_ty: MirType,
+        value: Operand,
+    },
 }
 
 /// The value at the right

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_logical_op_requires_bool.of
+input_file: examples/validator/p5_continue_inside_while_ok.of
 ---
 Ok(
     Program {
@@ -18,20 +19,18 @@ Ok(
                         body: Some(
                             Block {
                                 statements: [
-                                    Expr(
-                                        BinaryOp(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
-                                            ),
-                                            And,
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
+                                    While(
+                                        Literal(
+                                            Bool(
+                                                true,
                                             ),
                                         ),
+                                        Block {
+                                            statements: [
+                                                Continue,
+                                            ],
+                                            returns: None,
+                                        },
                                     ),
                                 ],
                                 returns: None,

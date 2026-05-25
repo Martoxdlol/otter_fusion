@@ -1,144 +1,171 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/spec/14_ffi/extern_function_export.of
+input_file: examples/spec/12_control_flow/while_loop.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
-            position: 6,
+            token_type: Var,
+            position: 3,
             line: 1,
-            column: 7,
-        },
-        Token {
-            token_type: Function,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: Identifier(
-                "on_tick",
-            ),
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: Colon,
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Star,
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Identifier(
-                "MyStruct",
-            ),
-            position: 36,
-            line: 1,
-            column: 37,
-        },
-        Token {
-            token_type: RightParen,
-            position: 37,
-            line: 1,
-            column: 38,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 39,
-            line: 1,
-            column: 40,
-        },
-        Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 43,
-            line: 2,
             column: 4,
         },
         Token {
-            token_type: Dot,
-            position: 44,
-            line: 2,
-            column: 5,
-        },
-        Token {
             token_type: Identifier(
-                "counter",
+                "i",
             ),
-            position: 51,
-            line: 2,
-            column: 12,
+            position: 5,
+            line: 1,
+            column: 6,
         },
         Token {
             token_type: Eq,
-            position: 53,
+            position: 7,
+            line: 1,
+            column: 8,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: While,
+            position: 16,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 18,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 19,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: LT,
+            position: 21,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 24,
             line: 2,
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "d",
-            ),
-            position: 55,
+            token_type: RightParen,
+            position: 25,
             line: 2,
-            column: 16,
+            column: 15,
         },
         Token {
-            token_type: Dot,
-            position: 56,
+            token_type: LeftBrace,
+            position: 27,
             line: 2,
             column: 17,
         },
         Token {
             token_type: Identifier(
-                "counter",
+                "print",
             ),
-            position: 63,
-            line: 2,
-            column: 24,
+            position: 35,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 36,
+            line: 3,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 37,
+            line: 3,
+            column: 10,
+        },
+        Token {
+            token_type: RightParen,
+            position: 38,
+            line: 3,
+            column: 11,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 39,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 43,
+            line: 4,
+            column: 4,
+        },
+        Token {
+            token_type: Eq,
+            position: 45,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 47,
+            line: 4,
+            column: 8,
         },
         Token {
             token_type: Plus,
-            position: 65,
-            line: 2,
-            column: 26,
+            position: 49,
+            line: 4,
+            column: 10,
         },
         Token {
             token_type: Int(
                 "1",
             ),
-            position: 67,
-            line: 2,
-            column: 28,
+            position: 51,
+            line: 4,
+            column: 12,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 52,
+            line: 4,
+            column: 13,
         },
         Token {
             token_type: RightBrace,
-            position: 69,
-            line: 3,
+            position: 54,
+            line: 5,
             column: 2,
         },
     ],

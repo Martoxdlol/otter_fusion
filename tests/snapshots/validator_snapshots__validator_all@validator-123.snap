@@ -1,8 +1,9 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/13_iterators/iterator_interface.of
+input_file: examples/spec/12_control_flow/break_continue.of
 ---
 ParserError(
-    "unexpected token '('",
+    "unexpected token 'for'",
 )

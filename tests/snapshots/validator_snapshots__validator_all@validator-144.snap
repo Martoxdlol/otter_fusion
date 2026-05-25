@@ -1,10 +1,9 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p2_unknown_type_errors.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'Nope' in module 'test_module'",
-    ],
+ParserError(
+    "unexpected token '*'",
 )

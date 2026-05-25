@@ -1,10 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p4_universal_extend_satisfies_interface.of
+input_file: examples/validator/p4_interface_method_signature_mismatch_errors.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'T' in module 'test_module'",
-    ],
-)
+Ok

@@ -360,6 +360,35 @@ fn lower_stmt<M: Module>(
                 b.def_var(var, v);
             }
         }
+        Stmt::StoreField {
+            recv,
+            offset,
+            field_ty,
+            value,
+        } => {
+            let recv_v = match ctx.vars.get(recv).copied() {
+                Some(var) => b.use_var(var),
+                None => panic!("StoreField on unbound receiver local"),
+            };
+            let value_v = use_operand(module, b, func_ids, ctx, value);
+            let addr = if *offset == 0 {
+                recv_v
+            } else {
+                b.ins().iadd_imm(recv_v, *offset as i64)
+            };
+            match field_ty {
+                MirType::Union(_) => {
+                    // Unions occupy a 16-byte tag+payload region; copy both halves
+                    let lo = b.ins().load(types::I64, MemFlags::trusted(), value_v, 0);
+                    b.ins().store(MemFlags::trusted(), lo, addr, 0);
+                    let hi = b.ins().load(types::I64, MemFlags::trusted(), value_v, 8);
+                    b.ins().store(MemFlags::trusted(), hi, addr, 8);
+                }
+                _ => {
+                    b.ins().store(MemFlags::trusted(), value_v, addr, 0);
+                }
+            }
+        }
     }
 }
 

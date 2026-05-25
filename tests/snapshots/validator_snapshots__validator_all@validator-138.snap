@@ -1,10 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p2_generic_arity_mismatch_errors.of
+input_file: examples/validator/p2_bound_must_be_interface.of
 ---
 ValidationErrors(
     [
-        "type 'Wrapper' in module 'test_module' expects 1 generic argument(s), got 2",
+        "bound on type parameter 'T' in test_module::Foo must be an interface",
     ],
 )

@@ -1,57 +1,58 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/parser/parse_simple_struct.of
+input_file: examples/parser/parse_interface_decl_unit.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Interface,
+            position: 9,
             line: 1,
-            column: 7,
+            column: 10,
         },
         Token {
             token_type: Identifier(
-                "Point",
+                "Named",
             ),
-            position: 12,
+            position: 15,
             line: 1,
-            column: 13,
+            column: 16,
         },
         Token {
             token_type: LeftBrace,
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Identifier(
-                "x",
-            ),
-            position: 16,
-            line: 1,
-            column: 17,
-        },
-        Token {
-            token_type: Colon,
             position: 17,
             line: 1,
             column: 18,
         },
         Token {
             token_type: Identifier(
-                "i32",
+                "name",
             ),
-            position: 21,
+            position: 22,
             line: 1,
-            column: 22,
+            column: 23,
         },
         Token {
-            token_type: RightBrace,
+            token_type: Colon,
             position: 23,
             line: 1,
             column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 29,
+            line: 1,
+            column: 30,
         },
     ],
 )

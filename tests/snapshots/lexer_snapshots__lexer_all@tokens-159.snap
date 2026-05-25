@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_binary_op_type_mismatch_errors.of
+input_file: examples/validator/p5_as_cast_changes_type.of
 ---
 Ok(
     [
@@ -38,38 +39,64 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Int(
-                "5",
-            ),
+            token_type: LeftParen,
             position: 19,
             line: 1,
             column: 20,
         },
         Token {
-            token_type: Plus,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: Float(
-                "5.0",
+            token_type: Int(
+                "5",
             ),
-            position: 25,
+            position: 20,
             line: 1,
-            column: 26,
+            column: 21,
         },
         Token {
-            token_type: Semicolon,
-            position: 26,
+            token_type: As,
+            position: 23,
             line: 1,
-            column: 27,
+            column: 24,
         },
         Token {
-            token_type: RightBrace,
+            token_type: Identifier(
+                "f64",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
             position: 28,
             line: 1,
             column: 29,
+        },
+        Token {
+            token_type: Plus,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: Float(
+                "2.0",
+            ),
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 37,
+            line: 1,
+            column: 38,
         },
     ],
 )

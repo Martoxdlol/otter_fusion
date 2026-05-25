@@ -427,7 +427,7 @@ impl ValidationError {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum ScopeEntry {
     Type(TypeId),
     Function(FnId),
@@ -882,10 +882,23 @@ impl Validator {
 
                 if importer_scope.direct.contains_key(&local) {
                     if importer_scope.imported_names.contains(&local) {
-                        self.errors.push(ValidationError::DuplicateImport {
-                            in_module: importer_name.clone(),
-                            local_name: local.clone(),
-                        });
+                        // Re-importing the *same* symbol from the *same* source
+                        // is harmless — that happens routinely when the implicit
+                        // prelude and an explicit `import { ... } from "of:core"`
+                        // both touch a core name like `Buffer`. Only fire the
+                        // duplicate error when the local name resolves to a
+                        // different entry than what's already in scope.
+                        let same = importer_scope
+                            .direct
+                            .get(&local)
+                            .map(|existing| existing == &entry)
+                            .unwrap_or(false);
+                        if !same {
+                            self.errors.push(ValidationError::DuplicateImport {
+                                in_module: importer_name.clone(),
+                                local_name: local.clone(),
+                            });
+                        }
                         continue;
                     }
                     // Local definition shadows the import; record in HIR but
@@ -1814,10 +1827,112 @@ impl Validator {
     ) -> Option<HirStatement> {
         match stmt {
             ast::Statement::Assign(target, value) => {
-                // TODO: implement assignment validation
-                let _typed_target = self.check_expr(target, fn_label, module, generics, locals, return_type, loop_depth, None);
-                let typed_value = self.check_expr(value, fn_label, module, generics, locals, return_type, loop_depth, None);
-                Some(HirStatement::Expr(typed_value))
+                // Two supported lvalue shapes: a bare variable (local in
+                // scope) and `recv.field` where `recv` is a managed struct
+                // (or interface) instance. Anything else is a type error.
+                match target {
+                    ast::Expr::Variable(name) => {
+                        let target_ty = locals
+                            .iter()
+                            .rev()
+                            .find_map(|scope| scope.get(name).cloned());
+                        let target_ty = match target_ty {
+                            Some(t) => t,
+                            None => {
+                                self.errors.push(ValidationError::UnknownVariable {
+                                    function: fn_label.to_string(),
+                                    name: name.clone(),
+                                });
+                                ResolvedType::Null
+                            }
+                        };
+                        let typed_value = self.check_expr(
+                            value, fn_label, module, generics, locals, return_type, loop_depth,
+                            Some(&target_ty),
+                        );
+                        if !types_compatible(&typed_value.ty, &target_ty) {
+                            self.errors.push(ValidationError::TypeMismatch {
+                                function: fn_label.to_string(),
+                                context: format!("assignment to '{}'", name),
+                                expected: format_type(&target_ty),
+                                actual: format_type(&typed_value.ty),
+                            });
+                        }
+                        Some(HirStatement::AssignVar(
+                            name.clone(),
+                            target_ty,
+                            typed_value,
+                        ))
+                    }
+                    ast::Expr::Member(recv, field) => {
+                        let typed_recv = self.check_expr(
+                            recv, fn_label, module, generics, locals, return_type, loop_depth, None,
+                        );
+                        let field_ty = match &typed_recv.ty {
+                            ResolvedType::Struct(id, args) => {
+                                let s = self.hir.structs[id].clone();
+                                let mut subst: HashMap<TypeParamId, ResolvedType> =
+                                    HashMap::new();
+                                for (tp, arg) in s.type_params.iter().zip(args.iter()) {
+                                    subst.insert(*tp, arg.clone());
+                                }
+                                s.fields
+                                    .iter()
+                                    .find(|f| &f.name == field)
+                                    .map(|f| substitute(&f.ty, &subst))
+                            }
+                            ResolvedType::Interface(id, args) => {
+                                let i = self.hir.interfaces[id].clone();
+                                let mut subst: HashMap<TypeParamId, ResolvedType> =
+                                    HashMap::new();
+                                for (tp, arg) in i.type_params.iter().zip(args.iter()) {
+                                    subst.insert(*tp, arg.clone());
+                                }
+                                i.fields
+                                    .iter()
+                                    .find(|f| &f.name == field)
+                                    .map(|f| substitute(&f.ty, &subst))
+                            }
+                            _ => None,
+                        };
+                        let field_ty = match field_ty {
+                            Some(t) => t,
+                            None => {
+                                self.errors.push(ValidationError::UnknownMember {
+                                    function: fn_label.to_string(),
+                                    on: format_type(&typed_recv.ty),
+                                    member: field.clone(),
+                                });
+                                ResolvedType::Null
+                            }
+                        };
+                        let typed_value = self.check_expr(
+                            value, fn_label, module, generics, locals, return_type, loop_depth,
+                            Some(&field_ty),
+                        );
+                        if !types_compatible(&typed_value.ty, &field_ty) {
+                            self.errors.push(ValidationError::TypeMismatch {
+                                function: fn_label.to_string(),
+                                context: format!("assignment to field '{}'", field),
+                                expected: format_type(&field_ty),
+                                actual: format_type(&typed_value.ty),
+                            });
+                        }
+                        Some(HirStatement::AssignField(typed_recv, field.clone(), typed_value))
+                    }
+                    _ => {
+                        self.errors.push(ValidationError::TypeMismatch {
+                            function: fn_label.to_string(),
+                            context: "assignment target".to_string(),
+                            expected: "variable or field access".to_string(),
+                            actual: "complex expression".to_string(),
+                        });
+                        let typed_value = self.check_expr(
+                            value, fn_label, module, generics, locals, return_type, loop_depth, None,
+                        );
+                        Some(HirStatement::Expr(typed_value))
+                    }
+                }
             }
             ast::Statement::VarDecl(name, ty, init) => {
                 let annotated = ty.as_ref().map(|t| {
@@ -3676,7 +3791,7 @@ fn format_named(kind: &str, id: u32, args: &[ResolvedType]) -> String {
     }
 }
 
-fn substitute(ty: &ResolvedType, subst: &HashMap<TypeParamId, ResolvedType>) -> ResolvedType {
+pub fn substitute(ty: &ResolvedType, subst: &HashMap<TypeParamId, ResolvedType>) -> ResolvedType {
     match ty {
         ResolvedType::TypeParam(id) => subst.get(id).cloned().unwrap_or_else(|| ty.clone()),
         ResolvedType::Struct(id, args) => ResolvedType::Struct(

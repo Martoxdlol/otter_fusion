@@ -1,6 +1,12 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/parser/parse_type_decl_unit.of
+input_file: examples/parser/parse_implements_clause.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'Drawable' in module 'test_module'",
+        "unknown type 'Movable' in module 'test_module'",
+    ],
+)

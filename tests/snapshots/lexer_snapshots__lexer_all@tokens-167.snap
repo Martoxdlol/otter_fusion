@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_is_check_yields_bool.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     [
@@ -46,30 +47,30 @@ Ok(
             column: 20,
         },
         Token {
-            token_type: Is,
+            token_type: EqEq,
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
-            token_type: Identifier(
-                "i64",
+            token_type: Int(
+                "5",
             ),
-            position: 26,
+            position: 24,
             line: 1,
-            column: 27,
+            column: 25,
         },
         Token {
             token_type: Semicolon,
-            position: 27,
+            position: 25,
             line: 1,
-            column: 28,
+            column: 26,
         },
         Token {
             token_type: RightBrace,
-            position: 29,
+            position: 27,
             line: 1,
-            column: 30,
+            column: 28,
         },
     ],
 )

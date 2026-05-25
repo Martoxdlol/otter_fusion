@@ -1,28 +1,22 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/spec/05_extensions/extend_generic.of
+input_file: examples/spec/04_structs_interfaces/struct_implements.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Wrapper",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
                         fields: [
                             FieldDecl {
-                                name: "value",
-                                ty: Named(
-                                    "T",
-                                    [],
+                                name: "name",
+                                ty: Primitive(
+                                    String,
                                 ),
                                 is_pointer: false,
                             },
@@ -33,39 +27,41 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
             Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Wrapper",
-                            [
-                                Named(
-                                    "T",
-                                    [],
+                kind: Struct(
+                    StructDecl {
+                        name: "Person",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
                                 ),
-                            ],
-                        ),
-                        generic_params: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "age",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
                             },
                         ],
-                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "get",
+                                name: "greet",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
                                 return_type: Some(
-                                    Named(
-                                        "T",
-                                        [],
+                                    Primitive(
+                                        String,
                                     ),
                                 ),
                                 params: [],
@@ -73,19 +69,33 @@ Ok(
                                     Block {
                                         statements: [],
                                         returns: Some(
-                                            Member(
-                                                SelfRef,
-                                                "value",
+                                            BinaryOp(
+                                                Literal(
+                                                    String(
+                                                        "Hello, ",
+                                                    ),
+                                                ),
+                                                Add,
+                                                Member(
+                                                    SelfRef,
+                                                    "name",
+                                                ),
                                             ),
                                         ),
                                     },
                                 ),
                                 span: Span {
-                                    line: 6,
+                                    line: 9,
                                     col: 11,
                                     len: 8,
                                 },
                             },
+                        ],
+                        implements: [
+                            Named(
+                                "Named",
+                                [],
+                            ),
                         ],
                     },
                 ),

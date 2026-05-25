@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_type_expr_primitive.of
+input_file: examples/parser/parse_type_decl_unit.of
 ---
 Ok(
     Program {
@@ -9,7 +10,7 @@ Ok(
             Item {
                 kind: TypeAlias(
                     TypeAliasDecl {
-                        name: "X",
+                        name: "Age",
                         generics: [],
                         ty: Primitive(
                             Int32,

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p3_universal_extend_records_typeparam_args.of
+input_file: examples/validator/p3_extend_adds_specialised_method.of
 ---
 Ok(
     Program {
@@ -9,14 +10,9 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Box",
+                        name: "Foo",
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                        generics: [],
                         fields: [],
                         methods: [],
                         implements: [],
@@ -32,19 +28,14 @@ Ok(
                 kind: Extend(
                     ExtendDecl {
                         target: Named(
-                            "Box",
-                            [
-                                Named(
-                                    "U",
-                                    [],
-                                ),
-                            ],
+                            "Foo",
+                            [],
                         ),
                         generic_params: [],
                         implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "peek",
+                                name: "m",
                                 has_self_param: false,
                                 is_extern: false,
                                 generics: [],
@@ -58,7 +49,7 @@ Ok(
                                 ),
                                 span: Span {
                                     line: 2,
-                                    col: 25,
+                                    col: 22,
                                     len: 8,
                                 },
                             },

@@ -1,10 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p5_unknown_variable_errors.of
+input_file: examples/validator/p5_struct_init_extra_field_errors.of
 ---
 ValidationErrors(
     [
-        "unknown variable 'oops' in function 'test_module::test'",
+        "unknown field 'y' when initializing 'S' in function 'test_module::test'",
     ],
 )

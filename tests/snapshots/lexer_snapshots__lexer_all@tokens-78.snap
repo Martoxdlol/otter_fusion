@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/parser/parse_optional_generic_params.of
+input_file: examples/parser/parse_implements_clause.of
 ---
 Ok(
     [
@@ -20,50 +21,44 @@ Ok(
             column: 13,
         },
         Token {
-            token_type: LT,
-            position: 13,
-            line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
-            ),
+            token_type: Colon,
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: Comma,
-            position: 15,
+            token_type: Identifier(
+                "Movable",
+            ),
+            position: 22,
             line: 1,
-            column: 16,
+            column: 23,
+        },
+        Token {
+            token_type: Plus,
+            position: 24,
+            line: 1,
+            column: 25,
         },
         Token {
             token_type: Identifier(
-                "U",
+                "Drawable",
             ),
-            position: 17,
+            position: 33,
             line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: GT,
-            position: 18,
-            line: 1,
-            column: 19,
+            column: 34,
         },
         Token {
             token_type: LeftBrace,
-            position: 20,
+            position: 35,
             line: 1,
-            column: 21,
+            column: 36,
         },
         Token {
             token_type: RightBrace,
-            position: 21,
+            position: 36,
             line: 1,
-            column: 22,
+            column: 37,
         },
     ],
 )

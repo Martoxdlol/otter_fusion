@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_is_check_yields_bool.of
+input_file: examples/validator/p5_comparison_yields_bool.of
 ---
 Ok(
     Program {
@@ -19,14 +20,17 @@ Ok(
                             Block {
                                 statements: [
                                     Expr(
-                                        Is(
+                                        BinaryOp(
                                             Literal(
                                                 Int(
                                                     "5",
                                                 ),
                                             ),
-                                            Primitive(
-                                                Int64,
+                                            Eq,
+                                            Literal(
+                                                Int(
+                                                    "5",
+                                                ),
                                             ),
                                         ),
                                     ),

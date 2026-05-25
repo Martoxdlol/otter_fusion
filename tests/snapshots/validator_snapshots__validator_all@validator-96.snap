@@ -1,6 +1,9 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/03_functions/early_return.of
+input_file: examples/spec/02_variables/var_from_if.of
 ---
-Ok
+ParserError(
+    "unexpected token 'var'",
+)

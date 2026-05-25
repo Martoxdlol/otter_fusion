@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_map_literal.of
+input_file: examples/parser/parse_function_no_params.of
 ---
 Ok(
     Program {
@@ -9,7 +10,7 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "test",
+                        name: "noop",
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
@@ -17,38 +18,7 @@ Ok(
                         params: [],
                         body: Some(
                             Block {
-                                statements: [
-                                    Expr(
-                                        LiteralMap(
-                                            [
-                                                (
-                                                    Literal(
-                                                        String(
-                                                            "a",
-                                                        ),
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "1",
-                                                        ),
-                                                    ),
-                                                ),
-                                                (
-                                                    Literal(
-                                                        String(
-                                                            "b",
-                                                        ),
-                                                    ),
-                                                    Literal(
-                                                        Int(
-                                                            "2",
-                                                        ),
-                                                    ),
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                ],
+                                statements: [],
                                 returns: None,
                             },
                         ),

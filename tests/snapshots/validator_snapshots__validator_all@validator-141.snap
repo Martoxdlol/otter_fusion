@@ -1,8 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p2_pointer_outside_extern_errors.of
+input_file: examples/validator/p2_generic_arity_mismatch_errors.of
 ---
-ParserError(
-    "unexpected token '*'",
+ValidationErrors(
+    [
+        "type 'Wrapper' in module 'test_module' expects 1 generic argument(s), got 2",
+    ],
 )

@@ -1,55 +1,72 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
+input_file: examples/validator/p2_function_signature_resolved.of
 ---
 Ok(
     [
         Token {
-            token_type: Extern,
-            position: 6,
+            token_type: Function,
+            position: 8,
             line: 1,
-            column: 7,
+            column: 9,
         },
         Token {
-            token_type: Struct,
+            token_type: Identifier(
+                "add",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: LeftParen,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
             token_type: Identifier(
-                "Cfg",
+                "a",
             ),
-            position: 17,
+            position: 14,
             line: 1,
-            column: 18,
+            column: 15,
         },
         Token {
-            token_type: LeftBrace,
+            token_type: Colon,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
             position: 19,
             line: 1,
             column: 20,
         },
         Token {
-            token_type: Identifier(
-                "p",
-            ),
-            position: 21,
+            token_type: Comma,
+            position: 20,
             line: 1,
-            column: 22,
+            column: 21,
         },
         Token {
-            token_type: Colon,
+            token_type: Identifier(
+                "b",
+            ),
             position: 22,
             line: 1,
             column: 23,
         },
         Token {
-            token_type: Star,
-            position: 24,
+            token_type: Colon,
+            position: 23,
             line: 1,
-            column: 25,
+            column: 24,
         },
         Token {
             token_type: Identifier(
@@ -60,10 +77,44 @@ Ok(
             column: 28,
         },
         Token {
-            token_type: RightBrace,
+            token_type: RightParen,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
             position: 29,
             line: 1,
             column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "a",
+            ),
+            position: 37,
+            line: 1,
+            column: 38,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 39,
+            line: 1,
+            column: 40,
         },
     ],
 )

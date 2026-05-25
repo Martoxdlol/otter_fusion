@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_type_expr_named_with_type_args.of
+input_file: examples/parser/parse_type_alias_with_generics.of
 ---
 Ok(
     Program {
@@ -9,13 +10,21 @@ Ok(
             Item {
                 kind: TypeAlias(
                     TypeAliasDecl {
-                        name: "X",
-                        generics: [],
-                        ty: Named(
-                            "List",
+                        name: "Option",
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        ty: Union(
                             [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
                                 Primitive(
-                                    Int32,
+                                    Null,
                                 ),
                             ],
                         ),

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p1_struct_skeleton_inserted.of
+input_file: examples/validator/p1_duplicate_name_in_module_errors.of
 ---
 Ok(
     Program {
@@ -9,7 +10,7 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Foo",
+                        name: "X",
                         is_extern: false,
                         generics: [],
                         fields: [],
@@ -21,6 +22,34 @@ Ok(
                     line: 1,
                     col: 7,
                     len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "X",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_call_arg_type_mismatch_errors.of
+input_file: examples/validator/p5_binary_op_arithmetic_on_non_numeric_errors.of
 ---
 Ok(
     [
@@ -13,129 +14,63 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "f",
+                "test",
             ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "a",
-            ),
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: Colon,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
             position: 17,
             line: 1,
             column: 18,
         },
         Token {
-            token_type: RightParen,
-            position: 18,
+            token_type: Int(
+                "5",
+            ),
+            position: 19,
             line: 1,
-            column: 19,
+            column: 20,
         },
         Token {
-            token_type: LeftBrace,
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: Plus,
             position: 21,
             line: 1,
             column: 22,
         },
         Token {
-            token_type: Function,
-            position: 30,
-            line: 2,
-            column: 9,
-        },
-        Token {
-            token_type: Identifier(
-                "test",
-            ),
-            position: 35,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 36,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: RightParen,
-            position: 37,
-            line: 2,
-            column: 16,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 39,
-            line: 2,
-            column: 18,
-        },
-        Token {
-            token_type: Identifier(
-                "f",
-            ),
-            position: 41,
-            line: 2,
-            column: 20,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 42,
-            line: 2,
-            column: 21,
-        },
-        Token {
             token_type: StringLit(
-                "hola",
+                "hello",
             ),
-            position: 48,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: RightParen,
-            position: 49,
-            line: 2,
-            column: 28,
+            position: 29,
+            line: 1,
+            column: 30,
         },
         Token {
             token_type: Semicolon,
-            position: 50,
-            line: 2,
-            column: 29,
+            position: 30,
+            line: 1,
+            column: 31,
         },
         Token {
             token_type: RightBrace,
-            position: 52,
-            line: 2,
-            column: 31,
+            position: 32,
+            line: 1,
+            column: 33,
         },
     ],
 )

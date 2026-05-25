@@ -1,99 +1,96 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
 Ok(
     [
         Token {
-            token_type: Interface,
-            position: 9,
+            token_type: Type,
+            position: 4,
             line: 1,
-            column: 10,
+            column: 5,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "MyInt",
             ),
-            position: 11,
+            position: 10,
             line: 1,
-            column: 12,
+            column: 11,
         },
         Token {
-            token_type: LeftBrace,
-            position: 13,
+            token_type: Eq,
+            position: 12,
             line: 1,
-            column: 14,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Extend,
-            position: 21,
-            line: 2,
-            column: 7,
+            column: 13,
         },
         Token {
             token_type: Identifier(
-                "I",
+                "i64",
             ),
-            position: 23,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Function,
+            position: 26,
             line: 2,
             column: 9,
         },
         Token {
-            token_type: LeftBrace,
-            position: 25,
+            token_type: Identifier(
+                "foo",
+            ),
+            position: 30,
             line: 2,
-            column: 11,
+            column: 13,
         },
         Token {
-            token_type: Function,
-            position: 34,
+            token_type: LeftParen,
+            position: 31,
             line: 2,
-            column: 20,
+            column: 14,
+        },
+        Token {
+            token_type: RightParen,
+            position: 32,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 33,
+            line: 2,
+            column: 16,
         },
         Token {
             token_type: Identifier(
-                "f",
+                "MyInt",
             ),
-            position: 36,
+            position: 39,
             line: 2,
             column: 22,
         },
         Token {
-            token_type: LeftParen,
-            position: 37,
-            line: 2,
-            column: 23,
-        },
-        Token {
-            token_type: RightParen,
-            position: 38,
+            token_type: LeftBrace,
+            position: 41,
             line: 2,
             column: 24,
         },
         Token {
-            token_type: LeftBrace,
-            position: 40,
-            line: 2,
-            column: 26,
-        },
-        Token {
             token_type: RightBrace,
-            position: 41,
+            position: 42,
             line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 43,
-            line: 2,
-            column: 29,
+            column: 25,
         },
     ],
 )

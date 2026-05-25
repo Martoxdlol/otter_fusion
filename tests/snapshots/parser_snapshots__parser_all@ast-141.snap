@@ -1,8 +1,74 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_pointer_outside_extern_errors.of
+input_file: examples/validator/p2_generic_arity_mismatch_errors.of
 ---
-Err(
-    "unexpected token '*'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Wrapper",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "u",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "Wrapper",
+                                [
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                ],
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
 )

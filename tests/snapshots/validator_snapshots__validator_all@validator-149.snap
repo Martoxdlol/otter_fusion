@@ -1,6 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p4_default_method_does_not_require_struct_impl.of
+input_file: examples/validator/p3_extend_on_interface_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "invalid extend target in module 'test_module'",
+    ],
+)

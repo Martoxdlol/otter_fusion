@@ -1,38 +1,51 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_type_alias_with_generics.of
+input_file: examples/parser/parse_struct_with_method.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Option",
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
+                kind: Struct(
+                    StructDecl {
+                        name: "Foo",
+                        is_extern: false,
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "bar",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Int32,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 1,
+                                    col: 22,
+                                    len: 8,
+                                },
                             },
                         ],
-                        ty: Union(
-                            [
-                                Named(
-                                    "T",
-                                    [],
-                                ),
-                                Primitive(
-                                    Null,
-                                ),
-                            ],
-                        ),
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/parser/parse_type_expr_function_type.of
+input_file: examples/parser/parse_type_alias_union.of
 ---
 Ok(
     [
@@ -13,77 +14,45 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "X",
+                "Result",
             ),
-            position: 6,
+            position: 11,
             line: 1,
-            column: 7,
+            column: 12,
         },
         Token {
             token_type: Eq,
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "i32",
-            ),
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: Comma,
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
             token_type: Identifier(
-                "str",
+                "i64",
             ),
-            position: 18,
+            position: 17,
             line: 1,
-            column: 19,
+            column: 18,
         },
         Token {
-            token_type: RightParen,
+            token_type: Pipe,
             position: 19,
             line: 1,
             column: 20,
         },
         Token {
-            token_type: Minus,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: GT,
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
             token_type: Identifier(
-                "bool",
+                "str",
             ),
-            position: 27,
+            position: 23,
             line: 1,
-            column: 28,
+            column: 24,
         },
         Token {
             token_type: Semicolon,
-            position: 28,
+            position: 24,
             line: 1,
-            column: 29,
+            column: 25,
         },
     ],
 )

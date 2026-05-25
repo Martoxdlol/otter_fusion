@@ -1,60 +1,27 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_function_signature_resolved.of
+input_file: examples/validator/p1_struct_skeleton_inserted.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "add",
-                        has_self_param: false,
+                kind: Struct(
+                    StructDecl {
+                        name: "Foo",
                         is_extern: false,
                         generics: [],
-                        return_type: Some(
-                            Primitive(
-                                Int64,
-                            ),
-                        ),
-                        params: [
-                            ParamDecl {
-                                name: "a",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                            ParamDecl {
-                                name: "b",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: Some(
-                                    Variable(
-                                        "a",
-                                    ),
-                                ),
-                            },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
+                        fields: [],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 9,
-                    len: 8,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

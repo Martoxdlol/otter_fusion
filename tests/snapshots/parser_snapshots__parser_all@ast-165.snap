@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_continue_inside_while_ok.of
+input_file: examples/validator/p5_call_arity_mismatch_errors.of
 ---
 Ok(
     Program {
@@ -9,29 +10,23 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "test",
+                        name: "f",
                         has_self_param: false,
                         is_extern: false,
                         generics: [],
                         return_type: None,
-                        params: [],
+                        params: [
+                            ParamDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
                         body: Some(
                             Block {
-                                statements: [
-                                    While(
-                                        Literal(
-                                            Bool(
-                                                true,
-                                            ),
-                                        ),
-                                        Block {
-                                            statements: [
-                                                Continue,
-                                            ],
-                                            returns: None,
-                                        },
-                                    ),
-                                ],
+                                statements: [],
                                 returns: None,
                             },
                         ),
@@ -44,6 +39,44 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "test",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "f",
+                                            ),
+                                            [],
+                                            [],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

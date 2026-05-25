@@ -90,6 +90,23 @@ pub unsafe extern "C" fn __of_bind(fd: c_int, addr: *mut Buffer, len: u32) -> c_
     }
 }
 
+// Toggle SO_REUSEADDR on a socket. Returns 0 on success, -1 on error
+// (errno is set as usual). Lets a server rebind to its port immediately
+// after a previous instance exits, instead of waiting out TIME_WAIT.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_set_reuseaddr(fd: c_int, on: u8) -> c_int {
+    let val: c_int = if on != 0 { 1 } else { 0 };
+    unsafe {
+        libc::setsockopt(
+            fd,
+            libc::SOL_SOCKET,
+            libc::SO_REUSEADDR,
+            &val as *const _ as *const libc::c_void,
+            std::mem::size_of::<c_int>() as libc::socklen_t,
+        )
+    }
+}
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_listen(fd: c_int, backlog: c_int) -> c_int {
     unsafe { libc::listen(fd, backlog) }
@@ -235,6 +252,45 @@ pub unsafe extern "C" fn __of_buffer_from_str(s: *const c_char) -> *mut Buffer {
     }
     let bytes = unsafe { std::ffi::CStr::from_ptr(s) }.to_bytes().to_vec();
     buffer_from_vec(bytes)
+}
+
+// Copy `len` bytes starting at `start` out of `buf` into a fresh, leaked,
+// null-terminated C string (the `str` ABI on the of-side). Non-UTF8 bytes
+// survive — the runtime treats `str` as opaque bytes until printed.
+// Returns an empty C string on bad input (null buffer, negative indices,
+// out-of-range range). We don't return NULL because the small-primitive
+// nullable ABI (str | null) isn't wired up in codegen — the C function
+// would need to hand back a 16-byte tagged block, which is more work than
+// the failure case warrants. Callers can `s.size()` or compare to "" if
+// they care to distinguish.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_str_from_buffer(
+    buf: *mut Buffer,
+    start: i64,
+    len: i64,
+) -> *const c_char {
+    let empty = || {
+        let v = vec![0u8];
+        Box::leak(v.into_boxed_slice()).as_ptr() as *const c_char
+    };
+    if buf.is_null() || start < 0 || len < 0 {
+        return empty();
+    }
+    let b = unsafe { &*buf };
+    if b.data.is_null() {
+        return empty();
+    }
+    let s = start as u64;
+    let n = len as u64;
+    match s.checked_add(n) {
+        Some(end) if end <= b.size => {}
+        _ => return empty(),
+    }
+    let slice = unsafe { std::slice::from_raw_parts(b.data.add(s as usize), n as usize) };
+    let mut v = Vec::with_capacity(slice.len() + 1);
+    v.extend_from_slice(slice);
+    v.push(0);
+    Box::leak(v.into_boxed_slice()).as_ptr() as *const c_char
 }
 
 // Parse a dotted-quad IPv4 string and build a sockaddr_in for (host, port).

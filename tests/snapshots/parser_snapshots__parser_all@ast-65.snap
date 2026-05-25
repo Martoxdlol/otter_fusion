@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_extern_function_generic_pointer.of
+input_file: examples/parser/parse_expr_binary_precedence.of
 ---
 Ok(
     Program {
@@ -9,49 +10,46 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
-                        name: "hashmap_set",
+                        name: "test",
                         has_self_param: false,
-                        is_extern: true,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                        is_extern: false,
+                        generics: [],
                         return_type: None,
-                        params: [
-                            ParamDecl {
-                                name: "key",
-                                ty: Primitive(
-                                    String,
-                                ),
-                                is_pointer: true,
-                            },
-                            ParamDecl {
-                                name: "value",
-                                ty: Named(
-                                    "T",
-                                    [],
-                                ),
-                                is_pointer: true,
-                            },
-                        ],
+                        params: [],
                         body: Some(
                             Block {
-                                statements: [],
+                                statements: [
+                                    Expr(
+                                        BinaryOp(
+                                            Variable(
+                                                "x",
+                                            ),
+                                            Add,
+                                            BinaryOp(
+                                                Variable(
+                                                    "y",
+                                                ),
+                                                Mul,
+                                                Variable(
+                                                    "z",
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
                                 returns: None,
                             },
                         ),
                         span: Span {
                             line: 1,
-                            col: 16,
+                            col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 16,
+                    col: 9,
                     len: 8,
                 },
             },

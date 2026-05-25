@@ -39,7 +39,7 @@ extern struct Buffer {
   function alloc(size: u64): Buffer | null {
     __of_buffer_alloc(size)
   }
-  function get(self, i: u64): u8 | null {
+  function get(self, i: u64): u8 {
     __of_buffer_get(self, i)
   }
   function set(self, i: u64, v: u8) {
@@ -51,7 +51,10 @@ extern struct Buffer {
 }
 
 extern function __of_buffer_alloc(size: u64): Buffer | null;
-extern function __of_buffer_get(buf: Buffer, i: u64): u8 | null;
+// `__of_buffer_get` returns 0 for out-of-range reads instead of a tagged
+// nullable, because the small-primitive nullable ABI isn't wired up in
+// codegen yet. Callers should range-check `i < buf.size` themselves.
+extern function __of_buffer_get(buf: Buffer, i: u64): u8;
 extern function __of_buffer_set(buf: Buffer, i: u64, v: u8);
 extern function __of_buffer_free(buf: Buffer);
 

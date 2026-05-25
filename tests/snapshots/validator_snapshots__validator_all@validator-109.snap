@@ -1,11 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/06_type_logic/as_cast.of
+input_file: examples/spec/05_extensions/extend_generic_with_interface.of
 ---
-ValidationErrors(
-    [
-        "unknown variable 'print' in function 'test_module::process'",
-        "unknown variable 'print' in function 'test_module::process'",
-    ],
-)
+Ok

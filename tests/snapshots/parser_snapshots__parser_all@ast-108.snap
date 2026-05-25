@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/spec/05_extensions/extend_with_interface.of
+input_file: examples/spec/05_extensions/extend_generic.of
 ---
 Ok(
     Program {
@@ -9,14 +10,20 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Vehicle",
+                        name: "Wrapper",
                         is_extern: false,
-                        generics: [],
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
                         fields: [
                             FieldDecl {
-                                name: "speed",
-                                ty: Primitive(
-                                    Int32,
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
                                 ),
                                 is_pointer: false,
                             },
@@ -32,63 +39,34 @@ Ok(
                 },
             },
             Item {
-                kind: Interface(
-                    InterfaceDecl {
-                        name: "Movable",
-                        generics: [],
-                        fields: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "move",
-                                has_self_param: true,
-                                is_extern: false,
-                                generics: [],
-                                return_type: Some(
-                                    Primitive(
-                                        String,
-                                    ),
-                                ),
-                                params: [],
-                                body: None,
-                                span: Span {
-                                    line: 6,
-                                    col: 11,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 5,
-                    col: 10,
-                    len: 9,
-                },
-            },
-            Item {
                 kind: Extend(
                     ExtendDecl {
                         target: Named(
-                            "Vehicle",
-                            [],
+                            "Wrapper",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
                         ),
-                        generic_params: [],
-                        implements: [
-                            Named(
-                                "Movable",
-                                [],
-                            ),
+                        generic_params: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
                         ],
+                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "move",
+                                name: "get",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
                                 return_type: Some(
-                                    Primitive(
-                                        String,
+                                    Named(
+                                        "T",
+                                        [],
                                     ),
                                 ),
                                 params: [],
@@ -96,16 +74,15 @@ Ok(
                                     Block {
                                         statements: [],
                                         returns: Some(
-                                            Literal(
-                                                String(
-                                                    "The vehicle moves",
-                                                ),
+                                            Member(
+                                                SelfRef,
+                                                "value",
                                             ),
                                         ),
                                     },
                                 ),
                                 span: Span {
-                                    line: 10,
+                                    line: 6,
                                     col: 11,
                                     len: 8,
                                 },
@@ -114,7 +91,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 9,
+                    line: 5,
                     col: 7,
                     len: 6,
                 },

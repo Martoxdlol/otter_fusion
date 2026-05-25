@@ -1,73 +1,43 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p2_unknown_type_errors.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Box",
+                kind: Function(
+                    FunctionDecl {
+                        name: "foo",
+                        has_self_param: false,
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "Nope",
+                                [],
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
                             },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Box",
-                            [
-                                Primitive(
-                                    Int64,
-                                ),
-                            ],
-                        ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "is_int",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 27,
-                                    len: 8,
-                                },
-                            },
-                        ],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

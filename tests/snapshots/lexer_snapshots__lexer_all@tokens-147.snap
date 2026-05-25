@@ -1,139 +1,62 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p3_specialised_extend_records_concrete_args.of
+input_file: examples/validator/p2_unknown_type_errors.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
+            token_type: Function,
+            position: 8,
             line: 1,
-            column: 7,
+            column: 9,
         },
         Token {
             token_type: Identifier(
-                "Box",
-            ),
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "T",
+                "foo",
             ),
             position: 12,
             line: 1,
             column: 13,
         },
         Token {
-            token_type: GT,
+            token_type: LeftParen,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: LeftBrace,
+            token_type: RightParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
-            token_type: RightBrace,
-            position: 16,
+            token_type: Identifier(
+                "Nope",
+            ),
+            position: 20,
             line: 1,
-            column: 17,
+            column: 21,
         },
         Token {
-            token_type: Extend,
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: RightBrace,
             position: 23,
-            line: 2,
-            column: 7,
-        },
-        Token {
-            token_type: Identifier(
-                "Box",
-            ),
-            position: 27,
-            line: 2,
-            column: 11,
-        },
-        Token {
-            token_type: LT,
-            position: 28,
-            line: 2,
-            column: 12,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 31,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: GT,
-            position: 32,
-            line: 2,
-            column: 16,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 34,
-            line: 2,
-            column: 18,
-        },
-        Token {
-            token_type: Function,
-            position: 43,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: Identifier(
-                "is_int",
-            ),
-            position: 50,
-            line: 2,
-            column: 34,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 51,
-            line: 2,
-            column: 35,
-        },
-        Token {
-            token_type: RightParen,
-            position: 52,
-            line: 2,
-            column: 36,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 54,
-            line: 2,
-            column: 38,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 55,
-            line: 2,
-            column: 39,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 57,
-            line: 2,
-            column: 41,
+            line: 1,
+            column: 24,
         },
     ],
 )

@@ -1,6 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/parser/parse_extern_function_type_alias.of
+input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
 ---
-Ok
+ValidationErrors(
+    [
+        "unknown type 'Buffer' in module 'test_module'",
+    ],
+)

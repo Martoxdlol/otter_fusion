@@ -1,22 +1,22 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_simple_struct.of
+input_file: examples/parser/parse_interface_decl_unit.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Point",
-                        is_extern: false,
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
                         generics: [],
                         fields: [
                             FieldDecl {
-                                name: "x",
+                                name: "name",
                                 ty: Primitive(
-                                    Int32,
+                                    String,
                                 ),
                                 is_pointer: false,
                             },
@@ -27,8 +27,8 @@ Ok(
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
+                    col: 10,
+                    len: 9,
                 },
             },
         ],

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p4_default_method_does_not_require_struct_impl.of
+input_file: examples/validator/p3_extend_on_interface_errors.of
 ---
 Ok(
     Program {
@@ -12,6 +13,25 @@ Ok(
                         name: "I",
                         generics: [],
                         fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "I",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
                         methods: [
                             FunctionDecl {
                                 name: "f",
@@ -27,34 +47,11 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 1,
-                                    col: 23,
+                                    line: 2,
+                                    col: 20,
                                     len: 8,
                                 },
                             },
-                        ],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 10,
-                    len: 9,
-                },
-            },
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "S",
-                        is_extern: false,
-                        generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "I",
-                                [],
-                            ),
                         ],
                     },
                 ),

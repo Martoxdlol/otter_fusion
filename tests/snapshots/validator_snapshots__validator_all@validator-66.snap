@@ -1,10 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/parser/parse_extern_function_nullable_pointer_return.of
+input_file: examples/parser/parse_extend_decl_unit.of
 ---
 ValidationErrors(
     [
-        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Vehicle' in module 'test_module'",
     ],
 )

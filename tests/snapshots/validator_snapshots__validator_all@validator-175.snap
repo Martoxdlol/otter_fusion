@@ -1,10 +1,12 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p5_struct_init_extra_field_errors.of
+input_file: examples/validator/p5_self_member_access_in_method.of
 ---
 ValidationErrors(
     [
-        "unknown field 'y' when initializing 'S' in function 'test_module::test'",
+        "unknown member 'x' on 'null' in function 'test_module::S::m'",
+        "unknown variable 'self' in function 'test_module::S::m'",
     ],
 )

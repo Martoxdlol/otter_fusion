@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_optional_generic_params.of
+input_file: examples/parser/parse_implements_clause.of
 ---
 Ok(
     Program {
@@ -11,19 +12,19 @@ Ok(
                     StructDecl {
                         name: "Point",
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                            GenericParam {
-                                name: "U",
-                                bounds: [],
-                            },
-                        ],
+                        generics: [],
                         fields: [],
                         methods: [],
-                        implements: [],
+                        implements: [
+                            Named(
+                                "Movable",
+                                [],
+                            ),
+                            Named(
+                                "Drawable",
+                                [],
+                            ),
+                        ],
                     },
                 ),
                 span: Span {

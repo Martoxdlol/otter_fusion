@@ -1,14 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/parser/parse_expr_binary_mixed.of
+input_file: examples/parser/parse_empty_program.of
 ---
-ValidationErrors(
-    [
-        "invalid operator 'Add' for operand of type 'null' in function 'test_module::test'",
-        "invalid operator 'Div' for operand of type 'null' in function 'test_module::test'",
-        "unknown variable 'x' in function 'test_module::test'",
-        "unknown variable 'y' in function 'test_module::test'",
-        "unknown variable 'z' in function 'test_module::test'",
-    ],
-)
+Ok

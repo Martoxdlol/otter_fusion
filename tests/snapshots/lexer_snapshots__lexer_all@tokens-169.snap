@@ -1,43 +1,48 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_method_call_via_member.of
+input_file: examples/validator/p5_if_expression_typechecks.of
 ---
 Ok(
     [
         Token {
-            token_type: Struct,
-            position: 6,
-            line: 1,
-            column: 7,
-        },
-        Token {
-            token_type: Identifier(
-                "S",
-            ),
+            token_type: Function,
             position: 8,
             line: 1,
             column: 9,
         },
         Token {
-            token_type: LeftBrace,
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: Function,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
             token_type: Identifier(
-                "m",
+                "test",
             ),
-            position: 21,
+            position: 13,
             line: 1,
-            column: 22,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: If,
+            position: 20,
+            line: 1,
+            column: 21,
         },
         Token {
             token_type: LeftParen,
@@ -46,128 +51,68 @@ Ok(
             column: 23,
         },
         Token {
-            token_type: RightParen,
-            position: 23,
-            line: 1,
-            column: 24,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 25,
-            line: 1,
-            column: 26,
-        },
-        Token {
-            token_type: RightBrace,
+            token_type: True,
             position: 26,
             line: 1,
             column: 27,
         },
         Token {
-            token_type: RightBrace,
-            position: 28,
+            token_type: RightParen,
+            position: 27,
             line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: Function,
-            position: 37,
-            line: 2,
-            column: 9,
-        },
-        Token {
-            token_type: Identifier(
-                "test",
-            ),
-            position: 42,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 43,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: Identifier(
-                "s",
-            ),
-            position: 44,
-            line: 2,
-            column: 16,
-        },
-        Token {
-            token_type: Colon,
-            position: 45,
-            line: 2,
-            column: 17,
-        },
-        Token {
-            token_type: Identifier(
-                "S",
-            ),
-            position: 47,
-            line: 2,
-            column: 19,
-        },
-        Token {
-            token_type: RightParen,
-            position: 48,
-            line: 2,
-            column: 20,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 50,
-            line: 2,
-            column: 22,
-        },
-        Token {
-            token_type: Identifier(
-                "s",
-            ),
-            position: 52,
-            line: 2,
-            column: 24,
-        },
-        Token {
-            token_type: Dot,
-            position: 53,
-            line: 2,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "m",
-            ),
-            position: 54,
-            line: 2,
-            column: 26,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 55,
-            line: 2,
-            column: 27,
-        },
-        Token {
-            token_type: RightParen,
-            position: 56,
-            line: 2,
             column: 28,
         },
         Token {
-            token_type: Semicolon,
-            position: 57,
-            line: 2,
-            column: 29,
+            token_type: LeftBrace,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
+            position: 31,
+            line: 1,
+            column: 32,
         },
         Token {
             token_type: RightBrace,
-            position: 59,
-            line: 2,
-            column: 31,
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Else,
+            position: 38,
+            line: 1,
+            column: 39,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 40,
+            line: 1,
+            column: 41,
+        },
+        Token {
+            token_type: Int(
+                "6",
+            ),
+            position: 42,
+            line: 1,
+            column: 43,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 44,
+            line: 1,
+            column: 45,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 46,
+            line: 1,
+            column: 47,
         },
     ],
 )

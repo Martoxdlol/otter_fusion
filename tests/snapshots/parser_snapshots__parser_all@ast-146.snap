@@ -1,63 +1,59 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Interface(
-                    InterfaceDecl {
-                        name: "I",
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "MyInt",
                         generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                        ty: Primitive(
+                            Int64,
+                        ),
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 10,
-                    len: 9,
+                    col: 5,
+                    len: 4,
                 },
             },
             Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "I",
-                            [],
+                kind: Function(
+                    FunctionDecl {
+                        name: "foo",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Named(
+                                "MyInt",
+                                [],
+                            ),
                         ),
-                        generic_params: [],
-                        implements: [],
-                        methods: [
-                            FunctionDecl {
-                                name: "f",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 20,
-                                    len: 8,
-                                },
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
                             },
-                        ],
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

@@ -1,8 +1,55 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/parser/parse_error_unexpected_token_at_item.of
+input_file: examples/networking/web_server/of_io.of
 ---
-ParserError(
-    "unexpected token integer '42'",
+ValidationErrors(
+    [
+        "type mismatch in function 'test_module::TcpStream::write_str' (call to __of_write arg 2): expected 'uint64', found 'null'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "module 'test_module' imports unknown module 'of:core'",
+        "unknown member 'size' on 'null' in function 'test_module::TcpStream::write_str'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown type 'Buffer' in module 'test_module'",
+        "unknown variable '__of_buffer_free' in function 'test_module::FdSet::free'",
+        "unknown variable '__of_buffer_free' in function 'test_module::ReadResult::free'",
+        "unknown variable '__of_buffer_free' in function 'test_module::TcpListener::bind'",
+        "unknown variable '__of_buffer_free' in function 'test_module::TcpStream::connect'",
+        "unknown variable '__of_buffer_alloc' in function 'test_module::TcpStream::read'",
+        "unknown variable '__of_buffer_free' in function 'test_module::TcpStream::read'",
+        "unknown variable '__of_buffer_free' in function 'test_module::TcpStream::write_str'",
+        "unknown variable '__of_buffer_free' in function 'test_module::select'",
+    ],
 )

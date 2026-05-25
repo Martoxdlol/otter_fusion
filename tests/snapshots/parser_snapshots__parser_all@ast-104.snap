@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/spec/05_extensions/extend_basic.of
+input_file: examples/spec/04_structs_interfaces/struct_basic.of
 ---
 Ok(
     Program {
@@ -9,46 +10,34 @@ Ok(
             Item {
                 kind: Struct(
                     StructDecl {
-                        name: "Vehicle",
+                        name: "Person",
                         is_extern: false,
                         generics: [],
                         fields: [
                             FieldDecl {
-                                name: "speed",
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "age",
                                 ty: Primitive(
                                     Int32,
                                 ),
                                 is_pointer: false,
                             },
                         ],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "Vehicle",
-                            [],
-                        ),
-                        generic_params: [],
-                        implements: [],
                         methods: [
                             FunctionDecl {
-                                name: "is_fast",
+                                name: "greet",
                                 has_self_param: true,
                                 is_extern: false,
                                 generics: [],
                                 return_type: Some(
                                     Primitive(
-                                        Bool,
+                                        String,
                                     ),
                                 ),
                                 params: [],
@@ -57,31 +46,32 @@ Ok(
                                         statements: [],
                                         returns: Some(
                                             BinaryOp(
+                                                Literal(
+                                                    String(
+                                                        "Hello, ",
+                                                    ),
+                                                ),
+                                                Add,
                                                 Member(
                                                     SelfRef,
-                                                    "speed",
-                                                ),
-                                                Gt,
-                                                Literal(
-                                                    Int(
-                                                        "100",
-                                                    ),
+                                                    "name",
                                                 ),
                                             ),
                                         ),
                                     },
                                 ),
                                 span: Span {
-                                    line: 6,
+                                    line: 5,
                                     col: 11,
                                     len: 8,
                                 },
                             },
                         ],
+                        implements: [],
                     },
                 ),
                 span: Span {
-                    line: 5,
+                    line: 1,
                     col: 7,
                     len: 6,
                 },

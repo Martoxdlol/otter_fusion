@@ -1,6 +1,11 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p5_is_check_yields_bool.of
+input_file: examples/validator/p5_call_arg_type_mismatch_errors.of
 ---
-Ok
+ValidationErrors(
+    [
+        "type mismatch in function 'test_module::test' (call to f arg 0): expected 'int64', found 'string'",
+    ],
+)

@@ -159,6 +159,14 @@ pub enum HirStatement {
     VarDecl(String, ResolvedType, Option<TypedExpr>), // type always resolved (inferred or explicit)
     Return(Option<TypedExpr>),
     Expr(TypedExpr),
+    /// `name = value`. The LHS resolved to a local variable in scope. The
+    /// stored type is the variable's resolved declared type — kept on the
+    /// statement so lowering can coerce the rvalue without re-resolving.
+    AssignVar(String, ResolvedType, TypedExpr),
+    /// `obj.field = value`. `obj` is a managed struct instance; `field` is
+    /// the field name to store into. Lowering walks the receiver's type to
+    /// pick the field offset.
+    AssignField(TypedExpr, String, TypedExpr),
     While(TypedExpr, HirBlock),
     For(String, TypedExpr, HirBlock),
     Break,

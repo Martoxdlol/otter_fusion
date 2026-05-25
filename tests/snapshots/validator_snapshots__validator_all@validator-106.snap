@@ -1,6 +1,9 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/05_extensions/extend_generic_with_interface.of
+input_file: examples/spec/04_structs_interfaces/struct_instantiation.of
 ---
-Ok
+ParserError(
+    "unexpected token 'var'",
+)

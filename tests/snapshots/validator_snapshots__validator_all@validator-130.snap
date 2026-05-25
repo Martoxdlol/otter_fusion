@@ -1,12 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/14_ffi/pointer_syntax.of
+input_file: examples/spec/14_ffi/extern_struct.of
 ---
-ValidationErrors(
-    [
-        "unknown type 'Buffer' in module 'test_module'",
-        "unknown type 'Buffer' in module 'test_module'",
-        "unknown type 'MyStruct' in module 'test_module'",
-    ],
-)
+Ok

@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/parser/parse_struct_with_multiple_fields.of
+input_file: examples/parser/parse_simple_struct.of
 ---
 Ok(
     [
@@ -41,39 +42,17 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "f64",
+                "i32",
             ),
             position: 21,
             line: 1,
             column: 22,
         },
         Token {
-            token_type: Identifier(
-                "y",
-            ),
+            token_type: RightBrace,
             position: 23,
             line: 1,
             column: 24,
-        },
-        Token {
-            token_type: Colon,
-            position: 24,
-            line: 1,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "f64",
-            ),
-            position: 28,
-            line: 1,
-            column: 29,
-        },
-        Token {
-            token_type: RightBrace,
-            position: 30,
-            line: 1,
-            column: 31,
         },
     ],
 )

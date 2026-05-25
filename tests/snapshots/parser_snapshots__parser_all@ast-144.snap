@@ -1,44 +1,9 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_unknown_type_errors.of
+input_file: examples/validator/p2_pointer_outside_extern_errors.of
 ---
-Ok(
-    Program {
-        items: [
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "foo",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "Nope",
-                                [],
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 1,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 1,
-                    col: 9,
-                    len: 8,
-                },
-            },
-        ],
-    },
+Err(
+    "unexpected token '*'",
 )

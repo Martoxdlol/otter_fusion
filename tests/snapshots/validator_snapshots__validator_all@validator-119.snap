@@ -1,8 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/11_collections/map_literal.of
+input_file: examples/spec/10_generics/generic_function.of
 ---
-ParserError(
-    "unexpected token 'var'",
-)
+Ok

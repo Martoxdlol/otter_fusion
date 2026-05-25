@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_self_member_access_in_method.of
+input_file: examples/validator/p5_method_call_via_member.of
 ---
 Ok(
     Program {
@@ -12,15 +13,7 @@ Ok(
                         name: "S",
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
+                        fields: [],
                         methods: [
                             FunctionDecl {
                                 name: "m",
@@ -31,20 +24,13 @@ Ok(
                                 params: [],
                                 body: Some(
                                     Block {
-                                        statements: [
-                                            Expr(
-                                                Member(
-                                                    SelfRef,
-                                                    "x",
-                                                ),
-                                            ),
-                                        ],
+                                        statements: [],
                                         returns: None,
                                     },
                                 ),
                                 span: Span {
                                     line: 1,
-                                    col: 27,
+                                    col: 20,
                                     len: 8,
                                 },
                             },
@@ -56,6 +42,56 @@ Ok(
                     line: 1,
                     col: 7,
                     len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "test",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Named(
+                                    "S",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "s",
+                                                ),
+                                                "m",
+                                            ),
+                                            [],
+                                            [],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 2,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

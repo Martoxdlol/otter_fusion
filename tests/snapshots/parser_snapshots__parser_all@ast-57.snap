@@ -1,5 +1,6 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
 input_file: examples/networking/of_io.of
 ---
@@ -1820,6 +1821,61 @@ Ok(
             Item {
                 kind: Function(
                     FunctionDecl {
+                        name: "__of_str_from_buffer",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "buf",
+                                ty: Named(
+                                    "Buffer",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "start",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "len",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 125,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 125,
+                    col: 16,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
                         name: "__of_sockaddr_for_host",
                         has_self_param: false,
                         is_extern: true,
@@ -1860,14 +1916,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 122,
+                            line: 126,
                             col: 16,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 122,
+                    line: 126,
                     col: 16,
                     len: 8,
                 },
@@ -1900,14 +1956,61 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 123,
+                            line: 127,
                             col: 16,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 123,
+                    line: 127,
+                    col: 16,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "__of_set_reuseaddr",
+                        has_self_param: false,
+                        is_extern: true,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int32,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "fd",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "on",
+                                ty: Primitive(
+                                    Uint8,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 128,
+                            col: 16,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 128,
                     col: 16,
                     len: 8,
                 },
@@ -1925,7 +2028,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 127,
+                    line: 132,
                     col: 6,
                     len: 5,
                 },
@@ -1943,7 +2046,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 128,
+                    line: 133,
                     col: 6,
                     len: 5,
                 },
@@ -1975,7 +2078,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 130,
+                    line: 135,
                     col: 7,
                     len: 6,
                 },
@@ -2041,7 +2144,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 136,
+                                    line: 141,
                                     col: 11,
                                     len: 8,
                                 },
@@ -2050,7 +2153,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 135,
+                    line: 140,
                     col: 7,
                     len: 6,
                 },
@@ -2185,14 +2288,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 147,
+                            line: 152,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 147,
+                    line: 152,
                     col: 9,
                     len: 8,
                 },
@@ -2340,6 +2443,29 @@ Ok(
                                                         returns: None,
                                                     },
                                                     None,
+                                                ),
+                                            ),
+                                            Expr(
+                                                Call(
+                                                    Variable(
+                                                        "__of_set_reuseaddr",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "fd",
+                                                        ),
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Uint8,
+                                                            ),
+                                                        ),
+                                                    ],
                                                 ),
                                             ),
                                             VarDecl(
@@ -2654,7 +2780,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 161,
+                                    line: 166,
                                     col: 11,
                                     len: 8,
                                 },
@@ -2664,7 +2790,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 157,
+                    line: 162,
                     col: 7,
                     len: 6,
                 },
@@ -2791,7 +2917,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 189,
+                                    line: 198,
                                     col: 11,
                                     len: 8,
                                 },
@@ -2846,7 +2972,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 197,
+                                    line: 206,
                                     col: 11,
                                     len: 8,
                                 },
@@ -2880,7 +3006,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 201,
+                                    line: 210,
                                     col: 11,
                                     len: 8,
                                 },
@@ -2889,7 +3015,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 188,
+                    line: 197,
                     col: 7,
                     len: 6,
                 },
@@ -3260,7 +3386,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 211,
+                                    line: 220,
                                     col: 11,
                                     len: 8,
                                 },
@@ -3270,7 +3396,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 208,
+                    line: 217,
                     col: 7,
                     len: 6,
                 },
@@ -3515,7 +3641,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 236,
+                                    line: 245,
                                     col: 11,
                                     len: 8,
                                 },
@@ -3642,7 +3768,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 252,
+                                    line: 261,
                                     col: 11,
                                     len: 8,
                                 },
@@ -3769,7 +3895,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 260,
+                                    line: 269,
                                     col: 11,
                                     len: 8,
                                 },
@@ -3980,7 +4106,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 269,
+                                    line: 278,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4035,7 +4161,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 283,
+                                    line: 292,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4069,7 +4195,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 287,
+                                    line: 296,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4078,7 +4204,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 233,
+                    line: 242,
                     col: 7,
                     len: 6,
                 },
@@ -4111,7 +4237,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 294,
+                    line: 303,
                     col: 7,
                     len: 6,
                 },
@@ -4155,7 +4281,94 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 300,
+                                    line: 309,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "as_str",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                If(
+                                                    BinaryOp(
+                                                        Member(
+                                                            SelfRef,
+                                                            "len",
+                                                        ),
+                                                        Le,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "0",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Return(
+                                                                Some(
+                                                                    Literal(
+                                                                        String(
+                                                                            "",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Member(
+                                                        SelfRef,
+                                                        "buf",
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                    Member(
+                                                        SelfRef,
+                                                        "len",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 316,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4164,7 +4377,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 299,
+                    line: 308,
                     col: 7,
                     len: 6,
                 },
@@ -4224,7 +4437,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 310,
+                                    line: 329,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4234,7 +4447,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 307,
+                    line: 326,
                     col: 7,
                     len: 6,
                 },
@@ -4289,7 +4502,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 316,
+                                    line: 335,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4334,7 +4547,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 319,
+                                    line: 338,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4381,7 +4594,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 322,
+                                    line: 341,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4415,7 +4628,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 325,
+                                    line: 344,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4449,7 +4662,7 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 328,
+                                    line: 347,
                                     col: 11,
                                     len: 8,
                                 },
@@ -4458,7 +4671,7 @@ Ok(
                     },
                 ),
                 span: Span {
-                    line: 315,
+                    line: 334,
                     col: 7,
                     len: 6,
                 },
@@ -4834,14 +5047,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 339,
+                            line: 358,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 339,
+                    line: 358,
                     col: 9,
                     len: 8,
                 },
@@ -4938,14 +5151,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 363,
+                            line: 382,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 363,
+                    line: 382,
                     col: 9,
                     len: 8,
                 },
@@ -5216,14 +5429,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 372,
+                            line: 391,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 372,
+                    line: 391,
                     col: 9,
                     len: 8,
                 },

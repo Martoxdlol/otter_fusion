@@ -1,101 +1,108 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_as_cast_changes_type.of
+input_file: examples/validator/p4_missing_interface_method_errors.of
 ---
 Ok(
     [
         Token {
-            token_type: Function,
-            position: 8,
+            token_type: Interface,
+            position: 9,
             line: 1,
-            column: 9,
+            column: 10,
         },
         Token {
             token_type: Identifier(
-                "test",
+                "I",
             ),
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: LeftBrace,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: LeftParen,
-            position: 14,
+            token_type: Function,
+            position: 22,
             line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: RightParen,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: LeftBrace,
-            position: 17,
-            line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 19,
-            line: 1,
-            column: 20,
-        },
-        Token {
-            token_type: Int(
-                "5",
-            ),
-            position: 20,
-            line: 1,
-            column: 21,
-        },
-        Token {
-            token_type: As,
-            position: 23,
-            line: 1,
-            column: 24,
+            column: 23,
         },
         Token {
             token_type: Identifier(
-                "f64",
+                "f",
             ),
+            position: 24,
+            line: 1,
+            column: 25,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: RightParen,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+        Token {
+            token_type: Semicolon,
             position: 27,
             line: 1,
             column: 28,
         },
         Token {
-            token_type: RightParen,
-            position: 28,
+            token_type: RightBrace,
+            position: 29,
             line: 1,
-            column: 29,
+            column: 30,
         },
         Token {
-            token_type: Plus,
-            position: 30,
-            line: 1,
-            column: 31,
+            token_type: Struct,
+            position: 36,
+            line: 2,
+            column: 7,
         },
         Token {
-            token_type: Float(
-                "2.0",
+            token_type: Identifier(
+                "S",
             ),
-            position: 34,
-            line: 1,
-            column: 35,
+            position: 38,
+            line: 2,
+            column: 9,
         },
         Token {
-            token_type: Semicolon,
-            position: 35,
-            line: 1,
-            column: 36,
+            token_type: Colon,
+            position: 40,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "I",
+            ),
+            position: 42,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 44,
+            line: 2,
+            column: 15,
         },
         Token {
             token_type: RightBrace,
-            position: 37,
-            line: 1,
-            column: 38,
+            position: 45,
+            line: 2,
+            column: 16,
         },
     ],
 )

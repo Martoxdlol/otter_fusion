@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p4_struct_implements_interface_ok.of
+input_file: examples/validator/p4_interface_field_required_on_struct.of
 ---
 Ok(
     Program {
@@ -20,27 +21,7 @@ Ok(
                                 is_pointer: false,
                             },
                         ],
-                        methods: [
-                            FunctionDecl {
-                                name: "f",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 1,
-                                    col: 23,
-                                    len: 8,
-                                },
-                            },
-                        ],
+                        methods: [],
                         implements: [],
                     },
                 ),
@@ -56,36 +37,8 @@ Ok(
                         name: "S",
                         is_extern: false,
                         generics: [],
-                        fields: [
-                            FieldDecl {
-                                name: "x",
-                                ty: Primitive(
-                                    Int64,
-                                ),
-                                is_pointer: false,
-                            },
-                        ],
-                        methods: [
-                            FunctionDecl {
-                                name: "f",
-                                has_self_param: false,
-                                is_extern: false,
-                                generics: [],
-                                return_type: None,
-                                params: [],
-                                body: Some(
-                                    Block {
-                                        statements: [],
-                                        returns: None,
-                                    },
-                                ),
-                                span: Span {
-                                    line: 2,
-                                    col: 31,
-                                    len: 8,
-                                },
-                            },
-                        ],
+                        fields: [],
+                        methods: [],
                         implements: [
                             Named(
                                 "I",

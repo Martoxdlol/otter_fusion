@@ -1,10 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/validator/p3_extend_on_interface_errors.of
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
 ---
-ValidationErrors(
-    [
-        "invalid extend target in module 'test_module'",
-    ],
-)
+Ok

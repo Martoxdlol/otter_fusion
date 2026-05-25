@@ -1,8 +1,15 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/14_ffi/pin_unpin.of
+input_file: examples/spec/14_ffi/extern_function_export.of
 ---
-ParserError(
-    "unexpected token '*'",
+ValidationErrors(
+    [
+        "invalid operator 'Add' for operand of type 'null' in function 'test_module::on_tick'",
+        "type mismatch in function 'test_module::on_tick' (binary Add): expected 'null', found 'int64'",
+        "unknown member 'counter' on 'null' in function 'test_module::on_tick'",
+        "unknown member 'counter' on 'null' in function 'test_module::on_tick'",
+        "unknown type 'MyStruct' in module 'test_module'",
+    ],
 )

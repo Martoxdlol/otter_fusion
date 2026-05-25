@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_struct_with_multiple_fields.of
+input_file: examples/parser/parse_simple_struct.of
 ---
 Ok(
     Program {
@@ -16,14 +17,7 @@ Ok(
                             FieldDecl {
                                 name: "x",
                                 ty: Primitive(
-                                    Float64,
-                                ),
-                                is_pointer: false,
-                            },
-                            FieldDecl {
-                                name: "y",
-                                ty: Primitive(
-                                    Float64,
+                                    Int32,
                                 ),
                                 is_pointer: false,
                             },

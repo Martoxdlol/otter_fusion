@@ -1,25 +1,42 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_type_decl_unit.of
+input_file: examples/parser/parse_struct_with_multiple_fields.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Age",
+                kind: Struct(
+                    StructDecl {
+                        name: "Point",
+                        is_extern: false,
                         generics: [],
-                        ty: Primitive(
-                            Int32,
-                        ),
+                        fields: [
+                            FieldDecl {
+                                name: "x",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "y",
+                                ty: Primitive(
+                                    Float64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 7,
+                    len: 6,
                 },
             },
         ],

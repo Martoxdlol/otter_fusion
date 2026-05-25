@@ -1,53 +1,38 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_bound_must_be_interface.of
+input_file: examples/validator/p1_function_skeleton_inserted.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Bar",
+                kind: Function(
+                    FunctionDecl {
+                        name: "foo",
+                        has_self_param: false,
                         is_extern: false,
                         generics: [],
-                        fields: [],
-                        methods: [],
-                        implements: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [
-                                    Named(
-                                        "Bar",
-                                        [],
-                                    ),
-                                ],
-                            },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
+                    col: 9,
+                    len: 8,
                 },
             },
         ],

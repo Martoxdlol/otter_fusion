@@ -1,11 +1,48 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_comparison_yields_bool.of
+input_file: examples/validator/p5_call_arg_type_mismatch_errors.of
 ---
 Ok(
     Program {
         items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "f",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "a",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
             Item {
                 kind: Function(
                     FunctionDecl {
@@ -19,18 +56,18 @@ Ok(
                             Block {
                                 statements: [
                                     Expr(
-                                        BinaryOp(
-                                            Literal(
-                                                Int(
-                                                    "5",
-                                                ),
+                                        Call(
+                                            Variable(
+                                                "f",
                                             ),
-                                            Eq,
-                                            Literal(
-                                                Int(
-                                                    "5",
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "hola",
+                                                    ),
                                                 ),
-                                            ),
+                                            ],
                                         ),
                                     ),
                                 ],
@@ -38,14 +75,14 @@ Ok(
                             },
                         ),
                         span: Span {
-                            line: 1,
+                            line: 2,
                             col: 9,
                             len: 8,
                         },
                     },
                 ),
                 span: Span {
-                    line: 1,
+                    line: 2,
                     col: 9,
                     len: 8,
                 },

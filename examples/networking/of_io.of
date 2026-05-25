@@ -119,8 +119,13 @@ const MODE_RW_R_R: u32 = 420;
 // Additional Rust-side helpers used only by the facade.
 extern function __of_and_not_i32(a: i32, b: i32): i32;
 extern function __of_buffer_from_str(s: str): Buffer | null;
+// Returns the empty string on bad inputs rather than null; small-primitive
+// nullables (str | null, u8 | null, ...) need a 16-byte tagged-union ABI
+// that codegen doesn't emit yet. See the runtime side for details.
+extern function __of_str_from_buffer(buf: Buffer, start: i64, len: i64): str;
 extern function __of_sockaddr_for_host(host: str, port: u16): Buffer | null;
 extern function __of_accept_simple(fd: i32): i32;
+extern function __of_set_reuseaddr(fd: i32, on: u8): i32;
 
 // POSIX-stable errno values used when the facade itself decides to fail
 // (allocation, address parsing). Real kernel errors come via __of_errno().
@@ -163,6 +168,10 @@ struct TcpListener {
     if (fd < 0) {
       return IoError { errno: __of_errno(), op: "socket" };
     }
+    // Best-effort SO_REUSEADDR — ignore failures (older platforms, custom
+    // sysctl). The previous-binding-still-in-TIME_WAIT case is by far the
+    // common cause of "bind: errno 48" during dev, and this clears it.
+    __of_set_reuseaddr(fd, 1 as u8);
     var addr_maybe = __of_sockaddr_for_host(host, port);
     if (addr_maybe is null) {
       __of_close(fd);
@@ -299,6 +308,16 @@ struct ReadResult {
 extend ReadResult {
   function free(self) {
     __of_buffer_free(self.buf);
+  }
+
+  // Copy the first `self.len` bytes out as a str. Returns an empty string
+  // when the read was empty or the runtime helper couldn't allocate; see
+  // __of_str_from_buffer for the rationale.
+  function as_str(self): str {
+    if (self.len <= (0 as i64)) {
+      return "";
+    }
+    __of_str_from_buffer(self.buf, 0 as i64, self.len)
   }
 }
 

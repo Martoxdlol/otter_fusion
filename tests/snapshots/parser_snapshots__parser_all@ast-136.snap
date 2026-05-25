@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_bound_referencing_interface_ok.of
+input_file: examples/validator/p1_interface_skeleton_inserted.of
 ---
 Ok(
     Program {
@@ -20,33 +21,6 @@ Ok(
                     line: 1,
                     col: 10,
                     len: 9,
-                },
-            },
-            Item {
-                kind: Struct(
-                    StructDecl {
-                        name: "Foo",
-                        is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [
-                                    Named(
-                                        "Show",
-                                        [],
-                                    ),
-                                ],
-                            },
-                        ],
-                        fields: [],
-                        methods: [],
-                        implements: [],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
                 },
             },
         ],

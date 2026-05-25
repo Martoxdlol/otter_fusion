@@ -1,58 +1,35 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p2_type_alias_inlined_in_signature.of
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "MyInt",
+                kind: Struct(
+                    StructDecl {
+                        name: "Cfg",
+                        is_extern: true,
                         generics: [],
-                        ty: Primitive(
-                            Int64,
-                        ),
+                        fields: [
+                            FieldDecl {
+                                name: "p",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
-                },
-            },
-            Item {
-                kind: Function(
-                    FunctionDecl {
-                        name: "foo",
-                        has_self_param: false,
-                        is_extern: false,
-                        generics: [],
-                        return_type: Some(
-                            Named(
-                                "MyInt",
-                                [],
-                            ),
-                        ),
-                        params: [],
-                        body: Some(
-                            Block {
-                                statements: [],
-                                returns: None,
-                            },
-                        ),
-                        span: Span {
-                            line: 2,
-                            col: 9,
-                            len: 8,
-                        },
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 9,
-                    len: 8,
+                    col: 14,
+                    len: 6,
                 },
             },
         ],

@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_break_outside_loop_errors.of
+input_file: examples/validator/p5_binary_op_arithmetic_ok.of
 ---
 Ok(
     [
@@ -38,7 +39,23 @@ Ok(
             column: 18,
         },
         Token {
-            token_type: Break,
+            token_type: Int(
+                "5",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
             position: 23,
             line: 1,
             column: 24,

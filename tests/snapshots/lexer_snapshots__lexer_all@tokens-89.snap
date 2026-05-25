@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/spec/01_type_system/discriminated_unions.of
+input_file: examples/parser/parse_type_expr_function_type.of
 ---
 Ok(
     [
@@ -13,57 +14,77 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "Result",
+                "X",
             ),
-            position: 11,
+            position: 6,
             line: 1,
-            column: 12,
+            column: 7,
         },
         Token {
             token_type: Eq,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 17,
+            token_type: Comma,
+            position: 14,
             line: 1,
-            column: 18,
-        },
-        Token {
-            token_type: Pipe,
-            position: 19,
-            line: 1,
-            column: 20,
+            column: 15,
         },
         Token {
             token_type: Identifier(
                 "str",
             ),
-            position: 23,
+            position: 18,
             line: 1,
-            column: 24,
+            column: 19,
         },
         Token {
-            token_type: Pipe,
-            position: 25,
+            token_type: RightParen,
+            position: 19,
             line: 1,
-            column: 26,
+            column: 20,
         },
         Token {
-            token_type: Null,
-            position: 30,
+            token_type: Minus,
+            position: 21,
             line: 1,
-            column: 31,
+            column: 22,
+        },
+        Token {
+            token_type: GT,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "bool",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
         },
         Token {
             token_type: Semicolon,
-            position: 31,
+            position: 28,
             line: 1,
-            column: 32,
+            column: 29,
         },
     ],
 )

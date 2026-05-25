@@ -1,8 +1,9 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/12_control_flow/for_loop.of
+input_file: examples/spec/11_collections/list_literal.of
 ---
 ParserError(
-    "unexpected token 'for'",
+    "unexpected token 'var'",
 )

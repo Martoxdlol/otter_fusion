@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/spec/02_variables/var_with_type.of
+input_file: examples/spec/02_variables/block_expression.of
 ---
 Ok(
     [
@@ -13,127 +14,125 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "name",
+                "value",
             ),
-            position: 8,
-            line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: Colon,
             position: 9,
             line: 1,
             column: 10,
         },
         Token {
-            token_type: Identifier(
-                "str",
-            ),
+            token_type: Eq,
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: LeftBrace,
             position: 13,
             line: 1,
             column: 14,
         },
         Token {
-            token_type: Eq,
-            position: 15,
-            line: 1,
-            column: 16,
-        },
-        Token {
-            token_type: StringLit(
-                "John Doe",
-            ),
-            position: 26,
-            line: 1,
-            column: 27,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 27,
-            line: 1,
-            column: 28,
-        },
-        Token {
             token_type: Var,
-            position: 31,
+            position: 19,
             line: 2,
-            column: 4,
+            column: 6,
         },
         Token {
             token_type: Identifier(
-                "age",
+                "x",
             ),
-            position: 35,
+            position: 21,
             line: 2,
             column: 8,
         },
         Token {
             token_type: Eq,
-            position: 37,
+            position: 23,
             line: 2,
             column: 10,
         },
         Token {
             token_type: Int(
-                "30",
+                "10",
             ),
-            position: 40,
+            position: 26,
             line: 2,
             column: 13,
         },
         Token {
             token_type: Semicolon,
-            position: 41,
+            position: 27,
             line: 2,
             column: 14,
         },
         Token {
             token_type: Var,
-            position: 45,
+            position: 33,
             line: 3,
-            column: 4,
+            column: 6,
         },
         Token {
             token_type: Identifier(
-                "price",
+                "y",
             ),
-            position: 51,
+            position: 35,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 37,
             line: 3,
             column: 10,
         },
         Token {
-            token_type: Colon,
-            position: 52,
-            line: 3,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "f32",
+            token_type: Int(
+                "20",
             ),
-            position: 56,
+            position: 40,
             line: 3,
-            column: 15,
-        },
-        Token {
-            token_type: Eq,
-            position: 58,
-            line: 3,
-            column: 17,
-        },
-        Token {
-            token_type: Float(
-                "19.99",
-            ),
-            position: 64,
-            line: 3,
-            column: 23,
+            column: 13,
         },
         Token {
             token_type: Semicolon,
-            position: 65,
+            position: 41,
             line: 3,
-            column: 24,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "x",
+            ),
+            position: 45,
+            line: 4,
+            column: 4,
+        },
+        Token {
+            token_type: Plus,
+            position: 47,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "y",
+            ),
+            position: 49,
+            line: 4,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 51,
+            line: 5,
+            column: 2,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 52,
+            line: 5,
+            column: 3,
         },
     ],
 )

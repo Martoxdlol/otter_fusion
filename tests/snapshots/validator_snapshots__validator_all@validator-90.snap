@@ -1,8 +1,7 @@
 ---
 source: tests/validator_snapshots.rs
+assertion_line: 51
 expression: result
-input_file: examples/spec/01_type_system/primitives.of
+input_file: examples/parser/parse_type_expr_named_with_type_args.of
 ---
-ParserError(
-    "unexpected token 'var'",
-)
+Ok

@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p4_universal_extend_satisfies_interface.of
+input_file: examples/validator/p4_interface_method_signature_mismatch_errors.of
 ---
 Ok(
     Program {
@@ -19,7 +20,15 @@ Ok(
                                 is_extern: false,
                                 generics: [],
                                 return_type: None,
-                                params: [],
+                                params: [
+                                    ParamDecl {
+                                        name: "a",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
                                 body: Some(
                                     Block {
                                         statements: [],
@@ -47,42 +56,8 @@ Ok(
                     StructDecl {
                         name: "S",
                         is_extern: false,
-                        generics: [
-                            GenericParam {
-                                name: "T",
-                                bounds: [],
-                            },
-                        ],
+                        generics: [],
                         fields: [],
-                        methods: [],
-                        implements: [
-                            Named(
-                                "I",
-                                [],
-                            ),
-                        ],
-                    },
-                ),
-                span: Span {
-                    line: 2,
-                    col: 7,
-                    len: 6,
-                },
-            },
-            Item {
-                kind: Extend(
-                    ExtendDecl {
-                        target: Named(
-                            "S",
-                            [
-                                Named(
-                                    "T",
-                                    [],
-                                ),
-                            ],
-                        ),
-                        generic_params: [],
-                        implements: [],
                         methods: [
                             FunctionDecl {
                                 name: "f",
@@ -98,16 +73,22 @@ Ok(
                                     },
                                 ),
                                 span: Span {
-                                    line: 3,
-                                    col: 23,
+                                    line: 2,
+                                    col: 24,
                                     len: 8,
                                 },
                             },
                         ],
+                        implements: [
+                            Named(
+                                "I",
+                                [],
+                            ),
+                        ],
                     },
                 ),
                 span: Span {
-                    line: 3,
+                    line: 2,
                     col: 7,
                     len: 6,
                 },

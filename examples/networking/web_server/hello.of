@@ -1,0 +1,66 @@
+// hello.of — minimal web server on 127.0.0.1:8090.
+//
+//   curl -i http://127.0.0.1:8090/
+//   curl -i http://127.0.0.1:8090/health
+//   curl -i -X POST -d 'ping' http://127.0.0.1:8090/echo
+//   curl -i http://127.0.0.1:8090/unknown   # 404
+
+import { println } from "of:core";
+import { IoError } from "of_io";
+import { Server, Connection, Request, Response } from "web_server";
+
+function handle(req: Request): Response {
+  if (req.method == "GET") {
+    if (req.path == "/") {
+      return Response.html("<h1>Hello from Otter Fusion</h1>\n");
+    }
+    if (req.path == "/health") {
+      return Response.text("ok\n");
+    }
+  }
+  if (req.method == "POST") {
+    if (req.path == "/echo") {
+      return Response.text(req.body);
+    }
+  }
+  Response.not_found()
+}
+
+function main(): i64 {
+  var srv_or_err = Server.bind("127.0.0.1", 8090 as u16);
+  if (srv_or_err is IoError) {
+    println("bind: " + (srv_or_err as IoError).message());
+    return 1;
+  }
+  var srv = srv_or_err as Server;
+  println("listening on http://127.0.0.1:8090");
+
+  while (true) {
+    var conn_or_err = srv.accept();
+    if (conn_or_err is IoError) {
+      println("accept: " + (conn_or_err as IoError).message());
+      srv.close();
+      return 1;
+    }
+    var conn = conn_or_err as Connection;
+
+    var req_or_err = conn.read_request();
+    if (req_or_err is IoError) {
+      println("parse: " + (req_or_err as IoError).message());
+      conn.write_response(Response.bad_request("bad request\n"));
+      conn.close();
+      continue;
+    }
+    var req = req_or_err as Request;
+    println(req.method + " " + req.path);
+
+    var resp = handle(req);
+    var w = conn.write_response(resp);
+    if (w is IoError) {
+      println("write: " + (w as IoError).message());
+    }
+    conn.close();
+  }
+
+  0
+}

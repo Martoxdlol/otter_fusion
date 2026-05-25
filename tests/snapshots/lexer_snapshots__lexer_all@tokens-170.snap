@@ -1,139 +1,76 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_null_assignable_to_nullable_union.of
+input_file: examples/validator/p5_is_check_yields_bool.of
 ---
 Ok(
     [
         Token {
-            token_type: Type,
-            position: 4,
-            line: 1,
-            column: 5,
-        },
-        Token {
-            token_type: Identifier(
-                "Opt",
-            ),
+            token_type: Function,
             position: 8,
             line: 1,
-            column: 9,
-        },
-        Token {
-            token_type: Eq,
-            position: 10,
-            line: 1,
-            column: 11,
-        },
-        Token {
-            token_type: Identifier(
-                "i64",
-            ),
-            position: 14,
-            line: 1,
-            column: 15,
-        },
-        Token {
-            token_type: Pipe,
-            position: 16,
-            line: 1,
-            column: 17,
-        },
-        Token {
-            token_type: Null,
-            position: 21,
-            line: 1,
-            column: 22,
-        },
-        Token {
-            token_type: Semicolon,
-            position: 22,
-            line: 1,
-            column: 23,
-        },
-        Token {
-            token_type: Function,
-            position: 31,
-            line: 2,
             column: 9,
         },
         Token {
             token_type: Identifier(
                 "test",
             ),
-            position: 36,
-            line: 2,
+            position: 13,
+            line: 1,
             column: 14,
         },
         Token {
             token_type: LeftParen,
-            position: 37,
-            line: 2,
+            position: 14,
+            line: 1,
             column: 15,
         },
         Token {
             token_type: RightParen,
-            position: 38,
-            line: 2,
+            position: 15,
+            line: 1,
             column: 16,
         },
         Token {
             token_type: LeftBrace,
-            position: 40,
-            line: 2,
+            position: 17,
+            line: 1,
             column: 18,
         },
         Token {
-            token_type: Var,
-            position: 44,
-            line: 2,
-            column: 22,
+            token_type: Int(
+                "5",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Is,
+            position: 22,
+            line: 1,
+            column: 23,
         },
         Token {
             token_type: Identifier(
-                "x",
+                "i64",
             ),
-            position: 46,
-            line: 2,
-            column: 24,
-        },
-        Token {
-            token_type: Colon,
-            position: 47,
-            line: 2,
-            column: 25,
-        },
-        Token {
-            token_type: Identifier(
-                "Opt",
-            ),
-            position: 51,
-            line: 2,
-            column: 29,
-        },
-        Token {
-            token_type: Eq,
-            position: 53,
-            line: 2,
-            column: 31,
-        },
-        Token {
-            token_type: Null,
-            position: 58,
-            line: 2,
-            column: 36,
+            position: 26,
+            line: 1,
+            column: 27,
         },
         Token {
             token_type: Semicolon,
-            position: 59,
-            line: 2,
-            column: 37,
+            position: 27,
+            line: 1,
+            column: 28,
         },
         Token {
             token_type: RightBrace,
-            position: 61,
-            line: 2,
-            column: 39,
+            position: 29,
+            line: 1,
+            column: 30,
         },
     ],
 )

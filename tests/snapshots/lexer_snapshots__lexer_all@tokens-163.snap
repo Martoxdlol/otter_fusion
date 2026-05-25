@@ -1,7 +1,8 @@
 ---
 source: tests/lexer_snapshots.rs
+assertion_line: 13
 expression: tokens
-input_file: examples/validator/p5_call_resolves_module_function.of
+input_file: examples/validator/p5_break_outside_loop_errors.of
 ---
 Ok(
     [
@@ -13,99 +14,47 @@ Ok(
         },
         Token {
             token_type: Identifier(
-                "f",
+                "test",
             ),
-            position: 10,
+            position: 13,
             line: 1,
-            column: 11,
+            column: 14,
         },
         Token {
             token_type: LeftParen,
-            position: 11,
-            line: 1,
-            column: 12,
-        },
-        Token {
-            token_type: RightParen,
-            position: 12,
-            line: 1,
-            column: 13,
-        },
-        Token {
-            token_type: LeftBrace,
             position: 14,
             line: 1,
             column: 15,
         },
         Token {
-            token_type: RightBrace,
+            token_type: RightParen,
             position: 15,
             line: 1,
             column: 16,
         },
         Token {
-            token_type: Function,
-            position: 24,
-            line: 2,
-            column: 9,
-        },
-        Token {
-            token_type: Identifier(
-                "test",
-            ),
-            position: 29,
-            line: 2,
-            column: 14,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 30,
-            line: 2,
-            column: 15,
-        },
-        Token {
-            token_type: RightParen,
-            position: 31,
-            line: 2,
-            column: 16,
-        },
-        Token {
             token_type: LeftBrace,
-            position: 33,
-            line: 2,
+            position: 17,
+            line: 1,
             column: 18,
         },
         Token {
-            token_type: Identifier(
-                "f",
-            ),
-            position: 35,
-            line: 2,
-            column: 20,
-        },
-        Token {
-            token_type: LeftParen,
-            position: 36,
-            line: 2,
-            column: 21,
-        },
-        Token {
-            token_type: RightParen,
-            position: 37,
-            line: 2,
-            column: 22,
+            token_type: Break,
+            position: 23,
+            line: 1,
+            column: 24,
         },
         Token {
             token_type: Semicolon,
-            position: 38,
-            line: 2,
-            column: 23,
+            position: 24,
+            line: 1,
+            column: 25,
         },
         Token {
             token_type: RightBrace,
-            position: 40,
-            line: 2,
-            column: 25,
+            position: 26,
+            line: 1,
+            column: 27,
         },
     ],
 )

@@ -333,6 +333,45 @@ impl Lower {
         b.emit(AssignValue::Field(recv_op, idx), result_mir)
     }
 
+    /// Look up a field's byte offset, MIR type and resolved type on the
+    /// receiver's struct definition. Used by `AssignField` lowering to
+    /// produce a `Stmt::StoreField`. Panics on non-struct receivers or
+    /// unknown field names — the validator catches both before lowering.
+    pub fn resolve_field_layout(
+        &mut self,
+        recv_ty: &ResolvedType,
+        field: &str,
+        subst: &Subst,
+    ) -> (u32, crate::mir::MirType, ResolvedType) {
+        let (hir_id, args) = match recv_ty {
+            ResolvedType::Struct(id, args) => (*id, args.clone()),
+            other => panic!("field assignment on non-struct: {:?}", other),
+        };
+        let s = self.hir.structs[&hir_id].clone();
+        let mut hir_subst: std::collections::HashMap<crate::hir::TypeParamId, ResolvedType> =
+            std::collections::HashMap::new();
+        for (tp, arg) in s.type_params.iter().zip(args.iter()) {
+            hir_subst.insert(*tp, arg.clone());
+        }
+        let hir_field = s
+            .fields
+            .iter()
+            .find(|f| f.name == field)
+            .unwrap_or_else(|| panic!("no field `{}` on struct", field));
+        let field_resolved = crate::validator::substitute(&hir_field.ty, &hir_subst);
+        let mir_struct = self.get_or_create_struct(hir_id, args);
+        let mir_field = match &self.mir.types[&mir_struct] {
+            MirTypeDef::Struct { fields, .. } => fields
+                .iter()
+                .find(|f| f.name == field)
+                .cloned()
+                .unwrap_or_else(|| panic!("no MIR field `{}`", field)),
+            _ => unreachable!(),
+        };
+        let _ = subst; // future-proof: caller-side subst already applied
+        (mir_field.offset, mir_field.ty, field_resolved)
+    }
+
     fn lower_as(
         &mut self,
         e: &TypedExpr,

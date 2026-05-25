@@ -1,37 +1,53 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/parser/parse_extern_function_type_alias.of
+input_file: examples/parser/parse_extern_function_pointer_param_and_return.of
 ---
 Ok(
     Program {
         items: [
             Item {
-                kind: TypeAlias(
-                    TypeAliasDecl {
-                        name: "Fun",
+                kind: Function(
+                    FunctionDecl {
+                        name: "malloc",
+                        has_self_param: false,
+                        is_extern: true,
                         generics: [],
-                        ty: ExternFunction(
-                            [
-                                ExternParam {
-                                    name: "x",
-                                    ty: Named(
-                                        "MyStruct",
-                                        [],
-                                    ),
-                                    is_pointer: false,
-                                },
-                            ],
-                            Primitive(
-                                Bool,
+                        return_type: Some(
+                            Pointer(
+                                Named(
+                                    "Buffer",
+                                    [],
+                                ),
                             ),
                         ),
+                        params: [
+                            ParamDecl {
+                                name: "size",
+                                ty: Primitive(
+                                    Uint64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 16,
+                            len: 8,
+                        },
                     },
                 ),
                 span: Span {
                     line: 1,
-                    col: 5,
-                    len: 4,
+                    col: 16,
+                    len: 8,
                 },
             },
         ],

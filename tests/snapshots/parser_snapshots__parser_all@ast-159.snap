@@ -1,7 +1,8 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/validator/p5_binary_op_type_mismatch_errors.of
+input_file: examples/validator/p5_as_cast_changes_type.of
 ---
 Ok(
     Program {
@@ -20,15 +21,20 @@ Ok(
                                 statements: [
                                     Expr(
                                         BinaryOp(
-                                            Literal(
-                                                Int(
-                                                    "5",
+                                            As(
+                                                Literal(
+                                                    Int(
+                                                        "5",
+                                                    ),
+                                                ),
+                                                Primitive(
+                                                    Float64,
                                                 ),
                                             ),
                                             Add,
                                             Literal(
                                                 Float(
-                                                    "5.0",
+                                                    "2.0",
                                                 ),
                                             ),
                                         ),

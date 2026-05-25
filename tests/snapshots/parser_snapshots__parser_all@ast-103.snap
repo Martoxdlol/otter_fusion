@@ -1,8 +1,76 @@
 ---
 source: tests/parser_snapshots.rs
+assertion_line: 19
 expression: ast
-input_file: examples/spec/04_structs_interfaces/struct_instantiation.of
+input_file: examples/spec/04_structs_interfaces/interface_extends.of
 ---
-Err(
-    "unexpected token 'var'",
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Printable",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "to_string",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: None,
+                                span: Span {
+                                    line: 6,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Named",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 5,
+                    col: 10,
+                    len: 9,
+                },
+            },
+        ],
+    },
 )
