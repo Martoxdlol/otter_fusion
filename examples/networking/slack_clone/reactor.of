@@ -1,11 +1,11 @@
 // reactor.of — connection table + read/write helpers backing the event loop.
 //
-// One ConnState per accepted client, kept in a singly-linked list hung off
-// the Reactor. Each conn is in one of three phases:
+// One ConnState per accepted client. The table is a `List<ConnState>`; the
+// reactor walks it each tick to build select() fd_sets and to find conns to
+// wake. Three phases:
 //
-//   READING — buffered request bytes accumulating; reactor is select()ing
-//             this fd for readability.
-//   WRITING — response bytes prebuilt; reactor is select()ing for writability.
+//   READING — buffered request bytes accumulating; selected for readability.
+//   WRITING — response bytes prebuilt; selected for writability.
 //   WAITING — long-poll in flight, parked in ChatState.waiters; this conn is
 //             in NEITHER fd_set until either a message arrives or the deadline
 //             passes, at which point it gets flipped back to WRITING.
@@ -17,7 +17,6 @@
 import { println, Buffer, __of_buffer_free } from "of:core";
 import {
   TcpListener,
-  TcpStream,
   IoError,
   __of_buffer_from_str,
   __of_close,
@@ -42,7 +41,6 @@ struct ConnState {
   write_buf: Buffer | null,
   write_size: u64,
   write_pos: u64,
-  next: ConnState | null,
 }
 
 extend ConnState {
@@ -69,7 +67,7 @@ extend ConnState {
   }
 
   // Release fd + every Buffer the conn owns. Called once at connection
-  // teardown — the linked-list unlink is the caller's responsibility.
+  // teardown — the list unlink is the caller's responsibility.
   function free_all(self) {
     __of_close(self.fd);
     __of_buffer_free(self.read_buf);
@@ -89,8 +87,6 @@ function make_conn(fd: i32): ConnState | null {
     __of_close(fd);
     return null;
   }
-  // Best-effort: surface errors at the call site by warning, the conn
-  // can still proceed if fcntl failed (very rare on local sockets).
   var nb = fd_set_nonblocking(fd, true);
   if (nb is IoError) {
     println("set_nonblocking: " + (nb as IoError).message());
@@ -103,58 +99,68 @@ function make_conn(fd: i32): ConnState | null {
     write_buf: null,
     write_size: 0 as u64,
     write_pos: 0 as u64,
-    next: null,
   }
 }
 
 struct Reactor {
   listener: TcpListener,
-  head: ConnState | null,
+  conns: List<ConnState>,
 
   function new(listener: TcpListener): Reactor {
-    Reactor { listener: listener, head: null }
+    Reactor { listener: listener, conns: List.new<ConnState>() }
   }
 }
 
 extend Reactor {
   function push_conn(self, c: ConnState) {
-    c.next = self.head;
-    self.head = c;
+    self.conns.push(c);
+  }
+
+  // Linear scan to find a conn by fd. The caller wants the value back, not
+  // the index, so use this for read-only lookups.
+  function find_by_fd(self, fd: i32): ConnState | null {
+    for (c in self.conns) {
+      if (c.fd == fd) {
+        return c;
+      }
+    }
+    null
+  }
+
+  // Same scan, but returns the index so the caller can mutate via remove().
+  function index_of_fd(self, fd: i32): i64 {
+    var i: i64 = 0 as i64;
+    while (i < self.conns.size()) {
+      var c_or = self.conns.get(i);
+      if (c_or is ConnState) {
+        if ((c_or as ConnState).fd == fd) {
+          return i;
+        }
+      }
+      i = i + (1 as i64);
+    }
+    (0 as i64) - (1 as i64)
   }
 
   // Unlink the conn matching `fd` (if any) and run its teardown.
   function close_fd(self, fd: i32) {
-    var prev: ConnState | null = null;
-    var p: ConnState | null = self.head;
-    while (p is ConnState) {
-      var c = p as ConnState;
-      if (c.fd == fd) {
-        if (prev is null) {
-          self.head = c.next;
-        } else {
-          var pv = prev as ConnState;
-          pv.next = c.next;
-        }
-        c.free_all();
-        return;
-      }
-      prev = p;
-      p = c.next;
+    var idx = self.index_of_fd(fd);
+    if (idx < (0 as i64)) {
+      return;
+    }
+    var c_or = self.conns.remove(idx);
+    if (c_or is ConnState) {
+      (c_or as ConnState).free_all();
     }
   }
 
   // Move a parked WAITING conn back into write mode with the given response.
-  // Returns false if no conn with that fd was found (e.g. it was already torn
-  // down because the client disconnected).
+  // Returns false if no conn with that fd was found.
   function wake_fd(self, fd: i32, resp: Response): bool {
-    var p: ConnState | null = self.head;
-    while (p is ConnState) {
-      var c = p as ConnState;
-      if (c.fd == fd) {
-        c.start_writing(resp);
-        return true;
-      }
-      p = c.next;
+    var c_or = self.find_by_fd(fd);
+    if (c_or is ConnState) {
+      (c_or as ConnState).start_writing(resp);
+      return true;
     }
     false
   }
@@ -273,7 +279,6 @@ function write_more(c: ConnState): bool {
     if (err == (35 as i32) || err == (11 as i32)) {
       return false;
     }
-    // any other error → drop the conn
     c.write_pos = c.write_size;
     return true;
   }

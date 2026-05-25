@@ -226,3 +226,144 @@ pub unsafe extern "C" fn __of_buffer_set(buf: *mut Buffer, i: u64, v: u8) {
     }
     unsafe { *buf.data.add(i as usize) = v };
 }
+
+// ---- List<T> (declared in of_core.of) ----
+//
+// Backing store: `Vec<*mut c_void>` boxed and leaked. Elements are read and
+// written as opaque pointer-sized slots — fine for `List<SomeStruct>` (managed
+// references are pointer-sized) but NOT for `List<i32>` / `List<f64>` /
+// `List<bool>`, which the small-primitive ABI would need to widen and the
+// runtime would need to read at the right width. The of-side type system
+// already exposes that gap: `__of_list_get<T>(l, i): T | null` round-trips
+// through a tagged union for primitives, which codegen doesn't emit yet.
+//
+// No `__of_list_free` — consistent with the rest of `__of_alloc`, lists leak.
+
+type ElemSlot = *mut c_void;
+type ListVec = Vec<ElemSlot>;
+
+fn list_mut<'a>(l: *mut ListVec) -> Option<&'a mut ListVec> {
+    if l.is_null() { None } else { Some(unsafe { &mut *l }) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_list_new() -> *mut ListVec {
+    Box::into_raw(Box::new(Vec::new()))
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_size(l: *mut ListVec) -> i64 {
+    match list_mut(l) {
+        Some(v) => v.len() as i64,
+        None => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_is_empty(l: *mut ListVec) -> u8 {
+    match list_mut(l) {
+        Some(v) => if v.is_empty() { 1 } else { 0 },
+        None => 1,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_clear(l: *mut ListVec) {
+    if let Some(v) = list_mut(l) {
+        v.clear();
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_get(l: *mut ListVec, i: i64) -> *mut c_void {
+    let v = match list_mut(l) {
+        Some(v) => v,
+        None => return std::ptr::null_mut(),
+    };
+    if i < 0 || (i as usize) >= v.len() {
+        return std::ptr::null_mut();
+    }
+    v[i as usize]
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_set(l: *mut ListVec, i: i64, val: *mut c_void) {
+    let v = match list_mut(l) {
+        Some(v) => v,
+        None => return,
+    };
+    if i < 0 || (i as usize) >= v.len() {
+        return;
+    }
+    v[i as usize] = val;
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_push(l: *mut ListVec, val: *mut c_void) {
+    if let Some(v) = list_mut(l) {
+        v.push(val);
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_pop(l: *mut ListVec) -> *mut c_void {
+    match list_mut(l).and_then(|v| v.pop()) {
+        Some(p) => p,
+        None => std::ptr::null_mut(),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_insert(l: *mut ListVec, i: i64, val: *mut c_void) {
+    let v = match list_mut(l) {
+        Some(v) => v,
+        None => return,
+    };
+    if i < 0 {
+        return;
+    }
+    let idx = (i as usize).min(v.len());
+    v.insert(idx, val);
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_remove(l: *mut ListVec, i: i64) -> *mut c_void {
+    let v = match list_mut(l) {
+        Some(v) => v,
+        None => return std::ptr::null_mut(),
+    };
+    if i < 0 || (i as usize) >= v.len() {
+        return std::ptr::null_mut();
+    }
+    v.remove(i as usize)
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_truncate(l: *mut ListVec, n: i64) {
+    if let Some(v) = list_mut(l) {
+        let n = if n < 0 { 0 } else { n as usize };
+        v.truncate(n);
+    }
+}
+
+// Reference-equality only — fine for managed `T` (which all share a single
+// allocation per value), wrong for primitives that pass-through the wider
+// nullable ABI.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_contains(l: *mut ListVec, val: *mut c_void) -> u8 {
+    match list_mut(l) {
+        Some(v) => if v.iter().any(|&p| p == val) { 1 } else { 0 },
+        None => 0,
+    }
+}
+
+// `i64 | null` lowers to a tagged union for primitives that codegen doesn't
+// emit yet, so this helper isn't reachable from the of-side; declared to keep
+// the symbol table aligned with `of_core.of`.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_list_index_of(l: *mut ListVec, val: *mut c_void) -> i64 {
+    match list_mut(l) {
+        Some(v) => v.iter().position(|&p| p == val).map(|n| n as i64).unwrap_or(-1),
+        None => -1,
+    }
+}

@@ -1,60 +1,39 @@
-// state.of — in-memory chat store.
+// state.of — in-memory chat store, backed by `List<T>`.
 //
-// Channels, messages, and long-poll waiters live as linked lists hung off
-// `ChatState`. No List<T> / Map<K,V> runtime is available, so every
-// collection is a head pointer + `next: T | null` field. Channel and
-// message counts in a demo stay small enough that O(n) lookups don't
-// matter.
+// Each channel keeps its messages in a List in insertion order. Waiters
+// (long-poll requests parked until either a new message arrives or their
+// deadline passes) sit in a second List on ChatState. `next_id` is the id
+// the NEXT message will take; "messages since N" means "messages with id > N".
 
 import { println } from "of:core";
 import { json_str } from "json";
-
-// ----- Messages ----------------------------------------------------------
 
 struct Message {
   id: i64,
   user: str,
   text: str,
-  next: Message | null,
 }
-
-// ----- Channels ----------------------------------------------------------
-//
-// `next_id` is the id the NEXT message will take. So if a channel has
-// posted 3 messages, ids are 1,2,3 and `next_id == 4`. Clients ask for
-// "messages since N" meaning "messages with id > N".
 
 struct Channel {
   name: str,
-  head: Message | null,
-  tail: Message | null,
+  messages: List<Message>,
   next_id: i64,
-  next: Channel | null,
 }
 
 extend Channel {
   function append(self, user: str, text: str): i64 {
     var id = self.next_id;
     self.next_id = id + (1 as i64);
-    var m = Message { id: id, user: user, text: text, next: null };
-    if (self.tail is null) {
-      self.head = m;
-    } else {
-      var prev = self.tail as Message;
-      prev.next = m;
-    }
-    self.tail = m;
+    self.messages.push(Message { id: id, user: user, text: text });
     id
   }
 
-  // Build the JSON payload for a long-poll response: every message with
-  // id > since, plus the new high-water mark.
+  // JSON for a long-poll response: every message with id > since, plus the
+  // new high-water mark.
   function poll_json(self, since: i64): str {
     var msgs = "";
     var first = true;
-    var p: Message | null = self.head;
-    while (p is Message) {
-      var m = p as Message;
+    for (m in self.messages) {
       if (m.id > since) {
         var entry = "{\"id\":" + (m.id as str)
                   + ",\"user\":" + json_str(m.user)
@@ -66,128 +45,94 @@ extend Channel {
           msgs = msgs + "," + entry;
         }
       }
-      p = m.next;
     }
     var next_cursor = self.next_id - (1 as i64);
     "{\"messages\":[" + msgs + "],\"next\":" + (next_cursor as str) + "}"
   }
 }
 
-// ----- Waiters -----------------------------------------------------------
-//
-// A `Waiter` is a long-poll request that didn't have new data when it
-// arrived. We hold its connection state and wake it up when (a) the
-// channel receives a message it'd want, or (b) its deadline passes.
-
 struct Waiter {
   fd: i32,
   channel: str,
   since: i64,
   deadline_ms: i64,
-  next: Waiter | null,
 }
 
-// ----- ChatState ---------------------------------------------------------
-
 struct ChatState {
-  channels: Channel | null,
-  waiters: Waiter | null,
+  channels: List<Channel>,
+  waiters: List<Waiter>,
 
   function new(): ChatState {
-    ChatState { channels: null, waiters: null }
+    ChatState {
+      channels: List.new<Channel>(),
+      waiters: List.new<Waiter>(),
+    }
   }
 }
 
 extend ChatState {
-  // Look up a channel by name, or create-and-prepend if absent.
+  // Look up a channel by name, or create it (and append to the list) if absent.
   function ensure_channel(self, name: str): Channel {
-    var p: Channel | null = self.channels;
-    while (p is Channel) {
-      var c = p as Channel;
+    for (c in self.channels) {
       if (c.name == name) {
         return c;
       }
-      p = c.next;
     }
-    var fresh = Channel {
-      name: name,
-      head: null,
-      tail: null,
-      next_id: 1 as i64,
-      next: self.channels,
-    };
-    self.channels = fresh;
+    var fresh = Channel { name: name, messages: List.new<Message>(), next_id: 1 as i64 };
+    self.channels.push(fresh);
     fresh
   }
 
   // Look up without creating. Used by /poll so unknown channels look empty
   // rather than appearing in the channel list on first poll.
   function find_channel(self, name: str): Channel | null {
-    var p: Channel | null = self.channels;
-    while (p is Channel) {
-      var c = p as Channel;
+    for (c in self.channels) {
       if (c.name == name) {
         return c;
       }
-      p = c.next;
     }
     null
   }
 
   function add_waiter(self, fd: i32, channel: str, since: i64, deadline_ms: i64) {
-    var w = Waiter {
-      fd: fd,
-      channel: channel,
-      since: since,
-      deadline_ms: deadline_ms,
-      next: self.waiters,
-    };
-    self.waiters = w;
+    self.waiters.push(Waiter {
+      fd: fd, channel: channel, since: since, deadline_ms: deadline_ms,
+    });
   }
 
-  // Walk the waiters list, unlinking and returning the first one matching
-  // `(channel, since < cursor)` — the caller responds to it, then calls
-  // again to drain. Returns null when no waiter is eligible.
+  // Take the first waiter matching `(channel, since < cursor)` out of the
+  // list and return it. Caller responds to it, then loops. Returns null when
+  // no waiter is eligible.
   function take_woken(self, channel: str, cursor: i64): Waiter | null {
-    var prev: Waiter | null = null;
-    var p: Waiter | null = self.waiters;
-    while (p is Waiter) {
-      var w = p as Waiter;
-      if (w.channel == channel && cursor > w.since) {
-        if (prev is null) {
-          self.waiters = w.next;
-        } else {
-          var pv = prev as Waiter;
-          pv.next = w.next;
+    var i: i64 = 0 as i64;
+    while (i < self.waiters.size()) {
+      var w_or = self.waiters.get(i);
+      if (w_or is Waiter) {
+        var w = w_or as Waiter;
+        if (w.channel == channel && cursor > w.since) {
+          self.waiters.remove(i);
+          return w;
         }
-        w.next = null;
-        return w;
       }
-      prev = p;
-      p = w.next;
+      i = i + (1 as i64);
     }
     null
   }
 
-  // Same shape as take_woken but matches on a passed deadline. Drives the
-  // "long poll timed out → respond with []" branch.
+  // Same shape, but matches on an elapsed deadline. Drives the "long poll
+  // timed out → respond with []" branch.
   function take_expired(self, now_ms: i64): Waiter | null {
-    var prev: Waiter | null = null;
-    var p: Waiter | null = self.waiters;
-    while (p is Waiter) {
-      var w = p as Waiter;
-      if (w.deadline_ms <= now_ms) {
-        if (prev is null) {
-          self.waiters = w.next;
-        } else {
-          var pv = prev as Waiter;
-          pv.next = w.next;
+    var i: i64 = 0 as i64;
+    while (i < self.waiters.size()) {
+      var w_or = self.waiters.get(i);
+      if (w_or is Waiter) {
+        var w = w_or as Waiter;
+        if (w.deadline_ms <= now_ms) {
+          self.waiters.remove(i);
+          return w;
         }
-        w.next = null;
-        return w;
       }
-      prev = p;
-      p = w.next;
+      i = i + (1 as i64);
     }
     null
   }
@@ -196,46 +141,37 @@ extend ChatState {
   // to bound the select() timeout so expirations fire promptly.
   function earliest_deadline(self): i64 {
     var best: i64 = (0 as i64) - (1 as i64);
-    var p: Waiter | null = self.waiters;
-    while (p is Waiter) {
-      var w = p as Waiter;
+    for (w in self.waiters) {
       if (best < (0 as i64) || w.deadline_ms < best) {
         best = w.deadline_ms;
       }
-      p = w.next;
     }
     best
   }
 
-  // Unlink whatever waiter (if any) is currently parked on `fd`. Used when
-  // a client disconnects mid-wait so we don't try to write to its closed fd.
+  // Unlink any waiter (if any) parked on `fd`. Used when a client disconnects
+  // mid-wait so we don't try to write to its closed fd.
   function drop_waiter_for_fd(self, fd: i32) {
-    var prev: Waiter | null = null;
-    var p: Waiter | null = self.waiters;
-    while (p is Waiter) {
-      var w = p as Waiter;
-      if (w.fd == fd) {
-        if (prev is null) {
-          self.waiters = w.next;
-        } else {
-          var pv = prev as Waiter;
-          pv.next = w.next;
+    var i: i64 = 0 as i64;
+    while (i < self.waiters.size()) {
+      var w_or = self.waiters.get(i);
+      if (w_or is Waiter) {
+        var w = w_or as Waiter;
+        if (w.fd == fd) {
+          self.waiters.remove(i);
+          return;
         }
-        return;
       }
-      prev = p;
-      p = w.next;
+      i = i + (1 as i64);
     }
   }
 
-  // Comma-separated, sorted-by-insertion list of channel names — used to
-  // build the JSON {"channels":[...]} response.
+  // Comma-separated, insertion-order channel names — used to build
+  // {"channels":[...]}.
   function channels_json(self): str {
     var body = "";
     var first = true;
-    var p: Channel | null = self.channels;
-    while (p is Channel) {
-      var c = p as Channel;
+    for (c in self.channels) {
       var entry = json_str(c.name);
       if (first) {
         body = entry;
@@ -243,7 +179,6 @@ extend ChatState {
       } else {
         body = body + "," + entry;
       }
-      p = c.next;
     }
     "{\"channels\":[" + body + "]}"
   }
@@ -252,10 +187,7 @@ extend ChatState {
 // Debug print so the operator can see what's in memory at startup.
 function debug_dump(s: ChatState) {
   println("-- chat state --");
-  var p: Channel | null = s.channels;
-  while (p is Channel) {
-    var c = p as Channel;
+  for (c in s.channels) {
     println("  channel " + c.name + " next_id=" + (c.next_id as str));
-    p = c.next;
   }
 }

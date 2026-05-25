@@ -544,6 +544,23 @@ fn register_runtime_shims(builder: &mut JITBuilder) {
     builder.symbol("__of_f64_to_str", otter_rt::__of_f64_to_str as *const u8);
     builder.symbol("__of_bool_to_str", otter_rt::__of_bool_to_str as *const u8);
     builder.symbol("__of_char_to_str", otter_rt::__of_char_to_str as *const u8);
+    builder.symbol("__of_buffer_alloc", otter_rt::__of_buffer_alloc as *const u8);
+    builder.symbol("__of_buffer_free", otter_rt::__of_buffer_free as *const u8);
+    builder.symbol("__of_buffer_get", otter_rt::__of_buffer_get as *const u8);
+    builder.symbol("__of_buffer_set", otter_rt::__of_buffer_set as *const u8);
+    builder.symbol("__of_list_new", otter_rt::__of_list_new as *const u8);
+    builder.symbol("__of_list_size", otter_rt::__of_list_size as *const u8);
+    builder.symbol("__of_list_is_empty", otter_rt::__of_list_is_empty as *const u8);
+    builder.symbol("__of_list_clear", otter_rt::__of_list_clear as *const u8);
+    builder.symbol("__of_list_get", otter_rt::__of_list_get as *const u8);
+    builder.symbol("__of_list_set", otter_rt::__of_list_set as *const u8);
+    builder.symbol("__of_list_push", otter_rt::__of_list_push as *const u8);
+    builder.symbol("__of_list_pop", otter_rt::__of_list_pop as *const u8);
+    builder.symbol("__of_list_insert", otter_rt::__of_list_insert as *const u8);
+    builder.symbol("__of_list_remove", otter_rt::__of_list_remove as *const u8);
+    builder.symbol("__of_list_truncate", otter_rt::__of_list_truncate as *const u8);
+    builder.symbol("__of_list_contains", otter_rt::__of_list_contains as *const u8);
+    builder.symbol("__of_list_index_of", otter_rt::__of_list_index_of as *const u8);
 }
 
 fn build_mir(file: &str) -> Result<MirProgram, i32> {

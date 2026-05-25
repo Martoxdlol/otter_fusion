@@ -10,12 +10,12 @@ that multiplexes everything through `select(2)`.
 - [`slack.of`](./slack.of) — entry point. Owns the event loop, routes
   HTTP requests to handlers, and threads the `Reactor` through to
   `route()` so handlers can park connections as long-poll waiters.
-- [`reactor.of`](./reactor.of) — `ConnState`, the connection table, and
-  per-connection read/write helpers. One `ConnState` per accepted
-  client, in one of three phases: `READING`, `WRITING`, `WAITING`.
-- [`state.of`](./state.of) — channels, messages, and waiters as
-  hand-rolled linked lists (the runtime has no `List<T>` / `Map<K,V>`
-  yet).
+- [`reactor.of`](./reactor.of) — `ConnState`, the connection table
+  (`List<ConnState>`), and per-connection read/write helpers. One
+  `ConnState` per accepted client, in one of three phases: `READING`,
+  `WRITING`, `WAITING`.
+- [`state.of`](./state.of) — channels (`List<Channel>`), per-channel
+  messages (`List<Message>`), and waiters (`List<Waiter>`).
 - [`url.of`](./url.of) — query-string and form-body parser using
   `Buffer` byte scans (no `str.split` either).
 - [`json.of`](./json.of) — string-escape helper for the JSON we emit.
@@ -77,12 +77,22 @@ cargo build --release -p otter_rt -p otter_io
 cargo build --release --bin otter_fusion
 
 cd examples/networking/slack_clone
+../../../target/release/otter_fusion build slack.of \
+   -l ../../../target/release/libotter_io.a \
+   -o /tmp/slack
+/tmp/slack
+```
+
+`build` auto-finds `libotter_rt.a` next to the compiler and invokes `cc`
+(adding `-lpthread -ldl -lm` on Linux). Or, equivalently, the manual
+two-step — useful if you want to inspect the object file or link by hand:
+
+```bash
 ../../../target/release/otter_fusion compile slack.of -o /tmp/slack.o
 cc /tmp/slack.o \
    ../../../target/release/libotter_rt.a \
    ../../../target/release/libotter_io.a \
    -o /tmp/slack
-/tmp/slack
 ```
 
 Open <http://127.0.0.1:8090/> in a browser. The page prompts for a
@@ -99,10 +109,14 @@ curl -s -X POST -d 'channel=general&user=alice&text=hello' http://127.0.0.1:8090
 curl -s 'http://127.0.0.1:8090/poll?channel=general&since=0&wait=25'
 ```
 
-## Runtime extension
+## Runtime additions
 
-The reactor needs a monotonic clock for waiter deadlines. We added one
-helper to `io/src/lib.rs`:
+Two pieces landed in the runtime to make this example possible. Both are
+language-wide, not slack-specific:
+
+**`__of_now_ms`** in [`io/src/lib.rs`](../../../io/src/lib.rs) — a
+monotonic clock used for long-poll deadlines. `of_io.of` exposes it as
+`now_ms(): i64`.
 
 ```rust
 pub extern "C" fn __of_now_ms() -> i64 {
@@ -110,17 +124,30 @@ pub extern "C" fn __of_now_ms() -> i64 {
 }
 ```
 
-`of_io.of` here exposes it as `now_ms(): i64`. Nothing else in the IO
-runtime changed.
+**`__of_list_*`** in [`rt/src/lib.rs`](../../../rt/src/lib.rs) — the
+backing store for `List<T>` declared in `src/of_core.of`. Each list is a
+leaked `Box<Vec<*mut c_void>>`; elements are stored as opaque pointer-
+sized slots. That works for any `List<SomeStruct>` (managed references
+are pointer-sized) but **not** for `List<i32>` / `List<f64>` /
+`List<bool>` — those need the small-primitive nullable ABI for
+`get`/`pop`/`remove`, which codegen doesn't emit yet. The whole set of
+13 symbols (`new`, `size`, `is_empty`, `clear`, `get`, `set`, `push`,
+`pop`, `insert`, `remove`, `truncate`, `contains`, `index_of`) is also
+registered for the JIT in `src/main.rs`.
 
 ## Why the design looks like this
 
 Several language features that would normally shape a chat server
 aren't wired up yet, so the design routes around them:
 
-- **No `List<T>` / `Map<K,V>` runtime.** Channels, messages, waiters,
-  and even the close-deferred-fd list are linked-list structs with
-  `next: Self | null` fields. Walking is O(n) but n is small here.
+- **`List<T>` only works for managed `T`.** The runtime added here
+  stores elements as raw pointer slots — fine for `List<Channel>`,
+  `List<Message>`, `List<Waiter>`, `List<ConnState>`, but it won't
+  carry `List<i32>` / `List<f64>` / `List<bool>` correctly until the
+  small-primitive nullable ABI for `.get()` / `.pop()` / `.remove()`
+  exists in codegen.
+- **No `Map<K,V>` runtime.** Channel lookup is a linear scan over
+  `state.channels`. n is small here, so it's fine.
 - **No `str.split` / `str.index_of` / `str.size`.** Query and form
   parsing converts the string to a `Buffer` once, then byte-scans for
   `?`, `&`, `=`, `%`. JSON escaping is the same shape.
