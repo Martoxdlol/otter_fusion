@@ -21,7 +21,7 @@ extend Wrapper<i32> {
 }
 
 interface Named {
-  name: str,
+  function name(self): str;
 }
 
 extend<T> Wrapper<T>: Named {

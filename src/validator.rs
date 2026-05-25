@@ -1727,8 +1727,19 @@ impl Validator {
             let mut locals: Vec<HashMap<String, ResolvedType>> = vec![HashMap::new()];
             if func.has_self
                 && let Some(owner) = func.owner {
-                    let self_ty = self.self_type_for(owner);
-                    locals[0].insert("self".to_string(), self_ty);
+                    let mut self_ty = self.self_type_for(owner);
+                    if let Some(s) = self.hir.structs.get(&owner) {
+                        for (target_args, f) in &s.specialised_methods {
+                            if *f == *fn_id {
+                                self_ty = ResolvedType::Struct(owner, target_args.clone());
+                                break;
+                            }
+                        }
+                    }
+                    locals
+                        .last_mut()
+                        .unwrap()
+                        .insert("self".to_string(), self_ty);
                 }
             for p in &func.params {
                 locals[0].insert(p.name.clone(), p.ty.clone());
@@ -2819,6 +2830,8 @@ impl Validator {
                         combined.insert(k, substitute(&v, &subst));
                     }
                     return Some((*fn_id, combined));
+                } else if target_args == &owner_args {
+                    return Some((*fn_id, HashMap::new()));
                 }
             }
         } else if let Some(i) = self.hir.interfaces.get(&owner_id) {
