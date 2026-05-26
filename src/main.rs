@@ -234,6 +234,11 @@ fn emit_object(file: &str, out_path: &Path) -> Result<(), i32> {
         eprintln!("{file}: error: isa flag: {e}");
         1
     })?;
+    // Fastest code, plus size-reduction transforms.
+    flag_builder.set("opt_level", "speed_and_size").map_err(|e| {
+        eprintln!("{file}: error: isa flag: {e}");
+        1
+    })?;
     let flags = cranelift_codegen::settings::Flags::new(flag_builder);
     let isa = isa_builder.finish(flags).map_err(|e| {
         eprintln!("{file}: error: isa: {e}");
@@ -500,6 +505,8 @@ fn make_jit_module(libs: Vec<libloading::Library>) -> Result<JITModule, String> 
     let mut flags = cranelift_codegen::settings::builder();
     flags.set("use_colocated_libcalls", "false").map_err(|e| e.to_string())?;
     flags.set("is_pic", "false").map_err(|e| e.to_string())?;
+    // Fastest code, plus size-reduction transforms.
+    flags.set("opt_level", "speed_and_size").map_err(|e| e.to_string())?;
     let isa_builder = cranelift_native::builder().map_err(|m| m.to_string())?;
     let isa = isa_builder
         .finish(cranelift_codegen::settings::Flags::new(flags))
