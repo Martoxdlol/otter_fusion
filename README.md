@@ -213,11 +213,10 @@ Point the `otterFusion.binaryPath` setting at your compiled binary (or have
 ```bash
 cd vscode-extension
 npm install
-npm run compile
+npm run package
 ```
 
-Then load it with VS Code's "Run Extension" launch config, or package it with
-`vsce`.
+You can right click the generated `.vsix` file and "Install Extension" to get it into your editor.
 
 ## Project layout
 
@@ -235,3 +234,7 @@ SPEC.md          # language reference
 ## Status
 
 This is just an experimental language! We don't eve GC memory yet!
+
+## Demo APP
+
+[https://of-slack.abcd.ar/](https://of-slack.abcd.ar/) is a super basic Slack clone built with Otter Fusion as backend.
