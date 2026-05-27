@@ -1,0 +1,533 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/language/10_generics.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "print",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "identity",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        return_type: Some(
+                            Named(
+                                "T",
+                                [],
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    Variable(
+                                        "value",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 3,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Wrapper",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [
+                            FieldDecl {
+                                name: "value",
+                                ty: Named(
+                                    "T",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Wrapper",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "get",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "T",
+                                        [],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Member(
+                                                SelfRef,
+                                                "value",
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 12,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Wrapper",
+                            [
+                                Primitive(
+                                    Int32,
+                                ),
+                            ],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "double",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Int32,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            BinaryOp(
+                                                Member(
+                                                    SelfRef,
+                                                    "value",
+                                                ),
+                                                Mul,
+                                                Literal(
+                                                    Int(
+                                                        "2",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 18,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 17,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "name",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 24,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 23,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Wrapper",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        implements: [
+                            Named(
+                                "Named",
+                                [],
+                            ),
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "name",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            Literal(
+                                                String(
+                                                    "Wrapper",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 28,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 27,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "main",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "w",
+                                        None,
+                                        Some(
+                                            StructInit(
+                                                Named(
+                                                    "Wrapper",
+                                                    [
+                                                        Primitive(
+                                                            Int32,
+                                                        ),
+                                                    ],
+                                                ),
+                                                [
+                                                    (
+                                                        "value",
+                                                        Literal(
+                                                            Int(
+                                                                "21",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "get: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "w",
+                                                                ),
+                                                                "get",
+                                                            ),
+                                                            [],
+                                                            [],
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "double: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "w",
+                                                                ),
+                                                                "double",
+                                                            ),
+                                                            [],
+                                                            [],
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "name: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Call(
+                                                        Member(
+                                                            Variable(
+                                                                "w",
+                                                            ),
+                                                            "name",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "print",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "id: ",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Call(
+                                                            Variable(
+                                                                "identity",
+                                                            ),
+                                                            [
+                                                                Primitive(
+                                                                    Int64,
+                                                                ),
+                                                            ],
+                                                            [
+                                                                Literal(
+                                                                    Int(
+                                                                        "7",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Literal(
+                                        Int(
+                                            "0",
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 33,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 33,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

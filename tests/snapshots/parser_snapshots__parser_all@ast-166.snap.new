@@ -1,0 +1,118 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/validator/p4_universal_extend_satisfies_interface.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "I",
+                        generics: [],
+                        fields: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "f",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 1,
+                                    col: 23,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 10,
+                    len: 9,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "S",
+                        is_extern: false,
+                        generics: [
+                            GenericParam {
+                                name: "T",
+                                bounds: [],
+                            },
+                        ],
+                        fields: [],
+                        methods: [],
+                        implements: [
+                            Named(
+                                "I",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "S",
+                            [
+                                Named(
+                                    "T",
+                                    [],
+                                ),
+                            ],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "f",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 3,
+                                    col: 23,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 3,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

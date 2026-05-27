@@ -657,23 +657,46 @@ impl Lower {
         subst: &Subst,
         b: &mut FnBuilder,
     ) -> Operand {
-        let elem_ty = match subst.apply(result_ty) {
-            ResolvedType::Struct(_, args) if args.len() == 1 => args[0].clone(),
+        // Build the list with the same `new()` + `push()` calls that user code
+        // uses. (The old `AllocList` rvalue allocated a bare placeholder block
+        // and dropped the elements, so literals came out empty and weren't even
+        // valid `ListVec`s.)
+        let (list_id, list_args) = match subst.apply(result_ty) {
+            ResolvedType::Struct(id, args) if args.len() == 1 => (id, args),
             other => panic!("list literal with non-List<T> type: {:?}", other),
         };
-        let elem_mir = self.lower_concrete_type(&elem_ty);
+        let elem_ty = list_args[0].clone();
+        let result_mir = self.lower_type(result_ty, subst);
 
-        let ops: Vec<Operand> = items
-            .iter()
-            .map(|e| {
+        let (new_fn, new_extra) = self.resolve_method_with_args(list_id, &list_args, "new");
+        let mut new_call_args = list_args.clone();
+        new_call_args.extend(new_extra);
+        let new_mir_fn = self.mono_fn(new_fn, new_call_args);
+        let list_local = b.new_temp(result_mir.clone());
+        b.push_stmt(Stmt::Assign(
+            list_local,
+            AssignValue::Call(Callee::Static(new_mir_fn), vec![]),
+        ));
+
+        if !items.is_empty() {
+            let (push_fn, push_extra) = self.resolve_method_with_args(list_id, &list_args, "push");
+            let mut push_call_args = list_args.clone();
+            push_call_args.extend(push_extra);
+            let push_mir_fn = self.mono_fn(push_fn, push_call_args);
+            for e in items {
                 let raw = self.lower_expr(e, subst, b);
                 let from = subst.apply(&e.ty);
-                self.coerce_to(raw, &from, &elem_ty, b)
-            })
-            .collect();
-
-        let result_mir = self.lower_type(result_ty, subst);
-        b.emit(AssignValue::AllocList(elem_mir, ops), result_mir)
+                let op = self.coerce_to(raw, &from, &elem_ty, b);
+                b.emit(
+                    AssignValue::Call(
+                        Callee::Static(push_mir_fn),
+                        vec![Operand::Copy(list_local), op],
+                    ),
+                    MirType::Unit,
+                );
+            }
+        }
+        Operand::Copy(list_local)
     }
 
     fn lower_map_lit(
@@ -683,28 +706,48 @@ impl Lower {
         subst: &Subst,
         b: &mut FnBuilder,
     ) -> Operand {
-        let (k_ty, v_ty) = match subst.apply(result_ty) {
-            ResolvedType::Struct(_, args) if args.len() == 2 => (args[0].clone(), args[1].clone()),
+        // Build the map with `new()` + `set()` calls, mirroring the list
+        // literal fix (the old `AllocMap` rvalue dropped the pairs).
+        let (map_id, map_args) = match subst.apply(result_ty) {
+            ResolvedType::Struct(id, args) if args.len() == 2 => (id, args),
             other => panic!("map literal with non-Map<K,V> type: {:?}", other),
         };
-        let k_mir = self.lower_concrete_type(&k_ty);
-        let v_mir = self.lower_concrete_type(&v_ty);
+        let k_ty = map_args[0].clone();
+        let v_ty = map_args[1].clone();
+        let result_mir = self.lower_type(result_ty, subst);
 
-        let ops: Vec<(Operand, Operand)> = pairs
-            .iter()
-            .map(|(k, v)| {
+        let (new_fn, new_extra) = self.resolve_method_with_args(map_id, &map_args, "new");
+        let mut new_call_args = map_args.clone();
+        new_call_args.extend(new_extra);
+        let new_mir_fn = self.mono_fn(new_fn, new_call_args);
+        let map_local = b.new_temp(result_mir.clone());
+        b.push_stmt(Stmt::Assign(
+            map_local,
+            AssignValue::Call(Callee::Static(new_mir_fn), vec![]),
+        ));
+
+        if !pairs.is_empty() {
+            let (set_fn, set_extra) = self.resolve_method_with_args(map_id, &map_args, "set");
+            let mut set_call_args = map_args.clone();
+            set_call_args.extend(set_extra);
+            let set_mir_fn = self.mono_fn(set_fn, set_call_args);
+            for (k, v) in pairs {
                 let k_raw = self.lower_expr(k, subst, b);
                 let k_from = subst.apply(&k.ty);
                 let k_op = self.coerce_to(k_raw, &k_from, &k_ty, b);
                 let v_raw = self.lower_expr(v, subst, b);
                 let v_from = subst.apply(&v.ty);
                 let v_op = self.coerce_to(v_raw, &v_from, &v_ty, b);
-                (k_op, v_op)
-            })
-            .collect();
-
-        let result_mir = self.lower_type(result_ty, subst);
-        b.emit(AssignValue::AllocMap(k_mir, v_mir, ops), result_mir)
+                b.emit(
+                    AssignValue::Call(
+                        Callee::Static(set_mir_fn),
+                        vec![Operand::Copy(map_local), k_op, v_op],
+                    ),
+                    MirType::Unit,
+                );
+            }
+        }
+        Operand::Copy(map_local)
     }
 
     pub fn lookup_free_function(&self, name: &str) -> Option<FnId> {

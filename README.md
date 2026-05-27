@@ -226,9 +226,23 @@ src/of_core.of   # the synthetic prelude, embedded at build time
 rt/              # otter_rt: runtime crate (GC, string ops, print)
 io/              # otter_io: POSIX I/O extern library + of_io.of bindings
 examples/        # language tour, networking demos, web server
+bench/           # cross-language benchmark suite + harness + plot
 tests/           # snapshot-based tests (insta) for lexer/parser/validator/lower
 vscode-extension/
 SPEC.md          # language reference
+```
+
+## Benchmarks
+
+![benchmark results](bench/results/benchmarks.png)
+
+Run them yourself:
+
+```bash
+cargo build --release -p otter_fusion -p otter_rt   # build the toolchain
+python3 bench/bench.py                               # build, verify, time all
+python3 bench/bench.py fib mandelbrot --runs 10      # a subset, more samples
+python3 bench/plot.py                                # regenerate the chart
 ```
 
 ## Status

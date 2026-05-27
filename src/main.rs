@@ -186,21 +186,19 @@ fn run_run(file: &str, lib_paths: &[String]) -> i32 {
             f();
             0
         }
+        // The program's own output is its stdout; `main`'s return value is the
+        // process exit code (truncated like a C `main`), not printed.
         MirType::Primitive(PrimitiveType::Int64) => {
             let f: extern "C" fn() -> i64 = unsafe { std::mem::transmute(code_ptr) };
-            let result = f();
-            println!("{result}");
-            0
+            f() as i32
         }
         MirType::Primitive(PrimitiveType::Int32) => {
             let f: extern "C" fn() -> i32 = unsafe { std::mem::transmute(code_ptr) };
-            println!("{}", f());
-            0
+            f()
         }
         MirType::Primitive(PrimitiveType::Bool) => {
             let f: extern "C" fn() -> i8 = unsafe { std::mem::transmute(code_ptr) };
-            println!("{}", f() != 0);
-            0
+            f() as i32
         }
         other => {
             eprintln!("{file}: error: unsupported `main` return type for JIT: {other:?}");
@@ -544,6 +542,7 @@ fn register_runtime_shims(builder: &mut JITBuilder) {
     builder.symbol("__of_vtable_clear", otter_rt::__of_vtable_clear as *const u8);
     builder.symbol("__of_print", otter_rt::__of_print as *const u8);
     builder.symbol("__of_println", otter_rt::__of_println as *const u8);
+    builder.symbol("__of_now_ns", otter_rt::__of_now_ns as *const u8);
     builder.symbol("__of_str_concat", otter_rt::__of_str_concat as *const u8);
     builder.symbol("__of_str_eq", otter_rt::__of_str_eq as *const u8);
     builder.symbol("__of_i64_to_str", otter_rt::__of_i64_to_str as *const u8);
@@ -568,6 +567,16 @@ fn register_runtime_shims(builder: &mut JITBuilder) {
     builder.symbol("__of_list_truncate", otter_rt::__of_list_truncate as *const u8);
     builder.symbol("__of_list_contains", otter_rt::__of_list_contains as *const u8);
     builder.symbol("__of_list_index_of", otter_rt::__of_list_index_of as *const u8);
+    builder.symbol("__of_map_new", otter_rt::__of_map_new as *const u8);
+    builder.symbol("__of_map_size", otter_rt::__of_map_size as *const u8);
+    builder.symbol("__of_map_is_empty", otter_rt::__of_map_is_empty as *const u8);
+    builder.symbol("__of_map_clear", otter_rt::__of_map_clear as *const u8);
+    builder.symbol("__of_map_get", otter_rt::__of_map_get as *const u8);
+    builder.symbol("__of_map_set", otter_rt::__of_map_set as *const u8);
+    builder.symbol("__of_map_remove", otter_rt::__of_map_remove as *const u8);
+    builder.symbol("__of_map_contains", otter_rt::__of_map_contains as *const u8);
+    builder.symbol("__of_map_keys", otter_rt::__of_map_keys as *const u8);
+    builder.symbol("__of_map_values", otter_rt::__of_map_values as *const u8);
 }
 
 fn build_mir(file: &str) -> Result<MirProgram, i32> {

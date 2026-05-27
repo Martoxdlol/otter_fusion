@@ -1,0 +1,47 @@
+import { println, now_ns } from "of:core";
+
+// Escape-time Mandelbrot over an 800x800 grid; checksum = sum of iteration
+// counts. Pure f64 math, so every language must produce the same integer.
+function run(): i64 {
+  var w: i64 = 800;
+  var h: i64 = 800;
+  var maxiter: i64 = 255;
+  var checksum: i64 = 0;
+
+  var py: i64 = 0;
+  while py < h {
+    var px: i64 = 0;
+    while px < w {
+      var cre: f64 = -2.0 + (px as f64) * (2.5 / (w as f64));
+      var cim: f64 = -1.25 + (py as f64) * (2.5 / (h as f64));
+      var zr: f64 = 0.0;
+      var zi: f64 = 0.0;
+      var zr2: f64 = 0.0;
+      var zi2: f64 = 0.0;
+      var i: i64 = 0;
+      while zr2 + zi2 <= 4.0 {
+        if (i >= maxiter) { break; }
+        zi = 2.0 * zr * zi + cim;
+        zr = zr2 - zi2 + cre;
+        zr2 = zr * zr;
+        zi2 = zi * zi;
+        i = i + 1;
+      }
+      checksum = checksum + i;
+      px = px + 1;
+    }
+    py = py + 1;
+  }
+
+  checksum
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

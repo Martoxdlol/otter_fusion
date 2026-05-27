@@ -1,0 +1,76 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/parser/parse_type_alias_with_generics.of
+---
+Ok(
+    [
+        Token {
+            token_type: Type,
+            position: 4,
+            line: 1,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "Option",
+            ),
+            position: 11,
+            line: 1,
+            column: 12,
+        },
+        Token {
+            token_type: LT,
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: GT,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "T",
+            ),
+            position: 18,
+            line: 1,
+            column: 19,
+        },
+        Token {
+            token_type: Pipe,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: Null,
+            position: 25,
+            line: 1,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 26,
+            line: 1,
+            column: 27,
+        },
+    ],
+)

@@ -1,0 +1,1260 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/networking/slack_clone/json.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "Buffer",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_buffer_free",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 7,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of_io",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "__of_buffer_from_str",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_str_from_buffer",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "ASCII_QUOTE",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "34",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 10,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "ASCII_BACKSLASH",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "92",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "ASCII_NEWLINE",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "10",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 12,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "ASCII_CR",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "13",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 13,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "ASCII_TAB",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "9",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 14,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "json_str",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                String,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "src_or",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_buffer_from_str",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "s",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "src_or",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                String(
+                                                                    "\"\"",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "src",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "src_or",
+                                                ),
+                                                Named(
+                                                    "Buffer",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "n",
+                                        None,
+                                        Some(
+                                            Member(
+                                                Variable(
+                                                    "src",
+                                                ),
+                                                "size",
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "dst_or",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Member(
+                                                    Variable(
+                                                        "Buffer",
+                                                    ),
+                                                    "alloc",
+                                                ),
+                                                [],
+                                                [
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            Variable(
+                                                                "n",
+                                                            ),
+                                                            Mul,
+                                                            As(
+                                                                Literal(
+                                                                    Int(
+                                                                        "2",
+                                                                    ),
+                                                                ),
+                                                                Primitive(
+                                                                    Uint64,
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "2",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Uint64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            Is(
+                                                Variable(
+                                                    "dst_or",
+                                                ),
+                                                Primitive(
+                                                    Null,
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_buffer_free",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "src",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                    Return(
+                                                        Some(
+                                                            Literal(
+                                                                String(
+                                                                    "\"\"",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "dst",
+                                        None,
+                                        Some(
+                                            As(
+                                                Variable(
+                                                    "dst_or",
+                                                ),
+                                                Named(
+                                                    "Buffer",
+                                                    [],
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "j",
+                                        Some(
+                                            Primitive(
+                                                Uint64,
+                                            ),
+                                        ),
+                                        Some(
+                                            As(
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                                Primitive(
+                                                    Uint64,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "dst",
+                                                ),
+                                                "set",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "j",
+                                                ),
+                                                Variable(
+                                                    "ASCII_QUOTE",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Assign(
+                                        Variable(
+                                            "j",
+                                        ),
+                                        BinaryOp(
+                                            Variable(
+                                                "j",
+                                            ),
+                                            Add,
+                                            As(
+                                                Literal(
+                                                    Int(
+                                                        "1",
+                                                    ),
+                                                ),
+                                                Primitive(
+                                                    Uint64,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "i",
+                                        Some(
+                                            Primitive(
+                                                Uint64,
+                                            ),
+                                        ),
+                                        Some(
+                                            As(
+                                                Literal(
+                                                    Int(
+                                                        "0",
+                                                    ),
+                                                ),
+                                                Primitive(
+                                                    Uint64,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    While(
+                                        BinaryOp(
+                                            Variable(
+                                                "i",
+                                            ),
+                                            Lt,
+                                            Variable(
+                                                "n",
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "b",
+                                                    None,
+                                                    Some(
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "src",
+                                                                ),
+                                                                "get",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "i",
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            Variable(
+                                                                "b",
+                                                            ),
+                                                            Eq,
+                                                            Variable(
+                                                                "ASCII_QUOTE",
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Expr(
+                                                                    Call(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "dst",
+                                                                            ),
+                                                                            "set",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            Variable(
+                                                                                "j",
+                                                                            ),
+                                                                            Variable(
+                                                                                "ASCII_BACKSLASH",
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Assign(
+                                                                    Variable(
+                                                                        "j",
+                                                                    ),
+                                                                    BinaryOp(
+                                                                        Variable(
+                                                                            "j",
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            Literal(
+                                                                                Int(
+                                                                                    "1",
+                                                                                ),
+                                                                            ),
+                                                                            Primitive(
+                                                                                Uint64,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Expr(
+                                                                    Call(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "dst",
+                                                                            ),
+                                                                            "set",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            Variable(
+                                                                                "j",
+                                                                            ),
+                                                                            Variable(
+                                                                                "ASCII_QUOTE",
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                                Assign(
+                                                                    Variable(
+                                                                        "j",
+                                                                    ),
+                                                                    BinaryOp(
+                                                                        Variable(
+                                                                            "j",
+                                                                        ),
+                                                                        Add,
+                                                                        As(
+                                                                            Literal(
+                                                                                Int(
+                                                                                    "1",
+                                                                                ),
+                                                                            ),
+                                                                            Primitive(
+                                                                                Uint64,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        Some(
+                                                            Block {
+                                                                statements: [],
+                                                                returns: Some(
+                                                                    If(
+                                                                        BinaryOp(
+                                                                            Variable(
+                                                                                "b",
+                                                                            ),
+                                                                            Eq,
+                                                                            Variable(
+                                                                                "ASCII_BACKSLASH",
+                                                                            ),
+                                                                        ),
+                                                                        Block {
+                                                                            statements: [
+                                                                                Expr(
+                                                                                    Call(
+                                                                                        Member(
+                                                                                            Variable(
+                                                                                                "dst",
+                                                                                            ),
+                                                                                            "set",
+                                                                                        ),
+                                                                                        [],
+                                                                                        [
+                                                                                            Variable(
+                                                                                                "j",
+                                                                                            ),
+                                                                                            Variable(
+                                                                                                "ASCII_BACKSLASH",
+                                                                                            ),
+                                                                                        ],
+                                                                                    ),
+                                                                                ),
+                                                                                Assign(
+                                                                                    Variable(
+                                                                                        "j",
+                                                                                    ),
+                                                                                    BinaryOp(
+                                                                                        Variable(
+                                                                                            "j",
+                                                                                        ),
+                                                                                        Add,
+                                                                                        As(
+                                                                                            Literal(
+                                                                                                Int(
+                                                                                                    "1",
+                                                                                                ),
+                                                                                            ),
+                                                                                            Primitive(
+                                                                                                Uint64,
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                                Expr(
+                                                                                    Call(
+                                                                                        Member(
+                                                                                            Variable(
+                                                                                                "dst",
+                                                                                            ),
+                                                                                            "set",
+                                                                                        ),
+                                                                                        [],
+                                                                                        [
+                                                                                            Variable(
+                                                                                                "j",
+                                                                                            ),
+                                                                                            Variable(
+                                                                                                "ASCII_BACKSLASH",
+                                                                                            ),
+                                                                                        ],
+                                                                                    ),
+                                                                                ),
+                                                                                Assign(
+                                                                                    Variable(
+                                                                                        "j",
+                                                                                    ),
+                                                                                    BinaryOp(
+                                                                                        Variable(
+                                                                                            "j",
+                                                                                        ),
+                                                                                        Add,
+                                                                                        As(
+                                                                                            Literal(
+                                                                                                Int(
+                                                                                                    "1",
+                                                                                                ),
+                                                                                            ),
+                                                                                            Primitive(
+                                                                                                Uint64,
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                            returns: None,
+                                                                        },
+                                                                        Some(
+                                                                            Block {
+                                                                                statements: [],
+                                                                                returns: Some(
+                                                                                    If(
+                                                                                        BinaryOp(
+                                                                                            Variable(
+                                                                                                "b",
+                                                                                            ),
+                                                                                            Eq,
+                                                                                            Variable(
+                                                                                                "ASCII_NEWLINE",
+                                                                                            ),
+                                                                                        ),
+                                                                                        Block {
+                                                                                            statements: [
+                                                                                                Expr(
+                                                                                                    Call(
+                                                                                                        Member(
+                                                                                                            Variable(
+                                                                                                                "dst",
+                                                                                                            ),
+                                                                                                            "set",
+                                                                                                        ),
+                                                                                                        [],
+                                                                                                        [
+                                                                                                            Variable(
+                                                                                                                "j",
+                                                                                                            ),
+                                                                                                            Variable(
+                                                                                                                "ASCII_BACKSLASH",
+                                                                                                            ),
+                                                                                                        ],
+                                                                                                    ),
+                                                                                                ),
+                                                                                                Assign(
+                                                                                                    Variable(
+                                                                                                        "j",
+                                                                                                    ),
+                                                                                                    BinaryOp(
+                                                                                                        Variable(
+                                                                                                            "j",
+                                                                                                        ),
+                                                                                                        Add,
+                                                                                                        As(
+                                                                                                            Literal(
+                                                                                                                Int(
+                                                                                                                    "1",
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                            Primitive(
+                                                                                                                Uint64,
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                                Expr(
+                                                                                                    Call(
+                                                                                                        Member(
+                                                                                                            Variable(
+                                                                                                                "dst",
+                                                                                                            ),
+                                                                                                            "set",
+                                                                                                        ),
+                                                                                                        [],
+                                                                                                        [
+                                                                                                            Variable(
+                                                                                                                "j",
+                                                                                                            ),
+                                                                                                            As(
+                                                                                                                Literal(
+                                                                                                                    Int(
+                                                                                                                        "110",
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                                Primitive(
+                                                                                                                    Uint8,
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                        ],
+                                                                                                    ),
+                                                                                                ),
+                                                                                                Assign(
+                                                                                                    Variable(
+                                                                                                        "j",
+                                                                                                    ),
+                                                                                                    BinaryOp(
+                                                                                                        Variable(
+                                                                                                            "j",
+                                                                                                        ),
+                                                                                                        Add,
+                                                                                                        As(
+                                                                                                            Literal(
+                                                                                                                Int(
+                                                                                                                    "1",
+                                                                                                                ),
+                                                                                                            ),
+                                                                                                            Primitive(
+                                                                                                                Uint64,
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ],
+                                                                                            returns: None,
+                                                                                        },
+                                                                                        Some(
+                                                                                            Block {
+                                                                                                statements: [],
+                                                                                                returns: Some(
+                                                                                                    If(
+                                                                                                        BinaryOp(
+                                                                                                            Variable(
+                                                                                                                "b",
+                                                                                                            ),
+                                                                                                            Eq,
+                                                                                                            Variable(
+                                                                                                                "ASCII_CR",
+                                                                                                            ),
+                                                                                                        ),
+                                                                                                        Block {
+                                                                                                            statements: [
+                                                                                                                Expr(
+                                                                                                                    Call(
+                                                                                                                        Member(
+                                                                                                                            Variable(
+                                                                                                                                "dst",
+                                                                                                                            ),
+                                                                                                                            "set",
+                                                                                                                        ),
+                                                                                                                        [],
+                                                                                                                        [
+                                                                                                                            Variable(
+                                                                                                                                "j",
+                                                                                                                            ),
+                                                                                                                            Variable(
+                                                                                                                                "ASCII_BACKSLASH",
+                                                                                                                            ),
+                                                                                                                        ],
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                                Assign(
+                                                                                                                    Variable(
+                                                                                                                        "j",
+                                                                                                                    ),
+                                                                                                                    BinaryOp(
+                                                                                                                        Variable(
+                                                                                                                            "j",
+                                                                                                                        ),
+                                                                                                                        Add,
+                                                                                                                        As(
+                                                                                                                            Literal(
+                                                                                                                                Int(
+                                                                                                                                    "1",
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                            Primitive(
+                                                                                                                                Uint64,
+                                                                                                                            ),
+                                                                                                                        ),
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                                Expr(
+                                                                                                                    Call(
+                                                                                                                        Member(
+                                                                                                                            Variable(
+                                                                                                                                "dst",
+                                                                                                                            ),
+                                                                                                                            "set",
+                                                                                                                        ),
+                                                                                                                        [],
+                                                                                                                        [
+                                                                                                                            Variable(
+                                                                                                                                "j",
+                                                                                                                            ),
+                                                                                                                            As(
+                                                                                                                                Literal(
+                                                                                                                                    Int(
+                                                                                                                                        "114",
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                                Primitive(
+                                                                                                                                    Uint8,
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                        ],
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                                Assign(
+                                                                                                                    Variable(
+                                                                                                                        "j",
+                                                                                                                    ),
+                                                                                                                    BinaryOp(
+                                                                                                                        Variable(
+                                                                                                                            "j",
+                                                                                                                        ),
+                                                                                                                        Add,
+                                                                                                                        As(
+                                                                                                                            Literal(
+                                                                                                                                Int(
+                                                                                                                                    "1",
+                                                                                                                                ),
+                                                                                                                            ),
+                                                                                                                            Primitive(
+                                                                                                                                Uint64,
+                                                                                                                            ),
+                                                                                                                        ),
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                            ],
+                                                                                                            returns: None,
+                                                                                                        },
+                                                                                                        Some(
+                                                                                                            Block {
+                                                                                                                statements: [],
+                                                                                                                returns: Some(
+                                                                                                                    If(
+                                                                                                                        BinaryOp(
+                                                                                                                            Variable(
+                                                                                                                                "b",
+                                                                                                                            ),
+                                                                                                                            Eq,
+                                                                                                                            Variable(
+                                                                                                                                "ASCII_TAB",
+                                                                                                                            ),
+                                                                                                                        ),
+                                                                                                                        Block {
+                                                                                                                            statements: [
+                                                                                                                                Expr(
+                                                                                                                                    Call(
+                                                                                                                                        Member(
+                                                                                                                                            Variable(
+                                                                                                                                                "dst",
+                                                                                                                                            ),
+                                                                                                                                            "set",
+                                                                                                                                        ),
+                                                                                                                                        [],
+                                                                                                                                        [
+                                                                                                                                            Variable(
+                                                                                                                                                "j",
+                                                                                                                                            ),
+                                                                                                                                            Variable(
+                                                                                                                                                "ASCII_BACKSLASH",
+                                                                                                                                            ),
+                                                                                                                                        ],
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                                Assign(
+                                                                                                                                    Variable(
+                                                                                                                                        "j",
+                                                                                                                                    ),
+                                                                                                                                    BinaryOp(
+                                                                                                                                        Variable(
+                                                                                                                                            "j",
+                                                                                                                                        ),
+                                                                                                                                        Add,
+                                                                                                                                        As(
+                                                                                                                                            Literal(
+                                                                                                                                                Int(
+                                                                                                                                                    "1",
+                                                                                                                                                ),
+                                                                                                                                            ),
+                                                                                                                                            Primitive(
+                                                                                                                                                Uint64,
+                                                                                                                                            ),
+                                                                                                                                        ),
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                                Expr(
+                                                                                                                                    Call(
+                                                                                                                                        Member(
+                                                                                                                                            Variable(
+                                                                                                                                                "dst",
+                                                                                                                                            ),
+                                                                                                                                            "set",
+                                                                                                                                        ),
+                                                                                                                                        [],
+                                                                                                                                        [
+                                                                                                                                            Variable(
+                                                                                                                                                "j",
+                                                                                                                                            ),
+                                                                                                                                            As(
+                                                                                                                                                Literal(
+                                                                                                                                                    Int(
+                                                                                                                                                        "116",
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                                Primitive(
+                                                                                                                                                    Uint8,
+                                                                                                                                                ),
+                                                                                                                                            ),
+                                                                                                                                        ],
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                                Assign(
+                                                                                                                                    Variable(
+                                                                                                                                        "j",
+                                                                                                                                    ),
+                                                                                                                                    BinaryOp(
+                                                                                                                                        Variable(
+                                                                                                                                            "j",
+                                                                                                                                        ),
+                                                                                                                                        Add,
+                                                                                                                                        As(
+                                                                                                                                            Literal(
+                                                                                                                                                Int(
+                                                                                                                                                    "1",
+                                                                                                                                                ),
+                                                                                                                                            ),
+                                                                                                                                            Primitive(
+                                                                                                                                                Uint64,
+                                                                                                                                            ),
+                                                                                                                                        ),
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                            ],
+                                                                                                                            returns: None,
+                                                                                                                        },
+                                                                                                                        Some(
+                                                                                                                            Block {
+                                                                                                                                statements: [],
+                                                                                                                                returns: Some(
+                                                                                                                                    If(
+                                                                                                                                        BinaryOp(
+                                                                                                                                            Variable(
+                                                                                                                                                "b",
+                                                                                                                                            ),
+                                                                                                                                            Lt,
+                                                                                                                                            As(
+                                                                                                                                                Literal(
+                                                                                                                                                    Int(
+                                                                                                                                                        "32",
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                                Primitive(
+                                                                                                                                                    Uint8,
+                                                                                                                                                ),
+                                                                                                                                            ),
+                                                                                                                                        ),
+                                                                                                                                        Block {
+                                                                                                                                            statements: [
+                                                                                                                                                Expr(
+                                                                                                                                                    Call(
+                                                                                                                                                        Member(
+                                                                                                                                                            Variable(
+                                                                                                                                                                "dst",
+                                                                                                                                                            ),
+                                                                                                                                                            "set",
+                                                                                                                                                        ),
+                                                                                                                                                        [],
+                                                                                                                                                        [
+                                                                                                                                                            Variable(
+                                                                                                                                                                "j",
+                                                                                                                                                            ),
+                                                                                                                                                            As(
+                                                                                                                                                                Literal(
+                                                                                                                                                                    Int(
+                                                                                                                                                                        "32",
+                                                                                                                                                                    ),
+                                                                                                                                                                ),
+                                                                                                                                                                Primitive(
+                                                                                                                                                                    Uint8,
+                                                                                                                                                                ),
+                                                                                                                                                            ),
+                                                                                                                                                        ],
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                                Assign(
+                                                                                                                                                    Variable(
+                                                                                                                                                        "j",
+                                                                                                                                                    ),
+                                                                                                                                                    BinaryOp(
+                                                                                                                                                        Variable(
+                                                                                                                                                            "j",
+                                                                                                                                                        ),
+                                                                                                                                                        Add,
+                                                                                                                                                        As(
+                                                                                                                                                            Literal(
+                                                                                                                                                                Int(
+                                                                                                                                                                    "1",
+                                                                                                                                                                ),
+                                                                                                                                                            ),
+                                                                                                                                                            Primitive(
+                                                                                                                                                                Uint64,
+                                                                                                                                                            ),
+                                                                                                                                                        ),
+                                                                                                                                                    ),
+                                                                                                                                                ),
+                                                                                                                                            ],
+                                                                                                                                            returns: None,
+                                                                                                                                        },
+                                                                                                                                        Some(
+                                                                                                                                            Block {
+                                                                                                                                                statements: [
+                                                                                                                                                    Expr(
+                                                                                                                                                        Call(
+                                                                                                                                                            Member(
+                                                                                                                                                                Variable(
+                                                                                                                                                                    "dst",
+                                                                                                                                                                ),
+                                                                                                                                                                "set",
+                                                                                                                                                            ),
+                                                                                                                                                            [],
+                                                                                                                                                            [
+                                                                                                                                                                Variable(
+                                                                                                                                                                    "j",
+                                                                                                                                                                ),
+                                                                                                                                                                Variable(
+                                                                                                                                                                    "b",
+                                                                                                                                                                ),
+                                                                                                                                                            ],
+                                                                                                                                                        ),
+                                                                                                                                                    ),
+                                                                                                                                                    Assign(
+                                                                                                                                                        Variable(
+                                                                                                                                                            "j",
+                                                                                                                                                        ),
+                                                                                                                                                        BinaryOp(
+                                                                                                                                                            Variable(
+                                                                                                                                                                "j",
+                                                                                                                                                            ),
+                                                                                                                                                            Add,
+                                                                                                                                                            As(
+                                                                                                                                                                Literal(
+                                                                                                                                                                    Int(
+                                                                                                                                                                        "1",
+                                                                                                                                                                    ),
+                                                                                                                                                                ),
+                                                                                                                                                                Primitive(
+                                                                                                                                                                    Uint64,
+                                                                                                                                                                ),
+                                                                                                                                                            ),
+                                                                                                                                                        ),
+                                                                                                                                                    ),
+                                                                                                                                                ],
+                                                                                                                                                returns: None,
+                                                                                                                                            },
+                                                                                                                                        ),
+                                                                                                                                    ),
+                                                                                                                                ),
+                                                                                                                            },
+                                                                                                                        ),
+                                                                                                                    ),
+                                                                                                                ),
+                                                                                                            },
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                            },
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            },
+                                                        ),
+                                                    ),
+                                                ),
+                                                Assign(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "i",
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Uint64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Member(
+                                                Variable(
+                                                    "dst",
+                                                ),
+                                                "set",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "j",
+                                                ),
+                                                Variable(
+                                                    "ASCII_QUOTE",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Assign(
+                                        Variable(
+                                            "j",
+                                        ),
+                                        BinaryOp(
+                                            Variable(
+                                                "j",
+                                            ),
+                                            Add,
+                                            As(
+                                                Literal(
+                                                    Int(
+                                                        "1",
+                                                    ),
+                                                ),
+                                                Primitive(
+                                                    Uint64,
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "out",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "dst",
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                    As(
+                                                        Variable(
+                                                            "j",
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "dst",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "__of_buffer_free",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "src",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    Variable(
+                                        "out",
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 19,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 19,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

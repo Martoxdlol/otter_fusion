@@ -1,0 +1,36 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/spec/04_structs_interfaces/interface_basic.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Interface(
+                    InterfaceDecl {
+                        name: "Named",
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 10,
+                    len: 9,
+                },
+            },
+        ],
+    },
+)

@@ -1,0 +1,3444 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/networking/slack_clone/views.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 374,
+            line: 8,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "page",
+            ),
+            position: 379,
+            line: 8,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 380,
+            line: 8,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 381,
+            line: 8,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 382,
+            line: 8,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 386,
+            line: 8,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 388,
+            line: 8,
+            column: 23,
+        },
+        Token {
+            token_type: StringLit(
+                "<!doctype html>\n",
+            ),
+            position: 410,
+            line: 9,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 414,
+            line: 10,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<html lang=\"en\"><head><meta charset=\"utf-8\"/><title>of-slack</title>\n",
+            ),
+            position: 491,
+            line: 10,
+            column: 81,
+        },
+        Token {
+            token_type: Plus,
+            position: 495,
+            line: 11,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n",
+            ),
+            position: 572,
+            line: 11,
+            column: 81,
+        },
+        Token {
+            token_type: Plus,
+            position: 576,
+            line: 12,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<style>\n",
+            ),
+            position: 588,
+            line: 12,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 592,
+            line: 13,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ":root {\n",
+            ),
+            position: 604,
+            line: 13,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 608,
+            line: 14,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  --bg-side: #19171d; --bg-side-hover: rgba(255,255,255,.07);\n",
+            ),
+            position: 674,
+            line: 14,
+            column: 70,
+        },
+        Token {
+            token_type: Plus,
+            position: 678,
+            line: 15,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  --bg-side-active: #1164a3; --side-fg: #d9d6d9; --side-fg-dim: #9b969b;\n",
+            ),
+            position: 755,
+            line: 15,
+            column: 81,
+        },
+        Token {
+            token_type: Plus,
+            position: 759,
+            line: 16,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  --bg: #ffffff; --fg: #1d1c1d; --fg-dim: #696969;\n",
+            ),
+            position: 814,
+            line: 16,
+            column: 59,
+        },
+        Token {
+            token_type: Plus,
+            position: 818,
+            line: 17,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  --border: #e8e8e8; --accent: #007a5a; --danger: #e01e5a;\n",
+            ),
+            position: 881,
+            line: 17,
+            column: 67,
+        },
+        Token {
+            token_type: Plus,
+            position: 885,
+            line: 18,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  --bubble-hover: #f8f8f8;\n",
+            ),
+            position: 916,
+            line: 18,
+            column: 35,
+        },
+        Token {
+            token_type: Plus,
+            position: 920,
+            line: 19,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "}\n",
+            ),
+            position: 926,
+            line: 19,
+            column: 10,
+        },
+        Token {
+            token_type: Plus,
+            position: 930,
+            line: 20,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "* { box-sizing: border-box; }\n",
+            ),
+            position: 964,
+            line: 20,
+            column: 38,
+        },
+        Token {
+            token_type: Plus,
+            position: 968,
+            line: 21,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "html,body { height: 100%; margin: 0; }\n",
+            ),
+            position: 1011,
+            line: 21,
+            column: 47,
+        },
+        Token {
+            token_type: Plus,
+            position: 1015,
+            line: 22,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "body { font: 14px/1.45 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;\n",
+            ),
+            position: 1127,
+            line: 22,
+            column: 116,
+        },
+        Token {
+            token_type: Plus,
+            position: 1131,
+            line: 23,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "       color: var(--fg); background: var(--bg);\n",
+            ),
+            position: 1183,
+            line: 23,
+            column: 56,
+        },
+        Token {
+            token_type: Plus,
+            position: 1187,
+            line: 24,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "       display: grid; grid-template-columns: 240px 1fr; height: 100vh; overflow: hidden; }\n",
+            ),
+            position: 1282,
+            line: 24,
+            column: 99,
+        },
+        Token {
+            token_type: Plus,
+            position: 1286,
+            line: 25,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 1291,
+            line: 25,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 1295,
+            line: 26,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "aside { background: var(--bg-side); color: var(--side-fg); display: flex; flex-direction: column; min-height: 0; }\n",
+            ),
+            position: 1414,
+            line: 26,
+            column: 123,
+        },
+        Token {
+            token_type: Plus,
+            position: 1418,
+            line: 27,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".brand { padding: 16px; font-size: 16px; font-weight: 700; letter-spacing: -.01em; color: #fff;\n",
+            ),
+            position: 1518,
+            line: 27,
+            column: 104,
+        },
+        Token {
+            token_type: Plus,
+            position: 1522,
+            line: 28,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "         border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; }\n",
+            ),
+            position: 1631,
+            line: 28,
+            column: 113,
+        },
+        Token {
+            token_type: Plus,
+            position: 1635,
+            line: 29,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,90,.18); }\n",
+            ),
+            position: 1769,
+            line: 29,
+            column: 138,
+        },
+        Token {
+            token_type: Plus,
+            position: 1773,
+            line: 30,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".brand .dot.off { background: var(--danger); box-shadow: 0 0 0 3px rgba(224,30,90,.18); }\n",
+            ),
+            position: 1867,
+            line: 30,
+            column: 98,
+        },
+        Token {
+            token_type: Plus,
+            position: 1871,
+            line: 31,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-scroll { flex: 1; overflow-y: auto; padding: 8px 4px 16px; }\n",
+            ),
+            position: 1942,
+            line: 31,
+            column: 75,
+        },
+        Token {
+            token_type: Plus,
+            position: 1946,
+            line: 32,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-h { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--side-fg-dim); padding: 12px 12px 4px; }\n",
+            ),
+            position: 2080,
+            line: 32,
+            column: 138,
+        },
+        Token {
+            token_type: Plus,
+            position: 2084,
+            line: 33,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-row { padding: 5px 12px; border-radius: 4px; cursor: pointer; user-select: none;\n",
+            ),
+            position: 2175,
+            line: 33,
+            column: 95,
+        },
+        Token {
+            token_type: Plus,
+            position: 2179,
+            line: 34,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "            display: flex; align-items: center; gap: 6px; margin: 0 4px; }\n",
+            ),
+            position: 2258,
+            line: 34,
+            column: 83,
+        },
+        Token {
+            token_type: Plus,
+            position: 2262,
+            line: 35,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-row:hover { background: var(--bg-side-hover); }\n",
+            ),
+            position: 2320,
+            line: 35,
+            column: 62,
+        },
+        Token {
+            token_type: Plus,
+            position: 2324,
+            line: 36,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-row.active { background: var(--bg-side-active); color: #fff; }\n",
+            ),
+            position: 2397,
+            line: 36,
+            column: 77,
+        },
+        Token {
+            token_type: Plus,
+            position: 2401,
+            line: 37,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-row .hash { color: var(--side-fg-dim); font-weight: 500; }\n",
+            ),
+            position: 2470,
+            line: 37,
+            column: 73,
+        },
+        Token {
+            token_type: Plus,
+            position: 2474,
+            line: 38,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".side-row.active .hash { color: rgba(255,255,255,.85); }\n",
+            ),
+            position: 2535,
+            line: 38,
+            column: 65,
+        },
+        Token {
+            token_type: Plus,
+            position: 2539,
+            line: 39,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".you-row { padding: 4px 12px 8px 16px; display: flex; align-items: center; gap: 8px; color: var(--side-fg); }\n",
+            ),
+            position: 2653,
+            line: 39,
+            column: 118,
+        },
+        Token {
+            token_type: Plus,
+            position: 2657,
+            line: 40,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".you-row .avatar { width: 26px; height: 26px; font-size: 11px; }\n",
+            ),
+            position: 2726,
+            line: 40,
+            column: 73,
+        },
+        Token {
+            token_type: Plus,
+            position: 2730,
+            line: 41,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".addch { padding: 6px 12px 12px; }\n",
+            ),
+            position: 2769,
+            line: 41,
+            column: 43,
+        },
+        Token {
+            token_type: Plus,
+            position: 2773,
+            line: 42,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".addch input { width: 100%; background: rgba(255,255,255,.06); border: 1px solid transparent;\n",
+            ),
+            position: 2871,
+            line: 42,
+            column: 102,
+        },
+        Token {
+            token_type: Plus,
+            position: 2875,
+            line: 43,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "               color: #fff; padding: 6px 10px; border-radius: 4px; font: inherit; }\n",
+            ),
+            position: 2963,
+            line: 43,
+            column: 92,
+        },
+        Token {
+            token_type: Plus,
+            position: 2967,
+            line: 44,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".addch input:focus { outline: none; border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.10); }\n",
+            ),
+            position: 3081,
+            line: 44,
+            column: 118,
+        },
+        Token {
+            token_type: Plus,
+            position: 3085,
+            line: 45,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".addch input::placeholder { color: var(--side-fg-dim); }\n",
+            ),
+            position: 3146,
+            line: 45,
+            column: 65,
+        },
+        Token {
+            token_type: Plus,
+            position: 3150,
+            line: 46,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 3155,
+            line: 46,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 3159,
+            line: 47,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "main { display: flex; flex-direction: column; min-height: 0; }\n",
+            ),
+            position: 3226,
+            line: 47,
+            column: 71,
+        },
+        Token {
+            token_type: Plus,
+            position: 3230,
+            line: 48,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "header.topbar { display: flex; align-items: center; gap: 10px;\n",
+            ),
+            position: 3297,
+            line: 48,
+            column: 71,
+        },
+        Token {
+            token_type: Plus,
+            position: 3301,
+            line: 49,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                padding: 12px 20px; border-bottom: 1px solid var(--border);\n",
+            ),
+            position: 3381,
+            line: 49,
+            column: 84,
+        },
+        Token {
+            token_type: Plus,
+            position: 3385,
+            line: 50,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                font-weight: 700; font-size: 15px; }\n",
+            ),
+            position: 3442,
+            line: 50,
+            column: 61,
+        },
+        Token {
+            token_type: Plus,
+            position: 3446,
+            line: 51,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "header.topbar .ch-name { display: flex; align-items: baseline; gap: 4px; }\n",
+            ),
+            position: 3525,
+            line: 51,
+            column: 83,
+        },
+        Token {
+            token_type: Plus,
+            position: 3529,
+            line: 52,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "header.topbar .ch-name .hash { color: var(--fg-dim); font-weight: 400; }\n",
+            ),
+            position: 3606,
+            line: 52,
+            column: 81,
+        },
+        Token {
+            token_type: Plus,
+            position: 3610,
+            line: 53,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "header.topbar .ch-meta { color: var(--fg-dim); font-weight: 400; font-size: 12px; margin-left: 8px; }\n",
+            ),
+            position: 3716,
+            line: 53,
+            column: 110,
+        },
+        Token {
+            token_type: Plus,
+            position: 3720,
+            line: 54,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 3725,
+            line: 54,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 3729,
+            line: 55,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#feed { flex: 1; overflow-y: auto; padding: 16px 0 12px; }\n",
+            ),
+            position: 3792,
+            line: 55,
+            column: 67,
+        },
+        Token {
+            token_type: Plus,
+            position: 3796,
+            line: 56,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#empty { color: var(--fg-dim); padding: 40px 24px; max-width: 420px; }\n",
+            ),
+            position: 3871,
+            line: 56,
+            column: 79,
+        },
+        Token {
+            token_type: Plus,
+            position: 3875,
+            line: 57,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#empty h3 { margin: 0 0 6px; color: var(--fg); font-size: 18px; }\n",
+            ),
+            position: 3945,
+            line: 57,
+            column: 74,
+        },
+        Token {
+            token_type: Plus,
+            position: 3949,
+            line: 58,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#empty p { margin: 0; }\n",
+            ),
+            position: 3977,
+            line: 58,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 3981,
+            line: 59,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".msg { display: grid; grid-template-columns: 36px 1fr; gap: 10px; padding: 6px 20px 6px 16px; }\n",
+            ),
+            position: 4081,
+            line: 59,
+            column: 104,
+        },
+        Token {
+            token_type: Plus,
+            position: 4085,
+            line: 60,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".msg:hover { background: var(--bubble-hover); }\n",
+            ),
+            position: 4137,
+            line: 60,
+            column: 56,
+        },
+        Token {
+            token_type: Plus,
+            position: 4141,
+            line: 61,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".msg.continuation { padding-top: 2px; padding-bottom: 2px; }\n",
+            ),
+            position: 4206,
+            line: 61,
+            column: 69,
+        },
+        Token {
+            token_type: Plus,
+            position: 4210,
+            line: 62,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".msg.continuation .avatar { visibility: hidden; }\n",
+            ),
+            position: 4264,
+            line: 62,
+            column: 58,
+        },
+        Token {
+            token_type: Plus,
+            position: 4268,
+            line: 63,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".msg.continuation .head { display: none; }\n",
+            ),
+            position: 4315,
+            line: 63,
+            column: 51,
+        },
+        Token {
+            token_type: Plus,
+            position: 4319,
+            line: 64,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".avatar { width: 36px; height: 36px; border-radius: 6px; color: #fff;\n",
+            ),
+            position: 4393,
+            line: 64,
+            column: 78,
+        },
+        Token {
+            token_type: Plus,
+            position: 4397,
+            line: 65,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "          display: flex; align-items: center; justify-content: center;\n",
+            ),
+            position: 4472,
+            line: 65,
+            column: 79,
+        },
+        Token {
+            token_type: Plus,
+            position: 4476,
+            line: 66,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "          font-weight: 600; font-size: 13px; text-transform: uppercase; }\n",
+            ),
+            position: 4554,
+            line: 66,
+            column: 82,
+        },
+        Token {
+            token_type: Plus,
+            position: 4558,
+            line: 67,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".head { display: flex; align-items: baseline; gap: 6px; margin-bottom: 1px; }\n",
+            ),
+            position: 4640,
+            line: 67,
+            column: 86,
+        },
+        Token {
+            token_type: Plus,
+            position: 4644,
+            line: 68,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".who { font-weight: 700; color: var(--fg); }\n",
+            ),
+            position: 4693,
+            line: 68,
+            column: 53,
+        },
+        Token {
+            token_type: Plus,
+            position: 4697,
+            line: 69,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".time { color: var(--fg-dim); font-size: 11px; }\n",
+            ),
+            position: 4750,
+            line: 69,
+            column: 57,
+        },
+        Token {
+            token_type: Plus,
+            position: 4754,
+            line: 70,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                ".body { white-space: pre-wrap; word-wrap: break-word; }\n",
+            ),
+            position: 4814,
+            line: 70,
+            column: 64,
+        },
+        Token {
+            token_type: Plus,
+            position: 4818,
+            line: 71,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 4823,
+            line: 71,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 4827,
+            line: 72,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer { padding: 12px 16px 18px; }\n",
+            ),
+            position: 4870,
+            line: 72,
+            column: 47,
+        },
+        Token {
+            token_type: Plus,
+            position: 4874,
+            line: 73,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer .wrap { display: flex; gap: 8px; align-items: center;\n",
+            ),
+            position: 4942,
+            line: 73,
+            column: 72,
+        },
+        Token {
+            token_type: Plus,
+            position: 4946,
+            line: 74,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                  border: 1px solid var(--border); border-radius: 8px;\n",
+            ),
+            position: 5021,
+            line: 74,
+            column: 79,
+        },
+        Token {
+            token_type: Plus,
+            position: 5025,
+            line: 75,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                  padding: 4px 4px 4px 12px; transition: border-color .12s; }\n",
+            ),
+            position: 5107,
+            line: 75,
+            column: 86,
+        },
+        Token {
+            token_type: Plus,
+            position: 5111,
+            line: 76,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer .wrap:focus-within { border-color: #888; }\n",
+            ),
+            position: 5168,
+            line: 76,
+            column: 61,
+        },
+        Token {
+            token_type: Plus,
+            position: 5172,
+            line: 77,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer input { flex: 1; border: 0; padding: 8px 0; font: inherit; color: var(--fg);\n",
+            ),
+            position: 5263,
+            line: 77,
+            column: 95,
+        },
+        Token {
+            token_type: Plus,
+            position: 5267,
+            line: 78,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                  background: transparent; outline: none; }\n",
+            ),
+            position: 5331,
+            line: 78,
+            column: 68,
+        },
+        Token {
+            token_type: Plus,
+            position: 5335,
+            line: 79,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer button { border: 0; background: var(--accent); color: #fff;\n",
+            ),
+            position: 5409,
+            line: 79,
+            column: 78,
+        },
+        Token {
+            token_type: Plus,
+            position: 5413,
+            line: 80,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "                   padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; }\n",
+            ),
+            position: 5512,
+            line: 80,
+            column: 103,
+        },
+        Token {
+            token_type: Plus,
+            position: 5516,
+            line: 81,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "#composer button:disabled { background: #c4c4c4; cursor: not-allowed; }\n",
+            ),
+            position: 5592,
+            line: 81,
+            column: 80,
+        },
+        Token {
+            token_type: Plus,
+            position: 5596,
+            line: 82,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 5601,
+            line: 82,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 5605,
+            line: 83,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "::-webkit-scrollbar { width: 8px; }\n",
+            ),
+            position: 5645,
+            line: 83,
+            column: 44,
+        },
+        Token {
+            token_type: Plus,
+            position: 5649,
+            line: 84,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "::-webkit-scrollbar-thumb { background: rgba(0,0,0,.18); border-radius: 4px; }\n",
+            ),
+            position: 5732,
+            line: 84,
+            column: 87,
+        },
+        Token {
+            token_type: Plus,
+            position: 5736,
+            line: 85,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "aside ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); }\n",
+            ),
+            position: 5811,
+            line: 85,
+            column: 79,
+        },
+        Token {
+            token_type: Plus,
+            position: 5815,
+            line: 86,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "</style></head>\n",
+            ),
+            position: 5835,
+            line: 86,
+            column: 24,
+        },
+        Token {
+            token_type: Plus,
+            position: 5839,
+            line: 87,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<body>\n",
+            ),
+            position: 5850,
+            line: 87,
+            column: 15,
+        },
+        Token {
+            token_type: Plus,
+            position: 5854,
+            line: 88,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<aside>\n",
+            ),
+            position: 5866,
+            line: 88,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 5870,
+            line: 89,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div class=\"brand\"><span id=\"dot\" class=\"dot\" title=\"connecting...\"></span><span>of-slack</span></div>\n",
+            ),
+            position: 5987,
+            line: 89,
+            column: 121,
+        },
+        Token {
+            token_type: Plus,
+            position: 5991,
+            line: 90,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div class=\"side-h\">You</div>\n",
+            ),
+            position: 6029,
+            line: 90,
+            column: 42,
+        },
+        Token {
+            token_type: Plus,
+            position: 6033,
+            line: 91,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div class=\"you-row\" id=\"you-row\"></div>\n",
+            ),
+            position: 6084,
+            line: 91,
+            column: 55,
+        },
+        Token {
+            token_type: Plus,
+            position: 6088,
+            line: 92,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div class=\"side-h\">Channels</div>\n",
+            ),
+            position: 6131,
+            line: 92,
+            column: 47,
+        },
+        Token {
+            token_type: Plus,
+            position: 6135,
+            line: 93,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div class=\"side-scroll\"><div id=\"chs\"></div></div>\n",
+            ),
+            position: 6197,
+            line: 93,
+            column: 66,
+        },
+        Token {
+            token_type: Plus,
+            position: 6201,
+            line: 94,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <form class=\"addch\" id=\"newch\"><input id=\"newch-name\" placeholder=\"+ add channel\" autocomplete=\"off\"/></form>\n",
+            ),
+            position: 6327,
+            line: 94,
+            column: 130,
+        },
+        Token {
+            token_type: Plus,
+            position: 6331,
+            line: 95,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "</aside>\n",
+            ),
+            position: 6344,
+            line: 95,
+            column: 17,
+        },
+        Token {
+            token_type: Plus,
+            position: 6348,
+            line: 96,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<main>\n",
+            ),
+            position: 6359,
+            line: 96,
+            column: 15,
+        },
+        Token {
+            token_type: Plus,
+            position: 6363,
+            line: 97,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <header class=\"topbar\">\n",
+            ),
+            position: 6395,
+            line: 97,
+            column: 36,
+        },
+        Token {
+            token_type: Plus,
+            position: 6399,
+            line: 98,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    <div class=\"ch-name\"><span class=\"hash\">#</span><span id=\"ch-title\">general</span></div>\n",
+            ),
+            position: 6502,
+            line: 98,
+            column: 107,
+        },
+        Token {
+            token_type: Plus,
+            position: 6506,
+            line: 99,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    <div class=\"ch-meta\" id=\"ch-meta\"></div>\n",
+            ),
+            position: 6559,
+            line: 99,
+            column: 57,
+        },
+        Token {
+            token_type: Plus,
+            position: 6563,
+            line: 100,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  </header>\n",
+            ),
+            position: 6579,
+            line: 100,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 6583,
+            line: 101,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <div id=\"feed\"></div>\n",
+            ),
+            position: 6613,
+            line: 101,
+            column: 34,
+        },
+        Token {
+            token_type: Plus,
+            position: 6617,
+            line: 102,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  <form id=\"composer\"><div class=\"wrap\">\n",
+            ),
+            position: 6666,
+            line: 102,
+            column: 53,
+        },
+        Token {
+            token_type: Plus,
+            position: 6670,
+            line: 103,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    <input id=\"msg\" autocomplete=\"off\" placeholder=\"Message #general\"/>\n",
+            ),
+            position: 6752,
+            line: 103,
+            column: 86,
+        },
+        Token {
+            token_type: Plus,
+            position: 6756,
+            line: 104,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    <button id=\"send\" type=\"submit\" disabled>Send</button>\n",
+            ),
+            position: 6823,
+            line: 104,
+            column: 71,
+        },
+        Token {
+            token_type: Plus,
+            position: 6827,
+            line: 105,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  </div></form>\n",
+            ),
+            position: 6847,
+            line: 105,
+            column: 24,
+        },
+        Token {
+            token_type: Plus,
+            position: 6851,
+            line: 106,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "</main>\n",
+            ),
+            position: 6863,
+            line: 106,
+            column: 16,
+        },
+        Token {
+            token_type: Plus,
+            position: 6867,
+            line: 107,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "<script>\n",
+            ),
+            position: 6880,
+            line: 107,
+            column: 17,
+        },
+        Token {
+            token_type: Plus,
+            position: 6884,
+            line: 108,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "(() => {\n",
+            ),
+            position: 6897,
+            line: 108,
+            column: 17,
+        },
+        Token {
+            token_type: Plus,
+            position: 6901,
+            line: 109,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const $ = (id) => document.getElementById(id);\n",
+            ),
+            position: 6954,
+            line: 109,
+            column: 57,
+        },
+        Token {
+            token_type: Plus,
+            position: 6958,
+            line: 110,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const state = {\n",
+            ),
+            position: 6980,
+            line: 110,
+            column: 26,
+        },
+        Token {
+            token_type: Plus,
+            position: 6984,
+            line: 111,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    channel: 'general',\n",
+            ),
+            position: 7012,
+            line: 111,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 7016,
+            line: 112,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    since: 0,\n",
+            ),
+            position: 7034,
+            line: 112,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 7038,
+            line: 113,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    user: localStorage.getItem('user') || (prompt('Your name?') || 'anon').trim() || 'anon',\n",
+            ),
+            position: 7135,
+            line: 113,
+            column: 101,
+        },
+        Token {
+            token_type: Plus,
+            position: 7139,
+            line: 114,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    lastSender: null,\n",
+            ),
+            position: 7165,
+            line: 114,
+            column: 30,
+        },
+        Token {
+            token_type: Plus,
+            position: 7169,
+            line: 115,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  };\n",
+            ),
+            position: 7178,
+            line: 115,
+            column: 13,
+        },
+        Token {
+            token_type: Plus,
+            position: 7182,
+            line: 116,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  localStorage.setItem('user', state.user);\n",
+            ),
+            position: 7230,
+            line: 116,
+            column: 52,
+        },
+        Token {
+            token_type: Plus,
+            position: 7234,
+            line: 117,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 7239,
+            line: 117,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 7243,
+            line: 118,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const PALETTE = ['#1264a3','#007a5a','#e8912d','#cc4d3a','#b15ea0','#5a30a3','#4a5566','#2c8d8f','#9a6f0b','#615a85'];\n",
+            ),
+            position: 7368,
+            line: 118,
+            column: 129,
+        },
+        Token {
+            token_type: Plus,
+            position: 7372,
+            line: 119,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function hash(s) { let h = 0; for (const c of s) h = ((h<<5)-h + c.charCodeAt(0))|0; return Math.abs(h); }\n",
+            ),
+            position: 7485,
+            line: 119,
+            column: 117,
+        },
+        Token {
+            token_type: Plus,
+            position: 7489,
+            line: 120,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function avatarFor(name) {\n",
+            ),
+            position: 7522,
+            line: 120,
+            column: 37,
+        },
+        Token {
+            token_type: Plus,
+            position: 7526,
+            line: 121,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const el = document.createElement('div'); el.className = 'avatar';\n",
+            ),
+            position: 7601,
+            line: 121,
+            column: 79,
+        },
+        Token {
+            token_type: Plus,
+            position: 7605,
+            line: 122,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    el.style.background = PALETTE[hash(name) % PALETTE.length];\n",
+            ),
+            position: 7673,
+            line: 122,
+            column: 72,
+        },
+        Token {
+            token_type: Plus,
+            position: 7677,
+            line: 123,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    el.textContent = (name || '?').trim().slice(0,1).toUpperCase() || '?';\n",
+            ),
+            position: 7756,
+            line: 123,
+            column: 83,
+        },
+        Token {
+            token_type: Plus,
+            position: 7760,
+            line: 124,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    return el;\n",
+            ),
+            position: 7779,
+            line: 124,
+            column: 23,
+        },
+        Token {
+            token_type: Plus,
+            position: 7783,
+            line: 125,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 7791,
+            line: 125,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 7795,
+            line: 126,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function fmtTime(d) {\n",
+            ),
+            position: 7823,
+            line: 126,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 7827,
+            line: 127,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const h = d.getHours(), m = d.getMinutes();\n",
+            ),
+            position: 7879,
+            line: 127,
+            column: 56,
+        },
+        Token {
+            token_type: Plus,
+            position: 7883,
+            line: 128,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const hh = ((h+11)%12)+1, mm = m<10?('0'+m):m, ap = h<12?'AM':'PM';\n",
+            ),
+            position: 7959,
+            line: 128,
+            column: 80,
+        },
+        Token {
+            token_type: Plus,
+            position: 7963,
+            line: 129,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    return hh + ':' + mm + ' ' + ap;\n",
+            ),
+            position: 8004,
+            line: 129,
+            column: 45,
+        },
+        Token {
+            token_type: Plus,
+            position: 8008,
+            line: 130,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 8016,
+            line: 130,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 8020,
+            line: 131,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 8025,
+            line: 131,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 8029,
+            line: 132,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const you = $('you-row');\n",
+            ),
+            position: 8061,
+            line: 132,
+            column: 36,
+        },
+        Token {
+            token_type: Plus,
+            position: 8065,
+            line: 133,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  you.appendChild(avatarFor(state.user));\n",
+            ),
+            position: 8111,
+            line: 133,
+            column: 50,
+        },
+        Token {
+            token_type: Plus,
+            position: 8115,
+            line: 134,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const youName = document.createElement('span'); youName.textContent = state.user; you.appendChild(youName);\n",
+            ),
+            position: 8229,
+            line: 134,
+            column: 118,
+        },
+        Token {
+            token_type: Plus,
+            position: 8233,
+            line: 135,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 8238,
+            line: 135,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 8242,
+            line: 136,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const chs = $('chs');\n",
+            ),
+            position: 8270,
+            line: 136,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 8274,
+            line: 137,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  let channelList = ['general'];\n",
+            ),
+            position: 8311,
+            line: 137,
+            column: 41,
+        },
+        Token {
+            token_type: Plus,
+            position: 8315,
+            line: 138,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function renderChannels(list) {\n",
+            ),
+            position: 8353,
+            line: 138,
+            column: 42,
+        },
+        Token {
+            token_type: Plus,
+            position: 8357,
+            line: 139,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    chs.innerHTML = '';\n",
+            ),
+            position: 8385,
+            line: 139,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 8389,
+            line: 140,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    for (const name of list) {\n",
+            ),
+            position: 8424,
+            line: 140,
+            column: 39,
+        },
+        Token {
+            token_type: Plus,
+            position: 8428,
+            line: 141,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const row = document.createElement('div'); row.className = 'side-row';\n",
+            ),
+            position: 8509,
+            line: 141,
+            column: 85,
+        },
+        Token {
+            token_type: Plus,
+            position: 8513,
+            line: 142,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      if (name === state.channel) row.classList.add('active');\n",
+            ),
+            position: 8580,
+            line: 142,
+            column: 71,
+        },
+        Token {
+            token_type: Plus,
+            position: 8584,
+            line: 143,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const h = document.createElement('span'); h.className='hash'; h.textContent='#';\n",
+            ),
+            position: 8675,
+            line: 143,
+            column: 95,
+        },
+        Token {
+            token_type: Plus,
+            position: 8679,
+            line: 144,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const n = document.createElement('span'); n.textContent = name;\n",
+            ),
+            position: 8753,
+            line: 144,
+            column: 78,
+        },
+        Token {
+            token_type: Plus,
+            position: 8757,
+            line: 145,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      row.appendChild(h); row.appendChild(n);\n",
+            ),
+            position: 8807,
+            line: 145,
+            column: 54,
+        },
+        Token {
+            token_type: Plus,
+            position: 8811,
+            line: 146,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      row.onclick = () => switchChannel(name);\n",
+            ),
+            position: 8862,
+            line: 146,
+            column: 55,
+        },
+        Token {
+            token_type: Plus,
+            position: 8866,
+            line: 147,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      chs.appendChild(row);\n",
+            ),
+            position: 8898,
+            line: 147,
+            column: 36,
+        },
+        Token {
+            token_type: Plus,
+            position: 8902,
+            line: 148,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    }\n",
+            ),
+            position: 8912,
+            line: 148,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 8916,
+            line: 149,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 8924,
+            line: 149,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 8928,
+            line: 150,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  async function loadChannels() {\n",
+            ),
+            position: 8966,
+            line: 150,
+            column: 42,
+        },
+        Token {
+            token_type: Plus,
+            position: 8970,
+            line: 151,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    try {\n",
+            ),
+            position: 8984,
+            line: 151,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 8988,
+            line: 152,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const r = await fetch('/channels');\n",
+            ),
+            position: 9034,
+            line: 152,
+            column: 50,
+        },
+        Token {
+            token_type: Plus,
+            position: 9038,
+            line: 153,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const j = await r.json();\n",
+            ),
+            position: 9074,
+            line: 153,
+            column: 40,
+        },
+        Token {
+            token_type: Plus,
+            position: 9078,
+            line: 154,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const merged = Array.from(new Set([state.channel, ...(j.channels || [])])).sort();\n",
+            ),
+            position: 9171,
+            line: 154,
+            column: 97,
+        },
+        Token {
+            token_type: Plus,
+            position: 9175,
+            line: 155,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      channelList = merged;\n",
+            ),
+            position: 9207,
+            line: 155,
+            column: 36,
+        },
+        Token {
+            token_type: Plus,
+            position: 9211,
+            line: 156,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      renderChannels(merged);\n",
+            ),
+            position: 9245,
+            line: 156,
+            column: 38,
+        },
+        Token {
+            token_type: Plus,
+            position: 9249,
+            line: 157,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    } catch (e) { /* keep prior list */ }\n",
+            ),
+            position: 9295,
+            line: 157,
+            column: 50,
+        },
+        Token {
+            token_type: Plus,
+            position: 9299,
+            line: 158,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 9307,
+            line: 158,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 9311,
+            line: 159,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 9316,
+            line: 159,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 9320,
+            line: 160,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const feed = $('feed');\n",
+            ),
+            position: 9350,
+            line: 160,
+            column: 34,
+        },
+        Token {
+            token_type: Plus,
+            position: 9354,
+            line: 161,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function showEmpty() {\n",
+            ),
+            position: 9383,
+            line: 161,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 9387,
+            line: 162,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    feed.innerHTML = '';\n",
+            ),
+            position: 9416,
+            line: 162,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 9420,
+            line: 163,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const e = document.createElement('div'); e.id = 'empty';\n",
+            ),
+            position: 9485,
+            line: 163,
+            column: 69,
+        },
+        Token {
+            token_type: Plus,
+            position: 9489,
+            line: 164,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const h3 = document.createElement('h3'); h3.textContent = '#' + state.channel;\n",
+            ),
+            position: 9576,
+            line: 164,
+            column: 91,
+        },
+        Token {
+            token_type: Plus,
+            position: 9580,
+            line: 165,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const p = document.createElement('p');\n",
+            ),
+            position: 9627,
+            line: 165,
+            column: 51,
+        },
+        Token {
+            token_type: Plus,
+            position: 9631,
+            line: 166,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    p.textContent = 'This is the start of the channel. Say hello.';\n",
+            ),
+            position: 9703,
+            line: 166,
+            column: 76,
+        },
+        Token {
+            token_type: Plus,
+            position: 9707,
+            line: 167,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    e.appendChild(h3); e.appendChild(p);\n",
+            ),
+            position: 9752,
+            line: 167,
+            column: 49,
+        },
+        Token {
+            token_type: Plus,
+            position: 9756,
+            line: 168,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    feed.appendChild(e);\n",
+            ),
+            position: 9785,
+            line: 168,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 9789,
+            line: 169,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 9797,
+            line: 169,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 9801,
+            line: 170,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function appendMessages(messages) {\n",
+            ),
+            position: 9843,
+            line: 170,
+            column: 46,
+        },
+        Token {
+            token_type: Plus,
+            position: 9847,
+            line: 171,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (!messages.length) return;\n",
+            ),
+            position: 9885,
+            line: 171,
+            column: 42,
+        },
+        Token {
+            token_type: Plus,
+            position: 9889,
+            line: 172,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const empty = $('empty'); if (empty) empty.remove();\n",
+            ),
+            position: 9950,
+            line: 172,
+            column: 65,
+        },
+        Token {
+            token_type: Plus,
+            position: 9954,
+            line: 173,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const nearBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 80;\n",
+            ),
+            position: 10042,
+            line: 173,
+            column: 92,
+        },
+        Token {
+            token_type: Plus,
+            position: 10046,
+            line: 174,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    for (const m of messages) {\n",
+            ),
+            position: 10082,
+            line: 174,
+            column: 40,
+        },
+        Token {
+            token_type: Plus,
+            position: 10086,
+            line: 175,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const wrap = document.createElement('div'); wrap.className = 'msg';\n",
+            ),
+            position: 10164,
+            line: 175,
+            column: 82,
+        },
+        Token {
+            token_type: Plus,
+            position: 10168,
+            line: 176,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const cont = state.lastSender === m.user;\n",
+            ),
+            position: 10220,
+            line: 176,
+            column: 56,
+        },
+        Token {
+            token_type: Plus,
+            position: 10224,
+            line: 177,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      if (cont) wrap.classList.add('continuation');\n",
+            ),
+            position: 10280,
+            line: 177,
+            column: 60,
+        },
+        Token {
+            token_type: Plus,
+            position: 10284,
+            line: 178,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      wrap.appendChild(avatarFor(m.user));\n",
+            ),
+            position: 10331,
+            line: 178,
+            column: 51,
+        },
+        Token {
+            token_type: Plus,
+            position: 10335,
+            line: 179,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const right = document.createElement('div');\n",
+            ),
+            position: 10390,
+            line: 179,
+            column: 59,
+        },
+        Token {
+            token_type: Plus,
+            position: 10394,
+            line: 180,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const head = document.createElement('div'); head.className = 'head';\n",
+            ),
+            position: 10473,
+            line: 180,
+            column: 83,
+        },
+        Token {
+            token_type: Plus,
+            position: 10477,
+            line: 181,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const who = document.createElement('span'); who.className = 'who'; who.textContent = m.user;\n",
+            ),
+            position: 10580,
+            line: 181,
+            column: 107,
+        },
+        Token {
+            token_type: Plus,
+            position: 10584,
+            line: 182,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const tm  = document.createElement('span'); tm.className = 'time'; tm.textContent = fmtTime(new Date());\n",
+            ),
+            position: 10699,
+            line: 182,
+            column: 119,
+        },
+        Token {
+            token_type: Plus,
+            position: 10703,
+            line: 183,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      head.appendChild(who); head.appendChild(tm);\n",
+            ),
+            position: 10758,
+            line: 183,
+            column: 59,
+        },
+        Token {
+            token_type: Plus,
+            position: 10762,
+            line: 184,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const body = document.createElement('div'); body.className = 'body'; body.textContent = m.text;\n",
+            ),
+            position: 10868,
+            line: 184,
+            column: 110,
+        },
+        Token {
+            token_type: Plus,
+            position: 10872,
+            line: 185,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      right.appendChild(head); right.appendChild(body);\n",
+            ),
+            position: 10932,
+            line: 185,
+            column: 64,
+        },
+        Token {
+            token_type: Plus,
+            position: 10936,
+            line: 186,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      wrap.appendChild(right);\n",
+            ),
+            position: 10971,
+            line: 186,
+            column: 39,
+        },
+        Token {
+            token_type: Plus,
+            position: 10975,
+            line: 187,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      feed.appendChild(wrap);\n",
+            ),
+            position: 11009,
+            line: 187,
+            column: 38,
+        },
+        Token {
+            token_type: Plus,
+            position: 11013,
+            line: 188,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      state.lastSender = m.user;\n",
+            ),
+            position: 11050,
+            line: 188,
+            column: 41,
+        },
+        Token {
+            token_type: Plus,
+            position: 11054,
+            line: 189,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    }\n",
+            ),
+            position: 11064,
+            line: 189,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 11068,
+            line: 190,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (nearBottom) feed.scrollTop = feed.scrollHeight;\n",
+            ),
+            position: 11128,
+            line: 190,
+            column: 64,
+        },
+        Token {
+            token_type: Plus,
+            position: 11132,
+            line: 191,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 11140,
+            line: 191,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 11144,
+            line: 192,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 11149,
+            line: 192,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 11153,
+            line: 193,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const dot = $('dot');\n",
+            ),
+            position: 11181,
+            line: 193,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 11185,
+            line: 194,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function setStatus(live) { dot.classList.toggle('off', !live); dot.title = live ? 'connected' : 'reconnecting...'; }\n",
+            ),
+            position: 11308,
+            line: 194,
+            column: 127,
+        },
+        Token {
+            token_type: Plus,
+            position: 11312,
+            line: 195,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 11317,
+            line: 195,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 11321,
+            line: 196,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  let polling = null;\n",
+            ),
+            position: 11347,
+            line: 196,
+            column: 30,
+        },
+        Token {
+            token_type: Plus,
+            position: 11351,
+            line: 197,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  async function poll() {\n",
+            ),
+            position: 11381,
+            line: 197,
+            column: 34,
+        },
+        Token {
+            token_type: Plus,
+            position: 11385,
+            line: 198,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const ctrl = new AbortController(); polling = ctrl;\n",
+            ),
+            position: 11445,
+            line: 198,
+            column: 64,
+        },
+        Token {
+            token_type: Plus,
+            position: 11449,
+            line: 199,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    try {\n",
+            ),
+            position: 11463,
+            line: 199,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 11467,
+            line: 200,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const url = '/poll?channel=' + encodeURIComponent(state.channel) + '&since=' + state.since + '&wait=25';\n",
+            ),
+            position: 11582,
+            line: 200,
+            column: 119,
+        },
+        Token {
+            token_type: Plus,
+            position: 11586,
+            line: 201,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const r = await fetch(url, { signal: ctrl.signal });\n",
+            ),
+            position: 11649,
+            line: 201,
+            column: 67,
+        },
+        Token {
+            token_type: Plus,
+            position: 11653,
+            line: 202,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      const j = await r.json();\n",
+            ),
+            position: 11689,
+            line: 202,
+            column: 40,
+        },
+        Token {
+            token_type: Plus,
+            position: 11693,
+            line: 203,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      setStatus(true);\n",
+            ),
+            position: 11720,
+            line: 203,
+            column: 31,
+        },
+        Token {
+            token_type: Plus,
+            position: 11724,
+            line: 204,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      appendMessages(j.messages || []);\n",
+            ),
+            position: 11768,
+            line: 204,
+            column: 48,
+        },
+        Token {
+            token_type: Plus,
+            position: 11772,
+            line: 205,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      if (typeof j.next === 'number' && j.next > state.since) state.since = j.next;\n",
+            ),
+            position: 11860,
+            line: 205,
+            column: 92,
+        },
+        Token {
+            token_type: Plus,
+            position: 11864,
+            line: 206,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    } catch (e) {\n",
+            ),
+            position: 11886,
+            line: 206,
+            column: 26,
+        },
+        Token {
+            token_type: Plus,
+            position: 11890,
+            line: 207,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      if (e.name !== 'AbortError') { setStatus(false); await new Promise(r => setTimeout(r, 800)); }\n",
+            ),
+            position: 11995,
+            line: 207,
+            column: 109,
+        },
+        Token {
+            token_type: Plus,
+            position: 11999,
+            line: 208,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    }\n",
+            ),
+            position: 12009,
+            line: 208,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 12013,
+            line: 209,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (polling === ctrl) poll();\n",
+            ),
+            position: 12051,
+            line: 209,
+            column: 42,
+        },
+        Token {
+            token_type: Plus,
+            position: 12055,
+            line: 210,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 12063,
+            line: 210,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 12067,
+            line: 211,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 12072,
+            line: 211,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 12076,
+            line: 212,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  function switchChannel(name) {\n",
+            ),
+            position: 12113,
+            line: 212,
+            column: 41,
+        },
+        Token {
+            token_type: Plus,
+            position: 12117,
+            line: 213,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (name === state.channel) return;\n",
+            ),
+            position: 12161,
+            line: 213,
+            column: 48,
+        },
+        Token {
+            token_type: Plus,
+            position: 12165,
+            line: 214,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    state.channel = name; state.since = 0; state.lastSender = null;\n",
+            ),
+            position: 12237,
+            line: 214,
+            column: 76,
+        },
+        Token {
+            token_type: Plus,
+            position: 12241,
+            line: 215,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    $('ch-title').textContent = name;\n",
+            ),
+            position: 12283,
+            line: 215,
+            column: 46,
+        },
+        Token {
+            token_type: Plus,
+            position: 12287,
+            line: 216,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    $('msg').placeholder = 'Message #' + name;\n",
+            ),
+            position: 12338,
+            line: 216,
+            column: 55,
+        },
+        Token {
+            token_type: Plus,
+            position: 12342,
+            line: 217,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    showEmpty();\n",
+            ),
+            position: 12363,
+            line: 217,
+            column: 25,
+        },
+        Token {
+            token_type: Plus,
+            position: 12367,
+            line: 218,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    renderChannels(channelList);\n",
+            ),
+            position: 12404,
+            line: 218,
+            column: 41,
+        },
+        Token {
+            token_type: Plus,
+            position: 12408,
+            line: 219,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (polling) { const p = polling; polling = null; p.abort(); }\n",
+            ),
+            position: 12479,
+            line: 219,
+            column: 75,
+        },
+        Token {
+            token_type: Plus,
+            position: 12483,
+            line: 220,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    poll();\n",
+            ),
+            position: 12499,
+            line: 220,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 12503,
+            line: 221,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  }\n",
+            ),
+            position: 12511,
+            line: 221,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 12515,
+            line: 222,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 12520,
+            line: 222,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 12524,
+            line: 223,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  const input = $('msg'), send = $('send');\n",
+            ),
+            position: 12572,
+            line: 223,
+            column: 52,
+        },
+        Token {
+            token_type: Plus,
+            position: 12576,
+            line: 224,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  input.addEventListener('input', () => { send.disabled = input.value.trim().length === 0; });\n",
+            ),
+            position: 12675,
+            line: 224,
+            column: 103,
+        },
+        Token {
+            token_type: Plus,
+            position: 12679,
+            line: 225,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  $('composer').onsubmit = async (e) => {\n",
+            ),
+            position: 12725,
+            line: 225,
+            column: 50,
+        },
+        Token {
+            token_type: Plus,
+            position: 12729,
+            line: 226,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    e.preventDefault();\n",
+            ),
+            position: 12757,
+            line: 226,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 12761,
+            line: 227,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const text = input.value.trim(); if (!text) return;\n",
+            ),
+            position: 12821,
+            line: 227,
+            column: 64,
+        },
+        Token {
+            token_type: Plus,
+            position: 12825,
+            line: 228,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    input.value = ''; send.disabled = true; input.focus();\n",
+            ),
+            position: 12888,
+            line: 228,
+            column: 67,
+        },
+        Token {
+            token_type: Plus,
+            position: 12892,
+            line: 229,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const body = 'channel=' + encodeURIComponent(state.channel) + '&user=' + encodeURIComponent(state.user) + '&text=' + encodeURIComponent(text);\n",
+            ),
+            position: 13043,
+            line: 229,
+            column: 155,
+        },
+        Token {
+            token_type: Plus,
+            position: 13047,
+            line: 230,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    try {\n",
+            ),
+            position: 13061,
+            line: 230,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 13065,
+            line: 231,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "      await fetch('/send', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });\n",
+            ),
+            position: 13189,
+            line: 231,
+            column: 128,
+        },
+        Token {
+            token_type: Plus,
+            position: 13193,
+            line: 232,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    } catch (e) { setStatus(false); }\n",
+            ),
+            position: 13235,
+            line: 232,
+            column: 46,
+        },
+        Token {
+            token_type: Plus,
+            position: 13239,
+            line: 233,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  };\n",
+            ),
+            position: 13248,
+            line: 233,
+            column: 13,
+        },
+        Token {
+            token_type: Plus,
+            position: 13252,
+            line: 234,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  $('newch').onsubmit = async (e) => {\n",
+            ),
+            position: 13295,
+            line: 234,
+            column: 47,
+        },
+        Token {
+            token_type: Plus,
+            position: 13299,
+            line: 235,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    e.preventDefault();\n",
+            ),
+            position: 13327,
+            line: 235,
+            column: 32,
+        },
+        Token {
+            token_type: Plus,
+            position: 13331,
+            line: 236,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    const inp = $('newch-name'); const name = inp.value.trim();\n",
+            ),
+            position: 13399,
+            line: 236,
+            column: 72,
+        },
+        Token {
+            token_type: Plus,
+            position: 13403,
+            line: 237,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    if (!name) return;\n",
+            ),
+            position: 13430,
+            line: 237,
+            column: 31,
+        },
+        Token {
+            token_type: Plus,
+            position: 13434,
+            line: 238,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    await fetch('/channels', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'channel=' + encodeURIComponent(name) });\n",
+            ),
+            position: 13599,
+            line: 238,
+            column: 169,
+        },
+        Token {
+            token_type: Plus,
+            position: 13603,
+            line: 239,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    inp.value = '';\n",
+            ),
+            position: 13627,
+            line: 239,
+            column: 28,
+        },
+        Token {
+            token_type: Plus,
+            position: 13631,
+            line: 240,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    await loadChannels();\n",
+            ),
+            position: 13661,
+            line: 240,
+            column: 34,
+        },
+        Token {
+            token_type: Plus,
+            position: 13665,
+            line: 241,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "    switchChannel(name);\n",
+            ),
+            position: 13694,
+            line: 241,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 13698,
+            line: 242,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  };\n",
+            ),
+            position: 13707,
+            line: 242,
+            column: 13,
+        },
+        Token {
+            token_type: Plus,
+            position: 13711,
+            line: 243,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "\n",
+            ),
+            position: 13716,
+            line: 243,
+            column: 9,
+        },
+        Token {
+            token_type: Plus,
+            position: 13720,
+            line: 244,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  $('ch-title').textContent = state.channel;\n",
+            ),
+            position: 13769,
+            line: 244,
+            column: 53,
+        },
+        Token {
+            token_type: Plus,
+            position: 13773,
+            line: 245,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  $('msg').placeholder = 'Message #' + state.channel;\n",
+            ),
+            position: 13831,
+            line: 245,
+            column: 62,
+        },
+        Token {
+            token_type: Plus,
+            position: 13835,
+            line: 246,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  showEmpty();\n",
+            ),
+            position: 13854,
+            line: 246,
+            column: 23,
+        },
+        Token {
+            token_type: Plus,
+            position: 13858,
+            line: 247,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  loadChannels();\n",
+            ),
+            position: 13880,
+            line: 247,
+            column: 26,
+        },
+        Token {
+            token_type: Plus,
+            position: 13884,
+            line: 248,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "  poll();\n",
+            ),
+            position: 13898,
+            line: 248,
+            column: 18,
+        },
+        Token {
+            token_type: Plus,
+            position: 13902,
+            line: 249,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "})();\n",
+            ),
+            position: 13912,
+            line: 249,
+            column: 14,
+        },
+        Token {
+            token_type: Plus,
+            position: 13916,
+            line: 250,
+            column: 4,
+        },
+        Token {
+            token_type: StringLit(
+                "</script></body></html>\n",
+            ),
+            position: 13944,
+            line: 250,
+            column: 32,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 13946,
+            line: 251,
+            column: 2,
+        },
+    ],
+)

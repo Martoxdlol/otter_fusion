@@ -1,0 +1,134 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/spec/03_functions/implicit_return.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "add",
+            ),
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "a",
+            ),
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Comma,
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "b",
+            ),
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Colon,
+            position: 23,
+            line: 1,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 27,
+            line: 1,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 28,
+            line: 1,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "a",
+            ),
+            position: 39,
+            line: 2,
+            column: 4,
+        },
+        Token {
+            token_type: Plus,
+            position: 41,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "b",
+            ),
+            position: 43,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 45,
+            line: 3,
+            column: 2,
+        },
+    ],
+)

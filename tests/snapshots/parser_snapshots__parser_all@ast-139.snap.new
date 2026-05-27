@@ -1,0 +1,9 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/spec/14_ffi/pin_unpin.of
+---
+Err(
+    "unexpected token '*'",
+)

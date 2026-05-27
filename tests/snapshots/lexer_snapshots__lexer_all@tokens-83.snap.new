@@ -1,0 +1,92 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/parser/parse_extern_struct.of
+---
+Ok(
+    [
+        Token {
+            token_type: Extern,
+            position: 6,
+            line: 1,
+            column: 7,
+        },
+        Token {
+            token_type: Struct,
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "MyCFunctionArgs",
+            ),
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 31,
+            line: 1,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "a",
+            ),
+            position: 33,
+            line: 1,
+            column: 34,
+        },
+        Token {
+            token_type: Colon,
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 38,
+            line: 1,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "b",
+            ),
+            position: 40,
+            line: 1,
+            column: 41,
+        },
+        Token {
+            token_type: Colon,
+            position: 41,
+            line: 1,
+            column: 42,
+        },
+        Token {
+            token_type: Star,
+            position: 43,
+            line: 1,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 46,
+            line: 1,
+            column: 47,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 48,
+            line: 1,
+            column: 49,
+        },
+    ],
+)

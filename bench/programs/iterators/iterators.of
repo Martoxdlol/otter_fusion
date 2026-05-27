@@ -1,0 +1,49 @@
+import { println, now_ns } from "of:core";
+
+// Iterator usage: a custom Range that implements Iterator<i64>, driven by
+// pulling next() until it yields null. filter (i % 3 == 0) and map (i * i) are
+// inline since of:core has no lazy combinators. Sum mod p over 0..10_000_000.
+struct Range: Iterator<i64> {
+  current: i64,
+  end: i64,
+
+  function next(self): i64 | null {
+    if (self.current >= self.end) {
+      null
+    } else {
+      var v = self.current;
+      self.current = self.current + 1;
+      v
+    }
+  }
+}
+
+function run(): i64 {
+  var n: i64 = 10000000;
+  var p: i64 = 1000000007;
+  var acc: i64 = 0;
+
+  var r = Range { current: 0, end: n };
+  while true {
+    var nx = r.next();
+    if (nx is null) {
+      break;
+    }
+    var i = nx as i64;
+    if (i % 3 == 0) {
+      acc = (acc + (i * i) % p) % p;
+    }
+  }
+
+  acc
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

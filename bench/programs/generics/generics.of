@@ -1,0 +1,34 @@
+import { println, now_ns } from "of:core";
+
+// Generic abstraction cost: a generic Wrapper<T> constructed and read 10M
+// times. Exercises monomorphization + generic method dispatch.
+struct Wrapper<T> {
+  value: T,
+}
+
+extend<T> Wrapper<T> {
+  function get(self): T { self.value }
+}
+
+function run(): i64 {
+  var n: i64 = 10000000;
+  var p: i64 = 1000000007;
+  var acc: i64 = 0;
+  var i: i64 = 0;
+  while i < n {
+    var w = Wrapper<i64> { value: i };
+    acc = (acc + w.get() * 2) % p;
+    i = i + 1;
+  }
+  acc
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

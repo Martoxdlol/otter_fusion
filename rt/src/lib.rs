@@ -1,7 +1,20 @@
 use std::collections::HashMap;
 use std::ffi::CStr;
+use std::io::Write;
 use std::os::raw::{c_char, c_void};
-use std::sync::Mutex;
+use std::sync::{Mutex, OnceLock};
+use std::time::Instant;
+
+// Monotonic nanosecond clock for in-program benchmarking. Returns nanoseconds
+// since the first call (the OnceLock fixes a base Instant), so callers measure
+// elapsed time as `end - start`. Instant is monotonic, so it never goes back.
+static CLOCK_BASE: OnceLock<Instant> = OnceLock::new();
+
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_now_ns() -> i64 {
+    let base = CLOCK_BASE.get_or_init(Instant::now);
+    base.elapsed().as_nanos() as i64
+}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_alloc(size: u64, type_id: u64) -> *mut c_void {
@@ -69,6 +82,11 @@ pub unsafe extern "C" fn __of_vtable_lookup(
     })
 }
 
+// We flush after every write. An AOT executable returns through the
+// codegen-emitted C `main`, which bypasses Rust's runtime stdout flush-at-exit,
+// so without an explicit flush a buffered AOT program prints nothing. Flushing
+// per call keeps both AOT and JIT output correct; benchmark hot loops don't
+// print, so this costs nothing where it matters.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_print(s: *const c_char) {
     if s.is_null() {
@@ -76,12 +94,14 @@ pub unsafe extern "C" fn __of_print(s: *const c_char) {
     }
     let cstr = unsafe { CStr::from_ptr(s) };
     print!("{}", cstr.to_string_lossy());
+    let _ = std::io::stdout().flush();
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_println(s: *const c_char) {
     unsafe { __of_print(s) };
     println!();
+    let _ = std::io::stdout().flush();
 }
 
 #[unsafe(no_mangle)]
@@ -357,13 +377,109 @@ pub unsafe extern "C" fn __of_list_contains(l: *mut ListVec, val: *mut c_void) -
     }
 }
 
-// `i64 | null` lowers to a tagged union for primitives that codegen doesn't
-// emit yet, so this helper isn't reachable from the of-side; declared to keep
-// the symbol table aligned with `of_core.of`.
+// Returns the index, or -1 when absent. The of-side `index_of` wrapper turns
+// -1 into `null` (and -1 can't be a valid index), so the `i64 | null` shape is
+// built in of-code, not here.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn __of_list_index_of(l: *mut ListVec, val: *mut c_void) -> i64 {
     match list_mut(l) {
         Some(v) => v.iter().position(|&p| p == val).map(|n| n as i64).unwrap_or(-1),
         None => -1,
     }
+}
+
+// ---- Map<K, V> (declared in of_core.of) ----
+//
+// Backing store: a `HashMap` keyed by the raw 8-byte key slot. As with List,
+// keys/values ride as opaque pointer-sized slots. Equality and hashing are on
+// the raw slot bits, which is correct for integer/primitive keys (the slot IS
+// the value) and for reference-identity keys, but NOT for string-content keys:
+// two separately-allocated equal strings have different pointers and won't
+// match. (Same limitation `__of_list_contains` documents.)
+//
+// get/remove return the bare value slot (a plain `V`); the of-side wrappers
+// guard them with `contains` and turn the miss into `null`, so the single C
+// symbol keeps one fixed ABI across monomorphizations. Like List, maps leak.
+
+type MapData = HashMap<u64, ElemSlot>;
+
+fn map_mut<'a>(m: *mut MapData) -> Option<&'a mut MapData> {
+    if m.is_null() { None } else { Some(unsafe { &mut *m }) }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn __of_map_new() -> *mut MapData {
+    Box::into_raw(Box::new(HashMap::new()))
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_size(m: *mut MapData) -> i64 {
+    match map_mut(m) {
+        Some(x) => x.len() as i64,
+        None => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_is_empty(m: *mut MapData) -> u8 {
+    match map_mut(m) {
+        Some(x) => if x.is_empty() { 1 } else { 0 },
+        None => 1,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_clear(m: *mut MapData) {
+    if let Some(x) = map_mut(m) {
+        x.clear();
+    }
+}
+
+// Assumes the key is present (the of-side `get` checks `contains` first).
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_get(m: *mut MapData, k: *mut c_void) -> *mut c_void {
+    map_mut(m)
+        .and_then(|x| x.get(&(k as u64)).copied())
+        .unwrap_or(std::ptr::null_mut())
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_set(m: *mut MapData, k: *mut c_void, v: *mut c_void) {
+    if let Some(x) = map_mut(m) {
+        x.insert(k as u64, v);
+    }
+}
+
+// Assumes the key is present (the of-side `remove` checks `contains` first).
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_remove(m: *mut MapData, k: *mut c_void) -> *mut c_void {
+    map_mut(m)
+        .and_then(|x| x.remove(&(k as u64)))
+        .unwrap_or(std::ptr::null_mut())
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_contains(m: *mut MapData, k: *mut c_void) -> u8 {
+    match map_mut(m) {
+        Some(x) => if x.contains_key(&(k as u64)) { 1 } else { 0 },
+        None => 0,
+    }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_keys(m: *mut MapData) -> *mut ListVec {
+    let v: ListVec = match map_mut(m) {
+        Some(x) => x.keys().map(|&k| k as *mut c_void).collect(),
+        None => Vec::new(),
+    };
+    Box::into_raw(Box::new(v))
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __of_map_values(m: *mut MapData) -> *mut ListVec {
+    let v: ListVec = match map_mut(m) {
+        Some(x) => x.values().copied().collect(),
+        None => Vec::new(),
+    };
+    Box::into_raw(Box::new(v))
 }

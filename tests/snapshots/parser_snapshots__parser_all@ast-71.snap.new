@@ -1,0 +1,58 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/parser/parse_expr_binary_left_associative.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "test",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        BinaryOp(
+                                            BinaryOp(
+                                                Variable(
+                                                    "x",
+                                                ),
+                                                Add,
+                                                Variable(
+                                                    "y",
+                                                ),
+                                            ),
+                                            Add,
+                                            Variable(
+                                                "z",
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

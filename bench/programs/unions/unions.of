@@ -1,0 +1,48 @@
+import { println, now_ns } from "of:core";
+
+// Discriminated unions + pattern matching: build and evaluate a small
+// arithmetic AST 2M times, varying it by the loop counter so it can't be
+// constant-folded.
+struct Num { v: i64 }
+struct Add { l: Expr, r: Expr }
+struct Mul { l: Expr, r: Expr }
+
+type Expr = Num | Add | Mul;
+
+function evaluate(e: Expr): i64 {
+  if (e is Num) {
+    (e as Num).v
+  } else if (e is Add) {
+    var a = e as Add;
+    evaluate(a.l) + evaluate(a.r)
+  } else {
+    var m = e as Mul;
+    evaluate(m.l) * evaluate(m.r)
+  }
+}
+
+function run(): i64 {
+  var count: i64 = 2000000;
+  var p: i64 = 1000000007;
+  var acc: i64 = 0;
+  var i: i64 = 0;
+  while i < count {
+    var expr: Expr = Add {
+      l: Num { v: i % 1000 },
+      r: Mul { l: Num { v: i % 7 }, r: Num { v: 3 } },
+    };
+    acc = (acc + evaluate(expr)) % p;
+    i = i + 1;
+  }
+  acc
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

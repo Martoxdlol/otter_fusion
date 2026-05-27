@@ -1,0 +1,172 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/spec/12_control_flow/while_loop.of
+---
+Ok(
+    [
+        Token {
+            token_type: Var,
+            position: 3,
+            line: 1,
+            column: 4,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 5,
+            line: 1,
+            column: 6,
+        },
+        Token {
+            token_type: Eq,
+            position: 7,
+            line: 1,
+            column: 8,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 9,
+            line: 1,
+            column: 10,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: While,
+            position: 16,
+            line: 2,
+            column: 6,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 18,
+            line: 2,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 19,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: LT,
+            position: 21,
+            line: 2,
+            column: 11,
+        },
+        Token {
+            token_type: Int(
+                "10",
+            ),
+            position: 24,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: RightParen,
+            position: 25,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 27,
+            line: 2,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "print",
+            ),
+            position: 35,
+            line: 3,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 36,
+            line: 3,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 37,
+            line: 3,
+            column: 10,
+        },
+        Token {
+            token_type: RightParen,
+            position: 38,
+            line: 3,
+            column: 11,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 39,
+            line: 3,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 43,
+            line: 4,
+            column: 4,
+        },
+        Token {
+            token_type: Eq,
+            position: 45,
+            line: 4,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 47,
+            line: 4,
+            column: 8,
+        },
+        Token {
+            token_type: Plus,
+            position: 49,
+            line: 4,
+            column: 10,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 51,
+            line: 4,
+            column: 12,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 52,
+            line: 4,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 54,
+            line: 5,
+            column: 2,
+        },
+    ],
+)

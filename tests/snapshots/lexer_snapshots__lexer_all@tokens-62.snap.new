@@ -1,0 +1,6338 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/networking/slack_clone/state.of
+---
+Ok(
+    [
+        Token {
+            token_type: Import,
+            position: 369,
+            line: 8,
+            column: 7,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 371,
+            line: 8,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "println",
+            ),
+            position: 379,
+            line: 8,
+            column: 17,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 381,
+            line: 8,
+            column: 19,
+        },
+        Token {
+            token_type: From,
+            position: 386,
+            line: 8,
+            column: 24,
+        },
+        Token {
+            token_type: StringLit(
+                "of:core",
+            ),
+            position: 396,
+            line: 8,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 397,
+            line: 8,
+            column: 35,
+        },
+        Token {
+            token_type: Import,
+            position: 404,
+            line: 9,
+            column: 7,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 406,
+            line: 9,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "json_str",
+            ),
+            position: 415,
+            line: 9,
+            column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 417,
+            line: 9,
+            column: 20,
+        },
+        Token {
+            token_type: From,
+            position: 422,
+            line: 9,
+            column: 25,
+        },
+        Token {
+            token_type: StringLit(
+                "json",
+            ),
+            position: 429,
+            line: 9,
+            column: 32,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 430,
+            line: 9,
+            column: 33,
+        },
+        Token {
+            token_type: Struct,
+            position: 438,
+            line: 11,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Message",
+            ),
+            position: 446,
+            line: 11,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 448,
+            line: 11,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 453,
+            line: 12,
+            column: 5,
+        },
+        Token {
+            token_type: Colon,
+            position: 454,
+            line: 12,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 458,
+            line: 12,
+            column: 10,
+        },
+        Token {
+            token_type: Comma,
+            position: 459,
+            line: 12,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "user",
+            ),
+            position: 466,
+            line: 13,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 467,
+            line: 13,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 471,
+            line: 13,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 472,
+            line: 13,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "text",
+            ),
+            position: 479,
+            line: 14,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 480,
+            line: 14,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 484,
+            line: 14,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 485,
+            line: 14,
+            column: 13,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 487,
+            line: 15,
+            column: 2,
+        },
+        Token {
+            token_type: Struct,
+            position: 495,
+            line: 17,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 503,
+            line: 17,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 505,
+            line: 17,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 512,
+            line: 18,
+            column: 7,
+        },
+        Token {
+            token_type: Colon,
+            position: 513,
+            line: 18,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 517,
+            line: 18,
+            column: 12,
+        },
+        Token {
+            token_type: Comma,
+            position: 518,
+            line: 18,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "messages",
+            ),
+            position: 529,
+            line: 19,
+            column: 11,
+        },
+        Token {
+            token_type: Colon,
+            position: 530,
+            line: 19,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 535,
+            line: 19,
+            column: 17,
+        },
+        Token {
+            token_type: LT,
+            position: 536,
+            line: 19,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "Message",
+            ),
+            position: 543,
+            line: 19,
+            column: 25,
+        },
+        Token {
+            token_type: GT,
+            position: 544,
+            line: 19,
+            column: 26,
+        },
+        Token {
+            token_type: Comma,
+            position: 545,
+            line: 19,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 555,
+            line: 20,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 556,
+            line: 20,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 560,
+            line: 20,
+            column: 15,
+        },
+        Token {
+            token_type: Comma,
+            position: 561,
+            line: 20,
+            column: 16,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 563,
+            line: 21,
+            column: 2,
+        },
+        Token {
+            token_type: Extend,
+            position: 571,
+            line: 23,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 579,
+            line: 23,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 581,
+            line: 23,
+            column: 17,
+        },
+        Token {
+            token_type: Function,
+            position: 592,
+            line: 24,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "append",
+            ),
+            position: 599,
+            line: 24,
+            column: 18,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 600,
+            line: 24,
+            column: 19,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 604,
+            line: 24,
+            column: 23,
+        },
+        Token {
+            token_type: Comma,
+            position: 605,
+            line: 24,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "user",
+            ),
+            position: 610,
+            line: 24,
+            column: 29,
+        },
+        Token {
+            token_type: Colon,
+            position: 611,
+            line: 24,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 615,
+            line: 24,
+            column: 34,
+        },
+        Token {
+            token_type: Comma,
+            position: 616,
+            line: 24,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "text",
+            ),
+            position: 621,
+            line: 24,
+            column: 40,
+        },
+        Token {
+            token_type: Colon,
+            position: 622,
+            line: 24,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 626,
+            line: 24,
+            column: 45,
+        },
+        Token {
+            token_type: RightParen,
+            position: 627,
+            line: 24,
+            column: 46,
+        },
+        Token {
+            token_type: Colon,
+            position: 628,
+            line: 24,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 632,
+            line: 24,
+            column: 51,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 634,
+            line: 24,
+            column: 53,
+        },
+        Token {
+            token_type: Var,
+            position: 642,
+            line: 25,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 645,
+            line: 25,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
+            position: 647,
+            line: 25,
+            column: 13,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 652,
+            line: 25,
+            column: 18,
+        },
+        Token {
+            token_type: Dot,
+            position: 653,
+            line: 25,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 660,
+            line: 25,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 661,
+            line: 25,
+            column: 27,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 670,
+            line: 26,
+            column: 9,
+        },
+        Token {
+            token_type: Dot,
+            position: 671,
+            line: 26,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 678,
+            line: 26,
+            column: 17,
+        },
+        Token {
+            token_type: Eq,
+            position: 680,
+            line: 26,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 683,
+            line: 26,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 685,
+            line: 26,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 687,
+            line: 26,
+            column: 26,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 688,
+            line: 26,
+            column: 27,
+        },
+        Token {
+            token_type: As,
+            position: 691,
+            line: 26,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 695,
+            line: 26,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 696,
+            line: 26,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 697,
+            line: 26,
+            column: 36,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 706,
+            line: 27,
+            column: 9,
+        },
+        Token {
+            token_type: Dot,
+            position: 707,
+            line: 27,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "messages",
+            ),
+            position: 715,
+            line: 27,
+            column: 18,
+        },
+        Token {
+            token_type: Dot,
+            position: 716,
+            line: 27,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "push",
+            ),
+            position: 720,
+            line: 27,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 721,
+            line: 27,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "Message",
+            ),
+            position: 728,
+            line: 27,
+            column: 31,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 730,
+            line: 27,
+            column: 33,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 733,
+            line: 27,
+            column: 36,
+        },
+        Token {
+            token_type: Colon,
+            position: 734,
+            line: 27,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 737,
+            line: 27,
+            column: 40,
+        },
+        Token {
+            token_type: Comma,
+            position: 738,
+            line: 27,
+            column: 41,
+        },
+        Token {
+            token_type: Identifier(
+                "user",
+            ),
+            position: 743,
+            line: 27,
+            column: 46,
+        },
+        Token {
+            token_type: Colon,
+            position: 744,
+            line: 27,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "user",
+            ),
+            position: 749,
+            line: 27,
+            column: 52,
+        },
+        Token {
+            token_type: Comma,
+            position: 750,
+            line: 27,
+            column: 53,
+        },
+        Token {
+            token_type: Identifier(
+                "text",
+            ),
+            position: 755,
+            line: 27,
+            column: 58,
+        },
+        Token {
+            token_type: Colon,
+            position: 756,
+            line: 27,
+            column: 59,
+        },
+        Token {
+            token_type: Identifier(
+                "text",
+            ),
+            position: 761,
+            line: 27,
+            column: 64,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 763,
+            line: 27,
+            column: 66,
+        },
+        Token {
+            token_type: RightParen,
+            position: 764,
+            line: 27,
+            column: 67,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 765,
+            line: 27,
+            column: 68,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 772,
+            line: 28,
+            column: 7,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 776,
+            line: 29,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 890,
+            line: 33,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "poll_json",
+            ),
+            position: 900,
+            line: 33,
+            column: 21,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 901,
+            line: 33,
+            column: 22,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 905,
+            line: 33,
+            column: 26,
+        },
+        Token {
+            token_type: Comma,
+            position: 906,
+            line: 33,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 912,
+            line: 33,
+            column: 33,
+        },
+        Token {
+            token_type: Colon,
+            position: 913,
+            line: 33,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 917,
+            line: 33,
+            column: 38,
+        },
+        Token {
+            token_type: RightParen,
+            position: 918,
+            line: 33,
+            column: 39,
+        },
+        Token {
+            token_type: Colon,
+            position: 919,
+            line: 33,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 923,
+            line: 33,
+            column: 44,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 925,
+            line: 33,
+            column: 46,
+        },
+        Token {
+            token_type: Var,
+            position: 933,
+            line: 34,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "msgs",
+            ),
+            position: 938,
+            line: 34,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 940,
+            line: 34,
+            column: 15,
+        },
+        Token {
+            token_type: StringLit(
+                "",
+            ),
+            position: 943,
+            line: 34,
+            column: 18,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 944,
+            line: 34,
+            column: 19,
+        },
+        Token {
+            token_type: Var,
+            position: 952,
+            line: 35,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 958,
+            line: 35,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 960,
+            line: 35,
+            column: 16,
+        },
+        Token {
+            token_type: True,
+            position: 965,
+            line: 35,
+            column: 21,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 966,
+            line: 35,
+            column: 22,
+        },
+        Token {
+            token_type: For,
+            position: 974,
+            line: 36,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 976,
+            line: 36,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "m",
+            ),
+            position: 977,
+            line: 36,
+            column: 11,
+        },
+        Token {
+            token_type: In,
+            position: 980,
+            line: 36,
+            column: 14,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 985,
+            line: 36,
+            column: 19,
+        },
+        Token {
+            token_type: Dot,
+            position: 986,
+            line: 36,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "messages",
+            ),
+            position: 994,
+            line: 36,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 995,
+            line: 36,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 997,
+            line: 36,
+            column: 31,
+        },
+        Token {
+            token_type: If,
+            position: 1006,
+            line: 37,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1008,
+            line: 37,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "m",
+            ),
+            position: 1009,
+            line: 37,
+            column: 12,
+        },
+        Token {
+            token_type: Dot,
+            position: 1010,
+            line: 37,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 1012,
+            line: 37,
+            column: 15,
+        },
+        Token {
+            token_type: GT,
+            position: 1014,
+            line: 37,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 1020,
+            line: 37,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1021,
+            line: 37,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1023,
+            line: 37,
+            column: 26,
+        },
+        Token {
+            token_type: Var,
+            position: 1035,
+            line: 38,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 1041,
+            line: 38,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 1043,
+            line: 38,
+            column: 20,
+        },
+        Token {
+            token_type: StringLit(
+                "{\"id\":",
+            ),
+            position: 1054,
+            line: 38,
+            column: 31,
+        },
+        Token {
+            token_type: Plus,
+            position: 1056,
+            line: 38,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1058,
+            line: 38,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "m",
+            ),
+            position: 1059,
+            line: 38,
+            column: 36,
+        },
+        Token {
+            token_type: Dot,
+            position: 1060,
+            line: 38,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "id",
+            ),
+            position: 1062,
+            line: 38,
+            column: 39,
+        },
+        Token {
+            token_type: As,
+            position: 1065,
+            line: 38,
+            column: 42,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1069,
+            line: 38,
+            column: 46,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1070,
+            line: 38,
+            column: 47,
+        },
+        Token {
+            token_type: Plus,
+            position: 1090,
+            line: 39,
+            column: 20,
+        },
+        Token {
+            token_type: StringLit(
+                ",\"user\":",
+            ),
+            position: 1103,
+            line: 39,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 1105,
+            line: 39,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "json_str",
+            ),
+            position: 1114,
+            line: 39,
+            column: 44,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1115,
+            line: 39,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "m",
+            ),
+            position: 1116,
+            line: 39,
+            column: 46,
+        },
+        Token {
+            token_type: Dot,
+            position: 1117,
+            line: 39,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "user",
+            ),
+            position: 1121,
+            line: 39,
+            column: 51,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1122,
+            line: 39,
+            column: 52,
+        },
+        Token {
+            token_type: Plus,
+            position: 1142,
+            line: 40,
+            column: 20,
+        },
+        Token {
+            token_type: StringLit(
+                ",\"text\":",
+            ),
+            position: 1155,
+            line: 40,
+            column: 33,
+        },
+        Token {
+            token_type: Plus,
+            position: 1157,
+            line: 40,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "json_str",
+            ),
+            position: 1166,
+            line: 40,
+            column: 44,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1167,
+            line: 40,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "m",
+            ),
+            position: 1168,
+            line: 40,
+            column: 46,
+        },
+        Token {
+            token_type: Dot,
+            position: 1169,
+            line: 40,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "text",
+            ),
+            position: 1173,
+            line: 40,
+            column: 51,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1174,
+            line: 40,
+            column: 52,
+        },
+        Token {
+            token_type: Plus,
+            position: 1176,
+            line: 40,
+            column: 54,
+        },
+        Token {
+            token_type: StringLit(
+                "}",
+            ),
+            position: 1180,
+            line: 40,
+            column: 58,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1181,
+            line: 40,
+            column: 59,
+        },
+        Token {
+            token_type: If,
+            position: 1192,
+            line: 41,
+            column: 11,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1194,
+            line: 41,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 1199,
+            line: 41,
+            column: 18,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1200,
+            line: 41,
+            column: 19,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1202,
+            line: 41,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "msgs",
+            ),
+            position: 1217,
+            line: 42,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 1219,
+            line: 42,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 1225,
+            line: 42,
+            column: 23,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1226,
+            line: 42,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 1242,
+            line: 43,
+            column: 16,
+        },
+        Token {
+            token_type: Eq,
+            position: 1244,
+            line: 43,
+            column: 18,
+        },
+        Token {
+            token_type: False,
+            position: 1250,
+            line: 43,
+            column: 24,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1251,
+            line: 43,
+            column: 25,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1261,
+            line: 44,
+            column: 10,
+        },
+        Token {
+            token_type: Else,
+            position: 1266,
+            line: 44,
+            column: 15,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1268,
+            line: 44,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "msgs",
+            ),
+            position: 1283,
+            line: 45,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 1285,
+            line: 45,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "msgs",
+            ),
+            position: 1290,
+            line: 45,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 1292,
+            line: 45,
+            column: 24,
+        },
+        Token {
+            token_type: StringLit(
+                ",",
+            ),
+            position: 1296,
+            line: 45,
+            column: 28,
+        },
+        Token {
+            token_type: Plus,
+            position: 1298,
+            line: 45,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 1304,
+            line: 45,
+            column: 36,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1305,
+            line: 45,
+            column: 37,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1315,
+            line: 46,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1323,
+            line: 47,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1329,
+            line: 48,
+            column: 6,
+        },
+        Token {
+            token_type: Var,
+            position: 1337,
+            line: 49,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "next_cursor",
+            ),
+            position: 1349,
+            line: 49,
+            column: 20,
+        },
+        Token {
+            token_type: Eq,
+            position: 1351,
+            line: 49,
+            column: 22,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 1356,
+            line: 49,
+            column: 27,
+        },
+        Token {
+            token_type: Dot,
+            position: 1357,
+            line: 49,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 1364,
+            line: 49,
+            column: 35,
+        },
+        Token {
+            token_type: Minus,
+            position: 1366,
+            line: 49,
+            column: 37,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1368,
+            line: 49,
+            column: 39,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 1369,
+            line: 49,
+            column: 40,
+        },
+        Token {
+            token_type: As,
+            position: 1372,
+            line: 49,
+            column: 43,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 1376,
+            line: 49,
+            column: 47,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1377,
+            line: 49,
+            column: 48,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1378,
+            line: 49,
+            column: 49,
+        },
+        Token {
+            token_type: StringLit(
+                "{\"messages\":[",
+            ),
+            position: 1400,
+            line: 50,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 1402,
+            line: 50,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "msgs",
+            ),
+            position: 1407,
+            line: 50,
+            column: 29,
+        },
+        Token {
+            token_type: Plus,
+            position: 1409,
+            line: 50,
+            column: 31,
+        },
+        Token {
+            token_type: StringLit(
+                "],\"next\":",
+            ),
+            position: 1423,
+            line: 50,
+            column: 45,
+        },
+        Token {
+            token_type: Plus,
+            position: 1425,
+            line: 50,
+            column: 47,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1427,
+            line: 50,
+            column: 49,
+        },
+        Token {
+            token_type: Identifier(
+                "next_cursor",
+            ),
+            position: 1438,
+            line: 50,
+            column: 60,
+        },
+        Token {
+            token_type: As,
+            position: 1441,
+            line: 50,
+            column: 63,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1445,
+            line: 50,
+            column: 67,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1446,
+            line: 50,
+            column: 68,
+        },
+        Token {
+            token_type: Plus,
+            position: 1448,
+            line: 50,
+            column: 70,
+        },
+        Token {
+            token_type: StringLit(
+                "}",
+            ),
+            position: 1452,
+            line: 50,
+            column: 74,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1456,
+            line: 51,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1458,
+            line: 52,
+            column: 2,
+        },
+        Token {
+            token_type: Struct,
+            position: 1466,
+            line: 54,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 1473,
+            line: 54,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1475,
+            line: 54,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 1480,
+            line: 55,
+            column: 5,
+        },
+        Token {
+            token_type: Colon,
+            position: 1481,
+            line: 55,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 1485,
+            line: 55,
+            column: 10,
+        },
+        Token {
+            token_type: Comma,
+            position: 1486,
+            line: 55,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 1496,
+            line: 56,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 1497,
+            line: 56,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1501,
+            line: 56,
+            column: 15,
+        },
+        Token {
+            token_type: Comma,
+            position: 1502,
+            line: 56,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 1510,
+            line: 57,
+            column: 8,
+        },
+        Token {
+            token_type: Colon,
+            position: 1511,
+            line: 57,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 1515,
+            line: 57,
+            column: 13,
+        },
+        Token {
+            token_type: Comma,
+            position: 1516,
+            line: 57,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 1530,
+            line: 58,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 1531,
+            line: 58,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 1535,
+            line: 58,
+            column: 19,
+        },
+        Token {
+            token_type: Comma,
+            position: 1536,
+            line: 58,
+            column: 20,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1538,
+            line: 59,
+            column: 2,
+        },
+        Token {
+            token_type: Struct,
+            position: 1546,
+            line: 61,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "ChatState",
+            ),
+            position: 1556,
+            line: 61,
+            column: 17,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1558,
+            line: 61,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 1569,
+            line: 62,
+            column: 11,
+        },
+        Token {
+            token_type: Colon,
+            position: 1570,
+            line: 62,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 1575,
+            line: 62,
+            column: 17,
+        },
+        Token {
+            token_type: LT,
+            position: 1576,
+            line: 62,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 1583,
+            line: 62,
+            column: 25,
+        },
+        Token {
+            token_type: GT,
+            position: 1584,
+            line: 62,
+            column: 26,
+        },
+        Token {
+            token_type: Comma,
+            position: 1585,
+            line: 62,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 1595,
+            line: 63,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 1596,
+            line: 63,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 1601,
+            line: 63,
+            column: 16,
+        },
+        Token {
+            token_type: LT,
+            position: 1602,
+            line: 63,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 1608,
+            line: 63,
+            column: 23,
+        },
+        Token {
+            token_type: GT,
+            position: 1609,
+            line: 63,
+            column: 24,
+        },
+        Token {
+            token_type: Comma,
+            position: 1610,
+            line: 63,
+            column: 25,
+        },
+        Token {
+            token_type: Function,
+            position: 1622,
+            line: 65,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "new",
+            ),
+            position: 1626,
+            line: 65,
+            column: 15,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1627,
+            line: 65,
+            column: 16,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1628,
+            line: 65,
+            column: 17,
+        },
+        Token {
+            token_type: Colon,
+            position: 1629,
+            line: 65,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "ChatState",
+            ),
+            position: 1639,
+            line: 65,
+            column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1641,
+            line: 65,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "ChatState",
+            ),
+            position: 1655,
+            line: 66,
+            column: 14,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1657,
+            line: 66,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 1672,
+            line: 67,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 1673,
+            line: 67,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 1678,
+            line: 67,
+            column: 21,
+        },
+        Token {
+            token_type: Dot,
+            position: 1679,
+            line: 67,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "new",
+            ),
+            position: 1682,
+            line: 67,
+            column: 25,
+        },
+        Token {
+            token_type: LT,
+            position: 1683,
+            line: 67,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 1690,
+            line: 67,
+            column: 33,
+        },
+        Token {
+            token_type: GT,
+            position: 1691,
+            line: 67,
+            column: 34,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1692,
+            line: 67,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1693,
+            line: 67,
+            column: 36,
+        },
+        Token {
+            token_type: Comma,
+            position: 1694,
+            line: 67,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 1708,
+            line: 68,
+            column: 14,
+        },
+        Token {
+            token_type: Colon,
+            position: 1709,
+            line: 68,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 1714,
+            line: 68,
+            column: 20,
+        },
+        Token {
+            token_type: Dot,
+            position: 1715,
+            line: 68,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "new",
+            ),
+            position: 1718,
+            line: 68,
+            column: 24,
+        },
+        Token {
+            token_type: LT,
+            position: 1719,
+            line: 68,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 1725,
+            line: 68,
+            column: 31,
+        },
+        Token {
+            token_type: GT,
+            position: 1726,
+            line: 68,
+            column: 32,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1727,
+            line: 68,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1728,
+            line: 68,
+            column: 34,
+        },
+        Token {
+            token_type: Comma,
+            position: 1729,
+            line: 68,
+            column: 35,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1735,
+            line: 69,
+            column: 6,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1739,
+            line: 70,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1741,
+            line: 71,
+            column: 2,
+        },
+        Token {
+            token_type: Extend,
+            position: 1749,
+            line: 73,
+            column: 7,
+        },
+        Token {
+            token_type: Identifier(
+                "ChatState",
+            ),
+            position: 1759,
+            line: 73,
+            column: 17,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1761,
+            line: 73,
+            column: 19,
+        },
+        Token {
+            token_type: Function,
+            position: 1853,
+            line: 75,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "ensure_channel",
+            ),
+            position: 1868,
+            line: 75,
+            column: 26,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1869,
+            line: 75,
+            column: 27,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 1873,
+            line: 75,
+            column: 31,
+        },
+        Token {
+            token_type: Comma,
+            position: 1874,
+            line: 75,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 1879,
+            line: 75,
+            column: 37,
+        },
+        Token {
+            token_type: Colon,
+            position: 1880,
+            line: 75,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 1884,
+            line: 75,
+            column: 42,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1885,
+            line: 75,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 1886,
+            line: 75,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 1894,
+            line: 75,
+            column: 52,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1896,
+            line: 75,
+            column: 54,
+        },
+        Token {
+            token_type: For,
+            position: 1904,
+            line: 76,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1906,
+            line: 76,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 1907,
+            line: 76,
+            column: 11,
+        },
+        Token {
+            token_type: In,
+            position: 1910,
+            line: 76,
+            column: 14,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 1915,
+            line: 76,
+            column: 19,
+        },
+        Token {
+            token_type: Dot,
+            position: 1916,
+            line: 76,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 1924,
+            line: 76,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1925,
+            line: 76,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1927,
+            line: 76,
+            column: 31,
+        },
+        Token {
+            token_type: If,
+            position: 1936,
+            line: 77,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 1938,
+            line: 77,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 1939,
+            line: 77,
+            column: 12,
+        },
+        Token {
+            token_type: Dot,
+            position: 1940,
+            line: 77,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 1944,
+            line: 77,
+            column: 17,
+        },
+        Token {
+            token_type: EqEq,
+            position: 1947,
+            line: 77,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 1952,
+            line: 77,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 1953,
+            line: 77,
+            column: 26,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 1955,
+            line: 77,
+            column: 28,
+        },
+        Token {
+            token_type: Return,
+            position: 1970,
+            line: 78,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 1972,
+            line: 78,
+            column: 17,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 1973,
+            line: 78,
+            column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1981,
+            line: 79,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 1987,
+            line: 80,
+            column: 6,
+        },
+        Token {
+            token_type: Var,
+            position: 1995,
+            line: 81,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "fresh",
+            ),
+            position: 2001,
+            line: 81,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 2003,
+            line: 81,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 2011,
+            line: 81,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2013,
+            line: 81,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 2018,
+            line: 81,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 2019,
+            line: 81,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 2024,
+            line: 81,
+            column: 37,
+        },
+        Token {
+            token_type: Comma,
+            position: 2025,
+            line: 81,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "messages",
+            ),
+            position: 2034,
+            line: 81,
+            column: 47,
+        },
+        Token {
+            token_type: Colon,
+            position: 2035,
+            line: 81,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "List",
+            ),
+            position: 2040,
+            line: 81,
+            column: 53,
+        },
+        Token {
+            token_type: Dot,
+            position: 2041,
+            line: 81,
+            column: 54,
+        },
+        Token {
+            token_type: Identifier(
+                "new",
+            ),
+            position: 2044,
+            line: 81,
+            column: 57,
+        },
+        Token {
+            token_type: LT,
+            position: 2045,
+            line: 81,
+            column: 58,
+        },
+        Token {
+            token_type: Identifier(
+                "Message",
+            ),
+            position: 2052,
+            line: 81,
+            column: 65,
+        },
+        Token {
+            token_type: GT,
+            position: 2053,
+            line: 81,
+            column: 66,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2054,
+            line: 81,
+            column: 67,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2055,
+            line: 81,
+            column: 68,
+        },
+        Token {
+            token_type: Comma,
+            position: 2056,
+            line: 81,
+            column: 69,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 2064,
+            line: 81,
+            column: 77,
+        },
+        Token {
+            token_type: Colon,
+            position: 2065,
+            line: 81,
+            column: 78,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 2067,
+            line: 81,
+            column: 80,
+        },
+        Token {
+            token_type: As,
+            position: 2070,
+            line: 81,
+            column: 83,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2074,
+            line: 81,
+            column: 87,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2076,
+            line: 81,
+            column: 89,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2077,
+            line: 81,
+            column: 90,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2086,
+            line: 82,
+            column: 9,
+        },
+        Token {
+            token_type: Dot,
+            position: 2087,
+            line: 82,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 2095,
+            line: 82,
+            column: 18,
+        },
+        Token {
+            token_type: Dot,
+            position: 2096,
+            line: 82,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "push",
+            ),
+            position: 2100,
+            line: 82,
+            column: 23,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2101,
+            line: 82,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "fresh",
+            ),
+            position: 2106,
+            line: 82,
+            column: 29,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2107,
+            line: 82,
+            column: 30,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2108,
+            line: 82,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "fresh",
+            ),
+            position: 2118,
+            line: 83,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2122,
+            line: 84,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 2272,
+            line: 88,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "find_channel",
+            ),
+            position: 2285,
+            line: 88,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2286,
+            line: 88,
+            column: 25,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2290,
+            line: 88,
+            column: 29,
+        },
+        Token {
+            token_type: Comma,
+            position: 2291,
+            line: 88,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 2296,
+            line: 88,
+            column: 35,
+        },
+        Token {
+            token_type: Colon,
+            position: 2297,
+            line: 88,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 2301,
+            line: 88,
+            column: 40,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2302,
+            line: 88,
+            column: 41,
+        },
+        Token {
+            token_type: Colon,
+            position: 2303,
+            line: 88,
+            column: 42,
+        },
+        Token {
+            token_type: Identifier(
+                "Channel",
+            ),
+            position: 2311,
+            line: 88,
+            column: 50,
+        },
+        Token {
+            token_type: Pipe,
+            position: 2313,
+            line: 88,
+            column: 52,
+        },
+        Token {
+            token_type: Null,
+            position: 2318,
+            line: 88,
+            column: 57,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2320,
+            line: 88,
+            column: 59,
+        },
+        Token {
+            token_type: For,
+            position: 2328,
+            line: 89,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2330,
+            line: 89,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 2331,
+            line: 89,
+            column: 11,
+        },
+        Token {
+            token_type: In,
+            position: 2334,
+            line: 89,
+            column: 14,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2339,
+            line: 89,
+            column: 19,
+        },
+        Token {
+            token_type: Dot,
+            position: 2340,
+            line: 89,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 2348,
+            line: 89,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2349,
+            line: 89,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2351,
+            line: 89,
+            column: 31,
+        },
+        Token {
+            token_type: If,
+            position: 2360,
+            line: 90,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2362,
+            line: 90,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 2363,
+            line: 90,
+            column: 12,
+        },
+        Token {
+            token_type: Dot,
+            position: 2364,
+            line: 90,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 2368,
+            line: 90,
+            column: 17,
+        },
+        Token {
+            token_type: EqEq,
+            position: 2371,
+            line: 90,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 2376,
+            line: 90,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2377,
+            line: 90,
+            column: 26,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2379,
+            line: 90,
+            column: 28,
+        },
+        Token {
+            token_type: Return,
+            position: 2394,
+            line: 91,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 2396,
+            line: 91,
+            column: 17,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2397,
+            line: 91,
+            column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2405,
+            line: 92,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2411,
+            line: 93,
+            column: 6,
+        },
+        Token {
+            token_type: Null,
+            position: 2420,
+            line: 94,
+            column: 9,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2424,
+            line: 95,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 2436,
+            line: 97,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "add_waiter",
+            ),
+            position: 2447,
+            line: 97,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2448,
+            line: 97,
+            column: 23,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2452,
+            line: 97,
+            column: 27,
+        },
+        Token {
+            token_type: Comma,
+            position: 2453,
+            line: 97,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2456,
+            line: 97,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 2457,
+            line: 97,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 2461,
+            line: 97,
+            column: 36,
+        },
+        Token {
+            token_type: Comma,
+            position: 2462,
+            line: 97,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 2470,
+            line: 97,
+            column: 45,
+        },
+        Token {
+            token_type: Colon,
+            position: 2471,
+            line: 97,
+            column: 46,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 2475,
+            line: 97,
+            column: 50,
+        },
+        Token {
+            token_type: Comma,
+            position: 2476,
+            line: 97,
+            column: 51,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 2482,
+            line: 97,
+            column: 57,
+        },
+        Token {
+            token_type: Colon,
+            position: 2483,
+            line: 97,
+            column: 58,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2487,
+            line: 97,
+            column: 62,
+        },
+        Token {
+            token_type: Comma,
+            position: 2488,
+            line: 97,
+            column: 63,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 2500,
+            line: 97,
+            column: 75,
+        },
+        Token {
+            token_type: Colon,
+            position: 2501,
+            line: 97,
+            column: 76,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2505,
+            line: 97,
+            column: 80,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2506,
+            line: 97,
+            column: 81,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2508,
+            line: 97,
+            column: 83,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2517,
+            line: 98,
+            column: 9,
+        },
+        Token {
+            token_type: Dot,
+            position: 2518,
+            line: 98,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 2525,
+            line: 98,
+            column: 17,
+        },
+        Token {
+            token_type: Dot,
+            position: 2526,
+            line: 98,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "push",
+            ),
+            position: 2530,
+            line: 98,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2531,
+            line: 98,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 2537,
+            line: 98,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2539,
+            line: 98,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2548,
+            line: 99,
+            column: 9,
+        },
+        Token {
+            token_type: Colon,
+            position: 2549,
+            line: 99,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 2552,
+            line: 99,
+            column: 13,
+        },
+        Token {
+            token_type: Comma,
+            position: 2553,
+            line: 99,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 2561,
+            line: 99,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 2562,
+            line: 99,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 2570,
+            line: 99,
+            column: 31,
+        },
+        Token {
+            token_type: Comma,
+            position: 2571,
+            line: 99,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 2577,
+            line: 99,
+            column: 38,
+        },
+        Token {
+            token_type: Colon,
+            position: 2578,
+            line: 99,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 2584,
+            line: 99,
+            column: 45,
+        },
+        Token {
+            token_type: Comma,
+            position: 2585,
+            line: 99,
+            column: 46,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 2597,
+            line: 99,
+            column: 58,
+        },
+        Token {
+            token_type: Colon,
+            position: 2598,
+            line: 99,
+            column: 59,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 2610,
+            line: 99,
+            column: 71,
+        },
+        Token {
+            token_type: Comma,
+            position: 2611,
+            line: 99,
+            column: 72,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2617,
+            line: 100,
+            column: 6,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2618,
+            line: 100,
+            column: 7,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2619,
+            line: 100,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 2623,
+            line: 101,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 2816,
+            line: 106,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "take_woken",
+            ),
+            position: 2827,
+            line: 106,
+            column: 22,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2828,
+            line: 106,
+            column: 23,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2832,
+            line: 106,
+            column: 27,
+        },
+        Token {
+            token_type: Comma,
+            position: 2833,
+            line: 106,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 2841,
+            line: 106,
+            column: 36,
+        },
+        Token {
+            token_type: Colon,
+            position: 2842,
+            line: 106,
+            column: 37,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 2846,
+            line: 106,
+            column: 41,
+        },
+        Token {
+            token_type: Comma,
+            position: 2847,
+            line: 106,
+            column: 42,
+        },
+        Token {
+            token_type: Identifier(
+                "cursor",
+            ),
+            position: 2854,
+            line: 106,
+            column: 49,
+        },
+        Token {
+            token_type: Colon,
+            position: 2855,
+            line: 106,
+            column: 50,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2859,
+            line: 106,
+            column: 54,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2860,
+            line: 106,
+            column: 55,
+        },
+        Token {
+            token_type: Colon,
+            position: 2861,
+            line: 106,
+            column: 56,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 2868,
+            line: 106,
+            column: 63,
+        },
+        Token {
+            token_type: Pipe,
+            position: 2870,
+            line: 106,
+            column: 65,
+        },
+        Token {
+            token_type: Null,
+            position: 2875,
+            line: 106,
+            column: 70,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2877,
+            line: 106,
+            column: 72,
+        },
+        Token {
+            token_type: Var,
+            position: 2885,
+            line: 107,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 2887,
+            line: 107,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 2888,
+            line: 107,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2892,
+            line: 107,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 2894,
+            line: 107,
+            column: 17,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 2896,
+            line: 107,
+            column: 19,
+        },
+        Token {
+            token_type: As,
+            position: 2899,
+            line: 107,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 2903,
+            line: 107,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2904,
+            line: 107,
+            column: 27,
+        },
+        Token {
+            token_type: While,
+            position: 2914,
+            line: 108,
+            column: 10,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2916,
+            line: 108,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 2917,
+            line: 108,
+            column: 13,
+        },
+        Token {
+            token_type: LT,
+            position: 2919,
+            line: 108,
+            column: 15,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2924,
+            line: 108,
+            column: 20,
+        },
+        Token {
+            token_type: Dot,
+            position: 2925,
+            line: 108,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 2932,
+            line: 108,
+            column: 28,
+        },
+        Token {
+            token_type: Dot,
+            position: 2933,
+            line: 108,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 2937,
+            line: 108,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2938,
+            line: 108,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2939,
+            line: 108,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2940,
+            line: 108,
+            column: 36,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 2942,
+            line: 108,
+            column: 38,
+        },
+        Token {
+            token_type: Var,
+            position: 2952,
+            line: 109,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 2957,
+            line: 109,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 2959,
+            line: 109,
+            column: 17,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 2964,
+            line: 109,
+            column: 22,
+        },
+        Token {
+            token_type: Dot,
+            position: 2965,
+            line: 109,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 2972,
+            line: 109,
+            column: 30,
+        },
+        Token {
+            token_type: Dot,
+            position: 2973,
+            line: 109,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "get",
+            ),
+            position: 2976,
+            line: 109,
+            column: 34,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2977,
+            line: 109,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 2978,
+            line: 109,
+            column: 36,
+        },
+        Token {
+            token_type: RightParen,
+            position: 2979,
+            line: 109,
+            column: 37,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 2980,
+            line: 109,
+            column: 38,
+        },
+        Token {
+            token_type: If,
+            position: 2989,
+            line: 110,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 2991,
+            line: 110,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 2995,
+            line: 110,
+            column: 15,
+        },
+        Token {
+            token_type: Is,
+            position: 2998,
+            line: 110,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 3005,
+            line: 110,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3006,
+            line: 110,
+            column: 26,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3008,
+            line: 110,
+            column: 28,
+        },
+        Token {
+            token_type: Var,
+            position: 3020,
+            line: 111,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3022,
+            line: 111,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 3024,
+            line: 111,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 3029,
+            line: 111,
+            column: 21,
+        },
+        Token {
+            token_type: As,
+            position: 3032,
+            line: 111,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 3039,
+            line: 111,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3040,
+            line: 111,
+            column: 32,
+        },
+        Token {
+            token_type: If,
+            position: 3051,
+            line: 112,
+            column: 11,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3053,
+            line: 112,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3054,
+            line: 112,
+            column: 14,
+        },
+        Token {
+            token_type: Dot,
+            position: 3055,
+            line: 112,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 3062,
+            line: 112,
+            column: 22,
+        },
+        Token {
+            token_type: EqEq,
+            position: 3065,
+            line: 112,
+            column: 25,
+        },
+        Token {
+            token_type: Identifier(
+                "channel",
+            ),
+            position: 3073,
+            line: 112,
+            column: 33,
+        },
+        Token {
+            token_type: And,
+            position: 3076,
+            line: 112,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "cursor",
+            ),
+            position: 3083,
+            line: 112,
+            column: 43,
+        },
+        Token {
+            token_type: GT,
+            position: 3085,
+            line: 112,
+            column: 45,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3087,
+            line: 112,
+            column: 47,
+        },
+        Token {
+            token_type: Dot,
+            position: 3088,
+            line: 112,
+            column: 48,
+        },
+        Token {
+            token_type: Identifier(
+                "since",
+            ),
+            position: 3093,
+            line: 112,
+            column: 53,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3094,
+            line: 112,
+            column: 54,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3096,
+            line: 112,
+            column: 56,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3111,
+            line: 113,
+            column: 15,
+        },
+        Token {
+            token_type: Dot,
+            position: 3112,
+            line: 113,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 3119,
+            line: 113,
+            column: 23,
+        },
+        Token {
+            token_type: Dot,
+            position: 3120,
+            line: 113,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "remove",
+            ),
+            position: 3126,
+            line: 113,
+            column: 30,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3127,
+            line: 113,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3128,
+            line: 113,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3129,
+            line: 113,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3130,
+            line: 113,
+            column: 34,
+        },
+        Token {
+            token_type: Return,
+            position: 3147,
+            line: 114,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3149,
+            line: 114,
+            column: 19,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3150,
+            line: 114,
+            column: 20,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3160,
+            line: 115,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3168,
+            line: 116,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3176,
+            line: 117,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 3178,
+            line: 117,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3180,
+            line: 117,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 3182,
+            line: 117,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3184,
+            line: 117,
+            column: 16,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3185,
+            line: 117,
+            column: 17,
+        },
+        Token {
+            token_type: As,
+            position: 3188,
+            line: 117,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3192,
+            line: 117,
+            column: 24,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3193,
+            line: 117,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3194,
+            line: 117,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3200,
+            line: 118,
+            column: 6,
+        },
+        Token {
+            token_type: Null,
+            position: 3209,
+            line: 119,
+            column: 9,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3213,
+            line: 120,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 3342,
+            line: 124,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "take_expired",
+            ),
+            position: 3355,
+            line: 124,
+            column: 24,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3356,
+            line: 124,
+            column: 25,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3360,
+            line: 124,
+            column: 29,
+        },
+        Token {
+            token_type: Comma,
+            position: 3361,
+            line: 124,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "now_ms",
+            ),
+            position: 3368,
+            line: 124,
+            column: 37,
+        },
+        Token {
+            token_type: Colon,
+            position: 3369,
+            line: 124,
+            column: 38,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3373,
+            line: 124,
+            column: 42,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3374,
+            line: 124,
+            column: 43,
+        },
+        Token {
+            token_type: Colon,
+            position: 3375,
+            line: 124,
+            column: 44,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 3382,
+            line: 124,
+            column: 51,
+        },
+        Token {
+            token_type: Pipe,
+            position: 3384,
+            line: 124,
+            column: 53,
+        },
+        Token {
+            token_type: Null,
+            position: 3389,
+            line: 124,
+            column: 58,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3391,
+            line: 124,
+            column: 60,
+        },
+        Token {
+            token_type: Var,
+            position: 3399,
+            line: 125,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3401,
+            line: 125,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 3402,
+            line: 125,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3406,
+            line: 125,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 3408,
+            line: 125,
+            column: 17,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3410,
+            line: 125,
+            column: 19,
+        },
+        Token {
+            token_type: As,
+            position: 3413,
+            line: 125,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3417,
+            line: 125,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3418,
+            line: 125,
+            column: 27,
+        },
+        Token {
+            token_type: While,
+            position: 3428,
+            line: 126,
+            column: 10,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3430,
+            line: 126,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3431,
+            line: 126,
+            column: 13,
+        },
+        Token {
+            token_type: LT,
+            position: 3433,
+            line: 126,
+            column: 15,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3438,
+            line: 126,
+            column: 20,
+        },
+        Token {
+            token_type: Dot,
+            position: 3439,
+            line: 126,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 3446,
+            line: 126,
+            column: 28,
+        },
+        Token {
+            token_type: Dot,
+            position: 3447,
+            line: 126,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 3451,
+            line: 126,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3452,
+            line: 126,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3453,
+            line: 126,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3454,
+            line: 126,
+            column: 36,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3456,
+            line: 126,
+            column: 38,
+        },
+        Token {
+            token_type: Var,
+            position: 3466,
+            line: 127,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 3471,
+            line: 127,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 3473,
+            line: 127,
+            column: 17,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3478,
+            line: 127,
+            column: 22,
+        },
+        Token {
+            token_type: Dot,
+            position: 3479,
+            line: 127,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 3486,
+            line: 127,
+            column: 30,
+        },
+        Token {
+            token_type: Dot,
+            position: 3487,
+            line: 127,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "get",
+            ),
+            position: 3490,
+            line: 127,
+            column: 34,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3491,
+            line: 127,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3492,
+            line: 127,
+            column: 36,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3493,
+            line: 127,
+            column: 37,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3494,
+            line: 127,
+            column: 38,
+        },
+        Token {
+            token_type: If,
+            position: 3503,
+            line: 128,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3505,
+            line: 128,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 3509,
+            line: 128,
+            column: 15,
+        },
+        Token {
+            token_type: Is,
+            position: 3512,
+            line: 128,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 3519,
+            line: 128,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3520,
+            line: 128,
+            column: 26,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3522,
+            line: 128,
+            column: 28,
+        },
+        Token {
+            token_type: Var,
+            position: 3534,
+            line: 129,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3536,
+            line: 129,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 3538,
+            line: 129,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 3543,
+            line: 129,
+            column: 21,
+        },
+        Token {
+            token_type: As,
+            position: 3546,
+            line: 129,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 3553,
+            line: 129,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3554,
+            line: 129,
+            column: 32,
+        },
+        Token {
+            token_type: If,
+            position: 3565,
+            line: 130,
+            column: 11,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3567,
+            line: 130,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3568,
+            line: 130,
+            column: 14,
+        },
+        Token {
+            token_type: Dot,
+            position: 3569,
+            line: 130,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 3580,
+            line: 130,
+            column: 26,
+        },
+        Token {
+            token_type: LtEq,
+            position: 3583,
+            line: 130,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "now_ms",
+            ),
+            position: 3590,
+            line: 130,
+            column: 36,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3591,
+            line: 130,
+            column: 37,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3593,
+            line: 130,
+            column: 39,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3608,
+            line: 131,
+            column: 15,
+        },
+        Token {
+            token_type: Dot,
+            position: 3609,
+            line: 131,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 3616,
+            line: 131,
+            column: 23,
+        },
+        Token {
+            token_type: Dot,
+            position: 3617,
+            line: 131,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "remove",
+            ),
+            position: 3623,
+            line: 131,
+            column: 30,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3624,
+            line: 131,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3625,
+            line: 131,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3626,
+            line: 131,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3627,
+            line: 131,
+            column: 34,
+        },
+        Token {
+            token_type: Return,
+            position: 3644,
+            line: 132,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3646,
+            line: 132,
+            column: 19,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3647,
+            line: 132,
+            column: 20,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3657,
+            line: 133,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3665,
+            line: 134,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3673,
+            line: 135,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 3675,
+            line: 135,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 3677,
+            line: 135,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 3679,
+            line: 135,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3681,
+            line: 135,
+            column: 16,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3682,
+            line: 135,
+            column: 17,
+        },
+        Token {
+            token_type: As,
+            position: 3685,
+            line: 135,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3689,
+            line: 135,
+            column: 24,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3690,
+            line: 135,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3691,
+            line: 135,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3697,
+            line: 136,
+            column: 6,
+        },
+        Token {
+            token_type: Null,
+            position: 3706,
+            line: 137,
+            column: 9,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 3710,
+            line: 138,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 3863,
+            line: 142,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "earliest_deadline",
+            ),
+            position: 3881,
+            line: 142,
+            column: 29,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3882,
+            line: 142,
+            column: 30,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3886,
+            line: 142,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3887,
+            line: 142,
+            column: 35,
+        },
+        Token {
+            token_type: Colon,
+            position: 3888,
+            line: 142,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3892,
+            line: 142,
+            column: 40,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3894,
+            line: 142,
+            column: 42,
+        },
+        Token {
+            token_type: Var,
+            position: 3902,
+            line: 143,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "best",
+            ),
+            position: 3907,
+            line: 143,
+            column: 13,
+        },
+        Token {
+            token_type: Colon,
+            position: 3908,
+            line: 143,
+            column: 14,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3912,
+            line: 143,
+            column: 18,
+        },
+        Token {
+            token_type: Eq,
+            position: 3914,
+            line: 143,
+            column: 20,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3916,
+            line: 143,
+            column: 22,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3917,
+            line: 143,
+            column: 23,
+        },
+        Token {
+            token_type: As,
+            position: 3920,
+            line: 143,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3924,
+            line: 143,
+            column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3925,
+            line: 143,
+            column: 31,
+        },
+        Token {
+            token_type: Minus,
+            position: 3927,
+            line: 143,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3929,
+            line: 143,
+            column: 35,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 3930,
+            line: 143,
+            column: 36,
+        },
+        Token {
+            token_type: As,
+            position: 3933,
+            line: 143,
+            column: 39,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3937,
+            line: 143,
+            column: 43,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3938,
+            line: 143,
+            column: 44,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 3939,
+            line: 143,
+            column: 45,
+        },
+        Token {
+            token_type: For,
+            position: 3947,
+            line: 144,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3949,
+            line: 144,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 3950,
+            line: 144,
+            column: 11,
+        },
+        Token {
+            token_type: In,
+            position: 3953,
+            line: 144,
+            column: 14,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 3958,
+            line: 144,
+            column: 19,
+        },
+        Token {
+            token_type: Dot,
+            position: 3959,
+            line: 144,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 3966,
+            line: 144,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3967,
+            line: 144,
+            column: 28,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 3969,
+            line: 144,
+            column: 30,
+        },
+        Token {
+            token_type: If,
+            position: 3978,
+            line: 145,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3980,
+            line: 145,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "best",
+            ),
+            position: 3984,
+            line: 145,
+            column: 15,
+        },
+        Token {
+            token_type: LT,
+            position: 3986,
+            line: 145,
+            column: 17,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 3988,
+            line: 145,
+            column: 19,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 3989,
+            line: 145,
+            column: 20,
+        },
+        Token {
+            token_type: As,
+            position: 3992,
+            line: 145,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 3996,
+            line: 145,
+            column: 27,
+        },
+        Token {
+            token_type: RightParen,
+            position: 3997,
+            line: 145,
+            column: 28,
+        },
+        Token {
+            token_type: Or,
+            position: 4000,
+            line: 145,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 4002,
+            line: 145,
+            column: 33,
+        },
+        Token {
+            token_type: Dot,
+            position: 4003,
+            line: 145,
+            column: 34,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 4014,
+            line: 145,
+            column: 45,
+        },
+        Token {
+            token_type: LT,
+            position: 4016,
+            line: 145,
+            column: 47,
+        },
+        Token {
+            token_type: Identifier(
+                "best",
+            ),
+            position: 4021,
+            line: 145,
+            column: 52,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4022,
+            line: 145,
+            column: 53,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4024,
+            line: 145,
+            column: 55,
+        },
+        Token {
+            token_type: Identifier(
+                "best",
+            ),
+            position: 4037,
+            line: 146,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 4039,
+            line: 146,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 4041,
+            line: 146,
+            column: 17,
+        },
+        Token {
+            token_type: Dot,
+            position: 4042,
+            line: 146,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "deadline_ms",
+            ),
+            position: 4053,
+            line: 146,
+            column: 29,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4054,
+            line: 146,
+            column: 30,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4062,
+            line: 147,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4068,
+            line: 148,
+            column: 6,
+        },
+        Token {
+            token_type: Identifier(
+                "best",
+            ),
+            position: 4077,
+            line: 149,
+            column: 9,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4081,
+            line: 150,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 4229,
+            line: 154,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "drop_waiter_for_fd",
+            ),
+            position: 4248,
+            line: 154,
+            column: 30,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4249,
+            line: 154,
+            column: 31,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4253,
+            line: 154,
+            column: 35,
+        },
+        Token {
+            token_type: Comma,
+            position: 4254,
+            line: 154,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 4257,
+            line: 154,
+            column: 39,
+        },
+        Token {
+            token_type: Colon,
+            position: 4258,
+            line: 154,
+            column: 40,
+        },
+        Token {
+            token_type: Identifier(
+                "i32",
+            ),
+            position: 4262,
+            line: 154,
+            column: 44,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4263,
+            line: 154,
+            column: 45,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4265,
+            line: 154,
+            column: 47,
+        },
+        Token {
+            token_type: Var,
+            position: 4273,
+            line: 155,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4275,
+            line: 155,
+            column: 10,
+        },
+        Token {
+            token_type: Colon,
+            position: 4276,
+            line: 155,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 4280,
+            line: 155,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 4282,
+            line: 155,
+            column: 17,
+        },
+        Token {
+            token_type: Int(
+                "0",
+            ),
+            position: 4284,
+            line: 155,
+            column: 19,
+        },
+        Token {
+            token_type: As,
+            position: 4287,
+            line: 155,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 4291,
+            line: 155,
+            column: 26,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4292,
+            line: 155,
+            column: 27,
+        },
+        Token {
+            token_type: While,
+            position: 4302,
+            line: 156,
+            column: 10,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4304,
+            line: 156,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4305,
+            line: 156,
+            column: 13,
+        },
+        Token {
+            token_type: LT,
+            position: 4307,
+            line: 156,
+            column: 15,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4312,
+            line: 156,
+            column: 20,
+        },
+        Token {
+            token_type: Dot,
+            position: 4313,
+            line: 156,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 4320,
+            line: 156,
+            column: 28,
+        },
+        Token {
+            token_type: Dot,
+            position: 4321,
+            line: 156,
+            column: 29,
+        },
+        Token {
+            token_type: Identifier(
+                "size",
+            ),
+            position: 4325,
+            line: 156,
+            column: 33,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4326,
+            line: 156,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4327,
+            line: 156,
+            column: 35,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4328,
+            line: 156,
+            column: 36,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4330,
+            line: 156,
+            column: 38,
+        },
+        Token {
+            token_type: Var,
+            position: 4340,
+            line: 157,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 4345,
+            line: 157,
+            column: 15,
+        },
+        Token {
+            token_type: Eq,
+            position: 4347,
+            line: 157,
+            column: 17,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4352,
+            line: 157,
+            column: 22,
+        },
+        Token {
+            token_type: Dot,
+            position: 4353,
+            line: 157,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 4360,
+            line: 157,
+            column: 30,
+        },
+        Token {
+            token_type: Dot,
+            position: 4361,
+            line: 157,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "get",
+            ),
+            position: 4364,
+            line: 157,
+            column: 34,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4365,
+            line: 157,
+            column: 35,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4366,
+            line: 157,
+            column: 36,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4367,
+            line: 157,
+            column: 37,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4368,
+            line: 157,
+            column: 38,
+        },
+        Token {
+            token_type: If,
+            position: 4377,
+            line: 158,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4379,
+            line: 158,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 4383,
+            line: 158,
+            column: 15,
+        },
+        Token {
+            token_type: Is,
+            position: 4386,
+            line: 158,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 4393,
+            line: 158,
+            column: 25,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4394,
+            line: 158,
+            column: 26,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4396,
+            line: 158,
+            column: 28,
+        },
+        Token {
+            token_type: Var,
+            position: 4408,
+            line: 159,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 4410,
+            line: 159,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 4412,
+            line: 159,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "w_or",
+            ),
+            position: 4417,
+            line: 159,
+            column: 21,
+        },
+        Token {
+            token_type: As,
+            position: 4420,
+            line: 159,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "Waiter",
+            ),
+            position: 4427,
+            line: 159,
+            column: 31,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4428,
+            line: 159,
+            column: 32,
+        },
+        Token {
+            token_type: If,
+            position: 4439,
+            line: 160,
+            column: 11,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4441,
+            line: 160,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "w",
+            ),
+            position: 4442,
+            line: 160,
+            column: 14,
+        },
+        Token {
+            token_type: Dot,
+            position: 4443,
+            line: 160,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 4445,
+            line: 160,
+            column: 17,
+        },
+        Token {
+            token_type: EqEq,
+            position: 4448,
+            line: 160,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "fd",
+            ),
+            position: 4451,
+            line: 160,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4452,
+            line: 160,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4454,
+            line: 160,
+            column: 26,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4469,
+            line: 161,
+            column: 15,
+        },
+        Token {
+            token_type: Dot,
+            position: 4470,
+            line: 161,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "waiters",
+            ),
+            position: 4477,
+            line: 161,
+            column: 23,
+        },
+        Token {
+            token_type: Dot,
+            position: 4478,
+            line: 161,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "remove",
+            ),
+            position: 4484,
+            line: 161,
+            column: 30,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4485,
+            line: 161,
+            column: 31,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4486,
+            line: 161,
+            column: 32,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4487,
+            line: 161,
+            column: 33,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4488,
+            line: 161,
+            column: 34,
+        },
+        Token {
+            token_type: Return,
+            position: 4505,
+            line: 162,
+            column: 17,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4506,
+            line: 162,
+            column: 18,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4516,
+            line: 163,
+            column: 10,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4524,
+            line: 164,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4532,
+            line: 165,
+            column: 8,
+        },
+        Token {
+            token_type: Eq,
+            position: 4534,
+            line: 165,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "i",
+            ),
+            position: 4536,
+            line: 165,
+            column: 12,
+        },
+        Token {
+            token_type: Plus,
+            position: 4538,
+            line: 165,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4540,
+            line: 165,
+            column: 16,
+        },
+        Token {
+            token_type: Int(
+                "1",
+            ),
+            position: 4541,
+            line: 165,
+            column: 17,
+        },
+        Token {
+            token_type: As,
+            position: 4544,
+            line: 165,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 4548,
+            line: 165,
+            column: 24,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4549,
+            line: 165,
+            column: 25,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4550,
+            line: 165,
+            column: 26,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4556,
+            line: 166,
+            column: 6,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4560,
+            line: 167,
+            column: 4,
+        },
+        Token {
+            token_type: Function,
+            position: 4665,
+            line: 171,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "channels_json",
+            ),
+            position: 4679,
+            line: 171,
+            column: 25,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4680,
+            line: 171,
+            column: 26,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4684,
+            line: 171,
+            column: 30,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4685,
+            line: 171,
+            column: 31,
+        },
+        Token {
+            token_type: Colon,
+            position: 4686,
+            line: 171,
+            column: 32,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 4690,
+            line: 171,
+            column: 36,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4692,
+            line: 171,
+            column: 38,
+        },
+        Token {
+            token_type: Var,
+            position: 4700,
+            line: 172,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "body",
+            ),
+            position: 4705,
+            line: 172,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 4707,
+            line: 172,
+            column: 15,
+        },
+        Token {
+            token_type: StringLit(
+                "",
+            ),
+            position: 4710,
+            line: 172,
+            column: 18,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4711,
+            line: 172,
+            column: 19,
+        },
+        Token {
+            token_type: Var,
+            position: 4719,
+            line: 173,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 4725,
+            line: 173,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 4727,
+            line: 173,
+            column: 16,
+        },
+        Token {
+            token_type: True,
+            position: 4732,
+            line: 173,
+            column: 21,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4733,
+            line: 173,
+            column: 22,
+        },
+        Token {
+            token_type: For,
+            position: 4741,
+            line: 174,
+            column: 8,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4743,
+            line: 174,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 4744,
+            line: 174,
+            column: 11,
+        },
+        Token {
+            token_type: In,
+            position: 4747,
+            line: 174,
+            column: 14,
+        },
+        Token {
+            token_type: SelfRef,
+            position: 4752,
+            line: 174,
+            column: 19,
+        },
+        Token {
+            token_type: Dot,
+            position: 4753,
+            line: 174,
+            column: 20,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 4761,
+            line: 174,
+            column: 28,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4762,
+            line: 174,
+            column: 29,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4764,
+            line: 174,
+            column: 31,
+        },
+        Token {
+            token_type: Var,
+            position: 4774,
+            line: 175,
+            column: 10,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 4780,
+            line: 175,
+            column: 16,
+        },
+        Token {
+            token_type: Eq,
+            position: 4782,
+            line: 175,
+            column: 18,
+        },
+        Token {
+            token_type: Identifier(
+                "json_str",
+            ),
+            position: 4791,
+            line: 175,
+            column: 27,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4792,
+            line: 175,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 4793,
+            line: 175,
+            column: 29,
+        },
+        Token {
+            token_type: Dot,
+            position: 4794,
+            line: 175,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 4798,
+            line: 175,
+            column: 34,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4799,
+            line: 175,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4800,
+            line: 175,
+            column: 36,
+        },
+        Token {
+            token_type: If,
+            position: 4809,
+            line: 176,
+            column: 9,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 4811,
+            line: 176,
+            column: 11,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 4816,
+            line: 176,
+            column: 16,
+        },
+        Token {
+            token_type: RightParen,
+            position: 4817,
+            line: 176,
+            column: 17,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4819,
+            line: 176,
+            column: 19,
+        },
+        Token {
+            token_type: Identifier(
+                "body",
+            ),
+            position: 4832,
+            line: 177,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 4834,
+            line: 177,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 4840,
+            line: 177,
+            column: 21,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4841,
+            line: 177,
+            column: 22,
+        },
+        Token {
+            token_type: Identifier(
+                "first",
+            ),
+            position: 4855,
+            line: 178,
+            column: 14,
+        },
+        Token {
+            token_type: Eq,
+            position: 4857,
+            line: 178,
+            column: 16,
+        },
+        Token {
+            token_type: False,
+            position: 4863,
+            line: 178,
+            column: 22,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4864,
+            line: 178,
+            column: 23,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4872,
+            line: 179,
+            column: 8,
+        },
+        Token {
+            token_type: Else,
+            position: 4877,
+            line: 179,
+            column: 13,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 4879,
+            line: 179,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "body",
+            ),
+            position: 4892,
+            line: 180,
+            column: 13,
+        },
+        Token {
+            token_type: Eq,
+            position: 4894,
+            line: 180,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "body",
+            ),
+            position: 4899,
+            line: 180,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 4901,
+            line: 180,
+            column: 22,
+        },
+        Token {
+            token_type: StringLit(
+                ",",
+            ),
+            position: 4905,
+            line: 180,
+            column: 26,
+        },
+        Token {
+            token_type: Plus,
+            position: 4907,
+            line: 180,
+            column: 28,
+        },
+        Token {
+            token_type: Identifier(
+                "entry",
+            ),
+            position: 4913,
+            line: 180,
+            column: 34,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 4914,
+            line: 180,
+            column: 35,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4922,
+            line: 181,
+            column: 8,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4928,
+            line: 182,
+            column: 6,
+        },
+        Token {
+            token_type: StringLit(
+                "{\"channels\":[",
+            ),
+            position: 4950,
+            line: 183,
+            column: 22,
+        },
+        Token {
+            token_type: Plus,
+            position: 4952,
+            line: 183,
+            column: 24,
+        },
+        Token {
+            token_type: Identifier(
+                "body",
+            ),
+            position: 4957,
+            line: 183,
+            column: 29,
+        },
+        Token {
+            token_type: Plus,
+            position: 4959,
+            line: 183,
+            column: 31,
+        },
+        Token {
+            token_type: StringLit(
+                "]}",
+            ),
+            position: 4964,
+            line: 183,
+            column: 36,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4968,
+            line: 184,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 4970,
+            line: 185,
+            column: 2,
+        },
+        Token {
+            token_type: Function,
+            position: 5048,
+            line: 188,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "debug_dump",
+            ),
+            position: 5059,
+            line: 188,
+            column: 20,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 5060,
+            line: 188,
+            column: 21,
+        },
+        Token {
+            token_type: Identifier(
+                "s",
+            ),
+            position: 5061,
+            line: 188,
+            column: 22,
+        },
+        Token {
+            token_type: Colon,
+            position: 5062,
+            line: 188,
+            column: 23,
+        },
+        Token {
+            token_type: Identifier(
+                "ChatState",
+            ),
+            position: 5072,
+            line: 188,
+            column: 33,
+        },
+        Token {
+            token_type: RightParen,
+            position: 5073,
+            line: 188,
+            column: 34,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 5075,
+            line: 188,
+            column: 36,
+        },
+        Token {
+            token_type: Identifier(
+                "println",
+            ),
+            position: 5085,
+            line: 189,
+            column: 10,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 5086,
+            line: 189,
+            column: 11,
+        },
+        Token {
+            token_type: StringLit(
+                "-- chat state --",
+            ),
+            position: 5104,
+            line: 189,
+            column: 29,
+        },
+        Token {
+            token_type: RightParen,
+            position: 5105,
+            line: 189,
+            column: 30,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 5106,
+            line: 189,
+            column: 31,
+        },
+        Token {
+            token_type: For,
+            position: 5112,
+            line: 190,
+            column: 6,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 5114,
+            line: 190,
+            column: 8,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 5115,
+            line: 190,
+            column: 9,
+        },
+        Token {
+            token_type: In,
+            position: 5118,
+            line: 190,
+            column: 12,
+        },
+        Token {
+            token_type: Identifier(
+                "s",
+            ),
+            position: 5120,
+            line: 190,
+            column: 14,
+        },
+        Token {
+            token_type: Dot,
+            position: 5121,
+            line: 190,
+            column: 15,
+        },
+        Token {
+            token_type: Identifier(
+                "channels",
+            ),
+            position: 5129,
+            line: 190,
+            column: 23,
+        },
+        Token {
+            token_type: RightParen,
+            position: 5130,
+            line: 190,
+            column: 24,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 5132,
+            line: 190,
+            column: 26,
+        },
+        Token {
+            token_type: Identifier(
+                "println",
+            ),
+            position: 5144,
+            line: 191,
+            column: 12,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 5145,
+            line: 191,
+            column: 13,
+        },
+        Token {
+            token_type: StringLit(
+                "  channel ",
+            ),
+            position: 5157,
+            line: 191,
+            column: 25,
+        },
+        Token {
+            token_type: Plus,
+            position: 5159,
+            line: 191,
+            column: 27,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 5161,
+            line: 191,
+            column: 29,
+        },
+        Token {
+            token_type: Dot,
+            position: 5162,
+            line: 191,
+            column: 30,
+        },
+        Token {
+            token_type: Identifier(
+                "name",
+            ),
+            position: 5166,
+            line: 191,
+            column: 34,
+        },
+        Token {
+            token_type: Plus,
+            position: 5168,
+            line: 191,
+            column: 36,
+        },
+        Token {
+            token_type: StringLit(
+                " next_id=",
+            ),
+            position: 5180,
+            line: 191,
+            column: 48,
+        },
+        Token {
+            token_type: Plus,
+            position: 5182,
+            line: 191,
+            column: 50,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 5184,
+            line: 191,
+            column: 52,
+        },
+        Token {
+            token_type: Identifier(
+                "c",
+            ),
+            position: 5185,
+            line: 191,
+            column: 53,
+        },
+        Token {
+            token_type: Dot,
+            position: 5186,
+            line: 191,
+            column: 54,
+        },
+        Token {
+            token_type: Identifier(
+                "next_id",
+            ),
+            position: 5193,
+            line: 191,
+            column: 61,
+        },
+        Token {
+            token_type: As,
+            position: 5196,
+            line: 191,
+            column: 64,
+        },
+        Token {
+            token_type: Identifier(
+                "str",
+            ),
+            position: 5200,
+            line: 191,
+            column: 68,
+        },
+        Token {
+            token_type: RightParen,
+            position: 5201,
+            line: 191,
+            column: 69,
+        },
+        Token {
+            token_type: RightParen,
+            position: 5202,
+            line: 191,
+            column: 70,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 5203,
+            line: 191,
+            column: 71,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 5207,
+            line: 192,
+            column: 4,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 5209,
+            line: 193,
+            column: 2,
+        },
+    ],
+)

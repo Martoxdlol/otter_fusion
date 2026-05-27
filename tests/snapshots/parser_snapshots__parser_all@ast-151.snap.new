@@ -1,0 +1,37 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/validator/p2_pointer_in_extern_struct_ok.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Cfg",
+                        is_extern: true,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "p",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: true,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 14,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

@@ -1,0 +1,39 @@
+import { println, now_ns } from "of:core";
+
+// Sieve of Eratosthenes: count primes below n.
+function run(): i64 {
+  var n: i64 = 2000000;
+
+  var sieve: List<bool> = [];
+  var i: i64 = 0;
+  while i < n {
+    sieve.push(true);
+    i = i + 1;
+  }
+
+  var count: i64 = 0;
+  var p: i64 = 2;
+  while p < n {
+    if (sieve.get(p) as bool) {
+      count = count + 1;
+      var m: i64 = p * 2;
+      while m < n {
+        sieve.set(m, false);
+        m = m + p;
+      }
+    }
+    p = p + 1;
+  }
+
+  count
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

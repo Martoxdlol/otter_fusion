@@ -1,0 +1,3477 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/networking/slack_clone/web_server.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "println",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "Buffer",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 27,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of_io",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "TcpListener",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "TcpStream",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "ReadResult",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "IoError",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "now_ms",
+                                    alias: None,
+                                },
+                                ImportSymbol {
+                                    name: "__of_str_from_buffer",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 28,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_OK",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "200",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 42,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_CREATED",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "201",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 43,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_NO_CONTENT",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "204",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 44,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_BAD_REQUEST",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "400",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 45,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_NOT_FOUND",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "404",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 46,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_METHOD_NOT_ALLOWED",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "405",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 47,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "STATUS_INTERNAL_ERROR",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "500",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 48,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "E_INVAL",
+                        ty: Primitive(
+                            Int32,
+                        ),
+                        value: Int(
+                            "22",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 52,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "MAX_REQUEST_BYTES",
+                        ty: Primitive(
+                            Uint64,
+                        ),
+                        value: Int(
+                            "8192",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 54,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "HTTP_SPACE",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "32",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 55,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "HTTP_CR",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "13",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 56,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Const(
+                    ConstDecl {
+                        name: "HTTP_LF",
+                        ty: Primitive(
+                            Uint8,
+                        ),
+                        value: Int(
+                            "10",
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 57,
+                    col: 6,
+                    len: 5,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Request",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "method",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "path",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "protocol",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "body",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "raw",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 66,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Response",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "status",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "status_text",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "content_type",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "body",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "ok",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "content_type",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_OK",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "OK",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Variable(
+                                                            "content_type",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 85,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "text",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_OK",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "OK",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/plain; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 94,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "html",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_OK",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "OK",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/html; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 103,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "json",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_OK",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "OK",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "application/json",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 112,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "not_found",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_NOT_FOUND",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "Not Found",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/plain; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Literal(
+                                                            String(
+                                                                "Not Found\n",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 120,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "bad_request",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_BAD_REQUEST",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "Bad Request",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/plain; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 128,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "method_not_allowed",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_METHOD_NOT_ALLOWED",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "Method Not Allowed",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/plain; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Literal(
+                                                            String(
+                                                                "Method Not Allowed\n",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 136,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "internal_error",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "STATUS_INTERNAL_ERROR",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Literal(
+                                                            String(
+                                                                "Internal Server Error",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Literal(
+                                                            String(
+                                                                "text/plain; charset=utf-8",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 144,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "with_status",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Response",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "status",
+                                        ty: Primitive(
+                                            Int32,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "status_text",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "body",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "content_type",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Response",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "status",
+                                                        Variable(
+                                                            "status",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "status_text",
+                                                        Variable(
+                                                            "status_text",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "content_type",
+                                                        Variable(
+                                                            "content_type",
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "body",
+                                                        Variable(
+                                                            "body",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 153,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 78,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Response",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "as_http",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            BinaryOp(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            BinaryOp(
+                                                                                BinaryOp(
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            "HTTP/1.1 ",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Add,
+                                                                                    As(
+                                                                                        Member(
+                                                                                            SelfRef,
+                                                                                            "status",
+                                                                                        ),
+                                                                                        Primitive(
+                                                                                            String,
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                Literal(
+                                                                                    String(
+                                                                                        " ",
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            Member(
+                                                                                SelfRef,
+                                                                                "status_text",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Literal(
+                                                                            String(
+                                                                                "\r\n",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            "Content-Type: ",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Member(
+                                                                    SelfRef,
+                                                                    "content_type",
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Literal(
+                                                                String(
+                                                                    "\r\n",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                "Connection: close\r\n",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Literal(
+                                                        String(
+                                                            "\r\n",
+                                                        ),
+                                                    ),
+                                                ),
+                                                Add,
+                                                Member(
+                                                    SelfRef,
+                                                    "body",
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 167,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 163,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Server",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "listener",
+                                ty: Named(
+                                    "TcpListener",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "bind",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Server",
+                                                [],
+                                            ),
+                                            Named(
+                                                "IoError",
+                                                [],
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "host",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "port",
+                                        ty: Primitive(
+                                            Uint16,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "listener_or_err",
+                                                None,
+                                                Some(
+                                                    Call(
+                                                        Member(
+                                                            Variable(
+                                                                "TcpListener",
+                                                            ),
+                                                            "bind",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Variable(
+                                                                "host",
+                                                            ),
+                                                            Variable(
+                                                                "port",
+                                                            ),
+                                                            Literal(
+                                                                Int(
+                                                                    "16",
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "listener_or_err",
+                                                        ),
+                                                        Named(
+                                                            "IoError",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Return(
+                                                                Some(
+                                                                    As(
+                                                                        Variable(
+                                                                            "listener_or_err",
+                                                                        ),
+                                                                        Named(
+                                                                            "IoError",
+                                                                            [],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Server",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "listener",
+                                                        As(
+                                                            Variable(
+                                                                "listener_or_err",
+                                                            ),
+                                                            Named(
+                                                                "TcpListener",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 183,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 180,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Server",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "accept",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Connection",
+                                                [],
+                                            ),
+                                            Named(
+                                                "IoError",
+                                                [],
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "stream_or_err",
+                                                None,
+                                                Some(
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "listener",
+                                                            ),
+                                                            "accept",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "stream_or_err",
+                                                        ),
+                                                        Named(
+                                                            "IoError",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Return(
+                                                                Some(
+                                                                    As(
+                                                                        Variable(
+                                                                            "stream_or_err",
+                                                                        ),
+                                                                        Named(
+                                                                            "IoError",
+                                                                            [],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "Connection",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "stream",
+                                                        As(
+                                                            Variable(
+                                                                "stream_or_err",
+                                                            ),
+                                                            Named(
+                                                                "TcpStream",
+                                                                [],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 193,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "close",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Member(
+                                                            SelfRef,
+                                                            "listener",
+                                                        ),
+                                                        "close",
+                                                    ),
+                                                    [],
+                                                    [],
+                                                ),
+                                            ),
+                                        ],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 201,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 192,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Connection",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "stream",
+                                ty: Named(
+                                    "TcpStream",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 210,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Connection",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "read_request",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Request",
+                                                [],
+                                            ),
+                                            Named(
+                                                "IoError",
+                                                [],
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "read_res",
+                                                None,
+                                                Some(
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "stream",
+                                                            ),
+                                                            "read",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Variable(
+                                                                "MAX_REQUEST_BYTES",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "read_res",
+                                                        ),
+                                                        Named(
+                                                            "IoError",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Expr(
+                                                                Call(
+                                                                    Variable(
+                                                                        "log_io_error",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Literal(
+                                                                            String(
+                                                                                "read",
+                                                                            ),
+                                                                        ),
+                                                                        As(
+                                                                            Variable(
+                                                                                "read_res",
+                                                                            ),
+                                                                            Named(
+                                                                                "IoError",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                            Return(
+                                                                Some(
+                                                                    As(
+                                                                        Variable(
+                                                                            "read_res",
+                                                                        ),
+                                                                        Named(
+                                                                            "IoError",
+                                                                            [],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                            VarDecl(
+                                                "r",
+                                                None,
+                                                Some(
+                                                    As(
+                                                        Variable(
+                                                            "read_res",
+                                                        ),
+                                                        Named(
+                                                            "ReadResult",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            VarDecl(
+                                                "parsed",
+                                                None,
+                                                Some(
+                                                    Call(
+                                                        Variable(
+                                                            "parse_request_bytes",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Member(
+                                                                Variable(
+                                                                    "r",
+                                                                ),
+                                                                "buf",
+                                                            ),
+                                                            Member(
+                                                                Variable(
+                                                                    "r",
+                                                                ),
+                                                                "len",
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Variable(
+                                                            "r",
+                                                        ),
+                                                        "free",
+                                                    ),
+                                                    [],
+                                                    [],
+                                                ),
+                                            ),
+                                            Expr(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "parsed",
+                                                        ),
+                                                        Named(
+                                                            "Request",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Expr(
+                                                                Call(
+                                                                    Variable(
+                                                                        "log_request",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        As(
+                                                                            Variable(
+                                                                                "parsed",
+                                                                            ),
+                                                                            Named(
+                                                                                "Request",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    Some(
+                                                        Block {
+                                                            statements: [
+                                                                Expr(
+                                                                    Call(
+                                                                        Variable(
+                                                                            "log_io_error",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            Literal(
+                                                                                String(
+                                                                                    "parse",
+                                                                                ),
+                                                                            ),
+                                                                            As(
+                                                                                Variable(
+                                                                                    "parsed",
+                                                                                ),
+                                                                                Named(
+                                                                                    "IoError",
+                                                                                    [],
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Variable(
+                                                "parsed",
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 215,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "write_response",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "IoError",
+                                                [],
+                                            ),
+                                            Primitive(
+                                                Null,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "resp",
+                                        ty: Named(
+                                            "Response",
+                                            [],
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                Call(
+                                                    Variable(
+                                                        "log_response",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "resp",
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                            VarDecl(
+                                                "w",
+                                                None,
+                                                Some(
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "stream",
+                                                            ),
+                                                            "write_str",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            Call(
+                                                                Member(
+                                                                    Variable(
+                                                                        "resp",
+                                                                    ),
+                                                                    "as_http",
+                                                                ),
+                                                                [],
+                                                                [],
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                If(
+                                                    Is(
+                                                        Variable(
+                                                            "w",
+                                                        ),
+                                                        Named(
+                                                            "IoError",
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    Block {
+                                                        statements: [
+                                                            Expr(
+                                                                Call(
+                                                                    Variable(
+                                                                        "log_io_error",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Literal(
+                                                                            String(
+                                                                                "write",
+                                                                            ),
+                                                                        ),
+                                                                        As(
+                                                                            Variable(
+                                                                                "w",
+                                                                            ),
+                                                                            Named(
+                                                                                "IoError",
+                                                                                [],
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                            Return(
+                                                                Some(
+                                                                    As(
+                                                                        Variable(
+                                                                            "w",
+                                                                        ),
+                                                                        Named(
+                                                                            "IoError",
+                                                                            [],
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                        returns: None,
+                                                    },
+                                                    None,
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Literal(
+                                                Null,
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 232,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "close",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Member(
+                                                            SelfRef,
+                                                            "stream",
+                                                        ),
+                                                        "close",
+                                                    ),
+                                                    [],
+                                                    [],
+                                                ),
+                                            ),
+                                        ],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 242,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 214,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "parse_request_bytes",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Union(
+                                [
+                                    Named(
+                                        "Request",
+                                        [],
+                                    ),
+                                    Named(
+                                        "IoError",
+                                        [],
+                                    ),
+                                ],
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "buf",
+                                ty: Named(
+                                    "Buffer",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "len",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "method_end",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "scan_for",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "len",
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                    Variable(
+                                                        "HTTP_SPACE",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "method_end",
+                                                ),
+                                                Lt,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "0",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            StructInit(
+                                                                Named(
+                                                                    "IoError",
+                                                                    [],
+                                                                ),
+                                                                [
+                                                                    (
+                                                                        "errno",
+                                                                        Variable(
+                                                                            "E_INVAL",
+                                                                        ),
+                                                                    ),
+                                                                    (
+                                                                        "op",
+                                                                        Literal(
+                                                                            String(
+                                                                                "parse-method",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "path_start",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "method_end",
+                                                ),
+                                                Add,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "1",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "path_end",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "scan_for",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "len",
+                                                    ),
+                                                    Variable(
+                                                        "path_start",
+                                                    ),
+                                                    Variable(
+                                                        "HTTP_SPACE",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "path_end",
+                                                ),
+                                                Lt,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "0",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Return(
+                                                        Some(
+                                                            StructInit(
+                                                                Named(
+                                                                    "IoError",
+                                                                    [],
+                                                                ),
+                                                                [
+                                                                    (
+                                                                        "errno",
+                                                                        Variable(
+                                                                            "E_INVAL",
+                                                                        ),
+                                                                    ),
+                                                                    (
+                                                                        "op",
+                                                                        Literal(
+                                                                            String(
+                                                                                "parse-path",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "proto_start",
+                                        None,
+                                        Some(
+                                            BinaryOp(
+                                                Variable(
+                                                    "path_end",
+                                                ),
+                                                Add,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "1",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "proto_end",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "scan_for",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "len",
+                                                    ),
+                                                    Variable(
+                                                        "proto_start",
+                                                    ),
+                                                    Variable(
+                                                        "HTTP_CR",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    Expr(
+                                        If(
+                                            BinaryOp(
+                                                Variable(
+                                                    "proto_end",
+                                                ),
+                                                Lt,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "0",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                            Block {
+                                                statements: [
+                                                    Assign(
+                                                        Variable(
+                                                            "proto_end",
+                                                        ),
+                                                        Variable(
+                                                            "len",
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                            None,
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "blank",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "scan_blank_line",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "len",
+                                                    ),
+                                                    As(
+                                                        Variable(
+                                                            "proto_end",
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "method_str",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                    Variable(
+                                                        "method_end",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "path_str",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "path_start",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "path_end",
+                                                        ),
+                                                        Sub,
+                                                        Variable(
+                                                            "path_start",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "proto_str",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    Variable(
+                                                        "proto_start",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "proto_end",
+                                                        ),
+                                                        Sub,
+                                                        Variable(
+                                                            "proto_start",
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "raw_str",
+                                        None,
+                                        Some(
+                                            Call(
+                                                Variable(
+                                                    "__of_str_from_buffer",
+                                                ),
+                                                [],
+                                                [
+                                                    Variable(
+                                                        "buf",
+                                                    ),
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                    Variable(
+                                                        "len",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ),
+                                    VarDecl(
+                                        "body_str",
+                                        Some(
+                                            Primitive(
+                                                String,
+                                            ),
+                                        ),
+                                        Some(
+                                            If(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "blank",
+                                                        ),
+                                                        Ge,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "0",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    And,
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "blank",
+                                                        ),
+                                                        Lt,
+                                                        Variable(
+                                                            "len",
+                                                        ),
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        Call(
+                                                            Variable(
+                                                                "__of_str_from_buffer",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                Variable(
+                                                                    "buf",
+                                                                ),
+                                                                Variable(
+                                                                    "blank",
+                                                                ),
+                                                                BinaryOp(
+                                                                    Variable(
+                                                                        "len",
+                                                                    ),
+                                                                    Sub,
+                                                                    Variable(
+                                                                        "blank",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                },
+                                                Some(
+                                                    Block {
+                                                        statements: [],
+                                                        returns: Some(
+                                                            Literal(
+                                                                String(
+                                                                    "",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    StructInit(
+                                        Named(
+                                            "Request",
+                                            [],
+                                        ),
+                                        [
+                                            (
+                                                "method",
+                                                Variable(
+                                                    "method_str",
+                                                ),
+                                            ),
+                                            (
+                                                "path",
+                                                Variable(
+                                                    "path_str",
+                                                ),
+                                            ),
+                                            (
+                                                "protocol",
+                                                Variable(
+                                                    "proto_str",
+                                                ),
+                                            ),
+                                            (
+                                                "body",
+                                                Variable(
+                                                    "body_str",
+                                                ),
+                                            ),
+                                            (
+                                                "raw",
+                                                Variable(
+                                                    "raw_str",
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 256,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 256,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "scan_for",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "buf",
+                                ty: Named(
+                                    "Buffer",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "len",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "start",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "target",
+                                ty: Primitive(
+                                    Uint8,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "i",
+                                        None,
+                                        Some(
+                                            Variable(
+                                                "start",
+                                            ),
+                                        ),
+                                    ),
+                                    While(
+                                        BinaryOp(
+                                            Variable(
+                                                "i",
+                                            ),
+                                            Lt,
+                                            Variable(
+                                                "len",
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            Call(
+                                                                Member(
+                                                                    Variable(
+                                                                        "buf",
+                                                                    ),
+                                                                    "get",
+                                                                ),
+                                                                [],
+                                                                [
+                                                                    As(
+                                                                        Variable(
+                                                                            "i",
+                                                                        ),
+                                                                        Primitive(
+                                                                            Uint64,
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                            Eq,
+                                                            Variable(
+                                                                "target",
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Return(
+                                                                    Some(
+                                                                        Variable(
+                                                                            "i",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                Assign(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "i",
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    UnaryOp(
+                                        Neg,
+                                        As(
+                                            Literal(
+                                                Int(
+                                                    "1",
+                                                ),
+                                            ),
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 300,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 300,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "scan_blank_line",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: Some(
+                            Primitive(
+                                Int64,
+                            ),
+                        ),
+                        params: [
+                            ParamDecl {
+                                name: "buf",
+                                ty: Named(
+                                    "Buffer",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "len",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "start",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    VarDecl(
+                                        "i",
+                                        None,
+                                        Some(
+                                            Variable(
+                                                "start",
+                                            ),
+                                        ),
+                                    ),
+                                    While(
+                                        BinaryOp(
+                                            BinaryOp(
+                                                Variable(
+                                                    "i",
+                                                ),
+                                                Add,
+                                                As(
+                                                    Literal(
+                                                        Int(
+                                                            "3",
+                                                        ),
+                                                    ),
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                            ),
+                                            Lt,
+                                            Variable(
+                                                "len",
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    If(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Call(
+                                                                            Member(
+                                                                                Variable(
+                                                                                    "buf",
+                                                                                ),
+                                                                                "get",
+                                                                            ),
+                                                                            [],
+                                                                            [
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "i",
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        Uint64,
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                        ),
+                                                                        Eq,
+                                                                        Variable(
+                                                                            "HTTP_CR",
+                                                                        ),
+                                                                    ),
+                                                                    And,
+                                                                    BinaryOp(
+                                                                        Call(
+                                                                            Member(
+                                                                                Variable(
+                                                                                    "buf",
+                                                                                ),
+                                                                                "get",
+                                                                            ),
+                                                                            [],
+                                                                            [
+                                                                                As(
+                                                                                    BinaryOp(
+                                                                                        Variable(
+                                                                                            "i",
+                                                                                        ),
+                                                                                        Add,
+                                                                                        As(
+                                                                                            Literal(
+                                                                                                Int(
+                                                                                                    "1",
+                                                                                                ),
+                                                                                            ),
+                                                                                            Primitive(
+                                                                                                Int64,
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        Uint64,
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                        ),
+                                                                        Eq,
+                                                                        Variable(
+                                                                            "HTTP_LF",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                And,
+                                                                BinaryOp(
+                                                                    Call(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "buf",
+                                                                            ),
+                                                                            "get",
+                                                                        ),
+                                                                        [],
+                                                                        [
+                                                                            As(
+                                                                                BinaryOp(
+                                                                                    Variable(
+                                                                                        "i",
+                                                                                    ),
+                                                                                    Add,
+                                                                                    As(
+                                                                                        Literal(
+                                                                                            Int(
+                                                                                                "2",
+                                                                                            ),
+                                                                                        ),
+                                                                                        Primitive(
+                                                                                            Int64,
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                                Primitive(
+                                                                                    Uint64,
+                                                                                ),
+                                                                            ),
+                                                                        ],
+                                                                    ),
+                                                                    Eq,
+                                                                    Variable(
+                                                                        "HTTP_CR",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            And,
+                                                            BinaryOp(
+                                                                Call(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "buf",
+                                                                        ),
+                                                                        "get",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        As(
+                                                                            BinaryOp(
+                                                                                Variable(
+                                                                                    "i",
+                                                                                ),
+                                                                                Add,
+                                                                                As(
+                                                                                    Literal(
+                                                                                        Int(
+                                                                                            "3",
+                                                                                        ),
+                                                                                    ),
+                                                                                    Primitive(
+                                                                                        Int64,
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            Primitive(
+                                                                                Uint64,
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                                Eq,
+                                                                Variable(
+                                                                    "HTTP_LF",
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Block {
+                                                            statements: [
+                                                                Return(
+                                                                    Some(
+                                                                        BinaryOp(
+                                                                            Variable(
+                                                                                "i",
+                                                                            ),
+                                                                            Add,
+                                                                            As(
+                                                                                Literal(
+                                                                                    Int(
+                                                                                        "4",
+                                                                                    ),
+                                                                                ),
+                                                                                Primitive(
+                                                                                    Int64,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                            returns: None,
+                                                        },
+                                                        None,
+                                                    ),
+                                                ),
+                                                Assign(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    BinaryOp(
+                                                        Variable(
+                                                            "i",
+                                                        ),
+                                                        Add,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: Some(
+                                    UnaryOp(
+                                        Neg,
+                                        As(
+                                            Literal(
+                                                Int(
+                                                    "1",
+                                                ),
+                                            ),
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 313,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 313,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "log",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "msg",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Variable(
+                                                    "msg",
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 329,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 329,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "log_request",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "req",
+                                ty: Named(
+                                    "Request",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "log",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            Literal(
+                                                                                String(
+                                                                                    "[",
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            As(
+                                                                                Call(
+                                                                                    Variable(
+                                                                                        "now_ms",
+                                                                                    ),
+                                                                                    [],
+                                                                                    [],
+                                                                                ),
+                                                                                Primitive(
+                                                                                    String,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Literal(
+                                                                            String(
+                                                                                "] --> ",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Member(
+                                                                        Variable(
+                                                                            "req",
+                                                                        ),
+                                                                        "method",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Literal(
+                                                                    String(
+                                                                        " ",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Member(
+                                                                Variable(
+                                                                    "req",
+                                                                ),
+                                                                "path",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                " ",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Member(
+                                                        Variable(
+                                                            "req",
+                                                        ),
+                                                        "protocol",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    If(
+                                        BinaryOp(
+                                            Member(
+                                                Variable(
+                                                    "req",
+                                                ),
+                                                "body",
+                                            ),
+                                            Neq,
+                                            Literal(
+                                                String(
+                                                    "",
+                                                ),
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "log",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "    body: ",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Member(
+                                                                    Variable(
+                                                                        "req",
+                                                                    ),
+                                                                    "body",
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                        None,
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 335,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 335,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "log_response",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "resp",
+                                ty: Named(
+                                    "Response",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "log",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        BinaryOp(
+                                                                            Literal(
+                                                                                String(
+                                                                                    "[",
+                                                                                ),
+                                                                            ),
+                                                                            Add,
+                                                                            As(
+                                                                                Call(
+                                                                                    Variable(
+                                                                                        "now_ms",
+                                                                                    ),
+                                                                                    [],
+                                                                                    [],
+                                                                                ),
+                                                                                Primitive(
+                                                                                    String,
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Literal(
+                                                                            String(
+                                                                                "] <-- ",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    As(
+                                                                        Member(
+                                                                            Variable(
+                                                                                "resp",
+                                                                            ),
+                                                                            "status",
+                                                                        ),
+                                                                        Primitive(
+                                                                            String,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Literal(
+                                                                    String(
+                                                                        " ",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Member(
+                                                                Variable(
+                                                                    "resp",
+                                                                ),
+                                                                "status_text",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                " ",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Member(
+                                                        Variable(
+                                                            "resp",
+                                                        ),
+                                                        "content_type",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: Some(
+                                    If(
+                                        BinaryOp(
+                                            Member(
+                                                Variable(
+                                                    "resp",
+                                                ),
+                                                "body",
+                                            ),
+                                            Neq,
+                                            Literal(
+                                                String(
+                                                    "",
+                                                ),
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "log",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "    body: ",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Member(
+                                                                    Variable(
+                                                                        "resp",
+                                                                    ),
+                                                                    "body",
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                        None,
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 342,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 342,
+                    col: 9,
+                    len: 8,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "log_io_error",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "op",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            ParamDecl {
+                                name: "err",
+                                ty: Named(
+                                    "IoError",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "log",
+                                            ),
+                                            [],
+                                            [
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "[",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    As(
+                                                                        Call(
+                                                                            Variable(
+                                                                                "now_ms",
+                                                                            ),
+                                                                            [],
+                                                                            [],
+                                                                        ),
+                                                                        Primitive(
+                                                                            String,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                Literal(
+                                                                    String(
+                                                                        "] !! ",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Variable(
+                                                                "op",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                ": ",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Call(
+                                                        Member(
+                                                            Variable(
+                                                                "err",
+                                                            ),
+                                                            "message",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 349,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 349,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

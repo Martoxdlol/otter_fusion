@@ -1,0 +1,76 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/validator/p5_binary_op_arithmetic_on_non_numeric_errors.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "test",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Int(
+                "5",
+            ),
+            position: 19,
+            line: 1,
+            column: 20,
+        },
+        Token {
+            token_type: Plus,
+            position: 21,
+            line: 1,
+            column: 22,
+        },
+        Token {
+            token_type: StringLit(
+                "hello",
+            ),
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 30,
+            line: 1,
+            column: 31,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 32,
+            line: 1,
+            column: 33,
+        },
+    ],
+)

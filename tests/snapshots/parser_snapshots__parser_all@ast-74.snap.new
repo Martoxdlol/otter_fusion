@@ -1,0 +1,35 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/parser/parse_extend_decl_unit.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Vehicle",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [
+                            Named(
+                                "Movable",
+                                [],
+                            ),
+                        ],
+                        methods: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

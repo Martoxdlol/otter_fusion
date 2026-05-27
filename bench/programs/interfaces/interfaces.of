@@ -1,0 +1,59 @@
+import { println, now_ns } from "of:core";
+
+// Dynamic dispatch: a list of shapes behind an interface, area() summed via
+// virtual calls. 2000 shapes * 5000 rounds = 10M dispatches.
+interface Shape {
+  function area(self): i64
+}
+
+struct Circle: Shape {
+  r: i64,
+  function area(self): i64 { self.r * self.r * 355 / 113 }
+}
+
+struct Square: Shape {
+  s: i64,
+  function area(self): i64 { self.s * self.s }
+}
+
+function run(): i64 {
+  var k: i64 = 2000;
+  var rounds: i64 = 5000;
+  var p: i64 = 1000000007;
+
+  var shapes: List<Shape> = [];
+  var i: i64 = 0;
+  while i < k {
+    var v: i64 = i % 100 + 1;
+    if (i % 2 == 0) {
+      shapes.push(Circle { r: v });
+    } else {
+      shapes.push(Square { s: v });
+    }
+    i = i + 1;
+  }
+
+  var acc: i64 = 0;
+  var round: i64 = 0;
+  while round < rounds {
+    var j: i64 = 0;
+    while j < k {
+      var sh = shapes.get(j) as Shape;
+      acc = (acc + sh.area()) % p;
+      j = j + 1;
+    }
+    round = round + 1;
+  }
+
+  acc
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

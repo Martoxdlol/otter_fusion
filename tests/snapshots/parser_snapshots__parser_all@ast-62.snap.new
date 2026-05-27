@@ -1,0 +1,2081 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/networking/slack_clone/state.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "of:core",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "println",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 8,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Import(
+                    ImportDecl {
+                        module: "json",
+                        symbols: Named(
+                            [
+                                ImportSymbol {
+                                    name: "json_str",
+                                    alias: None,
+                                },
+                            ],
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 9,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Message",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "id",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "user",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "text",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 11,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Channel",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "name",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "messages",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Named(
+                                            "Message",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "next_id",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 17,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "Channel",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "append",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "user",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "text",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "id",
+                                                None,
+                                                Some(
+                                                    Member(
+                                                        SelfRef,
+                                                        "next_id",
+                                                    ),
+                                                ),
+                                            ),
+                                            Assign(
+                                                Member(
+                                                    SelfRef,
+                                                    "next_id",
+                                                ),
+                                                BinaryOp(
+                                                    Variable(
+                                                        "id",
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "1",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Member(
+                                                            SelfRef,
+                                                            "messages",
+                                                        ),
+                                                        "push",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        StructInit(
+                                                            Named(
+                                                                "Message",
+                                                                [],
+                                                            ),
+                                                            [
+                                                                (
+                                                                    "id",
+                                                                    Variable(
+                                                                        "id",
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "user",
+                                                                    Variable(
+                                                                        "user",
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "text",
+                                                                    Variable(
+                                                                        "text",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Variable(
+                                                "id",
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 24,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "poll_json",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "since",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "msgs",
+                                                None,
+                                                Some(
+                                                    Literal(
+                                                        String(
+                                                            "",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            VarDecl(
+                                                "first",
+                                                None,
+                                                Some(
+                                                    Literal(
+                                                        Bool(
+                                                            true,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            For(
+                                                "m",
+                                                Member(
+                                                    SelfRef,
+                                                    "messages",
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        If(
+                                                            BinaryOp(
+                                                                Member(
+                                                                    Variable(
+                                                                        "m",
+                                                                    ),
+                                                                    "id",
+                                                                ),
+                                                                Gt,
+                                                                Variable(
+                                                                    "since",
+                                                                ),
+                                                            ),
+                                                            Block {
+                                                                statements: [
+                                                                    VarDecl(
+                                                                        "entry",
+                                                                        None,
+                                                                        Some(
+                                                                            BinaryOp(
+                                                                                BinaryOp(
+                                                                                    BinaryOp(
+                                                                                        BinaryOp(
+                                                                                            BinaryOp(
+                                                                                                BinaryOp(
+                                                                                                    Literal(
+                                                                                                        String(
+                                                                                                            "{\"id\":",
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                    Add,
+                                                                                                    As(
+                                                                                                        Member(
+                                                                                                            Variable(
+                                                                                                                "m",
+                                                                                                            ),
+                                                                                                            "id",
+                                                                                                        ),
+                                                                                                        Primitive(
+                                                                                                            String,
+                                                                                                        ),
+                                                                                                    ),
+                                                                                                ),
+                                                                                                Add,
+                                                                                                Literal(
+                                                                                                    String(
+                                                                                                        ",\"user\":",
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ),
+                                                                                            Add,
+                                                                                            Call(
+                                                                                                Variable(
+                                                                                                    "json_str",
+                                                                                                ),
+                                                                                                [],
+                                                                                                [
+                                                                                                    Member(
+                                                                                                        Variable(
+                                                                                                            "m",
+                                                                                                        ),
+                                                                                                        "user",
+                                                                                                    ),
+                                                                                                ],
+                                                                                            ),
+                                                                                        ),
+                                                                                        Add,
+                                                                                        Literal(
+                                                                                            String(
+                                                                                                ",\"text\":",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                    Add,
+                                                                                    Call(
+                                                                                        Variable(
+                                                                                            "json_str",
+                                                                                        ),
+                                                                                        [],
+                                                                                        [
+                                                                                            Member(
+                                                                                                Variable(
+                                                                                                    "m",
+                                                                                                ),
+                                                                                                "text",
+                                                                                            ),
+                                                                                        ],
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                Literal(
+                                                                                    String(
+                                                                                        "}",
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: Some(
+                                                                    If(
+                                                                        Variable(
+                                                                            "first",
+                                                                        ),
+                                                                        Block {
+                                                                            statements: [
+                                                                                Assign(
+                                                                                    Variable(
+                                                                                        "msgs",
+                                                                                    ),
+                                                                                    Variable(
+                                                                                        "entry",
+                                                                                    ),
+                                                                                ),
+                                                                                Assign(
+                                                                                    Variable(
+                                                                                        "first",
+                                                                                    ),
+                                                                                    Literal(
+                                                                                        Bool(
+                                                                                            false,
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                            ],
+                                                                            returns: None,
+                                                                        },
+                                                                        Some(
+                                                                            Block {
+                                                                                statements: [
+                                                                                    Assign(
+                                                                                        Variable(
+                                                                                            "msgs",
+                                                                                        ),
+                                                                                        BinaryOp(
+                                                                                            BinaryOp(
+                                                                                                Variable(
+                                                                                                    "msgs",
+                                                                                                ),
+                                                                                                Add,
+                                                                                                Literal(
+                                                                                                    String(
+                                                                                                        ",",
+                                                                                                    ),
+                                                                                                ),
+                                                                                            ),
+                                                                                            Add,
+                                                                                            Variable(
+                                                                                                "entry",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                                returns: None,
+                                                                            },
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            },
+                                                            None,
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                            VarDecl(
+                                                "next_cursor",
+                                                None,
+                                                Some(
+                                                    BinaryOp(
+                                                        Member(
+                                                            SelfRef,
+                                                            "next_id",
+                                                        ),
+                                                        Sub,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            BinaryOp(
+                                                BinaryOp(
+                                                    BinaryOp(
+                                                        BinaryOp(
+                                                            Literal(
+                                                                String(
+                                                                    "{\"messages\":[",
+                                                                ),
+                                                            ),
+                                                            Add,
+                                                            Variable(
+                                                                "msgs",
+                                                            ),
+                                                        ),
+                                                        Add,
+                                                        Literal(
+                                                            String(
+                                                                "],\"next\":",
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    As(
+                                                        Variable(
+                                                            "next_cursor",
+                                                        ),
+                                                        Primitive(
+                                                            String,
+                                                        ),
+                                                    ),
+                                                ),
+                                                Add,
+                                                Literal(
+                                                    String(
+                                                        "}",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 33,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 23,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "Waiter",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "fd",
+                                ty: Primitive(
+                                    Int32,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "channel",
+                                ty: Primitive(
+                                    String,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "since",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "deadline_ms",
+                                ty: Primitive(
+                                    Int64,
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 54,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "ChatState",
+                        is_extern: false,
+                        generics: [],
+                        fields: [
+                            FieldDecl {
+                                name: "channels",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Named(
+                                            "Channel",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                            FieldDecl {
+                                name: "waiters",
+                                ty: Named(
+                                    "List",
+                                    [
+                                        Named(
+                                            "Waiter",
+                                            [],
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        methods: [
+                            FunctionDecl {
+                                name: "new",
+                                has_self_param: false,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "ChatState",
+                                        [],
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [],
+                                        returns: Some(
+                                            StructInit(
+                                                Named(
+                                                    "ChatState",
+                                                    [],
+                                                ),
+                                                [
+                                                    (
+                                                        "channels",
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "List",
+                                                                ),
+                                                                "new",
+                                                            ),
+                                                            [
+                                                                Named(
+                                                                    "Channel",
+                                                                    [],
+                                                                ),
+                                                            ],
+                                                            [],
+                                                        ),
+                                                    ),
+                                                    (
+                                                        "waiters",
+                                                        Call(
+                                                            Member(
+                                                                Variable(
+                                                                    "List",
+                                                                ),
+                                                                "new",
+                                                            ),
+                                                            [
+                                                                Named(
+                                                                    "Waiter",
+                                                                    [],
+                                                                ),
+                                                            ],
+                                                            [],
+                                                        ),
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 65,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 61,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Extend(
+                    ExtendDecl {
+                        target: Named(
+                            "ChatState",
+                            [],
+                        ),
+                        generic_params: [],
+                        implements: [],
+                        methods: [
+                            FunctionDecl {
+                                name: "ensure_channel",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Named(
+                                        "Channel",
+                                        [],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "name",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            For(
+                                                "c",
+                                                Member(
+                                                    SelfRef,
+                                                    "channels",
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        If(
+                                                            BinaryOp(
+                                                                Member(
+                                                                    Variable(
+                                                                        "c",
+                                                                    ),
+                                                                    "name",
+                                                                ),
+                                                                Eq,
+                                                                Variable(
+                                                                    "name",
+                                                                ),
+                                                            ),
+                                                            Block {
+                                                                statements: [
+                                                                    Return(
+                                                                        Some(
+                                                                            Variable(
+                                                                                "c",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: None,
+                                                            },
+                                                            None,
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                            VarDecl(
+                                                "fresh",
+                                                None,
+                                                Some(
+                                                    StructInit(
+                                                        Named(
+                                                            "Channel",
+                                                            [],
+                                                        ),
+                                                        [
+                                                            (
+                                                                "name",
+                                                                Variable(
+                                                                    "name",
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "messages",
+                                                                Call(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "List",
+                                                                        ),
+                                                                        "new",
+                                                                    ),
+                                                                    [
+                                                                        Named(
+                                                                            "Message",
+                                                                            [],
+                                                                        ),
+                                                                    ],
+                                                                    [],
+                                                                ),
+                                                            ),
+                                                            (
+                                                                "next_id",
+                                                                As(
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int64,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ),
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Member(
+                                                            SelfRef,
+                                                            "channels",
+                                                        ),
+                                                        "push",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        Variable(
+                                                            "fresh",
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Variable(
+                                                "fresh",
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 75,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "find_channel",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Channel",
+                                                [],
+                                            ),
+                                            Primitive(
+                                                Null,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "name",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            For(
+                                                "c",
+                                                Member(
+                                                    SelfRef,
+                                                    "channels",
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        If(
+                                                            BinaryOp(
+                                                                Member(
+                                                                    Variable(
+                                                                        "c",
+                                                                    ),
+                                                                    "name",
+                                                                ),
+                                                                Eq,
+                                                                Variable(
+                                                                    "name",
+                                                                ),
+                                                            ),
+                                                            Block {
+                                                                statements: [
+                                                                    Return(
+                                                                        Some(
+                                                                            Variable(
+                                                                                "c",
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: None,
+                                                            },
+                                                            None,
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Literal(
+                                                Null,
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 88,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "add_waiter",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [
+                                    ParamDecl {
+                                        name: "fd",
+                                        ty: Primitive(
+                                            Int32,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "channel",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "since",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "deadline_ms",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            Expr(
+                                                Call(
+                                                    Member(
+                                                        Member(
+                                                            SelfRef,
+                                                            "waiters",
+                                                        ),
+                                                        "push",
+                                                    ),
+                                                    [],
+                                                    [
+                                                        StructInit(
+                                                            Named(
+                                                                "Waiter",
+                                                                [],
+                                                            ),
+                                                            [
+                                                                (
+                                                                    "fd",
+                                                                    Variable(
+                                                                        "fd",
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "channel",
+                                                                    Variable(
+                                                                        "channel",
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "since",
+                                                                    Variable(
+                                                                        "since",
+                                                                    ),
+                                                                ),
+                                                                (
+                                                                    "deadline_ms",
+                                                                    Variable(
+                                                                        "deadline_ms",
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ],
+                                                ),
+                                            ),
+                                        ],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 97,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "take_woken",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Waiter",
+                                                [],
+                                            ),
+                                            Primitive(
+                                                Null,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "channel",
+                                        ty: Primitive(
+                                            String,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                    ParamDecl {
+                                        name: "cursor",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "i",
+                                                Some(
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                                Some(
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            While(
+                                                BinaryOp(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    Lt,
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "waiters",
+                                                            ),
+                                                            "size",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [
+                                                        VarDecl(
+                                                            "w_or",
+                                                            None,
+                                                            Some(
+                                                                Call(
+                                                                    Member(
+                                                                        Member(
+                                                                            SelfRef,
+                                                                            "waiters",
+                                                                        ),
+                                                                        "get",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Variable(
+                                                                            "i",
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Expr(
+                                                            If(
+                                                                Is(
+                                                                    Variable(
+                                                                        "w_or",
+                                                                    ),
+                                                                    Named(
+                                                                        "Waiter",
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [
+                                                                        VarDecl(
+                                                                            "w",
+                                                                            None,
+                                                                            Some(
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "w_or",
+                                                                                    ),
+                                                                                    Named(
+                                                                                        "Waiter",
+                                                                                        [],
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                    returns: Some(
+                                                                        If(
+                                                                            BinaryOp(
+                                                                                BinaryOp(
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "w",
+                                                                                        ),
+                                                                                        "channel",
+                                                                                    ),
+                                                                                    Eq,
+                                                                                    Variable(
+                                                                                        "channel",
+                                                                                    ),
+                                                                                ),
+                                                                                And,
+                                                                                BinaryOp(
+                                                                                    Variable(
+                                                                                        "cursor",
+                                                                                    ),
+                                                                                    Gt,
+                                                                                    Member(
+                                                                                        Variable(
+                                                                                            "w",
+                                                                                        ),
+                                                                                        "since",
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                            Block {
+                                                                                statements: [
+                                                                                    Expr(
+                                                                                        Call(
+                                                                                            Member(
+                                                                                                Member(
+                                                                                                    SelfRef,
+                                                                                                    "waiters",
+                                                                                                ),
+                                                                                                "remove",
+                                                                                            ),
+                                                                                            [],
+                                                                                            [
+                                                                                                Variable(
+                                                                                                    "i",
+                                                                                                ),
+                                                                                            ],
+                                                                                        ),
+                                                                                    ),
+                                                                                    Return(
+                                                                                        Some(
+                                                                                            Variable(
+                                                                                                "w",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                                returns: None,
+                                                                            },
+                                                                            None,
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                None,
+                                                            ),
+                                                        ),
+                                                        Assign(
+                                                            Variable(
+                                                                "i",
+                                                            ),
+                                                            BinaryOp(
+                                                                Variable(
+                                                                    "i",
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int64,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: None,
+                                                },
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Literal(
+                                                Null,
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 106,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "take_expired",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Union(
+                                        [
+                                            Named(
+                                                "Waiter",
+                                                [],
+                                            ),
+                                            Primitive(
+                                                Null,
+                                            ),
+                                        ],
+                                    ),
+                                ),
+                                params: [
+                                    ParamDecl {
+                                        name: "now_ms",
+                                        ty: Primitive(
+                                            Int64,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "i",
+                                                Some(
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                                Some(
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            While(
+                                                BinaryOp(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    Lt,
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "waiters",
+                                                            ),
+                                                            "size",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [
+                                                        VarDecl(
+                                                            "w_or",
+                                                            None,
+                                                            Some(
+                                                                Call(
+                                                                    Member(
+                                                                        Member(
+                                                                            SelfRef,
+                                                                            "waiters",
+                                                                        ),
+                                                                        "get",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Variable(
+                                                                            "i",
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Expr(
+                                                            If(
+                                                                Is(
+                                                                    Variable(
+                                                                        "w_or",
+                                                                    ),
+                                                                    Named(
+                                                                        "Waiter",
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [
+                                                                        VarDecl(
+                                                                            "w",
+                                                                            None,
+                                                                            Some(
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "w_or",
+                                                                                    ),
+                                                                                    Named(
+                                                                                        "Waiter",
+                                                                                        [],
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                    returns: Some(
+                                                                        If(
+                                                                            BinaryOp(
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "w",
+                                                                                    ),
+                                                                                    "deadline_ms",
+                                                                                ),
+                                                                                Le,
+                                                                                Variable(
+                                                                                    "now_ms",
+                                                                                ),
+                                                                            ),
+                                                                            Block {
+                                                                                statements: [
+                                                                                    Expr(
+                                                                                        Call(
+                                                                                            Member(
+                                                                                                Member(
+                                                                                                    SelfRef,
+                                                                                                    "waiters",
+                                                                                                ),
+                                                                                                "remove",
+                                                                                            ),
+                                                                                            [],
+                                                                                            [
+                                                                                                Variable(
+                                                                                                    "i",
+                                                                                                ),
+                                                                                            ],
+                                                                                        ),
+                                                                                    ),
+                                                                                    Return(
+                                                                                        Some(
+                                                                                            Variable(
+                                                                                                "w",
+                                                                                            ),
+                                                                                        ),
+                                                                                    ),
+                                                                                ],
+                                                                                returns: None,
+                                                                            },
+                                                                            None,
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                None,
+                                                            ),
+                                                        ),
+                                                        Assign(
+                                                            Variable(
+                                                                "i",
+                                                            ),
+                                                            BinaryOp(
+                                                                Variable(
+                                                                    "i",
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int64,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: None,
+                                                },
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Literal(
+                                                Null,
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 124,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "earliest_deadline",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        Int64,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "best",
+                                                Some(
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                                Some(
+                                                    BinaryOp(
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "0",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                        Sub,
+                                                        As(
+                                                            Literal(
+                                                                Int(
+                                                                    "1",
+                                                                ),
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            For(
+                                                "w",
+                                                Member(
+                                                    SelfRef,
+                                                    "waiters",
+                                                ),
+                                                Block {
+                                                    statements: [],
+                                                    returns: Some(
+                                                        If(
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    Variable(
+                                                                        "best",
+                                                                    ),
+                                                                    Lt,
+                                                                    As(
+                                                                        Literal(
+                                                                            Int(
+                                                                                "0",
+                                                                            ),
+                                                                        ),
+                                                                        Primitive(
+                                                                            Int64,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Or,
+                                                                BinaryOp(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "w",
+                                                                        ),
+                                                                        "deadline_ms",
+                                                                    ),
+                                                                    Lt,
+                                                                    Variable(
+                                                                        "best",
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                            Block {
+                                                                statements: [
+                                                                    Assign(
+                                                                        Variable(
+                                                                            "best",
+                                                                        ),
+                                                                        Member(
+                                                                            Variable(
+                                                                                "w",
+                                                                            ),
+                                                                            "deadline_ms",
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: None,
+                                                            },
+                                                            None,
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            Variable(
+                                                "best",
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 142,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "drop_waiter_for_fd",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: None,
+                                params: [
+                                    ParamDecl {
+                                        name: "fd",
+                                        ty: Primitive(
+                                            Int32,
+                                        ),
+                                        is_pointer: false,
+                                    },
+                                ],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "i",
+                                                Some(
+                                                    Primitive(
+                                                        Int64,
+                                                    ),
+                                                ),
+                                                Some(
+                                                    As(
+                                                        Literal(
+                                                            Int(
+                                                                "0",
+                                                            ),
+                                                        ),
+                                                        Primitive(
+                                                            Int64,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            While(
+                                                BinaryOp(
+                                                    Variable(
+                                                        "i",
+                                                    ),
+                                                    Lt,
+                                                    Call(
+                                                        Member(
+                                                            Member(
+                                                                SelfRef,
+                                                                "waiters",
+                                                            ),
+                                                            "size",
+                                                        ),
+                                                        [],
+                                                        [],
+                                                    ),
+                                                ),
+                                                Block {
+                                                    statements: [
+                                                        VarDecl(
+                                                            "w_or",
+                                                            None,
+                                                            Some(
+                                                                Call(
+                                                                    Member(
+                                                                        Member(
+                                                                            SelfRef,
+                                                                            "waiters",
+                                                                        ),
+                                                                        "get",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Variable(
+                                                                            "i",
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ),
+                                                        Expr(
+                                                            If(
+                                                                Is(
+                                                                    Variable(
+                                                                        "w_or",
+                                                                    ),
+                                                                    Named(
+                                                                        "Waiter",
+                                                                        [],
+                                                                    ),
+                                                                ),
+                                                                Block {
+                                                                    statements: [
+                                                                        VarDecl(
+                                                                            "w",
+                                                                            None,
+                                                                            Some(
+                                                                                As(
+                                                                                    Variable(
+                                                                                        "w_or",
+                                                                                    ),
+                                                                                    Named(
+                                                                                        "Waiter",
+                                                                                        [],
+                                                                                    ),
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                    returns: Some(
+                                                                        If(
+                                                                            BinaryOp(
+                                                                                Member(
+                                                                                    Variable(
+                                                                                        "w",
+                                                                                    ),
+                                                                                    "fd",
+                                                                                ),
+                                                                                Eq,
+                                                                                Variable(
+                                                                                    "fd",
+                                                                                ),
+                                                                            ),
+                                                                            Block {
+                                                                                statements: [
+                                                                                    Expr(
+                                                                                        Call(
+                                                                                            Member(
+                                                                                                Member(
+                                                                                                    SelfRef,
+                                                                                                    "waiters",
+                                                                                                ),
+                                                                                                "remove",
+                                                                                            ),
+                                                                                            [],
+                                                                                            [
+                                                                                                Variable(
+                                                                                                    "i",
+                                                                                                ),
+                                                                                            ],
+                                                                                        ),
+                                                                                    ),
+                                                                                    Return(
+                                                                                        None,
+                                                                                    ),
+                                                                                ],
+                                                                                returns: None,
+                                                                            },
+                                                                            None,
+                                                                        ),
+                                                                    ),
+                                                                },
+                                                                None,
+                                                            ),
+                                                        ),
+                                                        Assign(
+                                                            Variable(
+                                                                "i",
+                                                            ),
+                                                            BinaryOp(
+                                                                Variable(
+                                                                    "i",
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Literal(
+                                                                        Int(
+                                                                            "1",
+                                                                        ),
+                                                                    ),
+                                                                    Primitive(
+                                                                        Int64,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: None,
+                                                },
+                                            ),
+                                        ],
+                                        returns: None,
+                                    },
+                                ),
+                                span: Span {
+                                    line: 154,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                            FunctionDecl {
+                                name: "channels_json",
+                                has_self_param: true,
+                                is_extern: false,
+                                generics: [],
+                                return_type: Some(
+                                    Primitive(
+                                        String,
+                                    ),
+                                ),
+                                params: [],
+                                body: Some(
+                                    Block {
+                                        statements: [
+                                            VarDecl(
+                                                "body",
+                                                None,
+                                                Some(
+                                                    Literal(
+                                                        String(
+                                                            "",
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            VarDecl(
+                                                "first",
+                                                None,
+                                                Some(
+                                                    Literal(
+                                                        Bool(
+                                                            true,
+                                                        ),
+                                                    ),
+                                                ),
+                                            ),
+                                            For(
+                                                "c",
+                                                Member(
+                                                    SelfRef,
+                                                    "channels",
+                                                ),
+                                                Block {
+                                                    statements: [
+                                                        VarDecl(
+                                                            "entry",
+                                                            None,
+                                                            Some(
+                                                                Call(
+                                                                    Variable(
+                                                                        "json_str",
+                                                                    ),
+                                                                    [],
+                                                                    [
+                                                                        Member(
+                                                                            Variable(
+                                                                                "c",
+                                                                            ),
+                                                                            "name",
+                                                                        ),
+                                                                    ],
+                                                                ),
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    returns: Some(
+                                                        If(
+                                                            Variable(
+                                                                "first",
+                                                            ),
+                                                            Block {
+                                                                statements: [
+                                                                    Assign(
+                                                                        Variable(
+                                                                            "body",
+                                                                        ),
+                                                                        Variable(
+                                                                            "entry",
+                                                                        ),
+                                                                    ),
+                                                                    Assign(
+                                                                        Variable(
+                                                                            "first",
+                                                                        ),
+                                                                        Literal(
+                                                                            Bool(
+                                                                                false,
+                                                                            ),
+                                                                        ),
+                                                                    ),
+                                                                ],
+                                                                returns: None,
+                                                            },
+                                                            Some(
+                                                                Block {
+                                                                    statements: [
+                                                                        Assign(
+                                                                            Variable(
+                                                                                "body",
+                                                                            ),
+                                                                            BinaryOp(
+                                                                                BinaryOp(
+                                                                                    Variable(
+                                                                                        "body",
+                                                                                    ),
+                                                                                    Add,
+                                                                                    Literal(
+                                                                                        String(
+                                                                                            ",",
+                                                                                        ),
+                                                                                    ),
+                                                                                ),
+                                                                                Add,
+                                                                                Variable(
+                                                                                    "entry",
+                                                                                ),
+                                                                            ),
+                                                                        ),
+                                                                    ],
+                                                                    returns: None,
+                                                                },
+                                                            ),
+                                                        ),
+                                                    ),
+                                                },
+                                            ),
+                                        ],
+                                        returns: Some(
+                                            BinaryOp(
+                                                BinaryOp(
+                                                    Literal(
+                                                        String(
+                                                            "{\"channels\":[",
+                                                        ),
+                                                    ),
+                                                    Add,
+                                                    Variable(
+                                                        "body",
+                                                    ),
+                                                ),
+                                                Add,
+                                                Literal(
+                                                    String(
+                                                        "]}",
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                    },
+                                ),
+                                span: Span {
+                                    line: 171,
+                                    col: 11,
+                                    len: 8,
+                                },
+                            },
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 73,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "debug_dump",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "s",
+                                ty: Named(
+                                    "ChatState",
+                                    [],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [
+                                    Expr(
+                                        Call(
+                                            Variable(
+                                                "println",
+                                            ),
+                                            [],
+                                            [
+                                                Literal(
+                                                    String(
+                                                        "-- chat state --",
+                                                    ),
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                    For(
+                                        "c",
+                                        Member(
+                                            Variable(
+                                                "s",
+                                            ),
+                                            "channels",
+                                        ),
+                                        Block {
+                                            statements: [
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "println",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                BinaryOp(
+                                                                    BinaryOp(
+                                                                        Literal(
+                                                                            String(
+                                                                                "  channel ",
+                                                                            ),
+                                                                        ),
+                                                                        Add,
+                                                                        Member(
+                                                                            Variable(
+                                                                                "c",
+                                                                            ),
+                                                                            "name",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    Literal(
+                                                                        String(
+                                                                            " next_id=",
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Member(
+                                                                        Variable(
+                                                                            "c",
+                                                                        ),
+                                                                        "next_id",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                    ),
+                                ],
+                                returns: None,
+                            },
+                        ),
+                        span: Span {
+                            line: 188,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 188,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

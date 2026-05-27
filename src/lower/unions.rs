@@ -115,6 +115,17 @@ impl Lower {
         if from == to {
             return op;
         }
+        // Two unions that differ only in variant order canonicalize to the
+        // same MirTypeId (tags are assigned by sorted variant name, so the
+        // repr is identical) — coercing one to the other is a no-op. Without
+        // this, widening would wrongly treat the whole source union as a
+        // variant of the target. Restricted to Union/Union so we never lower a
+        // bare TypeParam that is still non-concrete in a generic context.
+        if let (ResolvedType::Union(_), ResolvedType::Union(_)) = (from, to) {
+            if self.lower_concrete_type(from) == self.lower_concrete_type(to) {
+                return op;
+            }
+        }
         match (from, to) {
             // Primitive -> primitive: emit a Cast so the receiving slot
             // gets a value of the right CLIF width. The validator marks

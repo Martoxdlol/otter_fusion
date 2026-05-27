@@ -1,0 +1,51 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/validator/p4_implements_non_interface_errors.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "A",
+                        is_extern: false,
+                        generics: [],
+                        fields: [],
+                        methods: [],
+                        implements: [],
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 7,
+                    len: 6,
+                },
+            },
+            Item {
+                kind: Struct(
+                    StructDecl {
+                        name: "B",
+                        is_extern: false,
+                        generics: [],
+                        fields: [],
+                        methods: [],
+                        implements: [
+                            Named(
+                                "A",
+                                [],
+                            ),
+                        ],
+                    },
+                ),
+                span: Span {
+                    line: 2,
+                    col: 7,
+                    len: 6,
+                },
+            },
+        ],
+    },
+)

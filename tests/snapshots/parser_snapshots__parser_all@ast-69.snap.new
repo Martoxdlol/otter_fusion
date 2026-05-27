@@ -1,0 +1,11 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/parser/parse_empty_program.of
+---
+Ok(
+    Program {
+        items: [],
+    },
+)

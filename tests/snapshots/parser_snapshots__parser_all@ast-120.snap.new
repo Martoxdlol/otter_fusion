@@ -1,0 +1,144 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/spec/06_type_logic/as_cast.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: Function(
+                    FunctionDecl {
+                        name: "process",
+                        has_self_param: false,
+                        is_extern: false,
+                        generics: [],
+                        return_type: None,
+                        params: [
+                            ParamDecl {
+                                name: "input",
+                                ty: Union(
+                                    [
+                                        Primitive(
+                                            Int64,
+                                        ),
+                                        Primitive(
+                                            String,
+                                        ),
+                                    ],
+                                ),
+                                is_pointer: false,
+                            },
+                        ],
+                        body: Some(
+                            Block {
+                                statements: [],
+                                returns: Some(
+                                    If(
+                                        Is(
+                                            Variable(
+                                                "input",
+                                            ),
+                                            Primitive(
+                                                Int64,
+                                            ),
+                                        ),
+                                        Block {
+                                            statements: [
+                                                VarDecl(
+                                                    "value",
+                                                    None,
+                                                    Some(
+                                                        As(
+                                                            Variable(
+                                                                "input",
+                                                            ),
+                                                            Primitive(
+                                                                Int64,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                ),
+                                                Expr(
+                                                    Call(
+                                                        Variable(
+                                                            "print",
+                                                        ),
+                                                        [],
+                                                        [
+                                                            BinaryOp(
+                                                                Literal(
+                                                                    String(
+                                                                        "Number: ",
+                                                                    ),
+                                                                ),
+                                                                Add,
+                                                                As(
+                                                                    Variable(
+                                                                        "value",
+                                                                    ),
+                                                                    Primitive(
+                                                                        String,
+                                                                    ),
+                                                                ),
+                                                            ),
+                                                        ],
+                                                    ),
+                                                ),
+                                            ],
+                                            returns: None,
+                                        },
+                                        Some(
+                                            Block {
+                                                statements: [
+                                                    Expr(
+                                                        Call(
+                                                            Variable(
+                                                                "print",
+                                                            ),
+                                                            [],
+                                                            [
+                                                                BinaryOp(
+                                                                    Literal(
+                                                                        String(
+                                                                            "String: ",
+                                                                        ),
+                                                                    ),
+                                                                    Add,
+                                                                    As(
+                                                                        Variable(
+                                                                            "input",
+                                                                        ),
+                                                                        Primitive(
+                                                                            String,
+                                                                        ),
+                                                                    ),
+                                                                ),
+                                                            ],
+                                                        ),
+                                                    ),
+                                                ],
+                                                returns: None,
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            },
+                        ),
+                        span: Span {
+                            line: 1,
+                            col: 9,
+                            len: 8,
+                        },
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 9,
+                    len: 8,
+                },
+            },
+        ],
+    },
+)

@@ -1,0 +1,96 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/validator/p2_type_alias_inlined_in_signature.of
+---
+Ok(
+    [
+        Token {
+            token_type: Type,
+            position: 4,
+            line: 1,
+            column: 5,
+        },
+        Token {
+            token_type: Identifier(
+                "MyInt",
+            ),
+            position: 10,
+            line: 1,
+            column: 11,
+        },
+        Token {
+            token_type: Eq,
+            position: 12,
+            line: 1,
+            column: 13,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 17,
+            line: 1,
+            column: 18,
+        },
+        Token {
+            token_type: Function,
+            position: 26,
+            line: 2,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "foo",
+            ),
+            position: 30,
+            line: 2,
+            column: 13,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 31,
+            line: 2,
+            column: 14,
+        },
+        Token {
+            token_type: RightParen,
+            position: 32,
+            line: 2,
+            column: 15,
+        },
+        Token {
+            token_type: Colon,
+            position: 33,
+            line: 2,
+            column: 16,
+        },
+        Token {
+            token_type: Identifier(
+                "MyInt",
+            ),
+            position: 39,
+            line: 2,
+            column: 22,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 41,
+            line: 2,
+            column: 24,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 42,
+            line: 2,
+            column: 25,
+        },
+    ],
+)

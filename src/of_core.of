@@ -13,6 +13,13 @@ function println(value: str) {
 extern function __of_print(value: str);
 extern function __of_println(value: str);
 
+// Monotonic clock in nanoseconds since first call. For in-program timing:
+// measure `var t0 = now_ns(); ...work...; var dt = now_ns() - t0;`.
+function now_ns(): i64 {
+  __of_now_ns()
+}
+extern function __of_now_ns(): i64;
+
 extern function pin<T>(value: T): *T;
 extern function unpin<T>(ptr: *T);
 
@@ -71,8 +78,18 @@ struct List<T> {
   function clear(self) {
     __of_list_clear<T>(self)
   }
+  // get/pop/remove return `T | null`. The C side returns the bare element
+  // slot (a plain `T`); the null case is decided here in of-code with a
+  // bounds/emptiness guard. Wrapping the nullable on the of-side lets codegen
+  // build the right `T | null` representation per monomorphization (tagged
+  // union for primitives, NullableRef for managed refs), so the single shared
+  // C symbol keeps one fixed ABI.
   function get(self, i: i64): T | null {
-    __of_list_get<T>(self, i)
+    if (i < 0 || i >= self.size()) {
+      null
+    } else {
+      __of_list_get<T>(self, i)
+    }
   }
   function set(self, i: i64, v: T) {
     __of_list_set<T>(self, i, v)
@@ -81,13 +98,21 @@ struct List<T> {
     __of_list_push<T>(self, v)
   }
   function pop(self): T | null {
-    __of_list_pop<T>(self)
+    if (self.is_empty()) {
+      null
+    } else {
+      __of_list_pop<T>(self)
+    }
   }
   function insert(self, i: i64, v: T) {
     __of_list_insert<T>(self, i, v)
   }
   function remove(self, i: i64): T | null {
-    __of_list_remove<T>(self, i)
+    if (i < 0 || i >= self.size()) {
+      null
+    } else {
+      __of_list_remove<T>(self, i)
+    }
   }
   function truncate(self, n: i64) {
     __of_list_truncate<T>(self, n)
@@ -96,7 +121,12 @@ struct List<T> {
     __of_list_contains<T>(self, v)
   }
   function index_of(self, v: T): i64 | null {
-    __of_list_index_of<T>(self, v)
+    var idx = __of_list_index_of<T>(self, v);
+    if (idx < 0) {
+      null
+    } else {
+      idx
+    }
   }
 }
 
@@ -104,15 +134,15 @@ extern function __of_list_new<T>(): List<T>;
 extern function __of_list_size<T>(l: List<T>): i64;
 extern function __of_list_is_empty<T>(l: List<T>): bool;
 extern function __of_list_clear<T>(l: List<T>);
-extern function __of_list_get<T>(l: List<T>, i: i64): T | null;
+extern function __of_list_get<T>(l: List<T>, i: i64): T;
 extern function __of_list_set<T>(l: List<T>, i: i64, v: T);
 extern function __of_list_push<T>(l: List<T>, v: T);
-extern function __of_list_pop<T>(l: List<T>): T | null;
+extern function __of_list_pop<T>(l: List<T>): T;
 extern function __of_list_insert<T>(l: List<T>, i: i64, v: T);
-extern function __of_list_remove<T>(l: List<T>, i: i64): T | null;
+extern function __of_list_remove<T>(l: List<T>, i: i64): T;
 extern function __of_list_truncate<T>(l: List<T>, n: i64);
 extern function __of_list_contains<T>(l: List<T>, v: T): bool;
-extern function __of_list_index_of<T>(l: List<T>, v: T): i64 | null;
+extern function __of_list_index_of<T>(l: List<T>, v: T): i64;
 
 // ---- Map<K, V> ----
 
@@ -130,13 +160,21 @@ struct Map<K, V> {
     __of_map_clear<K, V>(self)
   }
   function get(self, k: K): V | null {
-    __of_map_get<K, V>(self, k)
+    if (self.contains(k)) {
+      __of_map_get<K, V>(self, k)
+    } else {
+      null
+    }
   }
   function set(self, k: K, v: V) {
     __of_map_set<K, V>(self, k, v)
   }
   function remove(self, k: K): V | null {
-    __of_map_remove<K, V>(self, k)
+    if (self.contains(k)) {
+      __of_map_remove<K, V>(self, k)
+    } else {
+      null
+    }
   }
   function contains(self, k: K): bool {
     __of_map_contains<K, V>(self, k)
@@ -153,9 +191,9 @@ extern function __of_map_new<K, V>(): Map<K, V>;
 extern function __of_map_size<K, V>(m: Map<K, V>): i64;
 extern function __of_map_is_empty<K, V>(m: Map<K, V>): bool;
 extern function __of_map_clear<K, V>(m: Map<K, V>);
-extern function __of_map_get<K, V>(m: Map<K, V>, k: K): V | null;
+extern function __of_map_get<K, V>(m: Map<K, V>, k: K): V;
 extern function __of_map_set<K, V>(m: Map<K, V>, k: K, v: V);
-extern function __of_map_remove<K, V>(m: Map<K, V>, k: K): V | null;
+extern function __of_map_remove<K, V>(m: Map<K, V>, k: K): V;
 extern function __of_map_contains<K, V>(m: Map<K, V>, k: K): bool;
 extern function __of_map_keys<K, V>(m: Map<K, V>): List<K>;
 extern function __of_map_values<K, V>(m: Map<K, V>): List<V>;

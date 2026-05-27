@@ -1,0 +1,19 @@
+import { println, now_ns } from "of:core";
+
+function fib(n: i64): i64 {
+  if (n < 2) { n } else { fib(n - 1) + fib(n - 2) }
+}
+
+function run(): i64 {
+  fib(35)
+}
+
+function main(): i64 {
+  var warm = run();
+  var t0 = now_ns();
+  var ans = run();
+  var dt = now_ns() - t0;
+  println(ans as str);
+  println(dt as str);
+  0
+}

@@ -1,0 +1,82 @@
+---
+source: tests/lexer_snapshots.rs
+assertion_line: 13
+expression: tokens
+input_file: examples/validator/p5_return_type_mismatch_errors.of
+---
+Ok(
+    [
+        Token {
+            token_type: Function,
+            position: 8,
+            line: 1,
+            column: 9,
+        },
+        Token {
+            token_type: Identifier(
+                "test",
+            ),
+            position: 13,
+            line: 1,
+            column: 14,
+        },
+        Token {
+            token_type: LeftParen,
+            position: 14,
+            line: 1,
+            column: 15,
+        },
+        Token {
+            token_type: RightParen,
+            position: 15,
+            line: 1,
+            column: 16,
+        },
+        Token {
+            token_type: Colon,
+            position: 16,
+            line: 1,
+            column: 17,
+        },
+        Token {
+            token_type: Identifier(
+                "i64",
+            ),
+            position: 20,
+            line: 1,
+            column: 21,
+        },
+        Token {
+            token_type: LeftBrace,
+            position: 22,
+            line: 1,
+            column: 23,
+        },
+        Token {
+            token_type: Return,
+            position: 29,
+            line: 1,
+            column: 30,
+        },
+        Token {
+            token_type: StringLit(
+                "hi",
+            ),
+            position: 34,
+            line: 1,
+            column: 35,
+        },
+        Token {
+            token_type: Semicolon,
+            position: 35,
+            line: 1,
+            column: 36,
+        },
+        Token {
+            token_type: RightBrace,
+            position: 37,
+            line: 1,
+            column: 38,
+        },
+    ],
+)

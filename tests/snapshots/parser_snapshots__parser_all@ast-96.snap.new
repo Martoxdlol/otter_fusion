@@ -1,0 +1,28 @@
+---
+source: tests/parser_snapshots.rs
+assertion_line: 19
+expression: ast
+input_file: examples/parser/parse_type_decl_unit.of
+---
+Ok(
+    Program {
+        items: [
+            Item {
+                kind: TypeAlias(
+                    TypeAliasDecl {
+                        name: "Age",
+                        generics: [],
+                        ty: Primitive(
+                            Int32,
+                        ),
+                    },
+                ),
+                span: Span {
+                    line: 1,
+                    col: 5,
+                    len: 4,
+                },
+            },
+        ],
+    },
+)
